@@ -9,11 +9,11 @@ from typing import List, Tuple
 import torch
 
 # Base directories
-PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(PACKAGE_DIR, ".."))
-DATA_DIR = os.path.join(PACKAGE_DIR, "data")
-ARTIFACTS_DIR = os.path.join(PACKAGE_DIR, "artifacts")
-RUNS_DIR = os.path.join(PACKAGE_DIR, "runs")
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PACKAGE_DIR = PROJECT_ROOT
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+ARTIFACTS_DIR = os.path.join(PROJECT_ROOT, "artifacts")
+RUNS_DIR = os.path.join(PROJECT_ROOT, "runs")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(ARTIFACTS_DIR, exist_ok=True)

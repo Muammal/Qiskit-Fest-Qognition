@@ -9,10 +9,17 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 import numpy as np
 
-# Ensure root directory and qiskit_exploit_hunter are accessible
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-PACKAGE_DIR = os.path.join(ROOT_DIR, "qiskit_exploit_hunter")
-for p in [ROOT_DIR, PACKAGE_DIR]:
+try:
+    from .visual_window import QuantumVisualWindow
+except ImportError:
+    try:
+        from visual_window import QuantumVisualWindow
+    except ImportError:
+        QuantumVisualWindow = None
+
+RUN_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.abspath(os.path.join(RUN_DIR, ".."))
+for p in [ROOT_DIR, RUN_DIR]:
     if p not in sys.path:
         sys.path.insert(0, p)
 

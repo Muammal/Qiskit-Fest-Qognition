@@ -1,26 +1,21 @@
 # ==============================================================================
-# Gitignore: Documentation, References, Notebooks & Generated Artifacts
+# Gitignore: Quantum RL & Game Exploit Detection Framework
 # ==============================================================================
 
-# References Directory (Notebooks & Research Documentation)
+# Archived References Directory (Legacy Out-of-Scope Fall Fest Notebooks)
 references/
 references/**
-
-# All Documentation Files (except root README.md)
-*.md
-**/*.md
-!README.md
-docs/
-**/docs/
-*.doc
-*.docx
-*.pdf
 
 # Jupyter Notebooks & Checkpoints
 *.ipynb
 **/*.ipynb
 .ipynb_checkpoints/
 **/.ipynb_checkpoints/
+
+# Binary & Office Document Formats
+*.doc
+*.docx
+*.pdf
 
 # Python Cache & Bytecode
 __pycache__/
@@ -44,8 +39,9 @@ runs/
 **/runs/
 *.log
 _vizdoom.ini
+scratch/
+**/scratch/
 
 # OS Specific
 .DS_Store
 Thumbs.db
-

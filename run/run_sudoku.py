@@ -12,12 +12,14 @@ import numpy as np
 # Add parent directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
-PACKAGE_DIR = os.path.join(ROOT_DIR, "qiskit_exploit_hunter")
-for p in [ROOT_DIR, PACKAGE_DIR]:
+for p in [ROOT_DIR, BASE_DIR]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from common import IterationLog, QuantumTerminalHUD
+try:
+    from .common import IterationLog, QuantumTerminalHUD
+except ImportError:
+    from common import IterationLog, QuantumTerminalHUD
 from engines.kernel_anomaly_engine import FastQuantumKernel, QuantumKernelAnomalyDetector
 from envs.sudoku_card_env import MiniSudoku4x4Env
 

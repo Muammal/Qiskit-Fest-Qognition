@@ -22,9 +22,8 @@ RUN_DIR = os.path.join(BASE_DIR, "run")
 UI_DIR = os.path.join(BASE_DIR, "ui")
 ENGINES_DIR = os.path.join(BASE_DIR, "engines")
 ENVS_DIR = os.path.join(BASE_DIR, "envs")
-PKG_DIR = os.path.join(BASE_DIR, "qiskit_exploit_hunter")
 
-for p in [BASE_DIR, RUN_DIR, UI_DIR, ENGINES_DIR, ENVS_DIR, PKG_DIR]:
+for p in [BASE_DIR, RUN_DIR, UI_DIR, ENGINES_DIR, ENVS_DIR]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
@@ -73,13 +72,13 @@ def interactive_menu():
             break
         elif choice == "2":
             from run.run_mario import run_mario_simulation
-            run_mario_simulation(iterations=3, steps_per_iter=12, delay=0.03, mock_2d=False)
+            run_mario_simulation(iterations=3, realtime_iter=1, force_realtime=False, headless=False, mock_2d=False)
         elif choice == "3":
             from run.run_doom import run_doom_simulation
-            run_doom_simulation(iterations=3, steps_per_iter=12, delay=0.03, mock_2d=False)
+            run_doom_simulation(iterations=3, realtime_iter=1, force_realtime=False, headless=False, mock_2d=False)
         elif choice == "4":
             from run.run_chess import run_chess_simulation
-            run_chess_simulation(iterations=3, moves_per_iter=6, delay=0.05)
+            run_chess_simulation(iterations=3, realtime_iter=1, force_realtime=False, moves_per_iter=15, headless=False)
         elif choice == "5":
             from run.run_sudoku import run_sudoku_simulation
             run_sudoku_simulation(iterations=3, delay=0.05)

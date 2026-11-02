@@ -88,6 +88,7 @@ class MarioRAMWrapper(gym.Wrapper):
         raw_obs, reward, term, trunc, info = self.env.step(action)
         features = self._extract_ram_features()
         info["ram_features"] = features
+        info["x"] = float(features[0] * 2560.0)
         return features, float(reward), term, trunc, info
 
 
@@ -308,7 +309,8 @@ class GlitchGrid2DEnv(gym.Env):
 def make_retro_env(
     env_name: str = "mario",
     mock_2d: bool = False,
-    headless: bool = True
+    headless: bool = True,
+    frame_skip: int = 1
 ) -> gym.Env:
     """
     Factory function for retro RAM environments.
@@ -322,18 +324,20 @@ def make_retro_env(
             import gym_super_mario_bros
             from nes_py.wrappers import JoypadSpace
             
-            # Simple movement actions: [['NOOP'], ['right'], ['right', 'A'], ['right', 'B'], ['right', 'A', 'B'], ['A'], ['left']]
             ACTIONS = [
                 ['NOOP'],
                 ['right'],
                 ['right', 'A'],
+                ['right', 'B'],
+                ['right', 'A', 'B'],
                 ['A'],
                 ['left']
             ]
             raw_env = gym_super_mario_bros.make("SuperMarioBros-1-1-v0")
             wrapped = JoypadSpace(raw_env, ACTIONS)
-            frame_skipped = FrameSkipWrapper(wrapped, skip=8)
-            ram_env = MarioRAMWrapper(frame_skipped)
+            if frame_skip > 1:
+                wrapped = FrameSkipWrapper(wrapped, skip=frame_skip)
+            ram_env = MarioRAMWrapper(wrapped)
             return ram_env
         except Exception as e:
             print(f"[RetroEnv] Warning: Mario env creation failed ({e}). Falling back to GlitchGrid2DEnv.")

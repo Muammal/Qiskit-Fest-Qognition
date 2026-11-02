@@ -13,10 +13,10 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 
 # Ensure root paths
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-PACKAGE_DIR = os.path.join(ROOT_DIR, "qiskit_exploit_hunter")
+UI_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.abspath(os.path.join(UI_DIR, ".."))
 RUN_DIR = os.path.join(ROOT_DIR, "run")
-for p in [ROOT_DIR, PACKAGE_DIR, RUN_DIR]:
+for p in [ROOT_DIR, UI_DIR, RUN_DIR]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
@@ -155,6 +155,7 @@ async def game_simulation_generator(game: str, is_exploit: bool, total_steps: in
             mario_x = float(obs[0] * 2560.0)
             mario_y = float(obs[1] * 240.0)
             vx = float((obs[2] * 12.0) - 6.0)
+            level_complete = (mario_x >= 2480.0) or (is_exploit and step >= (total_steps // 2))
 
             payload = {
                 "event": "step",
@@ -168,7 +169,8 @@ async def game_simulation_generator(game: str, is_exploit: bool, total_steps: in
                     "mario_x": round(mario_x, 1),
                     "mario_y": round(mario_y, 1),
                     "velocity_x": round(vx, 2),
-                    "collision_state": int(round(obs[3] * 3.0))
+                    "collision_state": int(round(obs[3] * 3.0)),
+                    "level_complete": level_complete
                 },
                 "q_expectations": [round(float(q), 3) for q in q_arr],
                 "anomaly_score": round(score, 4),
