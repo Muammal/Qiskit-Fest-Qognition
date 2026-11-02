@@ -1,0 +1,51 @@
+# ==============================================================================
+# Gitignore: Documentation, References, Notebooks & Generated Artifacts
+# ==============================================================================
+
+# References Directory (Notebooks & Research Documentation)
+references/
+references/**
+
+# All Documentation Files (except root README.md)
+*.md
+**/*.md
+!README.md
+docs/
+**/docs/
+*.doc
+*.docx
+*.pdf
+
+# Jupyter Notebooks & Checkpoints
+*.ipynb
+**/*.ipynb
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Python Cache & Bytecode
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments & Dependencies
+.env
+.venv
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Experiment Logs & Runtime Files
+runs/
+**/runs/
+*.log
+_vizdoom.ini
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
