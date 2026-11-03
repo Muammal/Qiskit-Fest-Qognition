@@ -71,7 +71,7 @@ artifacts/
 *.tfevents.*
 _vizdoom.ini
 
-# --- Skill & Planning Markdown Files (Gitignored as requested) ---
+# --- Skill, Planning, Roles, Tech Stack & Risk Markdown Files (Gitignored) ---
 PLAN.md
 *plan*.md
 *PLAN*.md
@@ -81,6 +81,24 @@ PLAN.md
 **/SKILL.md
 skills/
 .agents/
+
+ROLES.md
+*role*.md
+*ROLE*.md
+*roles*.md
+*ROLES*.md
+
+TECH_STACK.md
+*tech_stack*.md
+*TECH_STACK*.md
+*techstack*.md
+*TECHSTACK*.md
+
+RISKS_AND_FAQ.md
+*risk*.md
+*RISK*.md
+*risks*.md
+*RISKS*.md
 
 # --- Operating System & Editor Metadata ---
 .DS_Store
