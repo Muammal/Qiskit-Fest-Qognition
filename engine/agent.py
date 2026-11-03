@@ -155,7 +155,11 @@ class SurvivalAgent:
                 self.needs["morale"] = max(0, self.needs["morale"] - (.06 if dirty else 0))
         elif action == "forage":
             food = [p for p in world.food_tiles if p not in world.lava and p not in world.pdc]
-            if tuple(self.pos) not in food:
+            if self.inventory["wood"] < 2 and world.get_tile(*self.pos) != 2:
+                forests = [p for p in food if world.get_tile(*p) == 2] or food
+                if forests:
+                    self.walk_to(world, forests)
+            elif tuple(self.pos) not in food:
                 self.walk_to(world, food)
             if tuple(self.pos) in food:
                 self.inventory["food"] += 2
@@ -177,12 +181,19 @@ class SurvivalAgent:
             self.needs["safety"] = min(1, self.needs["safety"] + .05)
         elif action == "explore":
             import random
-            for _ in range(self.movement_budget(world)):
-                x,y = self.pos
-                choices = [(x+dx,y+dy) for dx,dy in ((1,0),(-1,0),(0,1),(0,-1))
-                           if world.walkable((x+dx,y+dy))]
-                if choices:
-                    self.pos = list(random.choice(choices))
+            budget = self.movement_budget(world)
+            dx, dy = random.choice([(1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,1),(1,-1),(-1,-1)])
+            for _ in range(budget):
+                x, y = self.pos
+                candidates = [(x+cx, y+cy) for cx, cy in ((1,0),(-1,0),(0,1),(0,-1))
+                              if world.walkable((x+cx, y+cy))]
+                if not candidates:
+                    break
+                favored = [c for c in candidates if (c[0]-x)*dx >= 0 and (c[1]-y)*dy >= 0]
+                if favored and random.random() < 0.75:
+                    self.pos = list(random.choice(favored))
+                else:
+                    self.pos = list(random.choice(candidates))
         elif action == "craft" and self.inventory["wood"]:
             self.inventory["wood"] -= 1
             self.inventory["tools"] += 1

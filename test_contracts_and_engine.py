@@ -520,3 +520,36 @@ def test_pdc_runout_and_width_vary_reproducibly_across_seeds():
         assert model.export_dict() == VolcanoModel(seed, world).export_dict()
         footprints.add(footprint)
     assert len(footprints) > erupting / 2
+
+
+def test_island_agent_moves_and_explores():
+    """Verify that agent in procedural island mode moves dynamically across the map."""
+    sim = SimulationEngine(seed=42, scenario="island")
+    tl = sim.run(max_steps=24)
+    assert len(tl["steps"]) >= 20
+    positions = [s["pos_after"] for s in tl["steps"]]
+    distinct_positions = {tuple(p) for p in positions}
+    # Agent should actively navigate, explore terrain, and not remain frozen
+    assert len(distinct_positions) >= 8
+    # Actions should encompass exploration, foraging, drinking, or resting
+    actions_taken = {s["action"] for s in tl["steps"]}
+    assert "explore" in actions_taken or "forage" in actions_taken
+
+
+def test_gui_event_choice_card_click():
+    """Verify clicking scenario cards directly selects the scenario."""
+    os.environ["SDL_VIDEODRIVER"] = "dummy"
+    from engine.gui import IslandVisualizerApp
+    app = IslandVisualizerApp(start_screen="event_choice")
+    assert app.app_state == "event_choice"
+
+    # Click directly within card 1 rect
+    app._handle_mouse_click((app.card1_rect.left + 50, app.card1_rect.top + 50))
+    assert app.app_state == "home"
+    assert app.scenario == "island"
+
+    # Return and click within card 2 rect
+    app.app_state = "event_choice"
+    app._handle_mouse_click((app.card2_rect.left + 50, app.card2_rect.top + 50))
+    assert app.app_state == "home"
+    assert app.scenario == "volcano"

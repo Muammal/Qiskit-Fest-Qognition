@@ -109,29 +109,47 @@ def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
     
     # Simple heuristic fallback prior based on urgent needs
     raw_priors = {act: 1.0 for act in ACTIONS}
+    wood = state.get("inventory", {}).get("wood", 0)
     
     # Thirst is urgent
     if needs["thirst"] < 0.3:
         raw_priors["drink"] += 40.0
+    elif needs["thirst"] < 0.5:
+        raw_priors["drink"] += 12.0
+
     # Hunger is urgent
     if needs["hunger"] < 0.3:
-        raw_priors["forage"] += 3.0
-    # Cold / Low warmth -> build shelter or rest
+        raw_priors["forage"] += 8.0
+    elif needs["hunger"] < 0.5:
+        raw_priors["forage"] += 4.0
+
+    # Cold / Low warmth -> build shelter if wood available, or forage for timber
     if needs["warmth"] < 0.4:
-        raw_priors["build_shelter"] += 3.5
+        if wood >= 2:
+            raw_priors["build_shelter"] += 12.0
+        else:
+            raw_priors["forage"] += 10.0
         raw_priors["rest"] += 2.0
+    elif needs["warmth"] < 0.65:
+        if wood >= 2:
+            raw_priors["build_shelter"] += 9.0
+        else:
+            raw_priors["forage"] += 6.0
+
+    # Daytime exploration drive when vitals are comfortable
+    if 8 <= hour <= 18 and needs["energy"] > 0.4 and needs["thirst"] >= 0.4 and needs["hunger"] >= 0.4:
+        raw_priors["explore"] += 3.0
+
     # Night time -> sleep
     if hour >= 21 or hour <= 5:
-        raw_priors["rest"] += 3.5
+        raw_priors["rest"] += 6.0
     # Threat / low safety -> hide
     if needs["safety"] < 0.3 or "storm" in state.get("recent_events", []):
-        raw_priors["hide"] += 3.0
+        raw_priors["hide"] += 4.0
 
     if any(e in ("tremor", "gas_plume", "eruption", "ash_fall") for e in state["recent_events"]):
         raw_priors["hide"] += 6.0  # assumption: warning-sensitive stub preference
-    # assumption: preparation and recovery precede discretionary activity.
-    if needs["warmth"] < .65:
-        raw_priors["build_shelter"] += 9.0
+
     if needs["energy"] < .3:
         raw_priors["rest"] += 15.0
     total = sum(raw_priors.values())
@@ -212,7 +230,10 @@ def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
     if state["needs"]["thirst"] < .3:
         chosen_action = "drink"
     elif state["needs"]["warmth"] < .4:
-        chosen_action = "build_shelter"
+        if state.get("inventory", {}).get("wood", 0) >= 2:
+            chosen_action = "build_shelter"
+        else:
+            chosen_action = "forage"
 
     decision = {
         "action": chosen_action,

@@ -662,18 +662,23 @@ class IslandVisualizerApp:
 
     def _build_event_choice_buttons(self):
         """Constructs buttons for the Event Choice Hub."""
-        c1_x, c2_x = 100, 820
-        card_w, card_y = 680, 200
+        c1_x, c2_x = 170, 850
+        card_w, card_y, card_h = 580, 165, 560
+        btn_y = card_y + card_h - 78
+        btn_w = card_w - 80
+
+        self.card1_rect = pygame.Rect(c1_x, card_y, card_w, card_h)
+        self.card2_rect = pygame.Rect(c2_x, card_y, card_w, card_h)
 
         self.btn_choice_island = UIButton(
-            (c1_x + 36, card_y + 440, card_w - 72, 54),
-            "SELECT ISLAND WILDERNESS", self.font_title,
-            bg_color=(21, 128, 61), active_color=COLOR_GREEN, icon="tree"
+            (c1_x + 40, btn_y, btn_w, 52),
+            "ENTER ISLAND SURVIVAL  →", self.font_title,
+            bg_color=(16, 92, 50), active_color=(34, 197, 94), icon="tree"
         )
         self.btn_choice_volcano = UIButton(
-            (c2_x + 36, card_y + 440, card_w - 72, 54),
-            "SELECT VOLCANO EVACUATION", self.font_title,
-            bg_color=(185, 28, 28), active_color=COLOR_ORANGE, icon="volcano"
+            (c2_x + 40, btn_y, btn_w, 52),
+            "ENTER VOLCANO EVACUATION  →", self.font_title,
+            bg_color=(140, 24, 24), active_color=(239, 68, 68), icon="volcano"
         )
 
     def _build_home_buttons(self):
@@ -859,6 +864,11 @@ class IslandVisualizerApp:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_F11:
                         self.toggle_fullscreen()
+                    elif self.app_state == "event_choice":
+                        if event.key in (pygame.K_1, pygame.K_KP1):
+                            self._handle_event_choice_click(self.btn_choice_island.rect.center)
+                        elif event.key in (pygame.K_2, pygame.K_KP2):
+                            self._handle_event_choice_click(self.btn_choice_volcano.rect.center)
                     elif event.key == pygame.K_SPACE and self.app_state == "sim":
                         self.is_paused = not self.is_paused
                     elif event.key == pygame.K_RIGHT and self.app_state == "sim":
@@ -915,7 +925,9 @@ class IslandVisualizerApp:
     def _update_hovers(self, pos: Tuple[int, int]) -> bool:
         hovered = False
         if self.app_state == "event_choice":
-            return self.btn_choice_island.check_hover(pos) or self.btn_choice_volcano.check_hover(pos)
+            c1_h = hasattr(self, 'card1_rect') and self.card1_rect.collidepoint(pos)
+            c2_h = hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(pos)
+            return self.btn_choice_island.check_hover(pos) or self.btn_choice_volcano.check_hover(pos) or c1_h or c2_h
 
         elif self.app_state == "home":
             btns = [
@@ -975,13 +987,15 @@ class IslandVisualizerApp:
             self._handle_sim_click(pos)
 
     def _handle_event_choice_click(self, pos: Tuple[int, int]):
-        if self.btn_choice_island.check_hover(pos):
+        c1_hit = self.btn_choice_island.check_hover(pos) or (hasattr(self, 'card1_rect') and self.card1_rect.collidepoint(pos))
+        c2_hit = self.btn_choice_volcano.check_hover(pos) or (hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(pos))
+        if c1_hit:
             self.scenario = "island"
             self._build_home_buttons()
             self._init_simulation()
             self.preview_mini_map = self._generate_mini_map(self.seed, size=300)
             self.app_state = "home"
-        elif self.btn_choice_volcano.check_hover(pos):
+        elif c2_hit:
             self.scenario = "volcano"
             self._build_home_buttons()
             self._init_simulation()
@@ -1120,86 +1134,143 @@ class IslandVisualizerApp:
             shift = math.sin(t_time * 1.6 + y * 0.08) * 18
             pygame.draw.line(self.canvas, (18, 28, 48), (0, y + shift), (WINDOW_WIDTH, y + shift), 1)
 
+        # Subtle ambient radial glow behind the two cards
+        glow_surf = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
+        pygame.draw.circle(glow_surf, (16, 185, 129, 14), (460, 445), 260)
+        pygame.draw.circle(glow_surf, (239, 68, 68, 14), (1140, 445), 260)
+        self.canvas.blit(glow_surf, (0, 0))
+
         # Header Title
         title_surf = self.font_hero.render("QUANTUM COGNITION SIMULATION", True, COLOR_TEXT_MAIN)
-        self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, 34))
+        self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, 38))
 
-        sub_str = "Cognitive Architecture Lab & Multi-Scenario Survival Simulator  |  Qiskit 2.x  •  Antigravity 2.0"
+        sub_str = "Select an Environment to Explore Cognitive Decision Models Under Survival Stress"
         sub_surf = self.font_sub.render(sub_str, True, COLOR_CYAN)
-        self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, 74))
+        self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, 86))
 
-        prompt_surf = self.font_title.render("SELECT SIMULATION SCENARIO TO BEGIN", True, COLOR_GOLD)
-        self.canvas.blit(prompt_surf, (WINDOW_WIDTH // 2 - prompt_surf.get_width() // 2, 140))
+        # Thin header divider
+        pygame.draw.line(self.canvas, (28, 42, 65), (280, 126), (1320, 126), 1)
 
-        # Scenario Selection Cards
-        card_w = 680
-        card_h = 560
-        c1_x = 100
-        c2_x = 820
-        c_y = 195
+        # Scenario Cards Setup
+        c1_x, c2_x = 170, 850
+        card_w, c_y, card_h = 580, 165, 560
 
+        hover_c1 = (hasattr(self, 'card1_rect') and self.card1_rect.collidepoint(mouse_pos)) or self.btn_choice_island.check_hover(mouse_pos)
+        hover_c2 = (hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(mouse_pos)) or self.btn_choice_volcano.check_hover(mouse_pos)
+
+        # -------------------------------------------------------------
         # Card 1: Island Wilderness
-        self.draw_card(c1_x, c_y, card_w, card_h)
-        draw_vector_icon(self.canvas, "tree", c1_x + 36, c_y + 26, 32, COLOR_GREEN)
-        self.canvas.blit(self.font_title.render("ISLAND WILDERNESS SURVIVAL", True, COLOR_TEXT_MAIN), (c1_x + 80, c_y + 22))
-        self.canvas.blit(self.font_small.render("Procedural Archipelago  •  Resource Foraging  •  Wildlife & Storms", True, COLOR_GREEN), (c1_x + 80, c_y + 48))
-        pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (c1_x + 30, c_y + 78), (c1_x + card_w - 30, c_y + 78), 1)
+        # -------------------------------------------------------------
+        c1_border = (34, 197, 94) if hover_c1 else COLOR_CARD_BORDER
+        c1_border_w = 2 if hover_c1 else 1
+        self.draw_card(c1_x, c_y, card_w, card_h, border_color=c1_border, border_width=c1_border_w)
+
+        # Icon badge with circular glow
+        pygame.draw.circle(self.canvas, (14, 45, 30), (c1_x + 58, c_y + 44), 24)
+        pygame.draw.circle(self.canvas, (34, 197, 94), (c1_x + 58, c_y + 44), 24, 1)
+        draw_vector_icon(self.canvas, "tree", c1_x + 43, c_y + 29, 30, COLOR_GREEN)
+
+        self.canvas.blit(self.font_title.render("ISLAND WILDERNESS", True, COLOR_TEXT_MAIN), (c1_x + 96, c_y + 24))
+        self.canvas.blit(self.font_small.render("Procedural Archipelago  •  Resource Economy", True, COLOR_GREEN), (c1_x + 96, c_y + 50))
+        pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (c1_x + 30, c_y + 82), (c1_x + card_w - 30, c_y + 82), 1)
 
         desc1 = (
-            "Stranded across an uncharted procedural island. Balance caloric hunger, dehydration, "
-            "hypothermia, fatigue, and sanity against stochastic storms, territorial wild boars, and "
-            "injuries using quantum belief interference. Craft tools, erect shelters, and explore land."
+            "Stranded across an uncharted procedural island. Explore the terrain, harvest timber, "
+            "forage food, and build shelters while enduring cold nights and storms using quantum belief interference."
         )
-        render_wrapped_text(self.canvas, desc1, self.font_body, COLOR_TEXT_MUTED, c1_x + 36, c_y + 95, card_w - 72, line_spacing=4, max_lines=4)
+        render_wrapped_text(self.canvas, desc1, self.font_body, COLOR_TEXT_MUTED, c1_x + 36, c_y + 100, card_w - 72, line_spacing=4, max_lines=3)
 
-        f_y = c_y + 215
-        self.canvas.blit(self.font_sub.render("SIMULATION ATTRIBUTES:", True, COLOR_GOLD), (c1_x + 36, f_y))
-        f_y += 30
-        for f in [
-            "Procedural 40x40 Map generated from seed",
-            "Organic coastline harmonics, pine forests & alpine snowcaps",
-            "Markov weather, nighttime frost, and predator encounters",
-            "Full resource economy: foraging, timber crafting & shelters"
-        ]:
-            pygame.draw.circle(self.canvas, COLOR_CYAN, (c1_x + 44, f_y + 8), 3)
-            self.canvas.blit(self.font_body.render(f, True, COLOR_TEXT_MAIN), (c1_x + 58, f_y))
-            f_y += 28
+        # Pill Badges
+        px = c1_x + 36
+        py = c_y + 172
+        px += self.draw_pill_tag(px, py, "40x40 Procedural Seed", COLOR_CYAN) + 10
+        px += self.draw_pill_tag(px, py, "Foraging & Crafting", COLOR_GREEN) + 10
+        self.draw_pill_tag(px, py, "Dynamic Weather", COLOR_GOLD)
+
+        # Key Mechanics Bullet list
+        f_y = c_y + 224
+        self.canvas.blit(self.font_sub.render("KEY MECHANICS", True, COLOR_GOLD), (c1_x + 36, f_y))
+        f_y += 28
+        bullets1 = [
+            ("Terrain", "Procedural coastline harmonics, pine forests & alpine snow", COLOR_GREEN),
+            ("Survival", "Caloric hunger, dehydration, hypothermia & fatigue decay", COLOR_CYAN),
+            ("Quantum Mind", "Superposition exploration & belief interference models", COLOR_PURPLE)
+        ]
+        for tag, text, dot_col in bullets1:
+            pygame.draw.circle(self.canvas, dot_col, (c1_x + 44, f_y + 9), 3)
+            tag_surf = self.font_body.render(f"{tag}: ", True, COLOR_TEXT_MAIN)
+            self.canvas.blit(tag_surf, (c1_x + 56, f_y))
+            desc_surf = self.font_small.render(text, True, COLOR_TEXT_MUTED)
+            self.canvas.blit(desc_surf, (c1_x + 56 + tag_surf.get_width(), f_y + 2))
+            f_y += 32
 
         self.btn_choice_island.check_hover(mouse_pos)
         self.btn_choice_island.draw(self.canvas)
 
+        # -------------------------------------------------------------
         # Card 2: Volcano Evacuation
-        self.draw_card(c2_x, c_y, card_w, card_h)
-        draw_vector_icon(self.canvas, "volcano", c2_x + 36, c_y + 26, 32, COLOR_ORANGE)
-        self.canvas.blit(self.font_title.render("VOLCANO ERUPTION EVACUATION", True, COLOR_TEXT_MAIN), (c2_x + 80, c_y + 22))
-        self.canvas.blit(self.font_small.render("Cataclysmic Escalation  •  Pyroclastic Surges  •  Emergency Routing", True, COLOR_ORANGE), (c2_x + 80, c_y + 48))
-        pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (c2_x + 30, c_y + 78), (c2_x + card_w - 30, c_y + 78), 1)
+        # -------------------------------------------------------------
+        c2_border = (239, 68, 68) if hover_c2 else COLOR_CARD_BORDER
+        c2_border_w = 2 if hover_c2 else 1
+        self.draw_card(c2_x, c_y, card_w, card_h, border_color=c2_border, border_width=c2_border_w)
+
+        # Icon badge with circular glow
+        pygame.draw.circle(self.canvas, (48, 16, 18), (c2_x + 58, c_y + 44), 24)
+        pygame.draw.circle(self.canvas, (239, 68, 68), (c2_x + 58, c_y + 44), 24, 1)
+        draw_vector_icon(self.canvas, "volcano", c2_x + 43, c_y + 29, 30, COLOR_ORANGE)
+
+        self.canvas.blit(self.font_title.render("VOLCANO EVACUATION", True, COLOR_TEXT_MAIN), (c2_x + 96, c_y + 24))
+        self.canvas.blit(self.font_small.render("Cataclysmic Escalation  •  Emergency Routing", True, COLOR_ORANGE), (c2_x + 96, c_y + 50))
+        pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (c2_x + 30, c_y + 82), (c2_x + card_w - 30, c_y + 82), 1)
 
         desc2 = (
-            "Evacuate a calibrated 40x40 volcanic topography under accelerating seismic unrest. "
-            "Decipher precursory tremors and gas plumes, navigate around molten lava flows, survive toxic "
-            "ash fallout, and execute BFS shortest-path routes to reach designated safety assembly points."
+            "Evacuate a calibrated 40x40 volcanic island under accelerating seismic unrest. "
+            "Read precursor signals, navigate around lava and deadly pyroclastic surges to reach safe assembly zones."
         )
-        render_wrapped_text(self.canvas, desc2, self.font_body, COLOR_TEXT_MUTED, c2_x + 36, c_y + 95, card_w - 72, line_spacing=4, max_lines=4)
+        render_wrapped_text(self.canvas, desc2, self.font_body, COLOR_TEXT_MUTED, c2_x + 36, c_y + 100, card_w - 72, line_spacing=4, max_lines=3)
 
-        f_y2 = c_y + 215
-        self.canvas.blit(self.font_sub.render("SIMULATION ATTRIBUTES:", True, COLOR_GOLD), (c2_x + 36, f_y2))
-        f_y2 += 30
-        for f in [
-            "Calibrated 40x40 Volcanic Topography with central caldera",
-            "Seeded hidden unrest, explosive eruptions, or false alarms",
-            "Fast pyroclastic density currents (PDCs), lava & lahars",
-            "Dynamic evacuation zoning (Safe / Caution / Danger) & BFS route"
-        ]:
-            pygame.draw.circle(self.canvas, COLOR_ORANGE, (c2_x + 44, f_y2 + 8), 3)
-            self.canvas.blit(self.font_body.render(f, True, COLOR_TEXT_MAIN), (c2_x + 58, f_y2))
-            f_y2 += 28
+        # Pill Badges
+        px2 = c2_x + 36
+        py2 = c_y + 172
+        px2 += self.draw_pill_tag(px2, py2, "Fixed 40x40 Caldera", COLOR_ORANGE) + 10
+        px2 += self.draw_pill_tag(px2, py2, "Pyroclastic Surges", (239, 68, 68)) + 10
+        self.draw_pill_tag(px2, py2, "Evacuation Routing", COLOR_GOLD)
+
+        # Key Mechanics Bullet list
+        f_y2 = c_y + 224
+        self.canvas.blit(self.font_sub.render("KEY MECHANICS", True, COLOR_GOLD), (c2_x + 36, f_y2))
+        f_y2 += 28
+        bullets2 = [
+            ("Topography", "Central caldera, radial valleys & coastal assembly points", COLOR_ORANGE),
+            ("Hazard Clock", "Precursor tremors, gas plumes, ash fall & fast PDCs", (239, 68, 68)),
+            ("Quantum Mind", "Stress decoherence & order-dependent belief shifts", COLOR_PURPLE)
+        ]
+        for tag, text, dot_col in bullets2:
+            pygame.draw.circle(self.canvas, dot_col, (c2_x + 44, f_y2 + 9), 3)
+            tag_surf = self.font_body.render(f"{tag}: ", True, COLOR_TEXT_MAIN)
+            self.canvas.blit(tag_surf, (c2_x + 56, f_y2))
+            desc_surf = self.font_small.render(text, True, COLOR_TEXT_MUTED)
+            self.canvas.blit(desc_surf, (c2_x + 56 + tag_surf.get_width(), f_y2 + 2))
+            f_y2 += 32
 
         self.btn_choice_volcano.check_hover(mouse_pos)
         self.btn_choice_volcano.draw(self.canvas)
 
-        tip_str = "Press [1] Island Wilderness  |  [2] Volcano Evacuation  |  [F11] Fullscreen Toggle"
-        self.canvas.blit(self.font_sub.render(tip_str, True, COLOR_TEXT_HINT), (WINDOW_WIDTH // 2 - 240, WINDOW_HEIGHT - 36))
+        # -------------------------------------------------------------
+        # Footer Hint Pill
+        # -------------------------------------------------------------
+        footer_w, footer_h = 560, 36
+        footer_x = (WINDOW_WIDTH - footer_w) // 2
+        footer_y = WINDOW_HEIGHT - 65
+        foot_rect = pygame.Rect(footer_x, footer_y, footer_w, footer_h)
+        foot_surf = pygame.Surface((footer_w, footer_h), pygame.SRCALPHA)
+        foot_surf.fill((16, 24, 40, 180))
+        self.canvas.blit(foot_surf, (footer_x, footer_y))
+        pygame.draw.rect(self.canvas, (32, 48, 72), foot_rect, 1, border_radius=18)
+
+        tip_str = "Press [1] Island Survival   •   [2] Volcano Evacuation   •   [F11] Fullscreen"
+        hint_surf = self.font_sub.render(tip_str, True, COLOR_TEXT_HINT)
+        self.canvas.blit(hint_surf, (footer_x + (footer_w - hint_surf.get_width()) // 2, footer_y + (footer_h - hint_surf.get_height()) // 2))
 
     # -------------------------------------------------------------------------
     # Render Home Screen (State 1)
@@ -1923,9 +1994,21 @@ class IslandVisualizerApp:
     # -------------------------------------------------------------------------
     # UI Utility Helpers
     # -------------------------------------------------------------------------
-    def draw_card(self, x: int, y: int, w: int, h: int):
+    def draw_card(self, x: int, y: int, w: int, h: int, border_color: Optional[Tuple[int, int, int]] = None, border_width: int = 1):
         pygame.draw.rect(self.canvas, COLOR_PANEL_BG, (x, y, w, h), border_radius=10)
-        pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, (x, y, w, h), 1, border_radius=10)
+        pygame.draw.rect(self.canvas, border_color or COLOR_CARD_BORDER, (x, y, w, h), border_width, border_radius=10)
+
+    def draw_pill_tag(self, x: int, y: int, text: str, color: Tuple[int, int, int]) -> int:
+        txt_surf = self.font_small.render(text, True, color)
+        pw = txt_surf.get_width() + 20
+        ph = 26
+        pill_rect = pygame.Rect(x, y, pw, ph)
+        pill_surf = pygame.Surface((pw, ph), pygame.SRCALPHA)
+        pill_surf.fill((color[0], color[1], color[2], 25))
+        self.canvas.blit(pill_surf, (x, y))
+        pygame.draw.rect(self.canvas, color, pill_rect, 1, border_radius=13)
+        self.canvas.blit(txt_surf, (x + 10, y + (ph - txt_surf.get_height()) // 2))
+        return pw
 
     def draw_badge(self, x: int, y: int, text: str, color: Tuple[int, int, int]):
         txt_surf = self.font_sub.render(text, True, color)

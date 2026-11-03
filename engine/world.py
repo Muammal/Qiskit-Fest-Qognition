@@ -62,7 +62,8 @@ class IslandWorld:
             self.spawn_pos = rng.choice(candidates) if candidates else [cx, cy + 4]
             self.food_tiles = [(x, y) for y in range(height) for x in range(width)
                                if self.tiles[y][x] == 2 and rng.random() < 0.3]
-            self.food_tiles.append(tuple(self.spawn_pos))
+            if self.tiles[self.spawn_pos[1]][self.spawn_pos[0]] == 2:
+                self.food_tiles.append(tuple(self.spawn_pos))
             self.shelter_tiles = []
             self.lava, self.pdc, self.lahar = set(), set(), set()
             self.ash = 0.0
