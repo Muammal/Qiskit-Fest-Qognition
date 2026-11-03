@@ -1,0 +1,31 @@
+# =============================================================================
+# .gitignore - Stranded Agent Documentation Branch (agent-docs)
+# =============================================================================
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.hypothesis/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Scratch & Temporary Folders
+scratch/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+.gemini/
+*.log
