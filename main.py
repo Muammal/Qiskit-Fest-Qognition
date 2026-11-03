@@ -14,7 +14,7 @@ from typing import Dict, Any
 
 from engine.world import IslandWorld
 from engine.agent import SurvivalAgent
-from engine.simulation import SimulationEngine
+from engine.simulation import SimulationEngine, DEFAULT_STEPS
 from engine.batch_runner import run_batch_comparison, curate_demo_pack
 import contracts
 
@@ -65,7 +65,7 @@ def format_bar(val: float, length: int = 12) -> str:
     return f"{color}[{'=' * filled}{' ' * empty}] {int(val * 100):3d}%{RESET}"
 
 
-def run_live_demo(seed: int = 101, mind: str = "quantum", noise: str = "ibm_hardware", speed: float = 0.3):
+def run_live_demo(seed: int = 101, mind: str = "quantum", noise: str = "stub", speed: float = 0.3):
     """Executes a live visual interactive survival run step-by-step in the terminal."""
     print(f"\n{BOLD}{CYAN}========================================================================{RESET}")
     print(f"{BOLD}{CYAN}   STRANDED - QUANTUM COGNITION SURVIVAL SIMULATION (LIVE RUN)       {RESET}")
@@ -74,7 +74,7 @@ def run_live_demo(seed: int = 101, mind: str = "quantum", noise: str = "ibm_hard
     print(f"  Legend: {BLUE}~{RESET} Water  {YELLOW}.{RESET} Plains  {GREEN}^{RESET} Forest  M Mountain  {MAGENTA}S{RESET} Shelter  {BOLD}{RED}@{RESET} Agent\n")
 
     sim = SimulationEngine(seed=seed, mind_type=mind, noise_source=noise)
-    max_steps = 24
+    max_steps = DEFAULT_STEPS
 
     def on_step(step_record: Dict[str, Any], engine: SimulationEngine):
         t = step_record["t"]
@@ -125,12 +125,12 @@ def main():
     parser.add_argument("--gui", action="store_true", help="Launch interactive 2D Pygame Island and Character visualizer (default)")
     parser.add_argument("--demo", action="store_true", help="Run interactive terminal ASCII survival run")
     parser.add_argument("--terminal", action="store_true", help="Run interactive terminal ASCII survival run")
-    parser.add_argument("--batch", action="store_true", help="Run batch comparison (Quantum vs Classical divergence)")
+    parser.add_argument("--batch", action="store_true", help="Compare synthetic heuristic stubs (no quantum or hardware results)")
     parser.add_argument("--curate", action="store_true", help="Curate signature runs into demo-pack/")
     parser.add_argument("--test", action="store_true", help="Execute integration test suite")
-    parser.add_argument("--seed", type=int, default=101, help="Random seed for world generation")
+    parser.add_argument("--seed", type=int, default=101, help="Event and volcano seed (the island is fixed)")
     parser.add_argument("--mind", type=str, default="quantum", choices=["quantum", "classical"], help="Mind engine")
-    parser.add_argument("--noise", type=str, default="ibm_hardware", help="Noise source profile")
+    parser.add_argument("--noise", type=str, default="stub", help="Noise source profile")
     parser.add_argument("--speed", type=float, default=0.2, help="Seconds delay per step during live demo")
 
     args = parser.parse_args()
@@ -140,13 +140,14 @@ def main():
         print(f"[Tech C] Running integration test suite...")
         sys.exit(pytest.main(["-v", "test_contracts_and_engine.py"]))
     elif args.batch:
-        summary = run_batch_comparison(num_seeds=20, max_steps=24)
-        print(f"\n{BOLD}=== Batch Comparison Results ({summary['num_seeds']} Seeds) ==={RESET}")
+        summary = run_batch_comparison(num_seeds=20, max_steps=DEFAULT_STEPS)
+        print(f"\n{BOLD}=== Synthetic Heuristic-Stub Results ({summary['num_seeds']} Seeds) ==={RESET}")
+        print(f"  {summary['provenance']['disclosure']} Noise source: {summary['noise_source']}")
         print(f"  Total Evaluated Decisions: {summary['total_evaluated_steps']}")
         print(f"  Decision Divergences:      {summary['total_divergences']}")
         print(f"  Divergence Rate:           {BOLD}{summary['divergence_rate_pct']}%{RESET}")
-        print(f"  Quantum Survival Rate:     {GREEN}{summary['quantum_survival_rate_pct']}%{RESET}")
-        print(f"  Classical Survival Rate:   {YELLOW}{summary['classical_survival_rate_pct']}%{RESET}\n")
+        print(f"  Quantum-labelled Stub Survival Rate:     {GREEN}{summary['quantum_survival_rate_pct']}%{RESET}")
+        print(f"  Classical-labelled Stub Survival Rate:   {YELLOW}{summary['classical_survival_rate_pct']}%{RESET}\n")
     elif args.curate:
         curate_demo_pack("demo-pack")
     elif args.demo or args.terminal:

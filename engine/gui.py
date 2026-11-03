@@ -1,44 +1,4 @@
-"""
-engine/gui.py - Interactive 2D Pygame Island Simulation, Home Screen & Debrief HUD
-Owned by Tech C (Integration, Engine, Visualization).
-
-Enhanced Suite:
-  1. Fullscreen & High-DPI Resolution Scaling:
-     - Instant fullscreen toggle via [⛶ Fullscreen] button or F11 / F key.
-     - Virtual canvas rendering with letterboxing/pillarboxing maintaining exact aspect ratio
-       and pixel-perfect mouse coordinate transformation at any display resolution.
-  2. Tactile, Modern UI Buttons:
-     - Native system hand cursor on hover (pygame.SYSTEM_CURSOR_HAND).
-     - Visual depth: subtle drop shadows, 1px mechanical press displacement, outer glow on hover,
-       and click ripple animation.
-     - Specialized button variants: Primary Emerald, Quantum Purple, Classical Blue,
-       Reconnaissance Cyan, Danger Crimson, and Minimalist Ghost.
-  3. Interactive Home Screen (Start Menu):
-     - Real-time procedural island mini-map preview thumbnail with terrain stats (land %, forest %, streams).
-     - Decision Mind selection cards with formula previews (Qiskit 2-qubit vs Classical ATUS).
-     - Island Presets with semantic difficulty tags + full numeric seed stepper (-100 to +100) + randomizer.
-     - Step horizon selector (12, 24, 36, 48 turns).
-     - Glowing Hero Launch button.
-  4. 2D Island Living World Viewport:
-     - Procedural 40x40 tiles with dynamic water waves, sparkling freshwater streams, shore foam,
-       layered pine canopies with food berry clusters, and alpine snowcaps.
-     - Dynamic lighting & weather: day ambient warmth, night navy tint (21:00-05:00),
-       storm rain with lightning flashes, and cold night frost vignette with drifting snow.
-     - Animated survivor avatar with walking interpolation (lerp), walking bobbing,
-       condition badges, particle bursts, and overhead speech bubbles.
-     - Hovering tile inspector tooltip near mouse cursor.
-  5. Telemetry HUD & Status Screens:
-     - Survivor profile with dynamic mood facial expression based on vitals.
-     - 6 Need Bars with dual-layer glossy progress bars and color gradation.
-     - Composite stress gauge & hardware decoherence meter.
-     - Event hazard banner and chronological order-effect chain.
-     - Action probability horizontal bar chart with leading action star highlight.
-     - Plain-language quantum reasoning quote box.
-  6. End-of-Event Debrief Screen & Action History Log Overlay:
-     - Golden laurel or memorial banner with comprehensive 5-metric breakdown.
-     - Immediate opposite mind comparison button (Quantum <-> Classical on same seed), replay run,
-       and return-to-home navigation.
-"""
+"""Pygame viewer for the shared fixed-island simulation and evacuation overlays."""
 
 import math
 import os
@@ -55,7 +15,8 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 import contracts
-from engine.world import IslandWorld
+from engine.world import IslandWorld, MAP_SEED
+from engine.simulation import SimulationEngine, DEFAULT_STEPS
 from engine.agent import SurvivalAgent
 from engine.events import EventGenerator
 from engine.simulation import SimulationEngine
@@ -114,10 +75,8 @@ ACTION_COLORS = {
 }
 
 PRESETS = [
-    {"label": "Archipelago (Seed 101)", "seed": 101, "tag": "Balanced • High Survival", "color": COLOR_GREEN},
-    {"label": "Arid Crag (Seed 105)", "seed": 105, "tag": "Arid Interior • Thirst Peril", "color": COLOR_ORANGE},
-    {"label": "Interference Lab (Seed 202)", "seed": 202, "tag": "Order Effect Divergence", "color": COLOR_PURPLE},
-    {"label": "Heroic Haven (Seed 777)", "seed": 777, "tag": "Timber Rich • Freshwater", "color": COLOR_CYAN}
+    {"label": f"Event seed {seed}", "seed": seed, "tag": "Same island; different events", "color": COLOR_CYAN}
+    for seed in (101, 105, 202, 777)
 ]
 
 
@@ -318,7 +277,7 @@ class WeatherSystem:
 # Island Pygame Viewer Application
 # -----------------------------------------------------------------------------
 class IslandVisualizerApp:
-    def __init__(self, seed: int = 101, mind_type: str = "quantum", noise_source: str = "ibm_hardware", start_screen: str = "home"):
+    def __init__(self, seed: int = 101, mind_type: str = "quantum", noise_source: str = "stub", start_screen: str = "home"):
         pygame.init()
         pygame.font.init()
         pygame.display.set_caption("Stranded: 2D Quantum Island & Survival Engine")
@@ -347,7 +306,7 @@ class IslandVisualizerApp:
         self.seed = seed
         self.mind_type = mind_type  # "quantum" | "classical"
         self.noise_source = noise_source
-        self.max_steps = 24
+        self.max_steps = DEFAULT_STEPS
 
         # Simulation Runtime State
         self.step_idx = 0
@@ -404,7 +363,7 @@ class IslandVisualizerApp:
 
     def _generate_mini_map(self, seed: int, size: int = 240) -> pygame.Surface:
         surf = pygame.Surface((size, size))
-        w = IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=seed)
+        w = IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=MAP_SEED)
         t_sz = size / GRID_DIM
 
         for y in range(GRID_DIM):
@@ -428,22 +387,22 @@ class IslandVisualizerApp:
         top_y = 110
 
         # Fullscreen Toggle Button on Home Screen
-        self.btn_home_fs = UIButton((WINDOW_WIDTH - 145, 24, 120, 32), "⛶ Fullscreen", self.font_body,
+        self.btn_home_fs = UIButton((WINDOW_WIDTH - 145, 24, 120, 32), " Fullscreen", self.font_body,
                                     bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN)
 
         # 1. Mind Toggle Cards
         self.btn_mind_quantum = UIButton(
-            (card_x + 20, top_y + 45, 380, 68), "⚛  2-Qubit Quantum Mind", self.font_title,
-            subtext="Non-commuting rotations $R_y, R_z$ + delay decoherence under stress",
+            (card_x + 20, top_y + 45, 380, 68), "  Quantum-labelled Stub", self.font_title,
+            subtext="Heuristic Python stub with event-order and stress effects",
             subfont=self.font_small, active_color=COLOR_PURPLE
         )
         self.btn_mind_classical = UIButton(
-            (card_x + 415, top_y + 45, 380, 68), "🧠  Classical Rational Mind", self.font_title,
-            subtext="Deterministic utility argmax from published ATUS summary tables",
+            (card_x + 415, top_y + 45, 380, 68), "  Classical Heuristic Stub", self.font_title,
+            subtext="Deterministic Python stub using hand-written need weights",
             subfont=self.font_small, active_color=COLOR_BLUE
         )
 
-        # 2. Preset Island Map Buttons
+        # Event seed buttons
         self.preset_buttons: List[UIButton] = []
         p_y = top_y + 155
         for i, preset in enumerate(PRESETS):
@@ -461,11 +420,11 @@ class IslandVisualizerApp:
         self.btn_seed_p1 = UIButton((card_x + 475, s_y, 40, 34), "+1", self.font_body)
         self.btn_seed_p10 = UIButton((card_x + 520, s_y, 45, 34), "+10", self.font_body)
         self.btn_seed_p100 = UIButton((card_x + 570, s_y, 50, 34), "+100", self.font_body)
-        self.btn_seed_rand = UIButton((card_x + 635, s_y, 160, 34), "🎲  Random Island", self.font_sub, active_color=COLOR_YELLOW)
+        self.btn_seed_rand = UIButton((card_x + 635, s_y, 160, 34), "  Random Events", self.font_sub, active_color=COLOR_YELLOW)
 
         # 4. Step Number Buttons
         self.step_buttons: List[UIButton] = []
-        step_choices = [12, 24, 36, 48]
+        step_choices = [12, 24, 36]
         st_y = top_y + 365
         for i, steps in enumerate(step_choices):
             sx = card_x + 20 + i * 194
@@ -474,36 +433,38 @@ class IslandVisualizerApp:
 
         # 5. Launch Button
         self.btn_launch = UIButton(
-            (card_x + 20, top_y + 445, 775, 54), "🚀  LAUNCH SURVIVAL SIMULATION", self.font_hero,
+            (card_x + 20, top_y + 445, 775, 54), "  LAUNCH SURVIVAL SIMULATION", self.font_hero,
             bg_color=(21, 128, 61), active_color=COLOR_GREEN
         )
 
     def _build_sim_buttons(self):
         # Map view top navigation bar buttons
-        self.btn_nav_home = UIButton((14, 10, 95, 30), "🏠 Menu", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN)
-        self.btn_nav_pause = UIButton((115, 10, 85, 30), "⏸ Pause", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_YELLOW)
-        self.btn_nav_step = UIButton((206, 10, 85, 30), "⏭ Step", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_GREEN)
-        self.btn_nav_speed = UIButton((297, 10, 85, 30), "⚡ 1.0x", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN)
-        self.btn_nav_mind = UIButton((388, 10, 110, 30), "⚛ Quantum", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_PURPLE)
-        self.btn_nav_log = UIButton((504, 10, 110, 30), "📋 Action Log", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN)
-        self.btn_nav_fs = UIButton((620, 10, 126, 30), "⛶ Fullscreen", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN)
+        self.btn_nav_home = UIButton((14, 10, 95, 30), " Menu", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN)
+        self.btn_nav_pause = UIButton((115, 10, 85, 30), " Pause", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_YELLOW)
+        self.btn_nav_step = UIButton((206, 10, 85, 30), " Step", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_GREEN)
+        self.btn_nav_speed = UIButton((297, 10, 85, 30), " 1.0x", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN)
+        self.btn_nav_mind = UIButton((388, 10, 110, 30), " Quantum", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_PURPLE)
+        self.btn_nav_log = UIButton((504, 10, 110, 30), " Action Log", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN)
+        self.btn_nav_fs = UIButton((620, 10, 126, 30), " Fullscreen", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN)
 
         # Debrief modal buttons
         mx = WINDOW_WIDTH // 2
         my = WINDOW_HEIGHT // 2
-        self.btn_modal_replay = UIButton((mx - 240, my + 140, 140, 42), "🔄 Replay Run", self.font_sub, bg_color=(37, 99, 235))
-        self.btn_modal_switch = UIButton((mx - 85, my + 140, 170, 42), "⚛/🧠 Compare Mind", self.font_sub, bg_color=COLOR_PURPLE)
-        self.btn_modal_home = UIButton((mx + 100, my + 140, 140, 42), "🏠 Home Screen", self.font_sub, bg_color=(51, 65, 85))
-        self.btn_modal_close = UIButton((mx + 255, my - 185, 32, 32), "✕", self.font_title, bg_color=COLOR_PANEL_BG)
+        self.btn_modal_replay = UIButton((mx - 240, my + 140, 140, 42), " Replay Run", self.font_sub, bg_color=(37, 99, 235))
+        self.btn_modal_switch = UIButton((mx - 85, my + 140, 170, 42), "/ Compare Mind", self.font_sub, bg_color=COLOR_PURPLE)
+        self.btn_modal_home = UIButton((mx + 100, my + 140, 140, 42), " Home Screen", self.font_sub, bg_color=(51, 65, 85))
+        self.btn_modal_close = UIButton((mx + 255, my - 185, 32, 32), "", self.font_title, bg_color=COLOR_PANEL_BG)
 
         # History log modal close
-        self.btn_hist_close = UIButton((WINDOW_WIDTH // 2 + 360, 45, 32, 32), "✕", self.font_title, bg_color=COLOR_PANEL_BG)
+        self.btn_hist_close = UIButton((WINDOW_WIDTH // 2 + 360, 45, 32, 32), "", self.font_title, bg_color=COLOR_PANEL_BG)
 
     def _init_simulation(self):
-        self.world = IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=self.seed)
-        self.agent = SurvivalAgent(start_pos=self.world.spawn_pos)
-        self.event_gen = EventGenerator(seed=self.seed)
+        self.engine = SimulationEngine(seed=self.seed, mind_type=self.mind_type, noise_source=self.noise_source)
+        self.world, self.agent = self.engine.world, self.engine.agent
+        self.event_gen = self.engine.event_gen
+        self.show_evacuation_map = True
         self.decide_fn = contracts.quantum_decide if self.mind_type == "quantum" else contracts.classical_decide
+        self.engine.decide_fn, self.engine.mind_type = self.decide_fn, self.mind_type
         self.history: List[Dict[str, Any]] = []
         self.current_decision: Dict[str, Any] = {
             "action": "none",
@@ -522,31 +483,16 @@ class IslandVisualizerApp:
             self.show_debrief_modal = True
             return
 
-        # 1. State snapshot
-        decision_state = self.agent.get_state()
-        in_shelter = self.world.is_in_shelter(self.agent.pos[0], self.agent.pos[1])
-
-        # 2. Environmental Hazard
-        event = self.event_gen.step_event(
-            day=self.agent.day,
-            hour=self.agent.hour,
-            current_pos=self.agent.pos,
-            in_shelter=in_shelter,
-            injured=self.agent.injured
-        )
+        self.engine.decide_fn = self.decide_fn
+        record = self.engine.step()
+        if record is None:
+            self.show_debrief_modal = True
+            return
+        event, action = record["event"], record["action"]
         self.current_event = event
-        self.agent.apply_event(event, in_shelter=in_shelter)
-
-        # 3. Decision
-        decision = self.decide_fn(self.agent.get_state())
-        contracts.validate_decision(decision)
+        decision = {k: record[k] for k in ("action", "probs", "reason")}
         self.current_decision = decision
-        action = decision["action"]
-
-        # 4. Action Execution
-        narrative = self.agent.execute_action(action, self.world)
-        in_shelter_after = self.world.is_in_shelter(self.agent.pos[0], self.agent.pos[1])
-        self.agent.step_decay(in_shelter=in_shelter_after)
+        narrative = f"{action} at {self.agent.pos}"
 
         # 5. Visual Particles & Speech Bubble
         self.weather.add_action_particles(self.char_screen_x, self.char_screen_y, action)
@@ -603,11 +549,14 @@ class IslandVisualizerApp:
                             self.app_state = "home"
                         elif ev.key in (pygame.K_TAB, pygame.K_l):
                             self.show_history_overlay = not self.show_history_overlay
+                        elif ev.key == pygame.K_e:
+                            self.show_evacuation_map = not self.show_evacuation_map
                         elif ev.key == pygame.K_r:
                             self._init_simulation()
                         elif ev.key == pygame.K_q:
                             self.mind_type = "classical" if self.mind_type == "quantum" else "quantum"
                             self.decide_fn = contracts.quantum_decide if self.mind_type == "quantum" else contracts.classical_decide
+                            self.engine.decide_fn, self.engine.mind_type = self.decide_fn, self.mind_type
                         elif ev.key == pygame.K_1:
                             self.speed_multiplier = 1.0
                         elif ev.key == pygame.K_2:
@@ -754,7 +703,7 @@ class IslandVisualizerApp:
         if seed_changed:
             self.preview_mini_map = self._generate_mini_map(self.seed, size=240)
 
-        step_choices = [12, 24, 36, 48]
+        step_choices = [12, 24, 36]
         for i, s_btn in enumerate(self.step_buttons):
             if s_btn.check_hover(pos):
                 s_btn.trigger_click()
@@ -811,6 +760,7 @@ class IslandVisualizerApp:
             self.btn_nav_mind.trigger_click()
             self.mind_type = "classical" if self.mind_type == "quantum" else "quantum"
             self.decide_fn = contracts.quantum_decide if self.mind_type == "quantum" else contracts.classical_decide
+            self.engine.decide_fn, self.engine.mind_type = self.decide_fn, self.mind_type
             return
         elif self.btn_nav_log.check_hover(pos):
             self.btn_nav_log.trigger_click()
@@ -848,7 +798,7 @@ class IslandVisualizerApp:
             pygame.draw.line(self.canvas, (18, 28, 48), (0, y + shift), (WINDOW_WIDTH, y + shift), 1)
 
         # Fullscreen Toggle Button on Home Screen
-        self.btn_home_fs.text = "🗗 Windowed" if self.is_fullscreen else "⛶ Fullscreen"
+        self.btn_home_fs.text = " Windowed" if self.is_fullscreen else " Fullscreen"
         self.btn_home_fs.check_hover(mouse_pos)
         self.btn_home_fs.draw(self.canvas)
 
@@ -856,7 +806,7 @@ class IslandVisualizerApp:
         title_surf = self.font_hero.render("STRANDED: QUANTUM SURVIVAL ENGINE", True, COLOR_TEXT_MAIN)
         self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, 24))
 
-        sub_str = "Qiskit 2.x • 2-Qubit Non-Commuting Cognition • IBM Hardware Decoherence Modeling"
+        sub_str = "Python policy stubs | Synthetic order and stress effects | No hardware results"
         sub_surf = self.font_sub.render(sub_str, True, COLOR_CYAN)
         self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, 62))
 
@@ -881,7 +831,7 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, stats_box, border_radius=6)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, stats_box, 1, border_radius=6)
 
-        temp_w = IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=self.seed)
+        temp_w = IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=MAP_SEED)
         land_tiles = sum(1 for row in temp_w.tiles for t in row if t in (1, 2, 3, 4))
         forest_tiles = sum(1 for row in temp_w.tiles for t in row if t == 2)
         streams = len(temp_w.freshwater_tiles)
@@ -889,11 +839,11 @@ class IslandVisualizerApp:
         forest_pct = int(forest_tiles / max(1, land_tiles) * 100)
 
         lines = [
-            f"World Seed:       #{self.seed}",
+            f"Event Seed:       #{self.seed}",
             f"Land Coverage:    {land_pct}% (Usable Mass)",
             f"Forest Density:   {forest_pct}% (Timber & Food)",
             f"Freshwater:       {'Available (' + str(streams) + ' tiles)' if streams > 0 else 'Arid / Sparse'}",
-            f"Starting Spawn:   [{temp_w.spawn_pos[0]}, {temp_w.spawn_pos[1]}] (Sheltered Coast)"
+            f"Starting Spawn:   [{temp_w.spawn_pos[0]}, {temp_w.spawn_pos[1]}] (Inland Forest)"
         ]
         for i, line in enumerate(lines):
             col = COLOR_CYAN if i == 0 else (COLOR_GREEN if i in (1, 2) else COLOR_TEXT_MUTED)
@@ -920,8 +870,8 @@ class IslandVisualizerApp:
         self.btn_mind_quantum.draw(self.canvas)
         self.btn_mind_classical.draw(self.canvas)
 
-        # 2. Island Presets & Custom Stepper
-        p_lbl = self.font_title.render("2. Select Island Preset or Custom World Seed", True, COLOR_TEXT_MAIN)
+        # Event seed controls
+        p_lbl = self.font_title.render("2. Event Seed (One Fixed Island)", True, COLOR_TEXT_MAIN)
         self.canvas.blit(p_lbl, (col2_x + 20, col2_y + 128))
 
         for i, p_btn in enumerate(self.preset_buttons):
@@ -932,7 +882,7 @@ class IslandVisualizerApp:
         seed_box = pygame.Rect(col2_x + 175, col2_y + 280, 290, 34)
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, seed_box, border_radius=6)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, seed_box, 1, border_radius=6)
-        seed_txt = self.font_title.render(f"Island Seed:  {self.seed}", True, COLOR_YELLOW)
+        seed_txt = self.font_title.render(f"Event Seed:  {self.seed}", True, COLOR_YELLOW)
         self.canvas.blit(seed_txt, (seed_box.x + (seed_box.width - seed_txt.get_width()) // 2, seed_box.y + 6))
 
         for s_btn in (self.btn_seed_m100, self.btn_seed_m10, self.btn_seed_m1, self.btn_seed_p1, self.btn_seed_p10, self.btn_seed_p100, self.btn_seed_rand):
@@ -943,7 +893,7 @@ class IslandVisualizerApp:
         st_lbl = self.font_title.render("3. Simulation Step Horizon (2 Hours per Turn)", True, COLOR_TEXT_MAIN)
         self.canvas.blit(st_lbl, (col2_x + 20, col2_y + 332))
 
-        step_choices = [12, 24, 36, 48]
+        step_choices = [12, 24, 36]
         for i, st_btn in enumerate(self.step_buttons):
             st_btn.is_active = (self.max_steps == step_choices[i])
             st_btn.check_hover(mouse_pos)
@@ -953,7 +903,7 @@ class IslandVisualizerApp:
         self.btn_launch.check_hover(mouse_pos)
         self.btn_launch.draw(self.canvas)
 
-        tip_str = "Press [ENTER] to Launch  •  [F11] Fullscreen  •  [Q] Toggle Mind Model  •  Decoherence Active"
+        tip_str = "Press [ENTER] to Launch  •  [F11] Fullscreen  •  [Q] Toggle Mind Model  •  Stub Policies Active"
         self.canvas.blit(self.font_sub.render(tip_str, True, COLOR_TEXT_HINT), (WINDOW_WIDTH // 2 - 275, WINDOW_HEIGHT - 32))
 
     # -------------------------------------------------------------------------
@@ -992,11 +942,11 @@ class IslandVisualizerApp:
         self.canvas.blit(bar_bg, (0, 0))
         pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (0, 50), (MAP_SIZE, 50), 1)
 
-        self.btn_nav_pause.text = "▶ Play" if self.is_paused else "⏸ Pause"
-        self.btn_nav_speed.text = f"⚡ {self.speed_multiplier}x"
-        self.btn_nav_mind.text = "⚛ Quantum" if self.mind_type == "quantum" else "🧠 Classical"
+        self.btn_nav_pause.text = "▶ Play" if self.is_paused else " Pause"
+        self.btn_nav_speed.text = f" {self.speed_multiplier}x"
+        self.btn_nav_mind.text = " Quantum" if self.mind_type == "quantum" else " Classical"
         self.btn_nav_mind.active_color = COLOR_PURPLE if self.mind_type == "quantum" else COLOR_BLUE
-        self.btn_nav_fs.text = "🗗 Window" if self.is_fullscreen else "⛶ Fullscreen"
+        self.btn_nav_fs.text = " Window" if self.is_fullscreen else " Fullscreen"
 
         for btn in (self.btn_nav_home, self.btn_nav_pause, self.btn_nav_step, self.btn_nav_speed, self.btn_nav_mind, self.btn_nav_log, self.btn_nav_fs):
             btn.check_hover(mouse_pos)
@@ -1062,6 +1012,29 @@ class IslandVisualizerApp:
         pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (MAP_SIZE, 0), (MAP_SIZE, WINDOW_HEIGHT), 2)
 
     def draw_atmosphere(self):
+        overlay = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
+        if self.show_evacuation_map:
+            colors = ((30,180,90,30), (240,180,20,45), (230,50,20,65))
+            for y,row in enumerate(self.world.zones):
+                for x,zone in enumerate(row):
+                    if self.world.get_tile(x,y):
+                        pygame.draw.rect(overlay, colors[zone], (x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
+            points = [(x*TILE_SIZE+TILE_SIZE//2,y*TILE_SIZE+TILE_SIZE//2) for x,y in self.world.route_from_spawn]
+            if len(points) > 1:
+                pygame.draw.lines(overlay, (80,255,230,220), False, points, 2)
+            for x,y in self.world.assembly_points:
+                pygame.draw.circle(overlay, (60,255,90), (x*TILE_SIZE+TILE_SIZE//2,y*TILE_SIZE+TILE_SIZE//2), 6)
+        for tiles,color in ((self.world.lava,(255,85,0,150)), (self.world.pdc,(100,90,90,105)), (self.world.lahar,(110,65,25,115))):
+            for x,y in tiles:
+                pygame.draw.rect(overlay,color,(x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
+        if self.world.ash:
+            ash = pygame.Surface((MAP_SIZE,MAP_SIZE),pygame.SRCALPHA)
+            ash.fill((160,160,160,int(70*self.world.ash)))
+            overlay.blit(ash,(0,0))
+        self.canvas.blit(overlay,(0,0))
+        phase = self.engine.volcano.phases[max(0,self.step_idx-1)]
+        self.canvas.blit(self.font_small.render(f"Phase: {phase} | E: evacuation map | 250 m/tile",True,COLOR_TEXT_MAIN),(10,60))
+
         hour = self.agent.hour
         if hour >= 21 or hour <= 5:
             night_surf = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
@@ -1152,19 +1125,19 @@ class IslandVisualizerApp:
         card1_h = 175
         self.draw_card(panel_x, curr_y, panel_w, card1_h)
 
-        mood_str = "😊 Resilient"
+        mood_str = " Resilient"
         mood_col = COLOR_GREEN
         if not self.agent.is_alive:
-            mood_str = "💀 Perished"
+            mood_str = " Perished"
             mood_col = COLOR_RED
         elif self.agent.injured:
-            mood_str = "🤕 Injured"
+            mood_str = " Injured"
             mood_col = COLOR_RED
         elif self.agent.stress > 0.65:
-            mood_str = "😰 Anxious"
+            mood_str = " Anxious"
             mood_col = COLOR_ORANGE
         elif self.agent.needs["warmth"] < 0.3:
-            mood_str = "🥶 Freezing"
+            mood_str = " Freezing"
             mood_col = COLOR_CYAN
 
         header_surf = self.font_sub.render(f"SURVIVOR STATUS  [{mood_str}]", True, mood_col)
@@ -1202,11 +1175,11 @@ class IslandVisualizerApp:
             decoherence_pct = min(1.0, (self.agent.stress - 0.4) / 0.5)
         self.draw_progress_bar(
             panel_x + 26 + bar_w, stress_y, bar_w, 15,
-            "Decoherence", decoherence_pct, COLOR_PURPLE
+            "Stub mixing", decoherence_pct, COLOR_PURPLE
         )
 
         inv = self.agent.inventory
-        inv_str = f"🎒 Resources:   Timber: {inv.get('wood', 0)}   •   Rations: {inv.get('food', 0)}   •   Tools: {inv.get('tools', 0)}"
+        inv_str = f" Resources:   Timber: {inv.get('wood', 0)}   •   Rations: {inv.get('food', 0)}   •   Tools: {inv.get('tools', 0)}"
         self.canvas.blit(self.font_body.render(inv_str, True, COLOR_TEXT_MUTED), (panel_x + 14, curr_y + 146))
 
         curr_y += card1_h + 10
@@ -1226,7 +1199,7 @@ class IslandVisualizerApp:
         pos_txt = f"Coordinates: [{px}, {py}]  |  Biome: {tile_name}  |  Shelter: {'Yes' if self.world.is_in_shelter(px, py) else 'No'}"
         self.canvas.blit(self.font_body.render(pos_txt, True, COLOR_TEXT_MUTED), (panel_x + 14, curr_y + 60))
 
-        history_str = " ➔ ".join([e.upper() for e in self.agent.recent_events if e != "none"] or ["None"])
+        history_str = "  ".join([e.upper() for e in self.agent.recent_events if e != "none"] or ["None"])
         self.canvas.blit(self.font_mono.render(f"Event Order Effect: [ {history_str} ]", True, COLOR_CYAN), (panel_x + 14, curr_y + 82))
 
         curr_y += card2_h + 10
@@ -1235,7 +1208,7 @@ class IslandVisualizerApp:
         card3_h = 240
         self.draw_card(panel_x, curr_y, panel_w, card3_h)
 
-        mind_title = "2-QUBIT QUANTUM BELIEF STATE" if self.mind_type == "quantum" else "CLASSICAL RATIONAL UTILITY"
+        mind_title = "QUANTUM-LABELLED STUB PROBABILITIES" if self.mind_type == "quantum" else "CLASSICAL STUB UTILITY"
         self.canvas.blit(self.font_sub.render(mind_title, True, COLOR_PURPLE if self.mind_type == "quantum" else COLOR_BLUE), (panel_x + 14, curr_y + 10))
 
         chosen_act = self.current_decision.get("action", "none").upper()
@@ -1253,7 +1226,7 @@ class IslandVisualizerApp:
             act_color = ACTION_COLORS.get(act, COLOR_CYAN)
             is_top = (act == max_act)
 
-            lbl_txt = f"★ {act[:8]}" if is_top else f"  {act[:8]}"
+            lbl_txt = f" {act[:8]}" if is_top else f"  {act[:8]}"
             lbl_col = COLOR_GOLD if is_top else COLOR_TEXT_MAIN
             self.canvas.blit(self.font_mono.render(f"{lbl_txt:10s}", True, lbl_col), (panel_x + 14, chart_y))
 
@@ -1311,7 +1284,7 @@ class IslandVisualizerApp:
         border_col = COLOR_GOLD if survived else COLOR_RED
         pygame.draw.rect(self.canvas, border_col, m_rect, 2, border_radius=12)
 
-        m_title = "🏆  MISSION COMPLETE: 48h SURVIVAL MASTERED!" if survived else f"💀  SURVIVOR PERISHED: {str(self.agent.cause_of_death).upper()}"
+        m_title = "  MISSION COMPLETE: 72h SURVIVAL MASTERED!" if survived else f"  SURVIVOR PERISHED: {str(self.agent.cause_of_death).upper()}"
         m_color = COLOR_GOLD if survived else COLOR_RED
         t_surf = self.font_hero.render(m_title, True, m_color)
         self.canvas.blit(t_surf, (mx + (mw - t_surf.get_width()) // 2, my + 24))
@@ -1325,9 +1298,9 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, box_rect, 1, border_radius=8)
 
         lines = [
-            ("Decision Engine:", "2-Qubit Quantum Mind (Qiskit 2.x)" if self.mind_type == "quantum" else "Classical ATUS Rational Argmax", COLOR_PURPLE if self.mind_type == "quantum" else COLOR_BLUE),
-            ("World Environment:", f"Seed #{self.seed} (Island Terrain, 40x40 Grid)", COLOR_YELLOW),
-            ("Final Stress & Noise:", f"{int(self.agent.stress*100)}% Stress  •  Decoherence: {int(max(0, self.agent.stress - 0.4)/0.5 * 100)}% off-diagonal decay", COLOR_CYAN),
+            ("Decision Engine:", "Quantum-labelled heuristic stub" if self.mind_type == "quantum" else "Classical heuristic stub", COLOR_PURPLE if self.mind_type == "quantum" else COLOR_BLUE),
+            ("World Environment:", f"Seed #{self.seed} (Events only; fixed 40x40 island)", COLOR_YELLOW),
+            ("Final Stress & Noise:", f"{int(self.agent.stress*100)}% Stress  •  Stub mixing: {int(max(0, self.agent.stress - 0.4)/0.5 * 100)}%", COLOR_CYAN),
             ("Physiological State:", f"Hunger: {int(self.agent.needs['hunger']*100)}% | Thirst: {int(self.agent.needs['thirst']*100)}% | Warmth: {int(self.agent.needs['warmth']*100)}%", COLOR_TEXT_MAIN),
             ("Resource Harvest:", f"Gathered {self.agent.inventory.get('wood',0)} Timber, Consumed Food Rations, Tools Crafted: {self.agent.inventory.get('tools',0)}", COLOR_TEXT_MUTED)
         ]
@@ -1425,7 +1398,7 @@ class IslandVisualizerApp:
         self.canvas.blit(val_surf, (bar_x + bar_w + 6, y))
 
 
-def launch_gui(seed: int = 101, mind: str = "quantum", noise: str = "ibm_hardware", start_screen: str = "home"):
+def launch_gui(seed: int = 101, mind: str = "quantum", noise: str = "stub", start_screen: str = "home"):
     """Launches the complete Pygame Island Simulation starting at the Home Screen."""
     app = IslandVisualizerApp(seed=seed, mind_type=mind, noise_source=noise, start_screen=start_screen)
     app.run()

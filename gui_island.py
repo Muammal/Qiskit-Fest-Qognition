@@ -11,9 +11,9 @@ from engine.gui import launch_gui
 
 def main():
     parser = argparse.ArgumentParser(description="Stranded: 2D Pygame Island & Character Visualizer")
-    parser.add_argument("--seed", type=int, default=101, help="Random seed for procedural island generation")
+    parser.add_argument("--seed", type=int, default=101, help="Seed for events on the fixed island")
     parser.add_argument("--mind", type=str, default="quantum", choices=["quantum", "classical"], help="Mind engine")
-    parser.add_argument("--noise", type=str, default="ibm_hardware", help="Hardware noise source profile")
+    parser.add_argument("--noise", type=str, default="stub", help="Stub policy label")
 
     args = parser.parse_args()
     print(f"Launching Pygame 2D Island Visualizer (Seed={args.seed}, Mind={args.mind})...")

@@ -28,7 +28,8 @@ EVENTS: List[str] = [
     "find_food",
     "animal",
     "cold_night",
-    "none"
+    "none",
+    "tremor", "gas_plume", "eruption", "ash_fall"
 ]
 
 TILE_TYPES: Dict[int, str] = {
@@ -101,13 +102,7 @@ def validate_decision(decision: Dict[str, Any]) -> bool:
 # -----------------------------------------------------------------------------
 
 def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
-    """
-    Tech B Responsibility.
-    Returns baseline human habit probability distribution over ACTIONS
-    derived from published American Time Use Survey (ATUS) summary tables.
-    
-    Stub Implementation: Context-aware uniform baseline.
-    """
+    """Tech B responsibility: priors from published ATUS tables. Heuristic stub until then."""
     validate_state(state)
     needs = state["needs"]
     hour = state["hour"]
@@ -117,7 +112,7 @@ def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
     
     # Thirst is urgent
     if needs["thirst"] < 0.3:
-        raw_priors["drink"] += 4.0
+        raw_priors["drink"] += 40.0
     # Hunger is urgent
     if needs["hunger"] < 0.3:
         raw_priors["forage"] += 3.0
@@ -132,17 +127,19 @@ def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
     if needs["safety"] < 0.3 or "storm" in state.get("recent_events", []):
         raw_priors["hide"] += 3.0
 
+    if any(e in ("tremor", "gas_plume", "eruption", "ash_fall") for e in state["recent_events"]):
+        raw_priors["hide"] += 6.0  # assumption: warning-sensitive stub preference
+    # assumption: preparation and recovery precede discretionary activity.
+    if needs["warmth"] < .65:
+        raw_priors["build_shelter"] += 9.0
+    if needs["energy"] < .3:
+        raw_priors["rest"] += 15.0
     total = sum(raw_priors.values())
     return {k: round(v / total, 4) for k, v in raw_priors.items()}
 
 
 def classical_decide(state: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Tech B Responsibility.
-    Baseline classical human decision model with no quantum interference or order effects.
-    
-    Stub Implementation: Deterministic argmax of ATUS priors with heuristic fallback.
-    """
+    """Tech B responsibility: classical baseline. Deterministic heuristic stub; no ATUS priors are loaded."""
     validate_state(state)
     priors = get_prior(state)
     chosen_action = max(priors.items(), key=lambda item: item[1])[0]
@@ -150,21 +147,14 @@ def classical_decide(state: Dict[str, Any]) -> Dict[str, Any]:
     decision = {
         "action": chosen_action,
         "probs": priors,
-        "reason": f"Classical rational choice: highest prior utility for {chosen_action} (p={priors[chosen_action]:.2f})"
+        "reason": f"Classical stub choice: highest prior utility for {chosen_action} (p={priors[chosen_action]:.2f})"
     }
     validate_decision(decision)
     return decision
 
 
 def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Tech A Responsibility.
-    2-Qubit Quantum Cognition Decision Engine (Qiskit 2.x).
-    Applies non-commuting unitary rotation gates for each recent event in order,
-    incorporating decoherence under stress, followed by projective measurement.
-    
-    Stub Implementation: Non-commuting sequential rotation stub with explainability reason.
-    """
+    """Tech A responsibility: 2-qubit decision circuit. Heuristic stub with no circuits until then."""
     validate_state(state)
     recent = state.get("recent_events", [])
     stress = state.get("stress", 0.0)
@@ -173,13 +163,19 @@ def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
     # Quantum cognition order effect simulation stub:
     # Event order (A then B vs B then A) changes resulting belief interference
     probs = dict(priors)
-    reason = "Quantum baseline prior measurement"
+    reason = "Quantum-labelled classical heuristic stub; no circuit or hardware execution"
 
     if recent:
         last_event = recent[-1]
         prior_event = recent[-2] if len(recent) > 1 else "none"
 
-        if last_event == "storm" and prior_event == "injury":
+        if last_event == "gas_plume" and prior_event == "tremor":
+            probs["hide"] += .45
+            reason = "Stub Order effect: tremor then gas plume strengthens evacuation preference"
+        elif last_event == "tremor" and prior_event == "gas_plume":
+            probs["rest"] += .3
+            reason = "Stub Order effect: gas plume then tremor favours recovery"
+        elif last_event == "storm" and prior_event == "injury":
             # Quantum constructive interference on safety
             probs["hide"] = round(probs.get("hide", 0.1) + 0.45, 4)
             probs["explore"] = round(max(0.01, probs.get("explore", 0.1) - 0.2), 4)
@@ -192,7 +188,7 @@ def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
         elif last_event == "animal":
             probs["hide"] = round(probs.get("hide", 0.1) + 0.35, 4)
             probs["build_shelter"] = round(probs.get("build_shelter", 0.1) + 0.2, 4)
-            reason = "Predator detection: belief rotation collapsed toward defensive evasion"
+            reason = "Stub boar encounter shifts probabilities toward defensive evasion"
 
     # Normalize probabilities
     total = sum(probs.values())
@@ -211,15 +207,17 @@ def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
         pct_decay = int(decoherence_gamma * 100)
         reason += f" [Decoherence: stress {stress:.2f} washes out {pct_decay}% quantum interference]"
 
-    # Weighted choice based on quantum state probabilities
-    actions = list(norm_probs.keys())
-    weights = list(norm_probs.values())
-    chosen_action = random.choices(actions, weights=weights, k=1)[0]
+    # assumption: both placeholders use the same survival competence; order changes preferences.
+    chosen_action = max(norm_probs, key=norm_probs.get)
+    if state["needs"]["thirst"] < .3:
+        chosen_action = "drink"
+    elif state["needs"]["warmth"] < .4:
+        chosen_action = "build_shelter"
 
     decision = {
         "action": chosen_action,
         "probs": norm_probs,
-        "reason": reason
+        "reason": "Stub: " + reason
     }
     validate_decision(decision)
     return decision
@@ -237,3 +235,8 @@ def explore_step(pos: List[int], world: Any, mode: str = "quantum") -> List[int]
     directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
     dx, dy = random.choice(directions)
     return [max(0, min(39, x + dx)), max(0, min(39, y + dy))]
+
+
+def load_seeds() -> list[int]:
+    """Stub seed list until teammate data is integrated."""
+    return list(range(20))
