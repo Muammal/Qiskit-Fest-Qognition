@@ -2,47 +2,32 @@
 engine/gui.py - Interactive 2D Pygame Island Simulation, Home Screen & Debrief HUD
 Owned by Tech C (Integration, Engine, Visualization).
 
-Enhanced Suite:
-  1. High-Resolution 1600x900 Widescreen Display:
-     - 16:9 standard cinematic aspect ratio.
-     - 900x900 high-definition island map viewport.
-     - 700x900 expansive telemetry and analytics dashboard.
-     - Fullscreen toggle via [Fullscreen] button or F11 key with letterboxing/pillarboxing
-       and exact mouse coordinate transformation at any display resolution.
-  2. Procedural Vector Iconography (Zero Broken Unicode Squares):
-     - Eliminates all font-dependent unicode emojis and tofu squares.
-     - Crisp, resolution-independent vector icons drawn directly with Pygame geometry
-       (Fullscreen, Windows, Quantum Atom, Neural Network, Play/Pause, Step, Speed Bolt,
-       Menu, Action Log, Dice, Rocket, Replay, Compare, Health Cross, and Shields).
-  3. Strict Text Assembly & Border-Bound Typography:
-     - Dynamic text wrapping (`wrap_text` and `render_wrapped_text`) ensuring decision rationales,
-       event chains, telemetry labels, and modal metrics never spill or exceed container borders.
-     - Dynamically calculated column offsets and bounded badge layouts.
-  4. Interactive Home Screen (Start Menu):
-     - High-resolution 300x300 procedural island mini-map preview thumbnail with terrain stats.
-     - Decision Mind selection cards with formula previews (Qiskit 2-qubit vs Classical ATUS).
-     - Island Presets with semantic difficulty tags + full numeric seed stepper + randomizer.
-     - Step horizon selector (12, 24, 36, 48 turns).
-     - Glowing Hero Launch button.
-  5. 2D Island Living World Viewport:
-     - Procedural 40x40 tiles with dynamic water waves, freshwater streams, shore foam,
-       layered pine canopies with food berry clusters, and alpine snowcaps.
-     - Dynamic lighting & weather: day ambient warmth, night navy tint (21:00-05:00),
-       storm rain with lightning flashes, and cold night frost vignette with drifting snow.
-     - Animated survivor avatar with walking interpolation (lerp), bobbing, condition badges,
-       particle bursts, and overhead speech bubbles.
-     - Hovering tile inspector tooltip near mouse cursor.
-  6. Telemetry HUD & Status Screens:
-     - Survivor profile with dynamic mood facial expression based on vitals.
-     - 6 Need Bars with dual-layer glossy progress bars and color gradation.
-     - Composite stress gauge & hardware decoherence meter.
-     - Event hazard banner and chronological order-effect chain.
-     - Action probability horizontal bar chart with leading action highlight.
-     - Plain-language quantum reasoning quote box neatly wrapped.
-  7. End-of-Event Debrief Screen & Action History Log Overlay:
-     - Golden laurel or memorial banner with comprehensive 5-metric breakdown.
-     - Immediate opposite mind comparison button (Quantum <-> Classical on same seed), replay run,
-       and return-to-home navigation.
+Enhanced Graphics & Production Visual Suite:
+  1. 2.5D Organic Terrain & Shoreline Foam:
+     - Organic coastal surf with dynamic white wave foam lapping on beaches.
+     - Multi-tiered pine trees with ground drop shadows, wind sway, and wild ruby berry clusters.
+     - Chiseled 3D mountain peaks with illuminated northwest cliffs and alpine snowcaps.
+     - Cozy survivor log cabin with thatched roof, stone campfire ring, flickering flames, and rising ember sparks.
+  2. Dynamic Lighting & Atmospheric Engine:
+     - Time-of-day solar cycle: Golden hour dawn/dusk, crystal noon daylight, and night darkness overlay.
+     - Dynamic radial point lights: Survivor lantern and campfire clearing holes with warm additive glow.
+     - Soft cumulus cloud shadows drifting across the island from west to east.
+     - Weather systems: Storm rain with lightning flashes, and drifting cold night snowflakes.
+  3. Stylized 2.5D Survivor Avatar:
+     - Directional facing (flips smoothly when walking left vs right).
+     - Procedural walking stride cycle with swinging limbs.
+     - Adventurer explorer hat, jacket, belt, boots, and bulging backpack.
+     - Expressive condition FX: Shivering breath vapor in freezing weather, bandage pulse when injured, sweat when stressed.
+     - Fading footstep trails in sand and snow.
+     - Quantum superposition ghost silhouettes during decision formulation.
+  4. 3D Quantum Bloch Sphere Hologram (HUD Card 3):
+     - Real-time rotating wireframe Bloch sphere with equator, meridian, and Z-axis (|0>, |1>).
+     - Quantum belief state vector |ψ⟩ pointing dynamically based on priors and non-commuting event rotations.
+     - IBM Quantum hardware decoherence static noise scanlines under elevated stress.
+  5. High-Resolution Display & Adaptive Fullscreen:
+     - Standard 16:9 canvas (1600x900) scaling seamlessly to 1080p, 1440p, 4K, and 16:10 laptop screens.
+     - True borderless native fullscreen via (0, 0) with zero display mode errors.
+     - Procedural vector icons (zero unicode squares) and dynamic border-bounded text wrapping.
 """
 
 import math
@@ -101,9 +86,9 @@ COLOR_GOLD = (250, 204, 21)
 
 # Tile Base Colors
 TILE_COLORS = {
-    0: (27, 58, 91),    # Ocean Deep Blue
-    1: (217, 175, 88),  # Plains / Coastal Sand
-    2: (22, 101, 52),   # Dense Forest Pine
+    0: (22, 54, 88),    # Ocean Deep Blue
+    1: (217, 180, 95),  # Plains / Coastal Sand
+    2: (20, 95, 48),    # Dense Forest Pine
     3: (71, 85, 105),   # Mountain Stone
     4: (180, 83, 9)     # Shelter Timber
 }
@@ -138,10 +123,7 @@ def set_cursor_safely(cursor_type):
 # Procedural Vector Icon Drawing Library (Zero Unicode Squares)
 # -----------------------------------------------------------------------------
 def draw_vector_icon(surface: pygame.Surface, icon: str, x: int, y: int, size: int, color: Tuple[int, int, int]):
-    """
-    Renders high-definition procedural vector icons directly with Pygame geometry.
-    Guarantees crisp, anti-aliased iconography with zero broken font squares.
-    """
+    """Renders high-definition procedural vector icons directly with Pygame geometry."""
     cx = x + size // 2
     cy = y + size // 2
     pad = max(1, size // 8)
@@ -281,10 +263,7 @@ def wrap_text(text: str, font: pygame.font.Font, max_width: int) -> List[str]:
 def render_wrapped_text(surface: pygame.Surface, text: str, font: pygame.font.Font,
                         color: Tuple[int, int, int], x: int, y: int, max_width: int,
                         line_spacing: int = 4, max_lines: Optional[int] = None) -> int:
-    """
-    Renders text cleanly wrapped within max_width without exceeding borders.
-    Returns the total vertical height used.
-    """
+    """Renders text cleanly wrapped within max_width without exceeding borders."""
     lines = wrap_text(text, font, max_width)
     if max_lines and len(lines) > max_lines:
         lines = lines[:max_lines]
@@ -301,6 +280,61 @@ def render_wrapped_text(surface: pygame.Surface, text: str, font: pygame.font.Fo
         surface.blit(surf, (x, curr_y))
         curr_y += line_h + line_spacing
     return curr_y - y
+
+
+# -----------------------------------------------------------------------------
+# 3D Quantum Bloch Sphere Hologram Renderer
+# -----------------------------------------------------------------------------
+def draw_bloch_sphere(surface: pygame.Surface, cx: int, cy: int, radius: int,
+                      theta: float, phi: float, rot_angle: float = 0.0,
+                      stress: float = 0.0, font: Optional[pygame.font.Font] = None):
+    """
+    Renders an animated 3D wireframe Bloch sphere with state vector projection.
+    Visualizes quantum amplitudes and decoherence in real time.
+    """
+    tilt = 0.36
+
+    # 1. Outer rim & depth glow
+    pygame.draw.circle(surface, (16, 26, 44), (cx, cy), radius + 2)
+    pygame.draw.circle(surface, (45, 65, 105), (cx, cy), radius, 2)
+
+    # 2. Equator (X-Y plane) & Meridian (X-Z plane)
+    pygame.draw.ellipse(surface, (32, 48, 80), (cx - radius, cy - int(radius * tilt), radius * 2, int(radius * tilt * 2)), 1)
+    pygame.draw.ellipse(surface, (32, 48, 80), (cx - int(radius * tilt), cy - radius, int(radius * tilt * 2), radius * 2), 1)
+
+    # 3. Z-axis (|0> on top, |1> on bottom)
+    pygame.draw.line(surface, (70, 95, 140), (cx, cy - radius - 6), (cx, cy + radius + 6), 1)
+    if font:
+        lbl0 = font.render("|0>", True, (148, 163, 184))
+        lbl1 = font.render("|1>", True, (148, 163, 184))
+        surface.blit(lbl0, (cx - lbl0.get_width() // 2, cy - radius - 16))
+        surface.blit(lbl1, (cx - lbl1.get_width() // 2, cy + radius + 4))
+
+    # 4. State vector calculation with 3D projection
+    effective_phi = phi + rot_angle
+    vx = radius * math.sin(theta) * math.cos(effective_phi)
+    vy = radius * math.sin(theta) * math.sin(effective_phi)
+    vz = radius * math.cos(theta)
+
+    # Physical Hardware Noise Jitter under decoherence
+    if stress > 0.4:
+        jitter_amp = (stress - 0.4) * 5.0
+        vx += random.uniform(-jitter_amp, jitter_amp)
+        vy += random.uniform(-jitter_amp, jitter_amp)
+
+    px = cx + int(vx)
+    py = cy - int(vz + vy * tilt)
+
+    # Phase projection onto equatorial plane
+    proj_py = cy - int(vy * tilt)
+    pygame.draw.line(surface, (60, 80, 115), (px, py), (px, proj_py), 1)
+    pygame.draw.circle(surface, (60, 80, 115), (px, proj_py), 2)
+
+    # 5. Glowing Quantum State Vector |ψ⟩
+    pygame.draw.line(surface, (168, 85, 247), (cx, cy), (px, py), 3)
+    pygame.draw.circle(surface, (192, 132, 252), (px, py), 6)
+    pygame.draw.circle(surface, (56, 189, 248), (px, py), 4)
+    pygame.draw.circle(surface, (255, 255, 255), (px, py), 2)
 
 
 # -----------------------------------------------------------------------------
@@ -343,13 +377,11 @@ class UIButton:
         dy = 1 if self.is_pressed else 0
         draw_rect = pygame.Rect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height)
 
-        # 1. Drop shadow
         if not self.is_pressed:
             shadow_surf = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
             pygame.draw.rect(shadow_surf, (0, 0, 0, 80), (0, 0, self.rect.width, self.rect.height), border_radius=6)
             surface.blit(shadow_surf, (self.rect.x, self.rect.y + 2))
 
-        # 2. Body fill and borders
         if self.is_active:
             bg = (min(255, self.active_color[0] // 3 + self.bg_color[0]),
                   min(255, self.active_color[1] // 3 + self.bg_color[1]),
@@ -367,7 +399,6 @@ class UIButton:
 
         pygame.draw.rect(surface, bg, draw_rect, border_radius=6)
 
-        # Outer glow on active/hover
         if self.is_active or self.is_hovered:
             glow_surf = pygame.Surface((draw_rect.width + 4, draw_rect.height + 4), pygame.SRCALPHA)
             glow_col = (*border[:3], 45)
@@ -376,17 +407,13 @@ class UIButton:
 
         pygame.draw.rect(surface, border, draw_rect, border_w, border_radius=6)
 
-        # Click ripple flash
         if self.ripple_timer > 0:
             alpha = int((self.ripple_timer / 0.25) * 120)
             rip_surf = pygame.Surface((draw_rect.width, draw_rect.height), pygame.SRCALPHA)
             rip_surf.fill((255, 255, 255, alpha))
             surface.blit(rip_surf, (draw_rect.x, draw_rect.y))
 
-        # Text & Vector Icon Assembly
         txt_col = COLOR_TEXT_MAIN if (self.is_active or self.is_hovered) else self.text_color
-        
-        # Check text length against button width
         display_text = self.text
         max_txt_w = draw_rect.width - (36 if self.icon else 14)
         if self.font.size(display_text)[0] > max_txt_w:
@@ -435,28 +462,29 @@ class UIButton:
 
 
 # -----------------------------------------------------------------------------
-# Weather & Particle Systems
+# Weather, Atmosphere & Dynamic Particle System
 # -----------------------------------------------------------------------------
 class WeatherSystem:
     def __init__(self, bounds: Tuple[int, int]):
         self.max_x, self.max_y = bounds
         self.rain_drops = [
-            [random.uniform(0, self.max_x), random.uniform(0, self.max_y), random.uniform(12, 19)]
+            [random.uniform(0, self.max_x), random.uniform(0, self.max_y), random.uniform(13, 20)]
             for _ in range(160)
         ]
         self.snow_flakes = [
             [random.uniform(0, self.max_x), random.uniform(0, self.max_y), random.uniform(1.2, 3.2), random.uniform(0.6, 1.8)]
-            for _ in range(95)
+            for _ in range(100)
         ]
         self.sparks: List[List[float]] = []
+        self.campfire_embers: List[List[float]] = []
         self.lightning_flash: float = 0.0
 
     def update(self, event: str, dt: float):
         if event == "storm":
             if self.lightning_flash > 0:
-                self.lightning_flash = max(0.0, self.lightning_flash - dt * 2.5)
-            elif random.random() < 0.008:
-                self.lightning_flash = 0.55
+                self.lightning_flash = max(0.0, self.lightning_flash - dt * 2.8)
+            elif random.random() < 0.009:
+                self.lightning_flash = 0.6
 
             for drop in self.rain_drops:
                 drop[0] -= 5.0 * (dt * 60)
@@ -469,12 +497,13 @@ class WeatherSystem:
 
         if event == "cold_night":
             for flake in self.snow_flakes:
-                flake[0] += math.sin(flake[1] * 0.05) * 1.3 * (dt * 60)
+                flake[0] += math.sin(flake[1] * 0.05) * 1.4 * (dt * 60)
                 flake[1] += flake[3] * (dt * 60)
                 if flake[1] > self.max_y:
                     flake[1] = 0
                     flake[0] = random.uniform(0, self.max_x)
 
+        # Action spark particles
         kept_sparks = []
         for s in self.sparks:
             s[0] += s[2] * (dt * 60)
@@ -483,6 +512,16 @@ class WeatherSystem:
             if s[4] > 0:
                 kept_sparks.append(s)
         self.sparks = kept_sparks
+
+        # Campfire rising embers
+        kept_embers = []
+        for e in self.campfire_embers:
+            e[0] += math.sin(e[1] * 0.1) * 0.5 * (dt * 60)
+            e[1] -= e[2] * (dt * 60)
+            e[3] -= dt
+            if e[3] > 0:
+                kept_embers.append(e)
+        self.campfire_embers = kept_embers
 
     def add_action_particles(self, x: float, y: float, action: str):
         color = ACTION_COLORS.get(action, COLOR_CYAN)
@@ -494,6 +533,13 @@ class WeatherSystem:
             dy = math.sin(angle) * speed - 1.5
             life = random.uniform(0.5, 1.1)
             self.sparks.append([x, y, dx, dy, life, life, color])
+
+    def spawn_campfire_ember(self, x: float, y: float):
+        if len(self.campfire_embers) < 30 and random.random() < 0.35:
+            speed = random.uniform(0.8, 2.2)
+            life = random.uniform(0.6, 1.4)
+            color = random.choice([(255, 160, 40), (255, 200, 60), (245, 100, 20)])
+            self.campfire_embers.append([x + random.uniform(-4, 4), y - 2, speed, life, life, color])
 
     def draw(self, surface: pygame.Surface, event: str):
         if event == "storm" and self.lightning_flash > 0:
@@ -512,6 +558,12 @@ class WeatherSystem:
                 x, y = int(flake[0]), int(flake[1])
                 pygame.draw.circle(surface, (241, 245, 249, 215), (x, y), int(flake[2]))
 
+        # Draw campfire embers
+        for e in self.campfire_embers:
+            size = max(1, int((e[3] / e[4]) * 3))
+            pygame.draw.circle(surface, e[5], (int(e[0]), int(e[1])), size)
+
+        # Draw action sparks
         for s in self.sparks:
             color = s[6]
             size = max(1, int((s[4] / s[5]) * 4))
@@ -527,7 +579,7 @@ class IslandVisualizerApp:
         pygame.font.init()
         pygame.display.set_caption("Stranded: 2D Quantum Island & Survival Engine")
 
-        # Query physical desktop resolution before window creation
+        # Query physical desktop display resolution before window creation
         display_info = pygame.display.Info()
         self.desktop_w = max(1024, display_info.current_w)
         self.desktop_h = max(720, display_info.current_h)
@@ -577,25 +629,61 @@ class IslandVisualizerApp:
         self._init_simulation()
         self.preview_mini_map = self._generate_mini_map(self.seed, size=300)
 
-        # Visuals
+        # Micro-Atmosphere & Lighting Systems
         self.weather = WeatherSystem((MAP_SIZE, MAP_SIZE))
         self.char_screen_x = float(self.agent.pos[0] * TILE_SIZE + TILE_SIZE / 2.0)
         self.char_screen_y = float(self.agent.pos[1] * TILE_SIZE + TILE_SIZE / 2.0)
+        self.last_char_x = self.char_screen_x
         self.char_bob = 0.0
+        self.walk_cycle = 0.0
+        self.facing_right = True
         self.bubble_text = "Awakening on uncharted shores..."
         self.bubble_timer = 3.5
         self.selected_tile: Optional[Tuple[int, int]] = None
 
+        # Pre-baked dynamic light textures (radial smooth falloff)
+        self.torch_mask = self._create_light_mask(radius=100, max_alpha=160)
+        self.torch_glow = self._create_light_glow(radius=100, color=(255, 195, 80), max_alpha=40)
+        self.campfire_mask = self._create_light_mask(radius=140, max_alpha=160)
+        self.campfire_glow = self._create_light_glow(radius=140, color=(255, 160, 40), max_alpha=55)
+
+        # Drifting atmospheric clouds
+        self.clouds = [
+            [random.uniform(-100, MAP_SIZE), random.uniform(0, MAP_SIZE), random.uniform(220, 320), random.uniform(110, 160), random.uniform(10.0, 18.0)]
+            for _ in range(4)
+        ]
+
+        # Footstep tracks that fade gently
+        self.footsteps: List[List[float]] = []
+
+        # Hologram rotation angle
+        self.bloch_rot = 0.0
+
         # Build Interactive Button Layouts
         self._build_home_buttons()
         self._build_sim_buttons()
+
+    def _create_light_mask(self, radius: int, max_alpha: int = 160) -> pygame.Surface:
+        """Pre-bakes a smooth radial falloff mask for light hole subtraction."""
+        surf = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+        for r in range(radius, 0, -2):
+            alpha = int(max_alpha * (1.0 - (r / radius) ** 1.6))
+            pygame.draw.circle(surf, (0, 0, 0, alpha), (radius, radius), r)
+        return surf
+
+    def _create_light_glow(self, radius: int, color: Tuple[int, int, int], max_alpha: int = 45) -> pygame.Surface:
+        """Pre-bakes an additive warm atmospheric glow around light sources."""
+        surf = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+        for r in range(radius, 0, -3):
+            alpha = int(max_alpha * (1.0 - (r / radius) ** 2.0))
+            pygame.draw.circle(surf, (*color[:3], alpha), (radius, radius), r)
+        return surf
 
     def toggle_fullscreen(self):
         """Toggles between Windowed and Fullscreen modes with automatic aspect-ratio scaling."""
         self.is_fullscreen = not self.is_fullscreen
         try:
             if self.is_fullscreen:
-                # Use native desktop resolution (0, 0) for true borderless fullscreen
                 self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
             else:
                 self.screen = pygame.display.set_mode((self.window_w, self.window_h), pygame.RESIZABLE)
@@ -612,9 +700,6 @@ class IslandVisualizerApp:
         """Maps physical window/fullscreen mouse coordinates back into the virtual 1600x900 canvas."""
         raw_x, raw_y = pygame.mouse.get_pos()
         sw, sh = self.screen.get_size()
-        if sw == WINDOW_WIDTH and sh == WINDOW_HEIGHT:
-            return raw_x, raw_y
-
         scale = min(sw / WINDOW_WIDTH, sh / WINDOW_HEIGHT)
         if scale <= 0:
             return raw_x, raw_y
@@ -643,7 +728,6 @@ class IslandVisualizerApp:
                 rect = (int(x * t_sz), int(y * t_sz), math.ceil(t_sz), math.ceil(t_sz))
                 pygame.draw.rect(surf, col, rect)
 
-        # Spawn indicator (red dot with white border)
         sx, sy = int(w.spawn_pos[0] * t_sz), int(w.spawn_pos[1] * t_sz)
         pygame.draw.circle(surf, COLOR_RED, (sx, sy), 6)
         pygame.draw.circle(surf, COLOR_TEXT_MAIN, (sx, sy), 4)
@@ -653,13 +737,11 @@ class IslandVisualizerApp:
         col2_x = 480
         top_y = 115
 
-        # Fullscreen Toggle Button on Home Screen
         self.btn_home_fs = UIButton(
             (WINDOW_WIDTH - 170, 24, 140, 36), "Fullscreen", self.font_body,
             bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="fullscreen"
         )
 
-        # 1. Mind Toggle Cards
         card_w = 515
         self.btn_mind_quantum = UIButton(
             (col2_x + 24, top_y + 36, card_w, 80), "2-Qubit Quantum Mind", self.font_title,
@@ -672,7 +754,6 @@ class IslandVisualizerApp:
             subfont=self.font_small, active_color=COLOR_BLUE, icon="classical"
         )
 
-        # 2. Preset Island Map Buttons (2x2 Grid)
         self.preset_buttons: List[UIButton] = []
         p_y = top_y + 165
         for i, preset in enumerate(PRESETS):
@@ -682,7 +763,6 @@ class IslandVisualizerApp:
                            subtext=preset["tag"], subfont=self.font_small, active_color=preset["color"])
             self.preset_buttons.append(btn)
 
-        # 3. Seed Steppers
         s_y = top_y + 300
         self.btn_seed_m100 = UIButton((col2_x + 24, s_y, 65, 38), "-100", self.font_body)
         self.btn_seed_m10 = UIButton((col2_x + 95, s_y, 55, 38), "-10", self.font_body)
@@ -693,7 +773,6 @@ class IslandVisualizerApp:
         self.btn_seed_rand = UIButton((col2_x + 768, s_y, 270, 38), "Random Island", self.font_sub,
                                       active_color=COLOR_YELLOW, icon="random")
 
-        # 4. Step Number Buttons
         self.step_buttons: List[UIButton] = []
         step_choices = [12, 24, 36, 48]
         st_y = top_y + 395
@@ -703,14 +782,12 @@ class IslandVisualizerApp:
             btn = UIButton((sx, st_y, btn_w, 44), f"{steps} Steps ({steps*2}h)", self.font_sub, active_color=COLOR_CYAN)
             self.step_buttons.append(btn)
 
-        # 5. Launch Button
         self.btn_launch = UIButton(
             (col2_x + 24, top_y + 490, 1046, 68), "LAUNCH SURVIVAL SIMULATION", self.font_hero,
             bg_color=(21, 128, 61), active_color=COLOR_GREEN, icon="launch"
         )
 
     def _build_sim_buttons(self):
-        # Map view top navigation bar buttons
         self.btn_nav_home = UIButton((14, 10, 105, 32), "Menu", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="menu")
         self.btn_nav_pause = UIButton((127, 10, 100, 32), "Pause", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_YELLOW, icon="pause")
         self.btn_nav_step = UIButton((235, 10, 100, 32), "Step >", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_GREEN, icon="step")
@@ -719,7 +796,6 @@ class IslandVisualizerApp:
         self.btn_nav_log = UIButton((609, 10, 130, 32), "Action Log", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="log")
         self.btn_nav_fs = UIButton((747, 10, 138, 32), "Fullscreen", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="fullscreen")
 
-        # Debrief modal buttons
         mx = WINDOW_WIDTH // 2
         my = WINDOW_HEIGHT // 2
         self.btn_modal_replay = UIButton((mx - 270, my + 175, 160, 46), "Replay Run", self.font_sub, bg_color=(37, 99, 235), icon="replay")
@@ -727,7 +803,6 @@ class IslandVisualizerApp:
         self.btn_modal_home = UIButton((mx + 110, my + 175, 160, 46), "Home Menu", self.font_sub, bg_color=(51, 65, 85), icon="menu")
         self.btn_modal_close = UIButton((mx + 360, my - 225, 34, 34), "X", self.font_title, bg_color=COLOR_PANEL_BG)
 
-        # History log modal close
         self.btn_hist_close = UIButton((WINDOW_WIDTH // 2 + 500, 45, 34, 34), "X", self.font_title, bg_color=COLOR_PANEL_BG)
 
     def _init_simulation(self):
@@ -748,16 +823,11 @@ class IslandVisualizerApp:
         self.is_paused = False
 
     def step_forward(self):
-        """Advances the simulation by one 2-hour step."""
         if not self.agent.is_alive or self.step_idx >= self.max_steps:
             self.show_debrief_modal = True
             return
 
-        # 1. State snapshot
-        decision_state = self.agent.get_state()
         in_shelter = self.world.is_in_shelter(self.agent.pos[0], self.agent.pos[1])
-
-        # 2. Environmental Hazard
         event = self.event_gen.step_event(
             day=self.agent.day,
             hour=self.agent.hour,
@@ -768,24 +838,20 @@ class IslandVisualizerApp:
         self.current_event = event
         self.agent.apply_event(event, in_shelter=in_shelter)
 
-        # 3. Decision
         decision = self.decide_fn(self.agent.get_state())
         contracts.validate_decision(decision)
         self.current_decision = decision
         action = decision["action"]
 
-        # 4. Action Execution
         narrative = self.agent.execute_action(action, self.world)
         in_shelter_after = self.world.is_in_shelter(self.agent.pos[0], self.agent.pos[1])
         self.agent.step_decay(in_shelter=in_shelter_after)
 
-        # 5. Visual Particles & Speech Bubble
         self.weather.add_action_particles(self.char_screen_x, self.char_screen_y, action)
         clean_narrative = narrative.split(';')[0]
         self.bubble_text = f"{action.upper()}: {clean_narrative}"
         self.bubble_timer = 2.8
 
-        # 6. Record
         self.step_idx += 1
         self.history.append({
             "t": self.step_idx,
@@ -858,7 +924,6 @@ class IslandVisualizerApp:
                         else:
                             self._handle_sim_click(virt_pos)
 
-            # Auto-stepping logic
             if self.app_state == "sim" and not self.is_paused and not self.show_debrief_modal and not self.show_history_overlay:
                 if self.agent.is_alive and self.step_idx < self.max_steps:
                     effective_delay = self.step_delay / self.speed_multiplier
@@ -866,19 +931,47 @@ class IslandVisualizerApp:
                         self.step_forward()
                         self.last_step_time = now
 
-            # Smooth Character Interpolation & Bobbing
+            # Smooth Character Interpolation, Bobbing & Walk Cycle
             if self.app_state == "sim":
                 target_x = float(self.agent.pos[0] * TILE_SIZE + TILE_SIZE / 2.0)
                 target_y = float(self.agent.pos[1] * TILE_SIZE + TILE_SIZE / 2.0)
                 dist = math.hypot(target_x - self.char_screen_x, target_y - self.char_screen_y)
-                if dist > 1.0:
-                    self.char_bob += dt * 15.0
+
+                if dist > 1.2:
+                    self.char_bob += dt * 14.0
+                    self.walk_cycle += dt * 12.0
+                    self.facing_right = (target_x >= self.char_screen_x)
+                    # Spawn footstep in sand or snow
+                    if random.random() < 0.2:
+                        cur_tile = self.world.get_tile(self.agent.pos[0], self.agent.pos[1])
+                        is_snow = (cur_tile == 3) or (self.current_event == "cold_night")
+                        self.footsteps.append([self.char_screen_x, self.char_screen_y + 8, 1.0, is_snow])
                 else:
                     self.char_bob = math.sin(time.time() * 3.0) * 0.8
+                    self.walk_cycle = 0.0
 
                 self.char_screen_x += (target_x - self.char_screen_x) * min(1.0, 10.0 * dt)
                 self.char_screen_y += (target_y - self.char_screen_y) * min(1.0, 10.0 * dt)
                 self.weather.update(self.current_event, dt)
+
+                # Update fading footsteps
+                kept_fs = []
+                for fs in self.footsteps:
+                    fs[2] -= dt * 0.06
+                    if fs[2] > 0:
+                        kept_fs.append(fs)
+                self.footsteps = kept_fs[-25:]
+
+                # Update drifting cloud masses
+                for c in self.clouds:
+                    c[0] += c[4] * dt
+                    if c[0] > MAP_SIZE + 250:
+                        c[0] = -320
+                        c[1] = random.uniform(0, MAP_SIZE)
+
+                # Update hologram rotation angle
+                self.bloch_rot += dt * 0.75
+
                 if self.bubble_timer > 0:
                     self.bubble_timer -= dt
 
@@ -1022,7 +1115,6 @@ class IslandVisualizerApp:
                 self.show_debrief_modal = False
             return
 
-        # Top Nav Bar Clicks
         if self.btn_nav_home.check_hover(pos):
             self.btn_nav_home.trigger_click()
             self.app_state = "home"
@@ -1055,7 +1147,6 @@ class IslandVisualizerApp:
             self.toggle_fullscreen()
             return
 
-        # Map Clicks
         mx, my = pos
         if mx < MAP_SIZE and my < MAP_SIZE:
             tx, ty = int(mx / TILE_SIZE), int(my / TILE_SIZE)
@@ -1075,18 +1166,15 @@ class IslandVisualizerApp:
         self.canvas.fill(COLOR_BG)
         t_time = time.time()
 
-        # Background subtle ambient ocean waves
         for y in range(0, WINDOW_HEIGHT, 36):
             shift = math.sin(t_time * 1.6 + y * 0.08) * 18
             pygame.draw.line(self.canvas, (18, 28, 48), (0, y + shift), (WINDOW_WIDTH, y + shift), 1)
 
-        # Fullscreen Toggle Button on Home Screen
         self.btn_home_fs.text = "Windowed" if self.is_fullscreen else "Fullscreen"
         self.btn_home_fs.icon = "windowed" if self.is_fullscreen else "fullscreen"
         self.btn_home_fs.check_hover(mouse_pos)
         self.btn_home_fs.draw(self.canvas)
 
-        # Header Title
         title_surf = self.font_hero.render("STRANDED: QUANTUM SURVIVAL ENGINE", True, COLOR_TEXT_MAIN)
         self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, 22))
 
@@ -1094,7 +1182,6 @@ class IslandVisualizerApp:
         sub_surf = self.font_sub.render(sub_str, True, COLOR_CYAN)
         self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, 62))
 
-        # Left Reconnaissance Card: Live Island Mini-Map (430 x 755)
         col1_x = 32
         col1_y = 96
         col1_w = 430
@@ -1104,19 +1191,16 @@ class IslandVisualizerApp:
         c1_title = self.font_title.render("ISLAND RECONNAISSANCE", True, COLOR_YELLOW)
         self.canvas.blit(c1_title, (col1_x + 22, col1_y + 18))
 
-        # Mini-map container (300 x 300)
         map_box = pygame.Rect(col1_x + (col1_w - 300) // 2, col1_y + 54, 300, 300)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, map_box, 2, border_radius=6)
         self.canvas.blit(self.preview_mini_map, (map_box.x, map_box.y))
 
-        # Spawn dot legend with procedural drawing (Zero unicode squares)
         leg_y = col1_y + 368
         pygame.draw.circle(self.canvas, COLOR_RED, (col1_x + 36, leg_y + 7), 5)
         pygame.draw.circle(self.canvas, COLOR_TEXT_MAIN, (col1_x + 36, leg_y + 7), 3)
         leg_surf = self.font_small.render("Red dot: Initial survivor drop-in spawn coordinate", True, COLOR_TEXT_MUTED)
         self.canvas.blit(leg_surf, (col1_x + 50, leg_y))
 
-        # Terrain Statistics
         stat_y = col1_y + 400
         stats_box = pygame.Rect(col1_x + 20, stat_y, col1_w - 40, 335)
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, stats_box, border_radius=8)
@@ -1143,14 +1227,12 @@ class IslandVisualizerApp:
             col = COLOR_CYAN if i == 0 else (COLOR_GREEN if i in (2, 3) else COLOR_TEXT_MUTED)
             self.canvas.blit(self.font_mono.render(line, True, col), (stats_box.x + 18, stats_box.y + 18 + i * 36))
 
-        # Right Configuration Card (1088 x 760)
         col2_x = 480
         col2_y = 96
         col2_w = 1088
         col2_h = 760
         self.draw_card(col2_x, col2_y, col2_w, col2_h)
 
-        # 1. Decision Mind Selection
         m_lbl = self.font_title.render("1. Select Cognitive Mind Model", True, COLOR_TEXT_MAIN)
         self.canvas.blit(m_lbl, (col2_x + 24, col2_y + 16))
 
@@ -1161,7 +1243,6 @@ class IslandVisualizerApp:
         self.btn_mind_quantum.draw(self.canvas)
         self.btn_mind_classical.draw(self.canvas)
 
-        # 2. Island Presets & Custom Stepper
         p_lbl = self.font_title.render("2. Select Island Preset or Custom World Seed", True, COLOR_TEXT_MAIN)
         self.canvas.blit(p_lbl, (col2_x + 24, col2_y + 138))
 
@@ -1180,7 +1261,6 @@ class IslandVisualizerApp:
             s_btn.check_hover(mouse_pos)
             s_btn.draw(self.canvas)
 
-        # 3. Simulation Duration
         st_lbl = self.font_title.render("3. Simulation Step Horizon (2 Hours per Turn)", True, COLOR_TEXT_MAIN)
         self.canvas.blit(st_lbl, (col2_x + 24, col2_y + 365))
 
@@ -1190,11 +1270,9 @@ class IslandVisualizerApp:
             st_btn.check_hover(mouse_pos)
             st_btn.draw(self.canvas)
 
-        # 4. Hero Launch Button
         self.btn_launch.check_hover(mouse_pos)
         self.btn_launch.draw(self.canvas)
 
-        # Quick Reference Hints
         hints_box = pygame.Rect(col2_x + 24, col2_y + 578, 1046, 155)
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, hints_box, border_radius=8)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, hints_box, 1, border_radius=8)
@@ -1220,25 +1298,28 @@ class IslandVisualizerApp:
     def draw_sim_screen(self, mouse_pos: Tuple[int, int]):
         self.canvas.fill(COLOR_BG)
 
-        # 1. Map Surface (900 x 900)
+        # 1. Map Surface (900 x 900) - 2.5D Organic Terrain & Depth
         self.draw_island_map()
 
-        # 2. Weather & Lighting
-        self.draw_atmosphere()
+        # 2. Footstep prints & micro-trails
+        self.draw_footsteps()
 
-        # 3. Survivor Character & Overhead Bubble
+        # 3. Dynamic Survivor Avatar & Quantum Superposition Echoes
         self.draw_character()
 
-        # 4. Top Map Bar Controls
+        # 4. Atmosphere, Radial Lights & Drifting Cloud Shadows
+        self.draw_atmosphere()
+
+        # 5. Top Map Bar Controls
         self.draw_map_navigation_bar(mouse_pos)
 
-        # 5. Telemetry & Analytics Dashboard (700 x 900)
+        # 6. Telemetry & Analytics Dashboard (700 x 900)
         self.draw_dashboard()
 
-        # 6. Floating Tile Inspector Tooltip
+        # 7. Floating Tile Inspector Tooltip
         self.draw_tile_tooltip(mouse_pos)
 
-        # 7. Modals: Full Action Log Overlay or Debrief Modal
+        # 8. Modals: Full Action Log Overlay or Debrief Modal
         if self.show_history_overlay:
             self.draw_history_overlay(mouse_pos)
         elif self.show_debrief_modal:
@@ -1246,7 +1327,7 @@ class IslandVisualizerApp:
 
     def draw_map_navigation_bar(self, mouse_pos: Tuple[int, int]):
         bar_bg = pygame.Surface((MAP_SIZE, 52), pygame.SRCALPHA)
-        bar_bg.fill((15, 23, 42, 225))
+        bar_bg.fill((15, 23, 42, 230))
         self.canvas.blit(bar_bg, (0, 0))
         pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (0, 52), (MAP_SIZE, 52), 1)
 
@@ -1265,7 +1346,18 @@ class IslandVisualizerApp:
             btn.check_hover(mouse_pos)
             btn.draw(self.canvas)
 
+    def draw_footsteps(self):
+        """Draws fading survivor footsteps in sand or mountain snow."""
+        for fs in self.footsteps:
+            x, y, alpha, is_snow = fs
+            col = (220, 235, 255) if is_snow else (160, 125, 60)
+            alpha_val = max(10, int(alpha * 110))
+            surf = pygame.Surface((6, 4), pygame.SRCALPHA)
+            pygame.draw.ellipse(surf, (*col, alpha_val), (0, 0, 6, 4))
+            self.canvas.blit(surf, (int(x - 3), int(y - 2)))
+
     def draw_island_map(self):
+        """Renders 2.5D organic terrain with animated coastal surf and depth."""
         t_time = time.time()
         for y in range(GRID_DIM):
             for x in range(GRID_DIM):
@@ -1275,51 +1367,158 @@ class IslandVisualizerApp:
                 rw = int(round((x + 1) * TILE_SIZE)) - rx
                 rh = int(round((y + 1) * TILE_SIZE)) - ry
                 rect = pygame.Rect(rx, ry, rw, rh)
+                cx = rx + rw // 2
+                cy = ry + rh // 2
 
+                # ---------------------------------------------------------
+                # 0: Ocean & Animated Coastal Surf
+                # ---------------------------------------------------------
                 if tile == 0:
                     is_fresh = (x, y) in self.world.freshwater_tiles
                     if is_fresh:
-                        flow = math.sin(t_time * 4.0 + x * 0.6 + y * 0.6) * 22
-                        base = (56, max(0, min(255, 189 + int(flow))), 248)
+                        # Flowing freshwater stream
+                        flow = math.sin(t_time * 4.0 + x * 0.7 + y * 0.7) * 20
+                        base = (45, max(0, min(255, 190 + int(flow))), 240)
                         pygame.draw.rect(self.canvas, base, rect)
-                        pygame.draw.circle(self.canvas, (224, 242, 254), (rx + rw // 2, ry + rh // 2), 3)
+                        # Stream river sparkles
+                        pygame.draw.circle(self.canvas, (215, 245, 255), (cx, cy), 3)
+                        pygame.draw.line(self.canvas, (180, 235, 255), (rx + 4, cy), (rx + rw - 4, cy), 1)
                     else:
-                        wave = math.sin(t_time * 2.2 + x * 0.35 + y * 0.45) * 16
-                        c = (27, max(0, min(255, 58 + int(wave))), 91)
-                        pygame.draw.rect(self.canvas, c, rect)
+                        # Check if water tile is coastal (adjacent to land)
+                        is_coastal = any(
+                            0 <= x + dx < GRID_DIM and 0 <= y + dy < GRID_DIM and self.world.get_tile(x + dx, y + dy) != 0
+                            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                        )
+                        if is_coastal:
+                            # Shallow turquoise lagoon water
+                            lagoon = (30, 140, 180)
+                            pygame.draw.rect(self.canvas, lagoon, rect)
+                            # Animated breathing shore foam
+                            foam_breathe = math.sin(t_time * 3.2 + x * 0.6 + y * 0.6)
+                            if foam_breathe > 0.1:
+                                foam_w = max(2, int(foam_breathe * 4))
+                                pygame.draw.circle(self.canvas, (230, 248, 255), (cx, cy), foam_w)
+                        else:
+                            # Deep ocean blue with ambient swell waves
+                            wave = math.sin(t_time * 2.2 + x * 0.35 + y * 0.45) * 14
+                            c = (20, max(0, min(255, 52 + int(wave))), 90)
+                            pygame.draw.rect(self.canvas, c, rect)
+                            if (x + y) % 5 == 0:
+                                pygame.draw.line(self.canvas, (35, 75, 120), (rx + 3, cy), (rx + rw - 3, cy), 1)
 
+                # ---------------------------------------------------------
+                # 1: Sand Beach & Coastal Plains
+                # ---------------------------------------------------------
                 elif tile == 1:
                     has_water_adj = any(
                         0 <= x + dx < GRID_DIM and 0 <= y + dy < GRID_DIM and self.world.get_tile(x + dx, y + dy) == 0
                         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]
                     )
-                    color = (234, 179, 8) if has_water_adj else (132, 204, 22)
-                    pygame.draw.rect(self.canvas, color, rect)
-                    speck = (202, 138, 4) if has_water_adj else (101, 163, 13)
-                    pygame.draw.rect(self.canvas, speck, (rx + 4, ry + 4, 3, 3))
+                    if has_water_adj:
+                        # Coastal beach sand
+                        pygame.draw.rect(self.canvas, (225, 185, 105), rect)
+                        pygame.draw.rect(self.canvas, (200, 155, 80), (rx + 4, ry + 4, 3, 3))
+                        pygame.draw.rect(self.canvas, (240, 205, 130), (rx + rw - 6, ry + rh - 6, 2, 2))
+                    else:
+                        # Lush inland grassy plains
+                        pygame.draw.rect(self.canvas, (115, 185, 45), rect)
+                        pygame.draw.rect(self.canvas, (95, 160, 35), (rx + 5, ry + 5, 3, 4))
+                        # Small wildflower dot
+                        if (x * 7 + y * 13) % 9 == 0:
+                            pygame.draw.circle(self.canvas, (250, 220, 90), (cx + 2, cy - 2), 2)
 
+                # ---------------------------------------------------------
+                # 2: Dense Pine Forest (Layered 2.5D Trees)
+                # ---------------------------------------------------------
                 elif tile == 2:
-                    pygame.draw.rect(self.canvas, (22, 101, 52), rect)
-                    pygame.draw.circle(self.canvas, (21, 128, 61), (rx + rw // 2, ry + rh // 2), rw // 2 - 1)
+                    # Forest floor grass
+                    pygame.draw.rect(self.canvas, (20, 85, 40), rect)
+
+                    # Southeast ground shadow
+                    pygame.draw.ellipse(self.canvas, (0, 0, 0, 70), (cx - 7, cy + 3, 16, 7))
+
+                    # Wind sway horizontal offset
+                    sway = math.sin(t_time * 2.0 + x * 0.4 + y * 0.6) * 1.5
+
+                    # Timber trunk
+                    pygame.draw.rect(self.canvas, (105, 55, 25), (cx - 2, cy + 1, 4, 7))
+
+                    # 3 Overlapping Canopy Tiers (Base to Top)
+                    t_cx = cx + sway
+                    # Tier 1 (Bottom wide canopy)
+                    pygame.draw.polygon(self.canvas, (18, 95, 46), [(t_cx, cy - 4), (t_cx - 8, cy + 4), (t_cx + 8, cy + 4)])
+                    # Tier 2 (Middle canopy with sunlit highlight)
+                    pygame.draw.polygon(self.canvas, (22, 115, 52), [(t_cx, cy - 8), (t_cx - 6, cy - 1), (t_cx + 6, cy - 1)])
+                    pygame.draw.polygon(self.canvas, (32, 145, 65), [(t_cx, cy - 8), (t_cx - 6, cy - 1), (t_cx, cy - 1)])
+                    # Tier 3 (Pine peak tip)
+                    pygame.draw.polygon(self.canvas, (28, 138, 62), [(t_cx, cy - 12), (t_cx - 4, cy - 6), (t_cx + 4, cy - 6)])
+
+                    # Wild Foraging Berry Node
                     if (x, y) in self.world.food_tiles:
-                        pygame.draw.circle(self.canvas, COLOR_RED, (rx + 6, ry + 6), 3)
-                        pygame.draw.circle(self.canvas, COLOR_RED, (rx + 15, ry + 8), 3)
+                        pygame.draw.circle(self.canvas, (235, 35, 35), (int(t_cx - 5), cy - 2), 3)
+                        pygame.draw.circle(self.canvas, (235, 35, 35), (int(t_cx + 4), cy - 1), 3)
+                        pygame.draw.circle(self.canvas, (255, 180, 180), (int(t_cx - 6), cy - 3), 1)
 
+                # ---------------------------------------------------------
+                # 3: Chiseled 3D Mountain Peaks
+                # ---------------------------------------------------------
                 elif tile == 3:
-                    pygame.draw.rect(self.canvas, (71, 85, 105), rect)
-                    p1 = (rx + rw // 2, ry + 3)
-                    p2 = (rx + 3, ry + rh - 3)
-                    p3 = (rx + rw - 3, ry + rh - 3)
-                    pygame.draw.polygon(self.canvas, (100, 116, 139), [p1, p2, p3])
-                    pygame.draw.polygon(self.canvas, (248, 250, 252), [p1, (rx + rw // 2 - 4, ry + 8), (rx + rw // 2 + 4, ry + 8)])
+                    # Mountain base foothills
+                    pygame.draw.rect(self.canvas, (60, 72, 88), rect)
 
+                    peak = (cx, ry + 2)
+                    left_base = (rx + 2, ry + rh - 2)
+                    right_base = (rx + rw - 2, ry + rh - 2)
+                    center_ridge = (cx + 2, ry + rh - 2)
+
+                    # Lit Northwest rock face
+                    pygame.draw.polygon(self.canvas, (120, 138, 160), [peak, left_base, center_ridge])
+                    # Shadowed Southeast rock face
+                    pygame.draw.polygon(self.canvas, (55, 68, 85), [peak, center_ridge, right_base])
+
+                    # Alpine Glacial Snowcap
+                    snow_l = (cx - 4, ry + 8)
+                    snow_r = (cx + 4, ry + 8)
+                    snow_c = (cx + 1, ry + 9)
+                    pygame.draw.polygon(self.canvas, (250, 252, 255), [peak, snow_l, snow_c])
+                    pygame.draw.polygon(self.canvas, (195, 215, 235), [peak, snow_c, snow_r])
+
+                # ---------------------------------------------------------
+                # 4: Survivor Log Cabin & Campfire
+                # ---------------------------------------------------------
                 elif tile == 4:
-                    pygame.draw.rect(self.canvas, (101, 163, 13), rect)
-                    p_roof = [(rx + rw // 2, ry + 2), (rx + 2, ry + rh - 3), (rx + rw - 2, ry + rh - 3)]
-                    pygame.draw.polygon(self.canvas, (180, 83, 9), p_roof)
-                    ember_glow = int(math.sin(t_time * 6.0) * 40)
-                    pygame.draw.circle(self.canvas, (245, max(0, min(255, 158 + ember_glow)), 11), (rx + rw // 2, ry + rh - 5), 4)
+                    # Ground grass
+                    pygame.draw.rect(self.canvas, (90, 155, 40), rect)
 
+                    # Cabin drop shadow
+                    pygame.draw.ellipse(self.canvas, (0, 0, 0, 75), (rx + 2, ry + rh - 6, rw - 4, 6))
+
+                    # Timber cabin wall
+                    pygame.draw.rect(self.canvas, (115, 65, 25), (rx + 3, ry + 8, rw - 6, rh - 10), border_radius=2)
+                    # Door opening
+                    pygame.draw.rect(self.canvas, (35, 20, 10), (cx - 2, ry + 12, 5, rh - 14))
+
+                    # Thatched pitched A-frame roof
+                    p_roof = [(cx, ry + 2), (rx + 1, ry + 9), (rx + rw - 1, ry + 9)]
+                    pygame.draw.polygon(self.canvas, (165, 90, 20), p_roof)
+                    pygame.draw.line(self.canvas, (190, 115, 35), (cx, ry + 2), (cx, ry + 9), 1)
+
+                    # Campfire outside shelter
+                    fire_x = cx + 6
+                    fire_y = ry + rh - 4
+                    # Stone circle
+                    pygame.draw.circle(self.canvas, (100, 110, 125), (fire_x, fire_y), 5, 1)
+                    # Flickering flame
+                    flame_h = max(2, int(4 + math.sin(t_time * 12.0) * 3))
+                    pygame.draw.polygon(self.canvas, (245, 120, 20), [
+                        (fire_x, fire_y - flame_h),
+                        (fire_x - 3, fire_y + 1),
+                        (fire_x + 3, fire_y + 1)
+                    ])
+                    pygame.draw.circle(self.canvas, (255, 220, 60), (fire_x, fire_y - 1), 2)
+                    self.weather.spawn_campfire_ember(fire_x, fire_y)
+
+        # Selected Tile Cursor Highlight
         if self.selected_tile:
             tx, ty = self.selected_tile
             s_rect = pygame.Rect(int(tx * TILE_SIZE), int(ty * TILE_SIZE), int(TILE_SIZE), int(TILE_SIZE))
@@ -1328,53 +1527,161 @@ class IslandVisualizerApp:
         pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (MAP_SIZE, 0), (MAP_SIZE, WINDOW_HEIGHT), 2)
 
     def draw_atmosphere(self):
+        """Renders time-of-day dynamic solar lighting, torch cutouts, and cloud shadows."""
         hour = self.agent.hour
-        if hour >= 21 or hour <= 5:
-            night_surf = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
-            night_surf.fill((10, 15, 35, 125))
-            self.canvas.blit(night_surf, (0, 0))
+        t_time = time.time()
 
+        # 1. Drifting cumulus cloud shadows (moving from west to east)
+        for c in self.clouds:
+            c_surf = pygame.Surface((int(c[2]), int(c[3])), pygame.SRCALPHA)
+            pygame.draw.ellipse(c_surf, (0, 0, 0, 35), (0, 0, int(c[2]), int(c[3])))
+            self.canvas.blit(c_surf, (int(c[0]), int(c[1])))
+
+        # 2. Solar Day / Night Lighting Mask
+        # Determine darkness alpha based on hour
+        darkness = 0
+        if hour >= 21 or hour <= 4:
+            darkness = 160  # Deep Night
+        elif hour in (5, 20):
+            darkness = 95   # Dawn / Dusk Twilight
+        elif hour in (6, 19):
+            darkness = 45   # Golden Hour
+
+        if darkness > 0:
+            dark_surf = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
+            dark_surf.fill((10, 15, 35, darkness))
+
+            # Carve out torchlight hole around survivor using BLEND_RGBA_SUB
+            survivor_x = int(self.char_screen_x)
+            survivor_y = int(self.char_screen_y)
+            dark_surf.blit(self.torch_mask, (survivor_x - 100, survivor_y - 100), special_flags=pygame.BLEND_RGBA_SUB)
+
+            # Carve out campfire light holes around shelters
+            for (sx, sy) in self.world.shelter_tiles:
+                sc_x = int(sx * TILE_SIZE + TILE_SIZE / 2)
+                sc_y = int(sy * TILE_SIZE + TILE_SIZE / 2)
+                dark_surf.blit(self.campfire_mask, (sc_x - 140, sc_y - 140), special_flags=pygame.BLEND_RGBA_SUB)
+
+            self.canvas.blit(dark_surf, (0, 0))
+
+            # Add warm golden/amber additive light glow on top
+            self.canvas.blit(self.torch_glow, (survivor_x - 100, survivor_y - 100), special_flags=pygame.BLEND_RGBA_ADD)
+            for (sx, sy) in self.world.shelter_tiles:
+                sc_x = int(sx * TILE_SIZE + TILE_SIZE / 2)
+                sc_y = int(sy * TILE_SIZE + TILE_SIZE / 2)
+                self.canvas.blit(self.campfire_glow, (sc_x - 140, sc_y - 140), special_flags=pygame.BLEND_RGBA_ADD)
+
+        # 3. Cold Night Frost Vignette
         if self.current_event == "cold_night":
             frost_surf = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
-            frost_surf.fill((148, 197, 245, 45))
+            frost_surf.fill((148, 197, 245, 50))
             self.canvas.blit(frost_surf, (0, 0))
 
+        # 4. Weather Systems (Rain, Lightning, Snow)
         self.weather.draw(self.canvas, self.current_event)
 
     def draw_character(self):
-        cx, cy = int(self.char_screen_x), int(self.char_screen_y + self.char_bob)
+        """Renders stylized 2.5D survivor avatar with walking animations and quantum superposition echoes."""
+        cx = int(self.char_screen_x)
+        cy = int(self.char_screen_y + self.char_bob)
+        t_time = time.time()
+
+        # -------------------------------------------------------------
+        # Quantum Superposition Ghost Silhouettes (Entropy Visualizer)
+        # -------------------------------------------------------------
+        if self.mind_type == "quantum":
+            probs = self.current_decision.get("probs", {})
+            # If multiple actions have significant probability, render superposition echoes
+            high_prob_actions = [a for a, p in probs.items() if p > 0.18]
+            if len(high_prob_actions) >= 2:
+                ghost_offset = math.sin(t_time * 6.0) * 10
+                ghost_surf = pygame.Surface((28, 32), pygame.SRCALPHA)
+                # Cyan ghost
+                pygame.draw.rect(ghost_surf, (56, 189, 248, 45), (6, 6, 12, 14), border_radius=3)
+                pygame.draw.circle(ghost_surf, (56, 189, 248, 45), (12, 6), 6)
+                self.canvas.blit(ghost_surf, (cx - 14 + int(ghost_offset), cy - 16))
+                # Purple ghost
+                ghost_surf_p = pygame.Surface((28, 32), pygame.SRCALPHA)
+                pygame.draw.rect(ghost_surf_p, (168, 85, 247, 45), (6, 6, 12, 14), border_radius=3)
+                pygame.draw.circle(ghost_surf_p, (168, 85, 247, 45), (12, 6), 6)
+                self.canvas.blit(ghost_surf_p, (cx - 14 - int(ghost_offset), cy - 16))
 
         # Ground Shadow
-        shadow_surf = pygame.Surface((26, 12), pygame.SRCALPHA)
-        pygame.draw.ellipse(shadow_surf, (0, 0, 0, 95), (0, 0, 26, 12))
-        self.canvas.blit(shadow_surf, (cx - 13, cy + 7))
+        pygame.draw.ellipse(self.canvas, (0, 0, 0, 85), (cx - 12, cy + 8, 24, 10))
 
-        # Torso & Clothing
-        body_color = (217, 119, 6) if not self.agent.injured else (185, 28, 28)
-        pygame.draw.rect(self.canvas, body_color, (cx - 6, cy - 7, 12, 14), border_radius=3)
+        # Shivering jitter under extreme cold
+        jx = int(random.uniform(-1, 1)) if (self.current_event == "cold_night" or self.agent.needs["warmth"] < 0.3) else 0
+        cx += jx
 
-        # Head & Blue Cap
-        pygame.draw.circle(self.canvas, (254, 215, 170), (cx, cy - 12), 7)
-        pygame.draw.circle(self.canvas, (67, 56, 202), (cx, cy - 14), 7, 2)
-        # Satchel
-        pygame.draw.rect(self.canvas, (120, 53, 15), (cx + 4, cy - 5, 5, 8), border_radius=1)
+        # Procedural Walking Strides (Legs & Boots)
+        leg_stride = math.sin(self.walk_cycle) * 3
+        # Left Leg
+        pygame.draw.rect(self.canvas, (35, 45, 60), (cx - 5, cy + 3 + int(leg_stride), 4, 8))
+        pygame.draw.rect(self.canvas, (75, 45, 20), (cx - 6 if self.facing_right else cx - 5, cy + 9 + int(leg_stride), 5, 4))
+        # Right Leg
+        pygame.draw.rect(self.canvas, (35, 45, 60), (cx + 1, cy + 3 - int(leg_stride), 4, 8))
+        pygame.draw.rect(self.canvas, (75, 45, 20), (cx + 1 if self.facing_right else cx, cy + 9 - int(leg_stride), 5, 4))
 
-        # Injury Cross
+        # Torso & Explorer Jacket
+        body_col = (215, 120, 20) if not self.agent.injured else (185, 28, 28)
+        pygame.draw.rect(self.canvas, body_col, (cx - 6, cy - 8, 12, 13), border_radius=3)
+        # Utility Belt & Gold Buckle
+        pygame.draw.rect(self.canvas, (45, 30, 15), (cx - 6, cy + 1, 12, 3))
+        pygame.draw.rect(self.canvas, (234, 179, 8), (cx - 2, cy + 1, 4, 3))
+
+        # Adventurer Leather Backpack (Facing-Aware)
+        bp_x = cx - 9 if self.facing_right else cx + 4
+        pygame.draw.rect(self.canvas, (115, 60, 20), (bp_x, cy - 7, 5, 10), border_radius=2)
+        # Bedroll on top of backpack
+        pygame.draw.rect(self.canvas, (65, 80, 100), (bp_x - 1, cy - 10, 7, 4), border_radius=2)
+
+        # Arms & Handheld Explorer Equipment
+        arm_swing = math.sin(self.walk_cycle) * 2
+        arm_x = cx + 5 if self.facing_right else cx - 7
+        pygame.draw.rect(self.canvas, body_col, (arm_x, cy - 6 + int(arm_swing), 3, 8), border_radius=1)
+        # Walking staff / torch held in hand
+        pygame.draw.line(self.canvas, (105, 65, 30), (arm_x + 1, cy - 12 + int(arm_swing)), (arm_x + 1, cy + 10 + int(arm_swing)), 2)
+        # Torch flame tip
+        pygame.draw.circle(self.canvas, (255, 180, 50), (arm_x + 1, cy - 13 + int(arm_swing)), 3)
+
+        # Head & Explorer Hat
+        pygame.draw.circle(self.canvas, (254, 215, 170), (cx, cy - 13), 6)
+        # Hat Brim & Crown
+        pygame.draw.ellipse(self.canvas, (55, 65, 85), (cx - 9, cy - 18, 18, 6))
+        pygame.draw.rect(self.canvas, (70, 80, 105), (cx - 5, cy - 23, 10, 6), border_radius=2)
+        # Hat band
+        pygame.draw.rect(self.canvas, (190, 80, 20), (cx - 5, cy - 19, 10, 2))
+
+        # Eye gazing direction
+        eye_x = cx + 2 if self.facing_right else cx - 3
+        pygame.draw.circle(self.canvas, (20, 30, 50), (eye_x, cy - 13), 1)
+
+        # Condition FX: Shivering Breath Puff in Cold Weather
+        if (self.current_event == "cold_night" or self.agent.needs["warmth"] < 0.3) and random.random() < 0.15:
+            breath_x = cx + 7 if self.facing_right else cx - 7
+            pygame.draw.circle(self.canvas, (220, 240, 255, 180), (breath_x, cy - 12), random.randint(2, 4))
+
+        # Condition FX: Injury Pulse Badge
         if self.agent.injured:
-            pygame.draw.circle(self.canvas, COLOR_RED, (cx - 10, cy - 16), 6)
-            pygame.draw.line(self.canvas, COLOR_TEXT_MAIN, (cx - 13, cy - 16), (cx - 7, cy - 16), 2)
-            pygame.draw.line(self.canvas, COLOR_TEXT_MAIN, (cx - 10, cy - 19), (cx - 10, cy - 13), 2)
+            pulse = math.sin(t_time * 8.0) * 2
+            pygame.draw.circle(self.canvas, COLOR_RED, (cx - 10, cy - 18), int(6 + pulse))
+            pygame.draw.line(self.canvas, COLOR_TEXT_MAIN, (cx - 13, cy - 18), (cx - 7, cy - 18), 2)
+            pygame.draw.line(self.canvas, COLOR_TEXT_MAIN, (cx - 10, cy - 21), (cx - 10, cy - 15), 2)
 
-        # Shelter Shield
+        # Condition FX: Stress Sweat Droplet
+        if self.agent.stress > 0.65 and random.random() < 0.25:
+            pygame.draw.circle(self.canvas, (56, 189, 248), (cx - 6, cy - 15), 2)
+
+        # Shelter Shield Indicator
         if self.world.is_in_shelter(self.agent.pos[0], self.agent.pos[1]):
-            pygame.draw.polygon(self.canvas, COLOR_GREEN, [(cx, cy - 25), (cx - 7, cy - 18), (cx + 7, cy - 18)])
+            pygame.draw.polygon(self.canvas, COLOR_GREEN, [(cx, cy - 27), (cx - 7, cy - 20), (cx + 7, cy - 20)])
 
-        # Speech / Thought Bubble
+        # Overhead Dialogue / Action Bubble
         if self.bubble_timer > 0 and self.bubble_text:
             text_surf = self.font_bubble.render(self.bubble_text, True, (15, 23, 42))
             tw, th = text_surf.get_width() + 18, text_surf.get_height() + 10
             bx = max(10, min(MAP_SIZE - tw - 10, cx - tw // 2))
-            by = cy - 50
+            by = cy - 54
 
             b_rect = pygame.Rect(bx, by, tw, th)
             pygame.draw.rect(self.canvas, (241, 245, 249), b_rect, border_radius=6)
@@ -1505,7 +1812,7 @@ class IslandVisualizerApp:
 
         curr_y += card2_h + 12
 
-        # Card 3: Quantum Superposition & Probabilities (width = 668, height = 370)
+        # Card 3: 2-Qubit Quantum Belief State & 3D Bloch Sphere Hologram (width = 668, height = 370)
         card3_h = 370
         self.draw_card(panel_x, curr_y, panel_w, card3_h)
 
@@ -1518,27 +1825,69 @@ class IslandVisualizerApp:
         probs = self.current_decision.get("probs", {})
         chart_y = curr_y + 72
         actions_list = contracts.ACTIONS
-        chart_w = panel_w - 190
+        chart_w = 260  # Compacted to accommodate the 3D Bloch sphere on the right
 
         max_act = max(probs.items(), key=lambda it: it[1])[0] if probs else "none"
 
+        # Render 7 Action Probability Bars on Left Side
         for act in actions_list:
             p = probs.get(act, 0.0)
             act_color = ACTION_COLORS.get(act, COLOR_CYAN)
             is_top = (act == max_act)
 
-            lbl_txt = f"> {act[:10]}" if is_top else f"  {act[:10]}"
+            lbl_txt = f"> {act[:9]}" if is_top else f"  {act[:9]}"
             lbl_col = COLOR_GOLD if is_top else COLOR_TEXT_MAIN
-            self.canvas.blit(self.font_mono.render(f"{lbl_txt:12s}", True, lbl_col), (panel_x + 16, chart_y))
+            self.canvas.blit(self.font_mono.render(f"{lbl_txt:11s}", True, lbl_col), (panel_x + 16, chart_y))
 
-            bar_rect = pygame.Rect(panel_x + 125, chart_y + 3, chart_w, 12)
+            bar_rect = pygame.Rect(panel_x + 115, chart_y + 3, chart_w, 12)
             pygame.draw.rect(self.canvas, (15, 23, 42), bar_rect, border_radius=3)
             fill_w = max(2, int(p * chart_w))
-            pygame.draw.rect(self.canvas, act_color, (panel_x + 125, chart_y + 3, fill_w, 12), border_radius=3)
+            pygame.draw.rect(self.canvas, act_color, (panel_x + 115, chart_y + 3, fill_w, 12), border_radius=3)
 
             pct_lbl = self.font_mono.render(f"{p*100:4.1f}%", True, COLOR_TEXT_MUTED)
-            self.canvas.blit(pct_lbl, (panel_x + 135 + chart_w, chart_y))
+            self.canvas.blit(pct_lbl, (panel_x + 123 + chart_w, chart_y))
             chart_y += 22
+
+        # -------------------------------------------------------------
+        # 3D Quantum Bloch Sphere Hologram on Right Side of Card 3
+        # -------------------------------------------------------------
+        bloch_box = pygame.Rect(panel_x + 440, curr_y + 38, 212, 195)
+        pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, bloch_box, border_radius=6)
+        pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, bloch_box, 1, border_radius=6)
+
+        bloch_title = self.font_small.render("Bloch Sphere Hologram |ψ⟩", True, COLOR_GOLD)
+        self.canvas.blit(bloch_title, (bloch_box.x + (bloch_box.width - bloch_title.get_width()) // 2, bloch_box.y + 8))
+
+        # Dynamic state angles derived from belief priorities
+        forage_p = probs.get("forage", 0.15)
+        drink_p = probs.get("drink", 0.15)
+        shelter_p = probs.get("build_shelter", 0.15)
+        theta_val = math.pi * (1.0 - max(0.05, min(0.95, forage_p + drink_p)))
+        phi_val = (shelter_p * 4.0 * math.pi) + len(self.agent.recent_events) * 0.8
+
+        bloch_cx = bloch_box.x + bloch_box.width // 2
+        bloch_cy = bloch_box.y + 115
+        draw_bloch_sphere(
+            surface=self.canvas,
+            cx=bloch_cx,
+            cy=bloch_cy,
+            radius=48,
+            theta=theta_val,
+            phi=phi_val,
+            rot_angle=self.bloch_rot,
+            stress=self.agent.stress,
+            font=self.font_small
+        )
+
+        coord_str = f"θ:{theta_val:.2f}  φ:{phi_val % (2*math.pi):.2f}"
+        coord_surf = self.font_mono.render(coord_str, True, COLOR_CYAN)
+        self.canvas.blit(coord_surf, (bloch_box.x + (bloch_box.width - coord_surf.get_width()) // 2, bloch_box.y + bloch_box.height - 20))
+
+        # Hardware Noise static scanlines on Card 3 when decohering
+        if self.mind_type == "quantum" and self.agent.stress > 0.45:
+            for _ in range(3):
+                ny = curr_y + random.randint(20, card3_h - 20)
+                pygame.draw.line(self.canvas, (168, 85, 247, 60), (panel_x + 16, ny), (panel_x + panel_w - 16, ny), 1)
 
         # Cognitive Reasoning Quote Box (Assembled Neatly Inside Borders)
         reason_rect = pygame.Rect(panel_x + 16, chart_y + 10, panel_w - 32, 95)
@@ -1615,7 +1964,6 @@ class IslandVisualizerApp:
         for i, (k, v, col) in enumerate(lines):
             ky = box_rect.y + 16 + i * 42
             self.canvas.blit(self.font_sub.render(k, True, COLOR_TEXT_HINT), (box_rect.x + 22, ky))
-            # Text strictly assembled within column bounds
             render_wrapped_text(
                 surface=self.canvas,
                 text=v,
@@ -1690,7 +2038,6 @@ class IslandVisualizerApp:
             self.canvas.blit(self.font_mono.render(act[:14], True, act_col), (col_act, row_y))
             self.canvas.blit(self.font_mono.render(p_str, True, COLOR_TEXT_MUTED), (col_prob, row_y))
 
-            # Reason bound strictly to avoid exceeding right modal border
             max_r_w = hx + hw - col_reason - 36
             r_display = reason_raw
             if self.font_mono.size(r_display)[0] > max_r_w:
