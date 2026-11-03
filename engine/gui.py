@@ -527,9 +527,22 @@ class IslandVisualizerApp:
         pygame.font.init()
         pygame.display.set_caption("Stranded: 2D Quantum Island & Survival Engine")
 
-        # High-Resolution Virtual Canvas Setup
+        # Query physical desktop resolution before window creation
+        display_info = pygame.display.Info()
+        self.desktop_w = max(1024, display_info.current_w)
+        self.desktop_h = max(720, display_info.current_h)
+
+        # Select optimal windowed resolution fitting comfortably within desktop workspace
+        if self.desktop_w >= 1800 and self.desktop_h >= 1050:
+            self.window_w, self.window_h = 1600, 900
+        elif self.desktop_w >= 1500 and self.desktop_h >= 860:
+            self.window_w, self.window_h = 1440, 810
+        else:
+            self.window_w, self.window_h = 1280, 720
+
+        # Virtual Canvas Setup
         self.is_fullscreen = False
-        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.RESIZABLE)
+        self.screen = pygame.display.set_mode((self.window_w, self.window_h), pygame.RESIZABLE)
         self.canvas = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
 
@@ -580,11 +593,20 @@ class IslandVisualizerApp:
     def toggle_fullscreen(self):
         """Toggles between Windowed and Fullscreen modes with automatic aspect-ratio scaling."""
         self.is_fullscreen = not self.is_fullscreen
-        if self.is_fullscreen:
-            info = pygame.display.Info()
-            self.screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.FULLSCREEN)
-        else:
-            self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.RESIZABLE)
+        try:
+            if self.is_fullscreen:
+                # Use native desktop resolution (0, 0) for true borderless fullscreen
+                self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+            else:
+                self.screen = pygame.display.set_mode((self.window_w, self.window_h), pygame.RESIZABLE)
+        except Exception:
+            try:
+                if self.is_fullscreen:
+                    self.screen = pygame.display.set_mode((self.desktop_w, self.desktop_h), pygame.FULLSCREEN)
+                else:
+                    self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.RESIZABLE)
+            except Exception:
+                pass
 
     def get_virtual_mouse_pos(self) -> Tuple[int, int]:
         """Maps physical window/fullscreen mouse coordinates back into the virtual 1600x900 canvas."""
@@ -794,6 +816,12 @@ class IslandVisualizerApp:
                 if ev.type == pygame.QUIT:
                     running = False
 
+                elif ev.type == pygame.VIDEORESIZE:
+                    if not self.is_fullscreen:
+                        self.window_w = max(960, ev.w)
+                        self.window_h = max(540, ev.h)
+                        self.screen = pygame.display.set_mode((self.window_w, self.window_h), pygame.RESIZABLE)
+
                 elif ev.type == pygame.KEYDOWN:
                     if ev.key == pygame.K_F11 or (ev.key == pygame.K_f and pygame.key.get_mods() & pygame.KMOD_ALT):
                         self.toggle_fullscreen()
@@ -889,15 +917,17 @@ class IslandVisualizerApp:
     def present(self):
         """Scales the 1600x900 virtual canvas to physical screen maintaining aspect ratio with letterboxing."""
         sw, sh = self.screen.get_size()
+        scale = min(sw / WINDOW_WIDTH, sh / WINDOW_HEIGHT)
+        if scale <= 0:
+            scale = 1.0
+        scaled_w = int(WINDOW_WIDTH * scale)
+        scaled_h = int(WINDOW_HEIGHT * scale)
+        offset_x = (sw - scaled_w) // 2
+        offset_y = (sh - scaled_h) // 2
+
         if sw == WINDOW_WIDTH and sh == WINDOW_HEIGHT:
             self.screen.blit(self.canvas, (0, 0))
         else:
-            scale = min(sw / WINDOW_WIDTH, sh / WINDOW_HEIGHT)
-            scaled_w = int(WINDOW_WIDTH * scale)
-            scaled_h = int(WINDOW_HEIGHT * scale)
-            offset_x = (sw - scaled_w) // 2
-            offset_y = (sh - scaled_h) // 2
-
             scaled_surf = pygame.transform.smoothscale(self.canvas, (scaled_w, scaled_h))
             self.screen.fill((5, 8, 18))
             self.screen.blit(scaled_surf, (offset_x, offset_y))
