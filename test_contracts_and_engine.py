@@ -220,5 +220,5 @@ def test_gui_fullscreen_and_aspect_scaling():
     # Verify virtual mouse coordinate mapping
     virt_pos = app.get_virtual_mouse_pos()
     assert len(virt_pos) == 2
-    assert 0 <= virt_pos[0] < 1280
-    assert 0 <= virt_pos[1] < 760
+    assert 0 <= virt_pos[0] <= app.canvas.get_width()
+    assert 0 <= virt_pos[1] <= app.canvas.get_height()
