@@ -1,56 +1,65 @@
-"""
-engine/events.py - Environmental Event Generator
-Owned by Tech C (Integration, Engine, Events).
-"""
+"""Persistent weather and common-random-number contextual events.
 
+Numerical probabilities are scenario assumptions, not measured island rates.
+"""
 import random
-from typing import Dict, List, Optional
+
+VOLCANIC = ('tremor', 'gas_plume', 'eruption', 'ash_fall')
+WEATHER_TRANSITIONS = {  # assumption: persistent two-hour weather transitions
+    'calm': (.78, .19, .03), 'rain': (.22, .65, .13), 'storm': (.12, .38, .50)}
 
 
 class EventGenerator:
-    """
-    Simulates stochastic and contextual island environmental events:
-      - 'storm': Severe rainfall and gales, severe hazard without shelter.
-      - 'cold_night': Nighttime temperature drop (hours 21 to 5).
-      - 'injury': Sprained ankle or cut sustained during strenuous work.
-      - 'animal': Territorial predator or wild boar encounter.
-      - 'find_food': High-yield foraging opportunity discovered.
-      - 'none': Normal calm island conditions.
-    """
+    def __init__(self, seed=42, horizon=36):
+        rng = random.Random(seed + 1009)  # assumption: independent weather stream
+        self.weather, self.uniforms, self.cold_draws = [], [], []
+        weather = 'calm'
+        for _ in range(horizon):
+            weather = rng.choices(('calm', 'rain', 'storm'), WEATHER_TRANSITIONS[weather])[0]
+            self.weather.append(weather)
+            self.uniforms.append(rng.random())
+            self.cold_draws.append(rng.random())
+        self.index = 0
+        self.world_events = []
 
-    def __init__(self, seed: int = 42):
-        self.rng = random.Random(seed)
-        self.storm_duration = 0
+    def prepare(self, volcano):
+        self.world_events = [self.world_event(t, (8+2*t) % 24, volcano) for t in range(len(self.weather))]
 
-    def step_event(self, day: int, hour: int, current_pos: List[int], in_shelter: bool, injured: bool) -> str:
-        """Evaluates time, terrain, and weather cycles to trigger a discrete event."""
-        # Active storm continues for 2-3 hours
-        if self.storm_duration > 0:
-            self.storm_duration -= 1
-            return "storm"
+    def world_event(self, t, hour, volcano):
+        sign = volcano.world_events[t]
+        if sign != 'none':
+            return sign
+        if self.weather[t] == 'storm':
+            return 'storm'
+        wet = self.weather[t] != 'calm'
+        probability = .12 + .22 * wet + .2 * volcano.hazard_by_step[t]['ash']  # assumption
+        if (hour >= 20 or hour <= 6) and self.cold_draws[t] < probability:
+            return 'cold_night'
+        return 'none'
 
-        roll = self.rng.random()
-
-        # Nighttime temperature hazard (hours 21 to 5)
-        if (hour >= 21 or hour <= 5) and not in_shelter and roll < 0.35:
-            return "cold_night"
-
-        # Stochastic storm front
-        if roll < 0.12:
-            self.storm_duration = self.rng.randint(1, 3)
-            return "storm"
-
-        # Wildlife encounter (more likely in deep forest/mountains)
-        if roll < 0.22:
-            return "animal"
-
-        # Accidental injury (higher probability if already fatigued or rushing)
-        if roll < 0.28:
-            return "injury"
-
-        # Lucky forage discovery
-        if roll < 0.40:
-            return "find_food"
-
-        return "none"
-
+    def step_event(self, day, hour, current_pos, in_shelter, injured, action='rest',
+                   world=None, energy=1.0, moved=False, t=None):
+        if t is None:
+            t = self.index
+            self.index += 1
+        base = self.world_events[t] if self.world_events else ('storm' if self.weather[t] == 'storm' else 'none')
+        if base in VOLCANIC:
+            return base
+        tile = world.get_tile(*current_pos) if world else 1
+        night = hour >= 20 or hour <= 6
+        # assumption: rest 0.2%; movement, darkness, slopes and fatigue add risk.
+        risk = .002 + .025*moved + .02*(moved and night) + .025*(moved and tile == 3) + .03*(1-energy)*moved
+        u = self.uniforms[t]
+        if u < risk:
+            return 'injury'
+        if base == 'storm':
+            return base
+        # assumption: boar encounters, forest exposure and dawn/dusk increase risk.
+        animal = .003 + .012*(tile == 2) + .012*(hour in (6,8,18,20))
+        if u < animal:
+            return 'animal'
+        if base == 'cold_night':
+            return base
+        if action == 'forage' and tile == 2 and u < .3:  # assumption: forage discovery rate
+            return 'find_food'
+        return 'none'

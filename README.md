@@ -1,12 +1,19 @@
-# Stranded: Quantum Cognition Decision-Making & Survival Simulation
+# Quantum Cognition Simulation: Decision-Making & Multi-Scenario Survival
 
-[![Integration Tests](https://img.shields.io/badge/tests-11%20passed-brightgreen.svg)](#daily-integration--testing)
+[![Integration Tests](https://img.shields.io/badge/tests-29%20passed-brightgreen.svg)](#daily-integration--testing)
 [![Qiskit](https://img.shields.io/badge/Qiskit-2.x-6929C4.svg)](https://qiskit.org/)
-[![Status](https://img.shields.io/badge/Day%201%20Deliverable-Complete-success.svg)](#tech-c-deliverables)
+[![Status](https://img.shields.io/badge/Multi--Scenario-Integrated-success.svg)](#tech-c-deliverables)
 
 > **"Can quantum probability explain why humans make counterintuitive survival decisions under extreme environmental stress?"**
 
-**Stranded** is a quantum cognition survival simulation built for a week-long hackathon. An autonomous agent is stranded on a procedurally generated $40 \times 40$ wilderness island. Rather than using classical Markov Decision Processes (MDP) or deterministic utility maximization, the agent's mind is governed by **2-qubit quantum circuits** whose belief states exhibit non-commuting order effects, contextual interference, and hardware-modeled decoherence under physiological stress.
+**Quantum Cognition Simulation** is an interactive multi-scenario cognitive modeling sandbox built for an advanced quantum hackathon. Players can choose between two distinct simulation horizons right from launch:
+
+1. **Island Wilderness Survival**: Stranded across a procedural 40x40 archipelago. Manage hunger, hydration, hypothermia, fatigue, and morale while foraging timber/rations, building shelters, and surviving stochastic maritime storms and territorial boars.
+2. **Volcano Eruption Evacuation**: Evacuate a calibrated 40x40 volcanic topography under accelerating seismic unrest. Decipher precursory tremors and gas plumes, navigate around lethal lava meanders and lahars, endure toxic ash fall, and follow BFS routes to safe assembly points.
+
+The agent's decision engine supports both a **2-qubit quantum cognition circuit** (exhibiting non-commuting order effects, constructive interference, and physiological stress decoherence) and an empirical **classical baseline** (derived from ATUS utility priors).
+
+> **Current status:** the minds in `contracts.py` are placeholder stubs, not quantum circuits or real data. Runs from them are labelled `noise_source: "stub"`, and comparisons between them are not results. See [the volcano model notes](docs/VOLCANO_MODEL.md) for sources, assumptions and the JSON format.
 
 ---
 
@@ -19,12 +26,14 @@ stranded/
 ├── contracts.py              # Frozen interfaces + working stubs (Tech C)
 ├── requirements.txt          # Pinned dependency environment (Tech C)
 ├── main.py                   # Interactive CLI demo & benchmark runner (Tech C)
-├── engine/                   # World generation, agents, survival loop (Tech C)
-│   ├── world.py              # 40x40 procedural terrain & freshwater hydrology
-│   ├── agent.py              # Physiological decay & lethal threshold checks
-│   ├── events.py             # Stochastic environmental hazard generator
+├── docs/VOLCANO_MODEL.md     # Sources, assumptions, constants, JSON format (Tech C)
+├── engine/                   # World, volcano, agents, survival loop (Tech C)
+│   ├── world.py              # One fixed island, valleys, evacuation zones
+│   ├── volcano.py            # Seeded hidden unrest, eruption and hazard model
+│   ├── agent.py              # Movement, physiology & lethal checks
+│   ├── events.py             # Weather and activity-linked event models
 │   ├── simulation.py         # Turn-based loop emitting timeline.json
-│   └── batch_runner.py       # Quantum vs Classical divergence benchmark
+│   └── batch_runner.py       # Paired mind comparison & demo curation
 ├── demo-pack/                # Curated signature runs for frontend replay (Tech C)
 │   ├── run_01_heroic_survival.json
 │   ├── run_02_dramatic_death.json
@@ -47,7 +56,7 @@ All tech roles code against `contracts.py`. Stubs guarantee that nobody is block
 
 ### Primitive Constants
 - **`ACTIONS`**: `["forage", "drink", "build_shelter", "rest", "explore", "craft", "hide"]`
-- **`EVENTS`**: `["storm", "injury", "find_food", "animal", "cold_night", "none"]`
+- **`EVENTS`**: `["storm", "injury", "find_food", "animal", "cold_night", "none", "tremor", "gas_plume", "eruption", "ash_fall"]`
 - **`TILE_TYPES`**: `{0: "water", 1: "plains", 2: "forest", 3: "mountain", 4: "shelter"}`
 
 ### Interface Signatures
@@ -63,6 +72,9 @@ def quantum_decide(state: dict) -> dict:
 
 def explore_step(pos: list, world: Any, mode: str = "quantum") -> list:
     """Tech B (Optional): Map traversal via quantum walk vs brownian random walk."""
+
+def load_seeds() -> list:
+    """Tech B: Seed list. Stub returns placeholder integers."""
 ```
 
 ### Decision Contract Schema
@@ -104,8 +116,9 @@ In physics, open quantum systems undergo decoherence ($T_1$ relaxation and $T_2$
 
 | Component | Status | Reality vs Metaphor |
 |---|---|---|
-| **Quantum Circuits** | Real | Genuine 2-qubit Qiskit 2.x circuits executed on Aer simulator and IBM Quantum superconducting hardware (`ibm_hardware` / fake backends). |
-| **Decoherence Delay** | Real | Circuit execution with calibrated `qc.delay(...)` idling to measure real physical transmon qubit decoherence as a function of simulated stress. |
+| **Quantum Circuits** | Planned | 2-qubit Qiskit 2.x circuits on the Aer simulator and fake backends, then IBM Quantum hardware. Not done yet: current runs use stubs. |
+| **Decoherence Delay** | Planned | Circuits with `qc.delay(...)` idling to measure physical qubit decoherence as a function of simulated stress. Not done yet: the stub only mixes probabilities. |
+| **Volcano & Events** | Synthetic model | Mechanisms informed by published sources, with assumed rates and compressed timing. Not a forecast or a real evacuation tool. See `docs/VOLCANO_MODEL.md`. |
 | **Cognitive Interference** | Mathematical Model | Human decision-making modeled using Hilbert space geometry (Hilbert space projection postulate) rather than classical Kolmogorov probability. |
 | **Biological Substrate** | Metaphor | The human brain is warm and wet, not a cryogenic 15mK dilution refrigerator. Quantum probability here is an algebraic theory of decision, not quantum biology. |
 
@@ -119,10 +132,10 @@ Simply run `python main.py` to launch the full graphical simulation with the int
 python main.py
 ```
 From the **Home Screen**, you can interactively:
-1. **Choose the Decision Mind**: `[⚛ 2-Qubit Quantum Mind]` vs `[🧠 Classical Baseline]`.
-2. **Select Map & Seed**: Pick presets (*Archipelago*, *Arid Crag*, *Interference Lab*, *Heroic Haven*) or tune seed with numeric steppers / randomizer.
-3. **Set Simulation Horizon**: Choose duration (`12`, `24`, `36`, or `48` steps).
-4. **Launch**: Click `[🚀 LAUNCH SURVIVAL SIMULATION]`.
+1. **Choose the Decision Mind**: `[Quantum-labelled Stub]` vs `[Classical Heuristic Stub]`.
+2. **Select Event Seed**: The island never changes. The seed changes weather, events and the volcano. Pick a preset or use the steppers / randomizer.
+3. **Set Simulation Horizon**: Choose duration (`12`, `24`, or `36` steps).
+4. **Launch**: Click `[LAUNCH SURVIVAL SIMULATION]`.
 5. **End-of-Event Debrief**: At the conclusion of the event (or upon fatality), a mission debrief modal appears with replay options, mind comparison, and return-to-home navigation.
 
 ---
@@ -137,7 +150,8 @@ From the **Home Screen**, you can interactively:
 | `RIGHT ARROW` or `N` | **Step Forward** single 2-hour turn |
 | `Q` or `[⚛ Mind Toggle]` Button | **Toggle Mind Live** (Quantum Mind $\leftrightarrow$ Classical Baseline) |
 | `1` / `2` / `3` or `[⚡ Speed]` Button | **Cycle Speed** (1.0x normal, 2.5x fast, 6.0x instant) |
-| `TAB` or `[📋 Action Log]` Button | **Toggle Chronological Action History Overlay** |
+| `E` | **Toggle Evacuation Map** (zones, assembly point, route from spawn) |
+| `TAB` or `[Action Log]` Button | **Toggle Chronological Action History Overlay** |
 | `R` | **Reset Current Run** |
 | `ESC` or `H` or `[🏠 Menu]` Button | **Return to Home Configuration Screen** |
 
@@ -157,7 +171,7 @@ python main.py --batch
 # Regenerate curated demo-pack/
 python main.py --curate
 
-# Run complete 11-test integration test suite
+# Run the integration test suite
 python main.py --test
 ```
 
