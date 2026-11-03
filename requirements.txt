@@ -1,22 +1,19 @@
-# Quantum Exploit Hunter Dependencies
-# Core Quantum & ML Stack
-qiskit>=1.0.0
-qiskit-aer>=0.14.0
-qiskit-machine-learning>=0.9.0
-torch>=2.0.0
+# Stranded: Quantum Cognition Survival Engine - Pinned Dependencies
+# Owned by Tech C (Integration & Contracts)
+
+# Quantum Computing & Simulation
+qiskit>=2.0.0
+qiskit-aer>=0.18.0
+qiskit-ibm-runtime>=0.36.0
+
+# Data & Analysis (ATUS Published Tables)
+pandas>=2.0.0
 numpy>=1.24.0
-scipy>=1.10.0
-scikit-learn>=1.2.0
+
+# Visualization & Demo Plots
 matplotlib>=3.7.0
-tensorboard>=2.12.0
+pygame-ce>=2.5.0
 
-# Game Engines & Environment Assets
-gymnasium>=0.29.0
-chess>=1.9.0
-
-# Retro Game Engines (Handled with automated --mock-2d fallback if unavailable)
-gym-super-mario-bros>=7.4.0
-nes-py>=8.2.1
-vizdoom>=1.2.0
-pygame-ce>=2.1.3
+# Testing & Verification
+pytest>=7.0.0
 

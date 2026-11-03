@@ -1,135 +1,161 @@
 """
-Interactive Master Entrypoint for Quantum RL & Game Exploit Detection Framework.
-Interactive CLI menu, web UI launcher, and direct CLI command runner.
-
-Usage:
-  python main.py                                                 # Interactive Menu
-  python main.py --ui                                            # Launch Web UI (http://127.0.0.1:8000)
-  python main.py --game [mario|doom|chess|sudoku|blackjack|all]  # Real-time game simulations
-  python main.py --day [1|2|3|4]                                 # Run specific research day pipeline
-  python main.py --all                                           # Run complete 4-day research pipeline
-  python main.py --blackjack                                     # Quick Blackjack exploit demo
-  python main.py --verify                                        # Run pre-flight verification
-  python main.py --showcase                                      # Run 320x speedup RAM showcase
+main.py - Interactive CLI Entry Point for Stranded
+Quantum Cognition Decision-Making & Survival Simulation Engine
+Tech C Deliverable (Engine, World & Integration)
 """
 
+import argparse
 import os
 import sys
+import time
+import json
+import random
+from typing import Dict, Any
 
-# Ensure root directory and submodules are in sys.path
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-RUN_DIR = os.path.join(BASE_DIR, "run")
-UI_DIR = os.path.join(BASE_DIR, "ui")
-ENGINES_DIR = os.path.join(BASE_DIR, "engines")
-ENVS_DIR = os.path.join(BASE_DIR, "envs")
-
-for p in [BASE_DIR, RUN_DIR, UI_DIR, ENGINES_DIR, ENVS_DIR]:
-    if p not in sys.path:
-        sys.path.insert(0, p)
+from engine.world import IslandWorld
+from engine.agent import SurvivalAgent
+from engine.simulation import SimulationEngine
+from engine.batch_runner import run_batch_comparison, curate_demo_pack
+import contracts
 
 
-def interactive_menu():
-    """Interactive terminal control center for launching simulations and web interfaces."""
-    CYAN = "\033[96m"
-    GREEN = "\033[92m"
-    YELLOW = "\033[93m"
-    RED = "\033[91m"
-    BOLD = "\033[1m"
-    RESET = "\033[0m"
+# Terminal styling helpers
+RESET = "\033[0m"
+BOLD = "\033[1m"
+CYAN = "\033[36m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+RED = "\033[31m"
+MAGENTA = "\033[35m"
+BLUE = "\033[34m"
 
-    while True:
-        print("\n" + "=" * 80)
-        print(f"{CYAN}{BOLD}   Ψ QUANTUM RL & GAME EXPLOIT DETECTION FRAMEWORK{RESET}")
-        print(f"   {GREEN}Qiskit 1.0+ | Aer MPS | 320.1x Headless Statevector Acceleration{RESET}")
-        print("=" * 80)
-        print(f" {BOLD}[1]{RESET}  {CYAN}Launch Real-Time Web Interface{RESET}  (FastAPI Server at http://127.0.0.1:8000)")
-        print(f" {BOLD}[2]{RESET}  Super Mario Bros (World 1-1)   (NES RAM 4D + Sub-Pixel Wall-Clip)")
-        print(f" {BOLD}[3]{RESET}  ViZDoom Corridor Combat        (freedoom2.wad + Health Overflow & Clip)")
-        print(f" {BOLD}[4]{RESET}  python-chess FEN Engine        (Legal GM Openings + Corrupted Kings/Pawns)")
-        print(f" {BOLD}[5]{RESET}  MiniSudoku 4x4 Invariants      (Latin Square Invariants + Duplicate Breach)")
-        print(f" {BOLD}[6]{RESET}  Blackjack-v1 Card Table        (Card Sum Overflow >31 & Infinite Ace)")
-        print(f" {BOLD}[7]{RESET}  {YELLOW}Simulate All Games Sequentially{RESET} (Full 5-Game Real-Time Suite)")
-        print("-" * 80)
-        print(f" {BOLD}[8]{RESET}  {GREEN}4-Day Research Pipeline{RESET}        (Day 1 to Day 4 Experiments & Plots)")
-        print(f" {BOLD}[9]{RESET}  Pre-Flight Verification Suite  (setup_and_verify.py)")
-        print(f" {BOLD}[10]{RESET} High-Speed RAM Benchmark       (visual_showcase.py - 19,200+ steps/sec)")
-        print(f" {BOLD}[0]{RESET}  {RED}Exit{RESET}")
-        print("=" * 80)
+TILE_CHARS = {
+    0: f"{BLUE}~{RESET}",  # water
+    1: f"{YELLOW}.{RESET}",  # plains
+    2: f"{GREEN}^{RESET}",   # forest
+    3: f"{RESET}M{RESET}",   # mountain
+    4: f"{MAGENTA}S{RESET}"   # shelter
+}
 
-        try:
-            choice = input(f"{BOLD}Select an option [0-10]: {RESET}").strip()
-        except (KeyboardInterrupt, EOFError):
-            print("\nExiting.")
-            break
 
-        if choice == "0":
-            print("Exiting Quantum Exploit Hunter.")
-            break
-        elif choice == "1":
-            print("\nStarting Real-Time Web UI Server...")
-            from ui.server import launch_ui
-            launch_ui(host="127.0.0.1", port=8000, auto_open=True)
-            break
-        elif choice == "2":
-            from run.run_mario import run_mario_simulation
-            run_mario_simulation(iterations=3, realtime_iter=1, force_realtime=False, headless=False, mock_2d=False)
-        elif choice == "3":
-            from run.run_doom import run_doom_simulation
-            run_doom_simulation(iterations=3, realtime_iter=1, force_realtime=False, headless=False, mock_2d=False)
-        elif choice == "4":
-            from run.run_chess import run_chess_simulation
-            run_chess_simulation(iterations=3, realtime_iter=1, force_realtime=False, moves_per_iter=15, headless=False)
-        elif choice == "5":
-            from run.run_sudoku import run_sudoku_simulation
-            run_sudoku_simulation(iterations=3, delay=0.05)
-        elif choice == "6":
-            from run.run_blackjack import run_blackjack_simulation
-            run_blackjack_simulation(iterations=3, delay=0.05)
-        elif choice == "7":
-            from run.run_game import main as run_game_main
-            sys.argv = ["run_game.py", "--game", "all", "--iters", "2", "--steps", "8", "--delay", "0.01"]
-            run_game_main()
-        elif choice == "8":
-            from run_pipeline import main as pipeline_main
-            sys.argv = ["run_pipeline.py", "--all"]
-            pipeline_main()
-        elif choice == "9":
-            from setup_and_verify import main as verify_main
-            verify_main()
-        elif choice == "10":
-            from visual_showcase import main as showcase_main
-            showcase_main()
-        else:
-            print(f"{RED}Invalid option '{choice}'. Please enter a number between 0 and 10.{RESET}")
+def render_ascii_map(world: IslandWorld, agent_pos: list, radius: int = 7) -> str:
+    """Renders a localized 2D viewport around the agent."""
+    ax, ay = agent_pos
+    lines = []
+    lines.append(f"+{'-' * (radius * 2 + 1)}+")
+    for y in range(max(0, ay - radius), min(world.height, ay + radius + 1)):
+        row_str = "|"
+        for x in range(max(0, ax - radius), min(world.width, ax + radius + 1)):
+            if x == ax and y == ay:
+                row_str += f"{BOLD}{RED}@{RESET}"
+            else:
+                tile = world.get_tile(x, y)
+                row_str += TILE_CHARS.get(tile, " ")
+        row_str += "|"
+        lines.append(row_str)
+    lines.append(f"+{'-' * (radius * 2 + 1)}+")
+    return "\n".join(lines)
+
+
+def format_bar(val: float, length: int = 12) -> str:
+    """Renders an ASCII percentage progress bar."""
+    filled = int(val * length)
+    empty = length - filled
+    color = GREEN if val > 0.5 else (YELLOW if val > 0.25 else RED)
+    return f"{color}[{'=' * filled}{' ' * empty}] {int(val * 100):3d}%{RESET}"
+
+
+def run_live_demo(seed: int = 101, mind: str = "quantum", noise: str = "ibm_hardware", speed: float = 0.3):
+    """Executes a live visual interactive survival run step-by-step in the terminal."""
+    print(f"\n{BOLD}{CYAN}========================================================================{RESET}")
+    print(f"{BOLD}{CYAN}   STRANDED - QUANTUM COGNITION SURVIVAL SIMULATION (LIVE RUN)       {RESET}")
+    print(f"{BOLD}{CYAN}========================================================================{RESET}")
+    print(f"  Configuration: Seed={seed} | Mind={mind.upper()} | Noise={noise}")
+    print(f"  Legend: {BLUE}~{RESET} Water  {YELLOW}.{RESET} Plains  {GREEN}^{RESET} Forest  M Mountain  {MAGENTA}S{RESET} Shelter  {BOLD}{RED}@{RESET} Agent\n")
+
+    sim = SimulationEngine(seed=seed, mind_type=mind, noise_source=noise)
+    max_steps = 24
+
+    def on_step(step_record: Dict[str, Any], engine: SimulationEngine):
+        t = step_record["t"]
+        state = step_record["state"]
+        event = step_record["event"]
+        action = step_record["action"]
+        probs = step_record["probs"]
+        reason = step_record["reason"]
+        in_shelter = engine.world.is_in_shelter(engine.agent.pos[0], engine.agent.pos[1])
+
+        print(f"\n{BOLD}--- Step {t + 1}/{max_steps} | Day {state['day']}, Hour {state['hour']:02d}:00 ---{RESET}")
+        map_view = render_ascii_map(engine.world, engine.agent.pos, radius=5)
+        print(map_view)
+
+        needs = state["needs"]
+        print(f"  Position: [{engine.agent.pos[0]}, {engine.agent.pos[1]}]  | In Shelter: {'Yes' if in_shelter else 'No'} | Injured: {'YES' if state['injured'] else 'No'}")
+        print(f"  Hunger: {format_bar(needs['hunger'])}  Thirst: {format_bar(needs['thirst'])}")
+        print(f"  Warmth: {format_bar(needs['warmth'])}  Energy: {format_bar(needs['energy'])}")
+        print(f"  Safety: {format_bar(needs['safety'])}  Morale: {format_bar(needs['morale'])}")
+        print(f"  Stress: {format_bar(engine.agent.stress)}")
+        print(f"  Recent Events: {state['recent_events']}")
+        print(f"  {BOLD}Event Encountered:{RESET} {YELLOW}{event.upper()}{RESET}")
+        print(f"  {BOLD}Chosen Action:{RESET} {GREEN}{action.upper()}{RESET}")
+        print(f"  {BOLD}Cognitive Probs:{RESET} { {k: v for k, v in probs.items() if v > 0.05} }")
+        print(f"  {BOLD}Quantum Reason:{RESET} {CYAN}{reason}{RESET}")
+
+        if speed > 0:
+            time.sleep(speed)
+
+    try:
+        timeline = sim.run(max_steps=max_steps, step_callback=on_step)
+    except TypeError:
+        # Fallback if SimulationEngine without step_callback parameter is loaded
+        timeline = sim.run(max_steps=max_steps)
+        for step in timeline.get("steps", []):
+            on_step(step, sim)
+
+    print(f"\n{BOLD}========================================================================{RESET}")
+    if timeline["outcome"] == "survived":
+        print(f"{BOLD}{GREEN}  >>> MISSION OUTCOME: SURVIVED! Successfully endured {len(timeline['steps']) * 2} hours on island. <<<{RESET}")
+    else:
+        print(f"{BOLD}{RED}  >>> MISSION OUTCOME: DIED ({str(timeline['cause']).upper()}) at Step {len(timeline['steps'])}. <<<{RESET}")
+    print(f"{BOLD}========================================================================{RESET}\n")
 
 
 def main():
-    args = sys.argv[1:]
+    parser = argparse.ArgumentParser(description="Stranded: Quantum Cognition Survival Engine")
+    parser.add_argument("--gui", action="store_true", help="Launch interactive 2D Pygame Island and Character visualizer (default)")
+    parser.add_argument("--demo", action="store_true", help="Run interactive terminal ASCII survival run")
+    parser.add_argument("--terminal", action="store_true", help="Run interactive terminal ASCII survival run")
+    parser.add_argument("--batch", action="store_true", help="Run batch comparison (Quantum vs Classical divergence)")
+    parser.add_argument("--curate", action="store_true", help="Curate signature runs into demo-pack/")
+    parser.add_argument("--test", action="store_true", help="Execute integration test suite")
+    parser.add_argument("--seed", type=int, default=101, help="Random seed for world generation")
+    parser.add_argument("--mind", type=str, default="quantum", choices=["quantum", "classical"], help="Mind engine")
+    parser.add_argument("--noise", type=str, default="ibm_hardware", help="Noise source profile")
+    parser.add_argument("--speed", type=float, default=0.2, help="Seconds delay per step during live demo")
 
-    # If flags passed, dispatch directly
-    if "--ui" in args:
-        from ui.server import launch_ui
-        launch_ui(host="127.0.0.1", port=8000, auto_open=True)
-    elif "--game" in args:
-        from run.run_game import main as run_game_main
-        run_game_main()
-    elif "--blackjack" in args:
-        from run_blackjack_exploit import run_blackjack_exploit_demo
-        run_blackjack_exploit_demo(num_hands=10)
-    elif "--verify" in args:
-        from setup_and_verify import main as verify_main
-        sys.argv = ["setup_and_verify.py"]
-        verify_main()
-    elif "--showcase" in args:
-        from visual_showcase import main as showcase_main
-        sys.argv = ["visual_showcase.py", "--mode", "showcase", "--steps", "15", "--fps", "20"]
-        showcase_main()
-    elif "--all" in args or "--day" in args:
-        from run_pipeline import main as pipeline_main
-        pipeline_main()
+    args = parser.parse_args()
+
+    if args.test:
+        import pytest
+        print(f"[Tech C] Running integration test suite...")
+        sys.exit(pytest.main(["-v", "test_contracts_and_engine.py"]))
+    elif args.batch:
+        summary = run_batch_comparison(num_seeds=20, max_steps=24)
+        print(f"\n{BOLD}=== Batch Comparison Results ({summary['num_seeds']} Seeds) ==={RESET}")
+        print(f"  Total Evaluated Decisions: {summary['total_evaluated_steps']}")
+        print(f"  Decision Divergences:      {summary['total_divergences']}")
+        print(f"  Divergence Rate:           {BOLD}{summary['divergence_rate_pct']}%{RESET}")
+        print(f"  Quantum Survival Rate:     {GREEN}{summary['quantum_survival_rate_pct']}%{RESET}")
+        print(f"  Classical Survival Rate:   {YELLOW}{summary['classical_survival_rate_pct']}%{RESET}\n")
+    elif args.curate:
+        curate_demo_pack("demo-pack")
+    elif args.demo or args.terminal:
+        run_live_demo(seed=args.seed, mind=args.mind, noise=args.noise, speed=args.speed)
     else:
-        # Default: Launch Interactive Menu
-        interactive_menu()
+        # Default single launch command: Full Pygame Application with Home Screen
+        from engine.gui import launch_gui
+        print(f"Launching Stranded 2D Island & Quantum Survival Simulation (Seed={args.seed}, Mind={args.mind})...")
+        launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen="home")
 
 
 if __name__ == "__main__":
