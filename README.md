@@ -1,6 +1,6 @@
 # Stranded: Quantum Cognition Decision-Making & Survival Simulation
 
-[![Integration Tests](https://img.shields.io/badge/tests-28%20passed-brightgreen.svg)](#daily-integration--testing)
+[![Integration Tests](https://img.shields.io/badge/tests-60%20passed-brightgreen.svg)](#daily-integration--testing)
 [![Qiskit](https://img.shields.io/badge/Qiskit-2.x-6929C4.svg)](https://qiskit.org/)
 [![Status](https://img.shields.io/badge/Day%201%20Deliverable-Complete-success.svg)](#tech-c-deliverables)
 
@@ -23,11 +23,14 @@ stranded/
 ├── main.py                   # Interactive CLI demo & benchmark runner (Tech C)
 ├── docs/VOLCANO_MODEL.md     # Sources, assumptions, constants, JSON format (Tech C)
 ├── engine/                   # World, volcano, agents, survival loop (Tech C)
-│   ├── world.py              # One fixed island, valleys, evacuation zones
-│   ├── volcano.py            # Seeded hidden unrest, eruption and hazard model
+│   ├── world.py              # Elevation, drainage and least-time evacuation routes
+│   ├── volcano.py            # Seeded wind, ash, active flows and unrest
 │   ├── agent.py              # Movement, physiology & lethal checks
 │   ├── events.py             # Weather and activity-linked event models
 │   ├── simulation.py         # Turn-based loop emitting timeline.json
+│   ├── gui.py                # Viewer controller, input and animation
+│   ├── gui_map.py            # Cached relief and hazard drawing
+│   ├── gui_panels.py         # Home, vitals, history and debrief
 │   └── batch_runner.py       # Paired mind comparison & demo curation
 ├── demo-pack/                # Curated signature runs for frontend replay (Tech C)
 │   ├── run_01_heroic_survival.json
@@ -128,10 +131,10 @@ python main.py
 ```
 From the **Home Screen**, you can interactively:
 1. **Choose the Decision Mind**: `[Quantum-labelled Stub]` vs `[Classical Heuristic Stub]`.
-2. **Select Event Seed**: The island never changes. The seed changes weather, events and the volcano. Pick a preset or use the steppers / randomizer.
+2. **Select Event Seed**: The island never changes. The seed changes weather, events and the volcano. Use the seed steppers or randomizer.
 3. **Set Simulation Horizon**: Choose duration (`12`, `24`, or `36` steps).
-4. **Launch**: Click `[LAUNCH SURVIVAL SIMULATION]`.
-5. **End-of-Event Debrief**: At the conclusion of the event (or upon fatality), a mission debrief modal appears with replay options, mind comparison, and return-to-home navigation.
+4. **Launch**: Click `[Start simulation]`.
+5. **End-of-Event Debrief**: At the conclusion of the event (or upon fatality), a run debrief modal appears with replay options, mind comparison, and return-to-home navigation.
 
 ---
 
@@ -139,16 +142,16 @@ From the **Home Screen**, you can interactively:
 
 | Control | Action |
 |---|---|
-| `F11` or `[⛶ Fullscreen]` Button | **Toggle Fullscreen / Windowed Mode** (Aspect-ratio scaled with letterboxing) |
+| `F11` or `[Fullscreen]` | **Toggle Fullscreen / Windowed Mode** (aspect-ratio scaling and letterboxing) |
 | `ENTER` / `SPACE` (Home Screen) | **Launch Survival Simulation** |
 | `SPACE` (In Simulation) | **Play / Pause** auto-stepping |
 | `RIGHT ARROW` or `N` | **Step Forward** single 2-hour turn |
-| `Q` or `[⚛ Mind Toggle]` Button | **Toggle Mind Live** (Quantum Mind $\leftrightarrow$ Classical Baseline) |
-| `1` / `2` / `3` or `[⚡ Speed]` Button | **Cycle Speed** (1.0x normal, 2.5x fast, 6.0x instant) |
-| `E` | **Toggle Evacuation Map** (zones, assembly point, route from spawn) |
-| `TAB` or `[Action Log]` Button | **Toggle Chronological Action History Overlay** |
+| `Q` or `[Switch stub]` | **Switch the live heuristic stub policy** |
+| `1` / `2` / `3` or `[Speed]` | **Playback Speed** (1.0x, 2.5x, 6.0x) |
+| `E` | **Toggle Evacuation Map** (zone boundaries, assembly points and walking routes) |
+| `TAB` or `[Action Log]` Button | **Toggle Action History** (mouse wheel scrolls; ESC or TAB closes) |
 | `R` | **Reset Current Run** |
-| `ESC` or `H` or `[🏠 Menu]` Button | **Return to Home Configuration Screen** |
+| `ESC` / `H` or `[Menu]` | **Return Home** (ESC first closes history or debrief) |
 
 ---
 

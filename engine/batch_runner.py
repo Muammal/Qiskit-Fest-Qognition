@@ -9,7 +9,7 @@ import sys
 from typing import Any, Dict, List, Tuple
 import pandas as pd
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # assumption: local import root
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
@@ -110,7 +110,7 @@ def curate_demo_pack(output_dir="demo-pack"):
         raise RuntimeError(f"Seed search incomplete: {sorted(found)}")
     for name, timeline in found.items():
         with open(os.path.join(output_dir, name+".json"), "w", encoding="utf-8") as f:
-            json.dump(timeline, f, indent=2)
+            json.dump(timeline, f, separators=(',', ':'))
     print("[DemoPack] Five searched stub runs exported:", {k:v["world"]["seed"] for k,v in found.items()})
 
 

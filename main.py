@@ -20,16 +20,16 @@ import contracts
 
 
 # Terminal styling helpers
-RESET = "\033[0m"
-BOLD = "\033[1m"
-CYAN = "\033[36m"
-GREEN = "\033[32m"
-YELLOW = "\033[33m"
-RED = "\033[31m"
-MAGENTA = "\033[35m"
-BLUE = "\033[34m"
+RESET = "\033[0m"  # assumption: terminal styling
+BOLD = "\033[1m"  # assumption: terminal styling
+CYAN = "\033[36m"  # assumption: terminal styling
+GREEN = "\033[32m"  # assumption: terminal styling
+YELLOW = "\033[33m"  # assumption: terminal styling
+RED = "\033[31m"  # assumption: terminal styling
+MAGENTA = "\033[35m"  # assumption: terminal styling
+BLUE = "\033[34m"  # assumption: terminal styling
 
-TILE_CHARS = {
+TILE_CHARS = {  # assumption: terminal symbols for frozen tile codes
     0: f"{BLUE}~{RESET}",  # water
     1: f"{YELLOW}.{RESET}",  # plains
     2: f"{GREEN}^{RESET}",   # forest
