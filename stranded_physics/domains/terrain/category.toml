@@ -5,5 +5,5 @@ owner = ""
 first_model = "hydrological routing on the real DEM"
 owns = "elevation, drainage, land cover, roughness, bathymetry, static hazard zones"
 must_not_own = "hazards, weather"
-outputs = []
+outputs = ["terrain.elevation", "terrain.land_mask", "terrain.land_cover"]
 wanted = ["Copernicus DEM GLO-30 tiles N13 W062 and N13 W061", "ESA WorldCover N12W063", "A bare-earth DEM or LiDAR for valley floors", "GEBCO bathymetry"]

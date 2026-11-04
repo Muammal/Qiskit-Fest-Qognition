@@ -17,7 +17,7 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 | seismic | data_only | unclaimed | 0 | 0 | none yet |
 | storm | model | unclaimed | 0 | 0 | Holland 1980 wind profile |
 | tephra | model | unclaimed | 0 | 0 | Suzuki source with Gaussian fallout |
-| terrain | model | unclaimed | 0 | 0 | hydrological routing on the real DEM |
+| terrain | model | unclaimed | 3 | 8 | hydrological routing on the real DEM |
 | tsunami | data_only | unclaimed | 0 | 0 | none yet |
 
 ## agent: Human body and movement
@@ -145,6 +145,12 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 **Owns:** elevation, drainage, land cover, roughness, bathymetry, static hazard zones
 
 **Must not own:** hazards, weather
+
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| copernicus_glo30_n13w062 | digital surface model | reference | no | Tile N13 W062 covers all of St Vincent, so the W061 tile named in the original proposal is not needed. A surface model: heights include canopy and buildings. |
+| esa_worldcover_2021_n12w063 | land cover | reference | no | Mapped from 2021 imagery, so it may already include some effects of the April 2021 eruption on the northern slopes. Check before using it as pre-eruption cover. |
+| fabdem_v1_2_n10w070 | bare-earth estimate | reference | no | Machine-learned correction of GLO-30, so not independent of it and not a survey. Used only to size canopy bias; no model reads it. Non-commercial terms: keep it out of the repo and out of any pack. |
 
 **Still wanted:**
 - Copernicus DEM GLO-30 tiles N13 W062 and N13 W061

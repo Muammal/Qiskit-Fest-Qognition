@@ -7,7 +7,7 @@
 | Track | Status | Next |
 |---|---|---|
 | Nov 6 demo, on `mohamed/tech-c-volcano` | Built and pushed, awaiting a hand-played run and team sign-off | Play one full run; agree `gui.py` with Muammal |
-| Physics engine, on `physics/main` | Interfaces done. **No real physics yet** | Review and freeze the interfaces (`T-001`) |
+| Physics engine, on `physics/main` | Interfaces done. Real St Vincent land surface started on `physics/T-201-terrain`, with one gate failing. **No hazard physics yet** | Review the failed gate in [terrain findings](../stranded_physics/domains/terrain/FINDINGS.md); review and freeze the interfaces (`T-001`) |
 | Real disaster data, in [`disaster_data/`](../disaster_data/) | Collected, checked and pushed, awaiting a separate full review | Review the facts; move them into category records (`T-101`) |
 
 ## Done
@@ -48,6 +48,7 @@ Every model in this branch is a deliberate fake, so no result from it can be cit
 
 ## In progress
 
+- **Real land surface (`T-201`, blocked):** St Vincent heights and land cover now load onto a 90 m grid. Summit height and island area pass, and the summit location gate fails, most likely because its target was wrong. See the [findings](../stranded_physics/domains/terrain/FINDINGS.md).
 - **Full review of the case-study facts,** beyond St Vincent.
 - **Filling the categories (`T-101`):** the data sits in `disaster_data/` for now, and the 14 categories stay empty until it moves into their records.
 
