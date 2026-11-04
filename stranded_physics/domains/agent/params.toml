@@ -1,4 +1,5 @@
-# agent T1 settings.
+# agent T1 settings. ISO 7933 is paywalled and was not read, so this is a plain water and energy balance, not that standard.
+# TIPTON = Tipton and Montgomery (2025), The physiology of survival: Fluid and food. Experimental Physiology. doi:10.1113/EP093194.
 
 [[parameter]]
 id = "agent.off_trail_factor"  # Tobler's 3/5 for walking off a path. From memory, and disputed by the 2023 GPS summary noted in docs/VOLCANO_MODEL.md.
@@ -7,4 +8,144 @@ unit = "dimensionless"
 valid_min = 0.1
 valid_max = 1.0
 role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "agent.body_mass"  # A round adult figure. Water loss limits scale with it.
+value = 70.0
+unit = "kg"
+valid_min = 40.0
+valid_max = 120.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "agent.body_water_fraction"  # A common textbook adult figure. From memory.
+value = 0.6
+unit = "dimensionless"
+valid_min = 0.45
+valid_max = 0.7
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "agent.lethal_water_loss"  # Middle of the published range.
+value = 0.175
+unit = "dimensionless"
+valid_min = 0.15
+valid_max = 0.2
+role = "input"
+status = "literature"
+source = "TIPTON p.2: 'Death usually occurs with acute losses in the range of 15-20% body water.'"
+
+[[parameter]]
+id = "agent.rest_water_need"  # Net need to drink at rest, after metabolic water. Scenario air is about 21 to 27 C, so close to this thermoneutral case.
+value = 1.0
+unit = "liter/day"
+valid_min = 0.5
+valid_max = 4.0
+role = "input"
+status = "literature"
+source = "TIPTON p.1: 'a minimum average requirement to drink in these conditions of around 1 L day-1'"
+
+[[parameter]]
+id = "agent.sweat_limit"
+value = 2.0
+unit = "liter/hour"
+valid_min = 0.5
+valid_max = 4.0
+role = "input"
+status = "literature"
+source = "TIPTON p.1: sweat loss 'at a rate of up to 2 L h-1'"
+
+[[parameter]]
+id = "agent.sweat_heat"  # Latent heat of vaporisation near skin temperature. A standard physical value, from memory. Assumes extra metabolic heat leaves by sweating.
+value = 2426.0
+unit = "kJ/kg"
+valid_min = 2300.0
+valid_max = 2500.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "agent.rest_energy"
+value = 1400.0
+unit = "kcal/day"
+valid_min = 1000.0
+valid_max = 2000.0
+role = "input"
+status = "literature"
+source = "TIPTON p.2: 'about 2400 kcal day-1 with normal activity, and about 1400 kcal day-1 if at rest'"
+
+[[parameter]]
+id = "agent.terrain_factor"  # Light brush, in Pandolf's terrain table, for forest paths. Read through a secondary summary of Pandolf et al. (1977) and Soule and Goldman (1972).
+value = 1.2
+unit = "dimensionless"
+valid_min = 1.0
+valid_max = 2.1
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "agent.drink_per_step"  # Water taken in during one two-hour step at a stream. No source held.
+value = 2.0
+unit = "liter"
+valid_min = 0.5
+valid_max = 4.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "agent.starvation_days"  # Lower end of the published range. No run lasts long enough to reach it, which is the point.
+value = 40.0
+unit = "day"
+valid_min = 20.0
+valid_max = 80.0
+role = "input"
+status = "literature"
+source = "TIPTON p.2: 'In complete starvation, this usually occurs within 40-60 days'"
+
+[[parameter]]
+id = "agent.felt_hunger_span"  # The food deficit at which the hunger need reads 0. Felt hunger, not risk of death. No source held.
+value = 7200.0
+unit = "kcal"
+valid_min = 2000.0
+valid_max = 30000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "agent.fatigue_span"  # Walking energy above rest at which the energy need reads 0: one normal day's total. No source held.
+value = 2400.0
+unit = "kcal"
+valid_min = 800.0
+valid_max = 6000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "agent.rest_recovery"  # Fatigue removed by one step of rest. Replaces an inherited rule. No source held.
+value = 240.0
+unit = "kcal"
+valid_min = 50.0
+valid_max = 800.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "agent.reference_grade"  # A typical uphill grade for the day-long reference walk used by the checks.
+value = 5.0
+unit = "dimensionless"
+valid_min = 0.0
+valid_max = 30.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "agent.reference_walk_hours"
+value = 8.0
+unit = "hour"
+valid_min = 1.0
+valid_max = 16.0
+role = "convention"
 status = "assumption"
