@@ -2,6 +2,8 @@
 
 Where the physics engine is planned and tracked. Anyone, person or Claude session, can pick up a task from here cold.
 
+**[See current progress](PROGRESS.md)**: what's done, what's in progress, and who we're waiting on.
+
 ## Start here
 
 1. Read [DESIGN.md](DESIGN.md). It takes five minutes.

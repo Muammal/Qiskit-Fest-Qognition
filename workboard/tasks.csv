@@ -1,6 +1,7 @@
 id,ws,title,owner,status,depends,gate_ids,spec,branch,updated
-T-001,WS0,Review and freeze interfaces v0.1,,todo,,,specs/T-001.md,,2026-11-04
-T-002,WS0,Add the physics CI workflow,,todo,T-001,,specs/T-002.md,,2026-11-04
+T-001,WS0,Review and freeze interfaces v0.1,Mohamed,review,,,specs/T-001.md,,2026-11-04
+T-002,WS0,Add the physics CI workflow,Claude,review,T-001,,specs/T-002.md,,2026-11-04
+T-100,WS1,Collect open disaster data,Claude,claimed,,,specs/T-100.md,,2026-11-04
 T-101,WS1,Move collected data into category records,,todo,T-001,,specs/T-101.md,,2026-11-04
 T-102,WS1,Week one data hunt: St Vincent 2021 validation data,,todo,,,specs/T-102.md,,2026-11-04
 T-103,WS1,EM-DAT export,,todo,,,specs/T-103.md,,2026-11-04
