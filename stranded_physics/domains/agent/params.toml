@@ -1,1 +1,10 @@
-# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+# agent T1 settings.
+
+[[parameter]]
+id = "agent.off_trail_factor"  # Tobler's 3/5 for walking off a path. From memory, and disputed by the 2023 GPS summary noted in docs/VOLCANO_MODEL.md.
+value = 0.6
+unit = "dimensionless"
+valid_min = 0.1
+valid_max = 1.0
+role = "input"
+status = "assumption"

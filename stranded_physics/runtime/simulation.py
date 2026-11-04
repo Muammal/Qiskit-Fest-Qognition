@@ -7,12 +7,12 @@ import numpy as np
 
 import contracts
 from stranded_physics.core.api import InterfaceError, ScenarioPack, XY
+from stranded_physics.domains.agent.walking import TravelField, travel_field, walk
 from stranded_physics.runtime.body import AgentBody, to_state
 from stranded_physics.runtime.perception import perceive
 
 STEP_MINUTES = 120
 SUBSTEP_MINUTES = 5  # Hazard contact is checked at this resolution along a walk.
-WALK_M_PER_S = .5  # assumption: T0 speed. WS6 replaces this with Tobler over real terrain.
 STORM_RAIN_MM_H = 5.  # assumption: T0 threshold; a `convention` value in the frozen event mapping.
 PHASE_NAMES = {0: "unrest", 1: "escalating", 2: "erupting", 3: "fading"}
 TILE_CODES = {"water": 0, "plains": 1, "forest": 2, "mountain": 3, "shelter": 4}
@@ -84,6 +84,7 @@ class PackSimulation:
         self.world = PackWorld(pack)
         self.agent = AgentBody(tuple(pack.sites["spawn"][0]), list(self.world.spawn_pos), pack.t0_local_hour)
         self.recent_events = ["none", "none"]
+        self._fields: dict[XY, TravelField] = {}
         self.steps: list[dict] = []
         self.warned = False
 
@@ -103,28 +104,42 @@ class PackSimulation:
             return "storm"
         return "none"
 
+    def _field(self, goal: XY) -> TravelField:
+        """Best walking times to one site, computed once. Terrain never changes, so this reads no hazard."""
+        if goal not in self._fields:
+            grid = self.pack.grid
+            self._fields[goal] = travel_field(self.pack.frame("terrain.elevation"), self.pack.frame("terrain.land_mask") > 0, grid.locate(goal), grid.dx_m)
+        return self._fields[goal]
+
+    def _nearest_site(self, sites: list[XY]) -> XY | None:
+        cell = self.pack.grid.locate(self.agent.xy_m)
+        if cell is None:
+            return None
+        goal = min(sites, key=lambda p: self._field(p).seconds[cell])
+        return goal if np.isfinite(self._field(goal).seconds[cell]) else None
+
     def _walk_goal(self, action: str) -> XY | None:
         sites = self.pack.sites
         if action == "hide" and self.warned:
-            return min(sites["assembly"], key=lambda p: math.dist(p, self.agent.xy_m))
+            return self._nearest_site(sites["assembly"])
         if action == "drink":
-            return min(sites["water"], key=lambda p: math.dist(p, self.agent.xy_m))
+            return self._nearest_site(sites["water"])
         return None
 
     def _advance(self, action: str, t_s: float) -> None:
         """Walk through the step in substeps, checking hazards at each. No solver runs here."""
         goal = self._walk_goal(action)
+        grid = self.pack.grid
+        spare_s = 0.
         for minute in range(0, STEP_MINUTES, SUBSTEP_MINUTES):
             clock = t_s + minute * 60.
-            if goal is not None:
-                remaining = math.dist(goal, self.agent.xy_m)
-                stride = WALK_M_PER_S * SUBSTEP_MINUTES * 60. * (.5 if self.agent.injured else 1.)
-                if remaining > 1.:
-                    share = min(1., stride / remaining)
-                    candidate = (self.agent.xy_m[0] + (goal[0] - self.agent.xy_m[0]) * share,
-                                 self.agent.xy_m[1] + (goal[1] - self.agent.xy_m[1]) * share)
-                    if self.pack.sample("terrain.land_mask", candidate):
-                        self.agent.xy_m = candidate
+            cell = grid.locate(self.agent.xy_m)
+            if goal is not None and cell is not None:
+                # An injured person covers half the ground. This factor is an assumption, carried over from T0.
+                budget = spare_s + SUBSTEP_MINUTES * 60. * (.5 if self.agent.injured else 1.)
+                reached, spare_s = walk(self._field(goal), cell, budget, (grid.ny, grid.nx))
+                if reached != cell:
+                    self.agent.xy_m = grid.centre(*reached)
             if self.pack.sample("pdc.arrival", self.agent.xy_m) <= clock and self.pack.sample("pdc.active", self.agent.xy_m, clock):
                 self.agent.alive, self.agent.cause = False, "pyroclastic_flow"
                 break

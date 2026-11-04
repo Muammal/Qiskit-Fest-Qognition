@@ -14,9 +14,11 @@ from rasterio.enums import Resampling
 from rasterio.transform import from_origin
 from rasterio.warp import reproject
 
-from stranded_physics.core.api import GridSpec, InterfaceError, Parameter
+from stranded_physics.core.api import GridSpec, InterfaceError, Parameter, XY
 from stranded_physics.core.fields import spec
 from stranded_physics.core.records import load_datasets, load_parameters
+from stranded_physics.domains.terrain.drainage import flow_accumulation, height_above_drainage, route
+from stranded_physics.st_vincent import VENT_XY
 
 HERE = Path(__file__).resolve().parent
 RAW = HERE.parents[2] / "artifacts" / "physics" / "raw" / "terrain"
@@ -70,17 +72,26 @@ def land_area_km2(mask: np.ndarray, grid: GridSpec) -> float:
     return float(mask.sum()) * grid.dx_m ** 2 / 1e6
 
 
+def static_zones(grid: GridSpec, vent: XY) -> np.ndarray:
+    """0 safe, 1 caution, 2 danger, by distance from the vent alone, so zones can never use a future hazard."""
+    xs = grid.x0_m + (np.arange(grid.nx) + .5) * grid.dx_m - vent[0]
+    ys = grid.y0_m - (np.arange(grid.ny) + .5) * grid.dx_m - vent[1]
+    distance = np.hypot(*np.meshgrid(xs, ys))
+    return np.select([distance <= SETTINGS["zone_danger"], distance <= SETTINGS["zone_caution"]], [2., 1.], 0.)
+
+
 class Terrain:
     """Static land surface for one grid. Raw files are pinned by hash, so a changed download can't pass unnoticed."""
 
     id = "terrain"
     tier = "T1"
     inputs = ()
-    outputs = (spec("terrain.elevation"), spec("terrain.land_mask"), spec("terrain.land_cover"))
+    outputs = (spec("terrain.elevation"), spec("terrain.land_mask"), spec("terrain.land_cover"), spec("terrain.zone"),
+               spec("terrain.flow_accumulation"), spec("terrain.height_above_drainage"))
     parameters: tuple[Parameter, ...] = PARAMETERS
 
-    def __init__(self, grid: GridSpec = ST_VINCENT_GRID, files: dict[str, tuple[Path, str]] | None = None) -> None:
-        self.grid = grid
+    def __init__(self, grid: GridSpec = ST_VINCENT_GRID, files: dict[str, tuple[Path, str]] | None = None, vent: XY = VENT_XY) -> None:
+        self.grid, self.vent = grid, vent
         self.files = default_files() if files is None else files
 
     def check_validity(self, fields) -> list[str]:
@@ -94,7 +105,14 @@ class Terrain:
 
     def run(self, fields, rng: np.random.Generator) -> dict[str, float]:
         dem, cover = self.files["dem"][0], self.files["cover"][0]
-        fields.put("terrain.elevation", read_elevation(dem, self.grid), "m", self.grid)
-        fields.put("terrain.land_mask", read_land_mask(dem, self.grid), "dimensionless", self.grid)
+        elevation, mask = read_elevation(dem, self.grid), read_land_mask(dem, self.grid)
+        land = mask > 0
+        drainage = route(elevation, land, self.grid.dx_m)
+        area = flow_accumulation(drainage, land, self.grid.dx_m)
+        fields.put("terrain.elevation", elevation, "m", self.grid)
+        fields.put("terrain.land_mask", mask, "dimensionless", self.grid)
         fields.put("terrain.land_cover", read_land_cover(cover, self.grid), "dimensionless", self.grid)
+        fields.put("terrain.zone", static_zones(self.grid, self.vent), "dimensionless", self.grid)
+        fields.put("terrain.flow_accumulation", area, "m**2", self.grid)
+        fields.put("terrain.height_above_drainage", height_above_drainage(elevation, drainage, area, SETTINGS["channel_area"]), "m", self.grid)
         return {}

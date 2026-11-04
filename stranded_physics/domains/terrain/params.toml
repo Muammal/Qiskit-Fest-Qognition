@@ -55,6 +55,33 @@ role = "convention"
 status = "assumption"
 
 [[parameter]]
+id = "terrain.channel_area"  # A cell counts as a channel with this much upslope area, about 30 cells.
+value = 250000.0
+unit = "m**2"
+valid_min = 10000.0
+valid_max = 10000000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.zone_danger"  # Rough stand-in for the 2021 red zone. A digitised official map would replace it.
+value = 8000.0
+unit = "m"
+valid_min = 1000.0
+valid_max = 20000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.zone_caution"  # Rough stand-in for the 2021 orange zone.
+value = 10000.0
+unit = "m"
+valid_min = 1000.0
+valid_max = 30000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
 id = "terrain.valley_window"  # Neighbourhood for finding valley floors, about 1 km across.
 value = 11
 unit = "dimensionless"

@@ -1,6 +1,6 @@
 """Measurements behind the terrain gates. Each prints a final JSON line that the gate runner reads.
 
-    python -m stranded_physics.domains.terrain.measure summit_height|summit_location|island_area|canopy
+    python -m stranded_physics.domains.terrain.measure summit_height|summit_location|island_area|canopy|drains_to_sea|channels_vs_bare_earth
 """
 from __future__ import annotations
 
@@ -9,11 +9,12 @@ import sys
 
 import numpy as np
 from rasterio.warp import transform as warp_transform
-from scipy.ndimage import uniform_filter
+from scipy.ndimage import binary_dilation, uniform_filter
 
 from stranded_physics.core.api import InterfaceError
 from stranded_physics.core.fields import FieldStore
 from stranded_physics.core.records import load_datasets
+from stranded_physics.domains.terrain.drainage import flow_accumulation, route, share_draining_out
 from stranded_physics.domains.terrain.model import HERE, SETTINGS, ST_VINCENT_GRID, Terrain, land_area_km2, raw_path, read_elevation
 
 GVP_SUMMIT_LONLAT = (-61.18, 13.33)  # Smithsonian GVP volcano 360150, as held in disaster_data/catalog/volcanoes.csv.
@@ -60,11 +61,30 @@ def canopy_bias(surface: np.ndarray, bare: np.ndarray, cover: np.ndarray, land: 
             **summarise("forest_all", usable & forest), **summarise("open_all", usable & ~forest)}
 
 
-def measure_canopy(store: FieldStore) -> dict[str, float]:
-    """FABDEM is a published machine-learned estimate of bare earth, not a survey, so this sizes the bias only roughly."""
+def read_bare_earth() -> np.ndarray:
     records = {r.id: r for r in load_datasets(HERE / "datasets.toml", "terrain")}
     archive = raw_path(records["fabdem_v1_2_n10w070"].url)
-    bare = read_elevation(f"zip://{archive.as_posix()}!{FABDEM_MEMBER}", ST_VINCENT_GRID)
+    return read_elevation(f"zip://{archive.as_posix()}!{FABDEM_MEMBER}", ST_VINCENT_GRID)
+
+
+def drains_to_sea(store: FieldStore) -> float:
+    land = store.get("terrain.land_mask", "dimensionless") > 0
+    return share_draining_out(route(store.get("terrain.elevation", "m"), land, ST_VINCENT_GRID.dx_m), land)
+
+
+def channels_vs_bare_earth(store: FieldStore) -> dict[str, float]:
+    """How much canopy moves the channels: the share of surface-model channel cells within one cell of a bare-earth channel."""
+    land = store.get("terrain.land_mask", "dimensionless") > 0
+    threshold, dx = SETTINGS["channel_area"], ST_VINCENT_GRID.dx_m
+    surface = store.get("terrain.flow_accumulation", "m**2") >= threshold
+    bare = flow_accumulation(route(np.where(land, read_bare_earth(), 0.), land, dx), land, dx) >= threshold
+    shared = surface & binary_dilation(bare, structure=np.ones((3, 3)))
+    return {"surface_channel_cells": int(surface.sum()), "bare_earth_channel_cells": int(bare.sum()), "shared_share": float(shared.sum() / max(surface.sum(), 1))}
+
+
+def measure_canopy(store: FieldStore) -> dict[str, float]:
+    """FABDEM is a published machine-learned estimate of bare earth, not a survey, so this sizes the bias only roughly."""
+    bare = read_bare_earth()
     return canopy_bias(store.get("terrain.elevation", "m"), bare, store.get("terrain.land_cover", "dimensionless"),
                        store.get("terrain.land_mask", "dimensionless") > 0, int(SETTINGS["valley_window"]), SETTINGS["valley_depth"])
 
@@ -82,6 +102,10 @@ def main(argv: list[str]) -> int:
         print(json.dumps({"value": land_area_km2(store.get("terrain.land_mask", "dimensionless"), ST_VINCENT_GRID)}))
     elif argv[0] == "canopy":
         print(json.dumps(measure_canopy(store)))
+    elif argv[0] == "drains_to_sea":
+        print(json.dumps({"value": drains_to_sea(store)}))
+    elif argv[0] == "channels_vs_bare_earth":
+        print(json.dumps(channels_vs_bare_earth(store)))
     else:
         print(__doc__)
         return 2
