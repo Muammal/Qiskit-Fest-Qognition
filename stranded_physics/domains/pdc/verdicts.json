@@ -43,5 +43,9 @@
     "value": 8.137428367510187,
     "verdict": "FAIL",
     "west_sea": 1.0
+  },
+  "pdc.records_and_units": {
+    "hash": "469637ff9af2df775fb8f995cfed962cc6b0b20b38611febef16df44c7de4d4f",
+    "verdict": "PASS"
   }
 }

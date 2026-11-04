@@ -14,5 +14,9 @@
     "hash": "e41cc9e887bdc656d8795441a25da718580568207831c7babd3c10a21978ab4c",
     "model_kg": 309689788821.8786,
     "verdict": "NO_TARGET"
+  },
+  "eruption.records_and_units": {
+    "hash": "c5dfb9e41585d267eabd92cc160298ed00e115a78750ffb6eb267d3ed0974a33",
+    "verdict": "PASS"
   }
 }

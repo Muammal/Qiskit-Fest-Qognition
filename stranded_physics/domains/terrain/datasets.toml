@@ -39,3 +39,16 @@ citation = "Hawker, L. et al. A 30 m global map of elevation with forests and bu
 split = "reference"
 content_check = "min_bytes:200000000"
 notes = "Machine-learned correction of GLO-30, so not independent of it and not a survey. Used only to size canopy bias; no model reads it. Non-commercial terms: keep it out of the repo and out of any pack."
+
+[[dataset]]
+id = "natural_earth_land"
+kind = "vector"
+url = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zip"
+retrieved_utc = "2026-11-03T22:41:36.130375+00:00"
+sha256 = "e547d749445eaa0964aba76738090ec88f5e63c4585122170f98c67a7ea922dc"
+licence = "Public domain, stated in the Natural Earth terms read in raw/natural_earth_terms.html"
+licence_confirmed = true
+citation = "Made with Natural Earth. Free vector and raster map data @ naturalearthdata.com. ne_10m_land"
+split = "reference"
+content_check = "min_bytes:1000"
+notes = "file: raw/ne_10m_land.zip"

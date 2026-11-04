@@ -1,1 +1,365 @@
 # One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+
+[[dataset]]
+id = "ibtracs_terms"
+kind = "case_study"
+url = "https://www.ncei.noaa.gov/products/international-best-track-archive"
+retrieved_utc = "2026-11-03T22:45:53.300962+00:00"
+sha256 = "338a7f0163a89615d9987d10041b305563f81c55af42d6311f78eabba5427c7d"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Knapp, K. R., M. C. Kruk, D. H. Levinson, H. J. Diamond, and C. J. Neumann, 2010, BAMS 91, 363-376, doi:10.1175/2009BAMS2755.1; and Gahtan, J., et al., 2024, IBTrACS Project, Version 4r01, NOAA NCEI, doi:10.25921/82ty-9e16, as requested on the provider page."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/ibtracs_terms.html"
+
+[[dataset]]
+id = "la_palma_eos"
+kind = "case_study"
+url = "https://eos.org/science-updates/volcanic-anatomy-mapped-as-it-erupts"
+retrieved_utc = "2026-11-04T01:14:27.057779+00:00"
+sha256 = "c55c4c20b83de7412eae8e568050133d6c49434088d575915702f90e823ea1a3"
+licence = "Text CC BY-NC-ND 3.0, stated on the article page"
+licence_confirmed = true
+citation = "Zanon, V., and L. D'Auria, 2024, Volcanic anatomy, mapped as it erupts, Eos 105, doi:10.1029/2024EO240431"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/la_palma_eos.html"
+
+[[dataset]]
+id = "la_palma_frontiers"
+kind = "case_study"
+url = "https://www.frontiersin.org/journals/earth-science/articles/10.3389/feart.2023.1166073/full"
+retrieved_utc = "2026-11-03T22:48:57.190069+00:00"
+sha256 = "9bf9daaa816472454284cc056755d3315c009a45fb0f3d5951bb89871700dec4"
+licence = "Creative Commons Attribution License (CC BY), stated on the article page"
+licence_confirmed = true
+citation = "Bonadonna, C., et al., 2023, Frontiers in Earth Science 11:1166073, doi:10.3389/feart.2023.1166073"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/la_palma_frontiers.html"
+
+[[dataset]]
+id = "la_palma_wiki"
+kind = "case_study"
+url = "https://en.wikipedia.org/wiki/2021_Cumbre_Vieja_volcanic_eruption"
+retrieved_utc = "2026-11-03T22:45:49.423823+00:00"
+sha256 = "bd12819a283b3a930b575a1f8d0eae175e43cd90e4c9af2e1aaa6a901e6b5b40"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "not confirmed"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/la_palma_wiki.html"
+
+[[dataset]]
+id = "miyakejima_eri_73"
+kind = "case_study"
+url = "https://www.eri.u-tokyo.ac.jp/KOHO/Yoran2001ep/07_3.html"
+retrieved_utc = "2026-11-04T01:14:09.802366+00:00"
+sha256 = "8e699a5475190f2f0050e2b46cf828637a3f172ce9bf53242eedbb287eb6022c"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Earthquake Research Institute, University of Tokyo, Yoran 2001, section 7-3"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/miyakejima_eri_73.html"
+
+[[dataset]]
+id = "miyakejima_gsj"
+kind = "case_study"
+url = "https://www.gsj.jp/hazards/volcano/miyake2000/"
+retrieved_utc = "2026-11-03T22:45:54.506696+00:00"
+sha256 = "24ac46e6bcec1e0d793a6345fd2384940908a8c029d19acce88828f1f7c13a1e"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "not confirmed"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/miyakejima_gsj.html"
+
+[[dataset]]
+id = "miyakejima_nied"
+kind = "case_study"
+url = "https://nied-repo.bosai.go.jp/records/4152"
+retrieved_utc = "2026-11-04T01:14:15.325734+00:00"
+sha256 = "b994de73b863fea46f6d34c0b7ab9abec587c8dd4e1e39f2cf12f6d49e306023"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Nakada, S., et al., 2005, Chronology and products of the 2000 eruption of Miyakejima Volcano, Japan, Bull. Volcanol. 67, 205-218, doi:10.1007/s00445-004-0404-4 (abstract in the NIED repository)"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/miyakejima_nied.html"
+
+[[dataset]]
+id = "miyakejima_osu"
+kind = "case_study"
+url = "https://volcano.oregonstate.edu/miyake-jima"
+retrieved_utc = "2026-11-04T01:14:06.620975+00:00"
+sha256 = "d37b5e5ba653313c2508c96219783f8b7205548bb172497c694e06d55e7425ed"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Volcano World, Oregon State University, Miyake-jima"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/miyakejima_osu.html"
+
+[[dataset]]
+id = "miyakejima_tokyo"
+kind = "case_study"
+url = "https://www.eri.u-tokyo.ac.jp/KOHO/Yoran2001ep/05_2.html"
+retrieved_utc = "2026-11-03T22:49:16.815467+00:00"
+sha256 = "469747daeb8bc9077a754e30e1233294cce22b0c1576fa65351dc8b48bbc0fa4"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Earthquake Research Institute, University of Tokyo, Yoran 2001, section 5-2"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/miyakejima_tokyo.html"
+
+[[dataset]]
+id = "miyakejima_usgs"
+kind = "case_study"
+url = "https://pubs.usgs.gov/publication/70206022"
+retrieved_utc = "2026-11-03T22:45:51.938335+00:00"
+sha256 = "1657aa32815019c7e74695f94fdcf93ce94fb20d11f161ba6c9e8204aac53ed1"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Wright, T., and Sakai, S., 2004, Bulletin of the Earthquake Research Institute, v. 79, p. 1-16 (USGS Publications Warehouse record)"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/miyakejima_usgs.html"
+
+[[dataset]]
+id = "miyakejima_wiki"
+kind = "case_study"
+url = "https://en.wikipedia.org/wiki/Miyake-jima"
+retrieved_utc = "2026-11-03T22:45:56.592982+00:00"
+sha256 = "fe306ec598e7e72d881f68f1e66700541e72e8f9a627184c4c215135c8a8a554"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "not confirmed"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/miyakejima_wiki.html"
+
+[[dataset]]
+id = "natural_earth_minor_islands"
+kind = "case_study"
+url = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_minor_islands.zip"
+retrieved_utc = "2026-11-03T22:41:41.107045+00:00"
+sha256 = "47c0b3ce26df7b4dbabdbb251023918cb2f5c83462a426288f1f253da7284db2"
+licence = "Public domain, stated in the Natural Earth terms read in raw/natural_earth_terms.html"
+licence_confirmed = true
+citation = "Made with Natural Earth. ne_10m_minor_islands"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/ne_10m_minor_islands.zip"
+
+[[dataset]]
+id = "natural_earth_terms"
+kind = "case_study"
+url = "https://www.naturalearthdata.com/about/terms-of-use/"
+retrieved_utc = "2026-11-03T22:45:42.647433+00:00"
+sha256 = "9abf8e9f339dfd65e762f6884363e3f15698a7ddd09415d38f2b8f1e363fad94"
+licence = "Public domain, stated in the Natural Earth terms read in raw/natural_earth_terms.html"
+licence_confirmed = true
+citation = "Natural Earth terms of use page"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/natural_earth_terms.html"
+
+[[dataset]]
+id = "noaa_hazel_legend"
+kind = "case_study"
+url = "https://www.ngdc.noaa.gov/hazel/static/js/main.4768c122.js"
+retrieved_utc = "2026-11-04T01:19:19.865241+00:00"
+sha256 = "174dc6c34a03658d5b636dbecb8a7691808ae314f2fcdd4288997bd54224b61d"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "NCEI HazEL front-end bundle, holding the on-site agent and tsunami-cause legends. Read as text, never executed."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/noaa_hazel_bundle_0.js"
+
+[[dataset]]
+id = "noaa_terms"
+kind = "case_study"
+url = "https://www.ngdc.noaa.gov/hazard/"
+retrieved_utc = "2026-11-03T22:45:48.717513+00:00"
+sha256 = "c599ad7f7bc900021d9bf11593f2f5b26e35bf257ee871ddb676e2423b98e7ad"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "NCEI Natural Hazards page"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/noaa_terms.html"
+
+[[dataset]]
+id = "noaa_tsunami_docs"
+kind = "case_study"
+url = "https://www.ngdc.noaa.gov/hazard/tsu_db.shtml"
+retrieved_utc = "2026-11-03T22:49:07.880801+00:00"
+sha256 = "737b600e711cc64a952f704f7aec214974ac7657650f0b229a56fbeb2c0cffb3"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "NCEI/WDS Global Historical Tsunami Database. Citation requested on the provider page: 'Please cite this data/database as: doi:10.7289/V5PN93H7'."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/noaa_tsunami_docs.html"
+
+[[dataset]]
+id = "noaa_volcano_docs"
+kind = "case_study"
+url = "https://www.ngdc.noaa.gov/hazard/volcano.shtml"
+retrieved_utc = "2026-11-03T22:49:04.839449+00:00"
+sha256 = "77bb30a974b12efca6b1464a33f8f67d442d77689888ae523c8e761e7a7d8cf4"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "NCEI/WDS Global Significant Volcanic Eruptions Database. Citation requested on the provider page: 'Please cite this data/database as doi:10.7289/V5JW8BSH'."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/noaa_volcano_docs.html"
+
+[[dataset]]
+id = "noaa_volcano_events"
+kind = "case_study"
+url = "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/volcanoes?itemsPerPage=200&page=1"
+retrieved_utc = "2026-11-03T22:38:52.351644+00:00"
+sha256 = "cebeb7aff2c56e15236a7c14645c8d22d830c08d6d9677a860b8998866f2aa69"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "NCEI/WDS Global Significant Volcanic Eruptions Database. Citation requested on the provider page: 'Please cite this data/database as doi:10.7289/V5JW8BSH'."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/noaa_volcano_events.json"
+
+[[dataset]]
+id = "noaa_volcano_legend"
+kind = "case_study"
+url = "https://www.ngdc.noaa.gov/hazel/view/hazards/volcano/event-data"
+retrieved_utc = "2026-11-03T22:45:55.230560+00:00"
+sha256 = "3fec2a9935a8d6d3f351d6c2a0c49ccf4a904016e5ac2820e48c55e1122987b6"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "NCEI/WDS Global Significant Volcanic Eruptions Database. Citation requested on the provider page: 'Please cite this data/database as doi:10.7289/V5JW8BSH'."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/noaa_volcano_legend.html"
+
+[[dataset]]
+id = "open_meteo_terms"
+kind = "case_study"
+url = "https://open-meteo.com/en/terms"
+retrieved_utc = "2026-11-03T22:45:45.130302+00:00"
+sha256 = "ae7c6f8c225a12b91bb373d79e2892890db673cff562c15a2ff571af96883b6e"
+licence = "CC-BY 4.0, stated in the Open-Meteo terms read in raw/open_meteo_terms.html"
+licence_confirmed = true
+citation = "Open-Meteo.com API, Historical Weather or Historical Forecast endpoint."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/open_meteo_terms.html"
+
+[[dataset]]
+id = "pelee_ebsco"
+kind = "case_study"
+url = "https://www.ebsco.com/research-starters/history/mount-pelee-erupts"
+retrieved_utc = "2026-11-04T01:17:00.940739+00:00"
+sha256 = "b71f7ada97a7dced96d3f03ad3b5151403c3c8018ddbc7d8eecdea0b1200b30e"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "EBSCO Research Starters, Mount Pelee Erupts"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/pelee_ebsco.html"
+
+[[dataset]]
+id = "pelee_sciam"
+kind = "case_study"
+url = "https://blogs.scientificamerican.com/history-of-geology/may-8-1902-la-pelee/"
+retrieved_utc = "2026-11-04T01:14:24.522981+00:00"
+sha256 = "4fa30646d5b0afe1bd26c1921616118b997c9600e57c198417c9312b36c0c9fa"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Scientific American blog, History of Geology, May 8, 1902: La Pelee"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/pelee_sciam.html"
+
+[[dataset]]
+id = "pelee_sdsu"
+kind = "case_study"
+url = "https://volcanoes.sdsu.edu/Pelee.html"
+retrieved_utc = "2026-11-04T01:14:21.733788+00:00"
+sha256 = "01dda6c4f70381986a1759bbc4c0b1d82b2b714c6fb9e44a569d1d0bf59a9667"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "How Volcanoes Work, San Diego State University, Mt. Pelee eruption (1902)"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/pelee_sdsu.html"
+
+[[dataset]]
+id = "pelee_usgs"
+kind = "case_study"
+url = "https://www.usgs.gov/news/volcano-watch-chronology-a-volcanic-disaster"
+retrieved_utc = "2026-11-03T22:48:45.975472+00:00"
+sha256 = "6ba213fb5a6cbd770741f49b996b6bb9c0e14982acee0f0894dbe019ed311110"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Hawaiian Volcano Observatory, USGS, Volcano Watch: Chronology of a volcanic disaster, March 11, 2004"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/pelee_usgs.html"
+
+[[dataset]]
+id = "pelee_wiki"
+kind = "case_study"
+url = "https://en.wikipedia.org/wiki/1902_eruption_of_Mount_Pel%C3%A9e"
+retrieved_utc = "2026-11-03T22:45:39.072081+00:00"
+sha256 = "a4276b2b7db6f3897b4d843b166c4b72c217ba5338d45034a82826de6f152a51"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "not confirmed"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/pelee_wiki.html"
+
+[[dataset]]
+id = "weather_la_palma"
+kind = "case_study"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=28.57&longitude=-17.83&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:45:06.880472+00:00"
+sha256 = "102965b80c0a686f12a0f440fdf01a953a422d7ed36a303a1f3b87e633f6c4d4"
+licence = "CC-BY 4.0, stated in the Open-Meteo terms read in raw/open_meteo_terms.html"
+licence_confirmed = true
+citation = "Open-Meteo.com API, Historical Weather or Historical Forecast endpoint."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/weather_la_palma.json"
+
+[[dataset]]
+id = "weather_miyakejima"
+kind = "case_study"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=34.094&longitude=139.526&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:44:43.041602+00:00"
+sha256 = "1d782026b6f1d018cdd4d6038eccdccd526d489037fb0724f57da7a1d54b1122"
+licence = "CC-BY 4.0, stated in the Open-Meteo terms read in raw/open_meteo_terms.html"
+licence_confirmed = true
+citation = "Open-Meteo.com API, Historical Weather or Historical Forecast endpoint."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/weather_miyakejima.json"
+
+[[dataset]]
+id = "weather_stromboli"
+kind = "case_study"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=38.789&longitude=15.213&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:44:51.161361+00:00"
+sha256 = "cbdaaeac168fb177c36e857d0aa80745f77e3772db5f8eb4428b445d84936511"
+licence = "CC-BY 4.0, stated in the Open-Meteo terms read in raw/open_meteo_terms.html"
+licence_confirmed = true
+citation = "Open-Meteo.com API, Historical Weather or Historical Forecast endpoint."
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/weather_stromboli.json"

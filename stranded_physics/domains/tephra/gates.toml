@@ -62,3 +62,11 @@ tolerance = 0.05
 role = "prediction"
 split = "reference"  # Not blind: the grain model changed after the first run missed Barbados. See workboard/ENGINE_STATUS.md.
 source = "'Des le 11 avril, toute l'ile de Saint-Vincent est entierement recouverte', st_vincent_ipgp in disaster_data/case_studies.json. The threshold is an assumption."
+
+[[gate]]
+id = "tephra.records_and_units"
+title = "Tephra parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/tephra'); load_datasets(p/'datasets.toml', 'tephra'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/tephra/datasets.toml", "stranded_physics/domains/tephra/params.toml"]
+required = true

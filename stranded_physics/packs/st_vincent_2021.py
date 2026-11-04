@@ -21,7 +21,7 @@ SCENARIO_TIME = replace(TIME, n=48)  # 96 hours, so the published first flow, 21
 CONTRACT_GRID = GridSpec(UTM, 687000., 1481000., 500., 40, 40)  # The contract's 40 x 40 tiles, on the northern 20 km of the island.
 LOCAL_HOUR_AT_START = 20  # 00:00 UTC on 8 April is 20:00 the evening before, at UTC-4.
 # Village positions are from memory, to about 500 m, and every site is snapped to land below. Check these against a gazetteer.
-SPAWN_LONLAT = (-61.243, 13.283)  # Chateaubelair, west coast, in the 2021 red zone.
+SPAWNS = {"chateaubelair": (-61.243, 13.283), "richmond": (-61.226, 13.317)}  # West-coast villages in the 2021 red zone. Richmond lies by the Wallibou valley.
 ASSEMBLY_LONLAT = ((-61.267, 13.233), (-61.140, 13.240))  # Barrouallie to the south-west, Colonarie to the south-east.
 MOST_SNAP_M = 1500.
 
@@ -35,14 +35,14 @@ def _nearest(mask: np.ndarray, point: XY) -> XY:
     return float(xs[best]), float(ys[best])
 
 
-def sites() -> dict[str, list[XY]]:
+def sites(spawn: str = "chateaubelair") -> dict[str, list[XY]]:
     """Sites from the real surface: people on land, and water at the nearest real channel, not at a chosen spot."""
     domain = Terrain()
     store = FieldStore()
     domain.run(ScopedFields(store, domain.id, domain.inputs, domain.outputs), np.random.default_rng(0))
     land = store.get("terrain.land_mask", "dimensionless") > 0
     channels = land & (store.get("terrain.flow_accumulation", "m**2") >= TERRAIN["channel_area"])
-    wanted = [to_utm(SPAWN_LONLAT), *[to_utm(p) for p in ASSEMBLY_LONLAT]]
+    wanted = [to_utm(SPAWNS[spawn]), *[to_utm(p) for p in ASSEMBLY_LONLAT]]
     placed = [_nearest(land, point) for point in wanted]
     for point, site in zip(wanted, placed):
         if math.dist(point, site) > MOST_SNAP_M:
@@ -50,11 +50,11 @@ def sites() -> dict[str, list[XY]]:
     return {"spawn": [placed[0]], "vent": [VENT_XY], "assembly": placed[1:], "water": [_nearest(channels, point) for point in placed]}
 
 
-def scenario() -> ScenarioSpec:
+def scenario(spawn: str = "chateaubelair") -> ScenarioSpec:
     domains = (Terrain(), Atmos(SCENARIO_TIME), Eruption(SCENARIO_TIME), Tephra(GRID, SCENARIO_TIME, VENT_XY),
                Pdc(GRID, SCENARIO_TIME, VENT_XY), Lahar(GRID, SCENARIO_TIME, VENT_XY))
-    return ScenarioSpec("st_vincent_2021", GRID, CONTRACT_GRID, SCENARIO_TIME, LOCAL_HOUR_AT_START, domains, sites())
+    return ScenarioSpec(f"st_vincent_2021_{spawn}", GRID, CONTRACT_GRID, SCENARIO_TIME, LOCAL_HOUR_AT_START, domains, sites(spawn))
 
 
-def build(seed: int) -> Pack:
-    return build_pack(scenario(), seed)
+def build(seed: int, spawn: str = "chateaubelair") -> Pack:
+    return build_pack(scenario(spawn), seed)

@@ -34,3 +34,11 @@ tolerance = 0.01
 role = "input"
 split = "reference"
 source = "wind_direction_200hPa at 2021-04-09T12:00 in upper_wind_st_vincent.json"
+
+[[gate]]
+id = "atmos.records_and_units"
+title = "Atmos parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/atmos'); load_datasets(p/'datasets.toml', 'atmos'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/atmos/datasets.toml", "stranded_physics/domains/atmos/params.toml"]
+required = true

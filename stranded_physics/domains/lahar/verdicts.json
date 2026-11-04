@@ -8,5 +8,9 @@
     "lahar_frames": 0,
     "max_rain_mm_h": 0.7,
     "verdict": "NO_TARGET"
+  },
+  "lahar.records_and_units": {
+    "hash": "5210ac552b8b26c091a4e7e4b857676be9ec7e185795a0cac06343be977f2cfe",
+    "verdict": "PASS"
   }
 }

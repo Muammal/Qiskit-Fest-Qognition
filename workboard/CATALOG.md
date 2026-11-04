@@ -7,18 +7,18 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 |---|---|---|---|---|---|
 | agent | model | unclaimed | 0 | 1 | Tobler walking, ISO 7933 heat strain, load carriage |
 | atmos | model | unclaimed | 2 | 1 | reanalysis forcing replayed per event |
-| eruption | model | unclaimed | 3 | 40 | source timeline and plume rise |
-| exposure | model | unclaimed | 0 | 0 | fragility curves |
-| gas | model | unclaimed | 0 | 0 | Gaussian plume |
-| impact | data_only | unclaimed | 0 | 0 | none yet |
+| eruption | model | unclaimed | 12 | 40 | source timeline and plume rise |
+| exposure | model | unclaimed | 28 | 1 | fragility curves |
+| gas | model | unclaimed | 0 | 1 | Gaussian plume |
+| impact | data_only | unclaimed | 1 | 1 | none yet |
 | lahar | model | unclaimed | 0 | 5 | LAHARZ, then shallow water |
-| lava | model | unclaimed | 0 | 0 | dome footprint |
-| pdc | model | unclaimed | 0 | 6 | energy cone, then depth-averaged flow |
-| seismic | data_only | unclaimed | 0 | 0 | none yet |
-| storm | model | unclaimed | 1 | 10 | Holland 1980 wind profile |
+| lava | model | unclaimed | 3 | 1 | dome footprint |
+| pdc | model | unclaimed | 3 | 6 | energy cone, then depth-averaged flow |
+| seismic | data_only | unclaimed | 2 | 1 | none yet |
+| storm | model | unclaimed | 2 | 10 | Holland 1980 wind profile |
 | tephra | model | unclaimed | 0 | 27 | Suzuki source with Gaussian fallout |
-| terrain | model | unclaimed | 3 | 11 | hydrological routing on the real DEM |
-| tsunami | data_only | unclaimed | 0 | 0 | none yet |
+| terrain | model | unclaimed | 4 | 11 | hydrological routing on the real DEM |
+| tsunami | data_only | unclaimed | 1 | 1 | none yet |
 
 ## agent: Human body and movement
 
@@ -57,6 +57,15 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 | st_vincent_plumes | research paper text | reference | no | Text extracted from the HTML article. |
 | st_vincent_ipgp | observatory summary | reference | no | Text extracted from the web page, in French. |
 | st_vincent_cole_accepted | research paper | reference | no | Plain text for reading sits beside it as st_vincent_cole_accepted.txt. |
+| gvp_eruptions | catalogue | calibration | no | file: raw/gvp_eruptions.json |
+| gvp_volcanoes | catalogue | reference | no | file: raw/gvp_volcanoes.json |
+| st_vincent_cole_accepted | case_study | calibration | no | file: raw/st_vincent_cole_accepted.pdf |
+| st_vincent_cole_uea | case_study | calibration | no | file: raw/st_vincent_cole_uea.html |
+| st_vincent_ipgp | case_study | calibration | no | file: raw/st_vincent_ipgp.html |
+| st_vincent_plumes | case_study | calibration | no | file: raw/st_vincent_plumes.html |
+| st_vincent_wiki | case_study | calibration | no | file: raw/st_vincent_wiki.html |
+| upper_wind_st_vincent | case_study | calibration | yes | file: raw/upper_wind_st_vincent.json |
+| weather_st_vincent | case_study | calibration | yes | file: raw/weather_st_vincent.json |
 
 **Still wanted:**
 - Erupted mass by phase for St Vincent 2021
@@ -67,6 +76,37 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 **Owns:** shelter materials, ash roof load, dynamic pressure fragility, burns
 
 **Must not own:** needs and physiology
+
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| ibtracs_terms | case_study | reference | no | file: raw/ibtracs_terms.html |
+| la_palma_eos | case_study | reference | yes | file: raw/la_palma_eos.html |
+| la_palma_frontiers | case_study | reference | yes | file: raw/la_palma_frontiers.html |
+| la_palma_wiki | case_study | reference | no | file: raw/la_palma_wiki.html |
+| miyakejima_eri_73 | case_study | reference | no | file: raw/miyakejima_eri_73.html |
+| miyakejima_gsj | case_study | reference | no | file: raw/miyakejima_gsj.html |
+| miyakejima_nied | case_study | reference | no | file: raw/miyakejima_nied.html |
+| miyakejima_osu | case_study | reference | no | file: raw/miyakejima_osu.html |
+| miyakejima_tokyo | case_study | reference | no | file: raw/miyakejima_tokyo.html |
+| miyakejima_usgs | case_study | reference | no | file: raw/miyakejima_usgs.html |
+| miyakejima_wiki | case_study | reference | no | file: raw/miyakejima_wiki.html |
+| natural_earth_minor_islands | case_study | reference | yes | file: raw/ne_10m_minor_islands.zip |
+| natural_earth_terms | case_study | reference | yes | file: raw/natural_earth_terms.html |
+| noaa_hazel_legend | case_study | reference | no | file: raw/noaa_hazel_bundle_0.js |
+| noaa_terms | case_study | reference | no | file: raw/noaa_terms.html |
+| noaa_tsunami_docs | case_study | reference | no | file: raw/noaa_tsunami_docs.html |
+| noaa_volcano_docs | case_study | reference | no | file: raw/noaa_volcano_docs.html |
+| noaa_volcano_events | case_study | reference | no | file: raw/noaa_volcano_events.json |
+| noaa_volcano_legend | case_study | reference | no | file: raw/noaa_volcano_legend.html |
+| open_meteo_terms | case_study | reference | yes | file: raw/open_meteo_terms.html |
+| pelee_ebsco | case_study | reference | no | file: raw/pelee_ebsco.html |
+| pelee_sciam | case_study | reference | no | file: raw/pelee_sciam.html |
+| pelee_sdsu | case_study | reference | no | file: raw/pelee_sdsu.html |
+| pelee_usgs | case_study | reference | no | file: raw/pelee_usgs.html |
+| pelee_wiki | case_study | reference | no | file: raw/pelee_wiki.html |
+| weather_la_palma | case_study | reference | yes | file: raw/weather_la_palma.json |
+| weather_miyakejima | case_study | reference | yes | file: raw/weather_miyakejima.json |
+| weather_stromboli | case_study | reference | yes | file: raw/weather_stromboli.json |
 
 **Still wanted:**
 - Building damage survey for St Vincent 2021
@@ -88,6 +128,10 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 **Must not own:** any model. These are targets, never inputs
 
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| brown_fatalities | table | holdout | no | file: raw/brown_fatalities.xlsx |
+
 **Still wanted:**
 - Brown et al. 2017 fatalities database
 - EM-DAT records (needs registration)
@@ -108,6 +152,12 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 **Must not own:** island-wide flows, since 2021 built a dome
 
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| heimaey_museum | case_study | reference | no | file: raw/heimaey_museum.html |
+| heimaey_usgs | case_study | calibration | no | file: raw/heimaey_usgs.html |
+| heimaey_wiki | case_study | reference | no | file: raw/heimaey_wiki.html |
+
 **Still wanted:**
 - Dome growth rate from observatory reports
 
@@ -116,6 +166,12 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 **Owns:** flow arrival, runout, deposit, surge margin
 
 **Must not own:** what triggers a collapse
+
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| montserrat_chronology | case_study | calibration | no | file: raw/montserrat_chronology.html |
+| montserrat_mvo | case_study | calibration | no | file: raw/montserrat_mvo.html |
+| weather_montserrat | case_study | calibration | yes | file: raw/weather_montserrat.json |
 
 **Still wanted:**
 - 2021 PDC deposit polygons
@@ -127,6 +183,11 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 **Owns:** earthquake catalogues near volcanoes, felt reports
 
 **Must not own:** a wave solver, for now
+
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| einarsson_2018 | article | reference | yes | file: raw/einarsson_2018.html |
+| noaa_earthquakes | catalogue | calibration | no | file: raw/noaa_earthquakes.json |
 
 **Still wanted:**
 - Local seismic network catalogue (UWI SRC); global catalogues miss small local swarms
@@ -140,6 +201,7 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 | Dataset | Kind | Split | Licence confirmed | Notes |
 |---|---|---|---|---|
 | ibtracs_beryl_2024 | storm best track | reference | no | beryl_2024.csv holds only Beryl 2024's rows and a few columns, cut from the full file, whose sha256 is 70a0191dfa495e49a4dd49d1c38e0451d48467bbcb789bdaf2dc01e8cc8744dc. The URL is the archive's usual path, and its exact match to the file held should be confirmed in T-104. |
+| ibtracs | tracks | calibration | no | file: raw/ibtracs_since1980.csv |
 
 **Still wanted:**
 - Local storm rainfall records
@@ -166,6 +228,7 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 | copernicus_glo30_n13w062 | digital surface model | reference | no | Tile N13 W062 covers all of St Vincent, so the W061 tile named in the original proposal is not needed. A surface model: heights include canopy and buildings. |
 | esa_worldcover_2021_n12w063 | land cover | reference | no | Mapped from 2021 imagery, so it may already include some effects of the April 2021 eruption on the northern slopes. Check before using it as pre-eruption cover. |
 | fabdem_v1_2_n10w070 | bare-earth estimate | reference | no | Machine-learned correction of GLO-30, so not independent of it and not a survey. Used only to size canopy bias; no model reads it. Non-commercial terms: keep it out of the repo and out of any pack. |
+| natural_earth_land | vector | reference | yes | file: raw/ne_10m_land.zip |
 
 **Still wanted:**
 - Copernicus DEM GLO-30 tiles N13 W062 and N13 W061
@@ -178,3 +241,7 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 **Owns:** NOAA volcanic tsunami records, runups
 
 **Must not own:** a wave solver, for now
+
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| noaa_tsunamis | catalogue | calibration | no | file: raw/noaa_tsunamis.json |

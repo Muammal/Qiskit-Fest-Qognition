@@ -65,10 +65,12 @@ class PackWorld:
 
     def export_dict(self) -> dict:
         grid = self.pack.contract_grid
+        route = [list(self.spawn_pos), list(self.assembly_points[0])]
         return {"width": self.width, "height": self.height, "tiles": self.tiles, "map_seed": self.pack.scenario,
                 "scale_m_per_tile": grid.dx_m, "elevation": [[round(v) for v in row] for row in self.elevation],
                 "evacuation_map": {"zones": self.zones, "assembly_points": [list(p) for p in self.assembly_points],
-                                   "route_from_spawn": [list(self.spawn_pos), list(self.assembly_points[0])]}}
+                                   "routes_from_spawn": [route], "route_from_spawn": route,
+                                   "clean_springs": [list(p) for p in self.clean_springs]}}
 
 
 class PackSimulation:
@@ -218,11 +220,20 @@ class PackSimulation:
         flows = [[col, row] for row in range(grid.ny) for col in range(grid.nx)
                  if self.pack.sample("pdc.active", grid.centre(row, col), t_s) > 0]
         load = self.pack.frame("tephra.deposit_load", t_s)
-        return {"new_lava": [], "new_pdc": flows, "new_lahar": [], "ash": round(float(load.max()), 3)}
+        ash = round(float(load.max()), 3)
+        return {"new_lava": [], "new_pdc": flows, "active_pdc": flows, "surge": [],
+                "new_lahar": [], "active_lahar": [], "ash": ash,
+                "ash_grid": ["0" * grid.nx for _ in range(grid.ny)], "wind_deg": 0.0}
 
     def timeline(self) -> dict:
+        volcano = self._volcano_export()
         world = self.world.export_dict()
         world.update(seed=self.seed, mind=self.mind_type, noise_source=self.noise_source, initial_tiles=self.world.tiles,
-                     volcano=self._volcano_export(), pack_hash=self.pack.content_hash, pack_verdicts=dict(self.pack.verdicts),
+                     volcano=volcano, pack_hash=self.pack.content_hash, pack_verdicts=dict(self.pack.verdicts),
                      weather=["storm" if r >= STORM_RAIN_MM_H else "rain" if r > 0 else "calm" for r in self.pack.series("atmos.rain_rate")])
-        return {"world": world, "steps": self.steps, "outcome": "survived" if self.agent.alive else "died", "cause": self.agent.cause}
+        left = next((r["t"] for r in self.steps if self.world.zones[r["pos_after"][1]][r["pos_after"][0]] != 2), None)
+        safe = next((r["t"] for r in self.steps if self.world.zones[r["pos_after"][1]][r["pos_after"][0]] == 0), None)
+        pdc = volcano["first_pdc_step"]
+        return {"world": world, "steps": self.steps, "outcome": "survived" if self.agent.alive else "died", "cause": self.agent.cause,
+                "evacuation": {"left_danger_step": left, "reached_safe_step": safe, "first_pdc_step": pdc,
+                               "margin_hours": None if safe is None or pdc is None else 2 * (pdc - safe)}}

@@ -1,1 +1,40 @@
 # One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+
+[[dataset]]
+id = "montserrat_chronology"
+kind = "case_study"
+url = "https://www.geo.mtu.edu/volcanoes/west.indies/soufriere/govt/miscdocs/chronology.html"
+retrieved_utc = "2026-11-03T22:45:41.890639+00:00"
+sha256 = "3e635dc54d32daab370677ef77174ff1e2c99b9d79645440b9f510c382ead1a6"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Montserrat Volcano Observatory, Chronology of the Eruption of Soufriere Hills Volcano, on the Michigan Tech mirror"
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/montserrat_chronology.html"
+
+[[dataset]]
+id = "montserrat_mvo"
+kind = "case_study"
+url = "https://geo.mtu.edu/volcanoes/west.indies/soufriere/govt/scireps/mvo_report0018.html"
+retrieved_utc = "2026-11-03T22:45:44.871167+00:00"
+sha256 = "5333fc6951e58de4721dc58a36e593f7786b3db42d7c5ec8dbad73d2737aa32b"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Montserrat Volcano Observatory, Scientific Report 18, 03 April 1996, on the Michigan Tech mirror"
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/montserrat_mvo.html"
+
+[[dataset]]
+id = "weather_montserrat"
+kind = "case_study"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=16.72&longitude=-62.18&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:44:34.489335+00:00"
+sha256 = "b7619904b4835fec1862faeee7eb295068db951b81c5a8c890f9b92952450bd0"
+licence = "CC-BY 4.0, stated in the Open-Meteo terms read in raw/open_meteo_terms.html"
+licence_confirmed = true
+citation = "Open-Meteo.com API, Historical Weather or Historical Forecast endpoint."
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/weather_montserrat.json"

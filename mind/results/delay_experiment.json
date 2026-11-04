@@ -1,0 +1,51 @@
+{
+  "backend": "fake_torino",
+  "calibration_source": "qiskit_ibm_runtime.fake_provider.FakeTorino snapshot",
+  "qiskit_version": "2.6.1",
+  "probe_qubit": 10,
+  "t1_us": 200.7961060054563,
+  "t2_us": 228.32516773950897,
+  "shots": 4000,
+  "seed_transpiler": 7,
+  "sampler_seed": 7,
+  "date": "2026-11-04T01:16:55.050520+00:00",
+  "p_protect_exact_no_delay": 0.36,
+  "caveat": "T1 relaxation also pushes the belief toward |0>=safe in the full decision circuit; only the coherence-probe rows isolate T2 alone.",
+  "rows": [
+    {
+      "t_us": 0,
+      "coherence_x_measured": 0.9085000000000001,
+      "coherence_theory_exp_t_over_t2": 1.0,
+      "coherence_ratio_measured_over_theory": 0.9085000000000001,
+      "p_protect_under_delay": 0.364
+    },
+    {
+      "t_us": 20,
+      "coherence_x_measured": 0.823,
+      "coherence_theory_exp_t_over_t2": 0.9161324090391288,
+      "coherence_ratio_measured_over_theory": 0.8983417592039895,
+      "p_protect_under_delay": 0.388
+    },
+    {
+      "t_us": 50,
+      "coherence_x_measured": 0.7270000000000001,
+      "coherence_theory_exp_t_over_t2": 0.8033330181544633,
+      "coherence_ratio_measured_over_theory": 0.9049796081706851,
+      "p_protect_under_delay": 0.42775
+    },
+    {
+      "t_us": 100,
+      "coherence_x_measured": 0.5914999999999999,
+      "coherence_theory_exp_t_over_t2": 0.6453439380571594,
+      "coherence_ratio_measured_over_theory": 0.9165655166464267,
+      "p_protect_under_delay": 0.4755
+    },
+    {
+      "t_us": 200,
+      "coherence_x_measured": 0.391,
+      "coherence_theory_exp_t_over_t2": 0.41646879838712275,
+      "coherence_ratio_measured_over_theory": 0.9388458427479877,
+      "p_protect_under_delay": 0.55425
+    }
+  ]
+}

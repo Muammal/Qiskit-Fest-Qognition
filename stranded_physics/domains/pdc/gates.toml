@@ -64,3 +64,11 @@ tolerance = 0.5
 role = "input"
 split = "reference"
 source = "Cole et al.: 'onset of the first significant PDC activity was associated with U3 activity from 21:30 UTC on 10th April'"
+
+[[gate]]
+id = "pdc.records_and_units"
+title = "Pdc parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/pdc'); load_datasets(p/'datasets.toml', 'pdc'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/pdc/datasets.toml", "stranded_physics/domains/pdc/params.toml"]
+required = true

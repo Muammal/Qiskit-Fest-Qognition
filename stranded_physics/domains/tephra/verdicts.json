@@ -24,5 +24,9 @@
   "tephra-model": {
     "hash": "473b261302d825ed269017ffd37c40638eb99f153b110aa7a3f1872e3a39dc4d",
     "verdict": "PASS"
+  },
+  "tephra.records_and_units": {
+    "hash": "db80d70f4412bf2fe1f93fbdd3552c14f00e6bab2c29560af437d5d93bc5cc3c",
+    "verdict": "PASS"
   }
 }

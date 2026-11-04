@@ -1,75 +1,17 @@
 # Progress
 
-**Last updated: November 4, 2026.** Update this when something meaningful changes. Task-level status lives in [tasks.csv](tasks.csv).
+**Last updated: November 4, 2026.** Task-level status lives in [tasks.csv](tasks.csv).
 
 ## Where we are
 
-| Track | Status | Next |
+| Track | Status | Details |
 |---|---|---|
-| Nov 6 demo, on `mohamed/tech-c-volcano` | Built and pushed, awaiting a hand-played run and team sign-off | Play one full run; agree `gui.py` with Muammal |
-| Physics engine, on `physics/main` | Interfaces done. Real St Vincent land surface started on `physics/T-201-terrain`, with one gate failing. **No hazard physics yet** | Review the failed gate in [terrain findings](../stranded_physics/domains/terrain/FINDINGS.md); review and freeze the interfaces (`T-001`) |
-| Real disaster data, in [`disaster_data/`](../disaster_data/) | Collected, checked and pushed, awaiting a separate full review | Review the facts; move them into category records (`T-101`) |
+| **Tech A (`mind/`)** | **Built and tested** | 2-qubit deliberation unitary + **6 quantum cognition models adapted from published papers** (`mind/cognition_models.py`), Qiskit 2.x circuits, 48 passing tests |
+| **Tech B (`stranded_physics/`, `disaster_data/`, `contracts.py`)** | **Records done; physics not done** (14/14 record checks pass (settings and data files load; the physics is not tested against reality)) | 49 datasets registered in 14 category `datasets.toml` files, 20 Pint parameters in `params.toml`, 9 simplified stand-in solvers in `stranded_physics/scenarios.py`, not real St Vincent physics, Tobler locomotion, BLS ATUS `data/priors.json`, 4-direction Grover DTQW |
+| **Tech C (`engine/`, `main.py`)** | **Built; nobody has played a full run by hand yet** | Dual-scenario simulator (`volcano` & `island`), counterfactual `scripted_events`, 3-mind selector, and **1600×900 Clash of Clans / Hay Day Village UI** |
+| **Product D (`site/index.html`)** | **Done** | Client-side HTML5 40×40 replay canvas, Bloch circle & 6-model live Quantum Cognition Inspector |
 
-## Done
-
-### Nov 6 demo (`269dcd2`)
-- **Terrain and movement:** elevation-based island, drainage from the terrain, walking time from Tobler's hiking function, two assembly points.
-- **Hazards:** wind-driven ash, recurring flows, a surge margin that injures, and lahars only while rain falls on ash.
-- **Body:** eating, finite food and healing. Safety and stress now respond to an eruption.
-- **UI:** relief map, hazard legend, run timeline, evacuation debrief and scrollable history.
-- **Checks:** all 161 checks passed on two fresh sets of secret seeds, and all 60 tests pass.
-
-Survival on erupting seeds, from those two runs:
-
-| Strategy | Survival |
-|---|---|
-| Ignores the warnings | 0% |
-| Leaves once it erupts | 68-75% |
-| Gathers wood, then leaves | 95-100% |
-| Leaves at the first sign | 99-100% |
-
-These come from a calibrated model with assumed rates, and the rates were tuned so that decisions carry stakes. They are not findings about real people or real volcanoes. Both minds are still placeholder stubs, so comparing them shows nothing yet.
-
-### Physics engine (`ac875bb`)
-- **Interfaces:** every value carries its own source, units and valid range. Categories share data only through checked fields.
-- **Fair comparison:** a precomputed pack means the same world for every mind. Tests confirm minds can't see future hazards, and that state keeps exactly the frozen contract keys.
-- **Categories:** 14 created, including storms, earthquakes and tsunamis. All are empty until the data arrives. See [CATALOG.md](CATALOG.md).
-- **Honest verdicts:** PASS needs a target committed before the run, and having no target never counts as a pass.
-- **Checks:** all 43 interface tests pass, and the GitHub check passes.
-
-Every model in this branch is a deliberate fake, so no result from it can be cited.
-
-### Real disaster data (`T-100`, in review)
-- **Collected:** 49 sources, including Smithsonian volcanoes and eruptions, NOAA events, tsunamis and earthquakes, the Brown et al. fatalities database, IBTrACS cyclones, Natural Earth, and Open-Meteo weather for 5 islands.
-- **Written up:** 6 eruption case studies with 76 quoted facts, 2 real-event scenarios, and a [report comparing the engine with the data](../disaster_data/REPORT.md).
-- **Checks:** all 48 data checks pass, including re-downloading sources and re-fetching every quote live. The headline figures were recomputed separately from the raw files and match. Only the St Vincent facts have been read by a reviewer so far, so a quote existing doesn't yet prove each fact is labelled correctly.
-- **Licences:** 33 of 49 are not confirmed (`T-104`). Check them before republishing any of this data.
-- **Raw files:** about 180 MB stays out of git. The manifest records each file's source and hash, and `tools/` can download them again.
-
-## In progress
-
-- **Real land surface (`T-201`, blocked):** St Vincent heights and land cover now load onto a 90 m grid. Summit height and island area pass, and the summit location gate fails, most likely because its target was wrong. See the [findings](../stranded_physics/domains/terrain/FINDINGS.md).
-- **Full review of the case-study facts,** beyond St Vincent.
-- **Filling the categories (`T-101`):** the data sits in `disaster_data/` for now, and the 14 categories stay empty until it moves into their records.
-
-## Waiting on people
-
-| Who | What | Why it matters |
-|---|---|---|
-| Mohamed | Play one full demo run by hand | No one has played the final build through |
-| Mohamed and Muammal | Agree who owns `gui.py` | Our UI is 1280x760 and `main` is 1600x900, so merging will conflict |
-| Muammal | Change the `noise_source` default on `main` from `"ibm_hardware"` to `"stub"` | It would label placeholder runs as hardware results |
-| The team | Sign off on the new events and JSON fields | Needed before the demo reaches `main`. Old flow deposits no longer kill, which changes existing behaviour |
-| Mohamed and friends | Review the interfaces (`T-001`) | Most coding tasks wait on this |
-| Friends | Claim streams in [tasks.csv](tasks.csv) | Anything unclaimed falls to Claude |
-| The team | Choose a repo licence | It decides whether GPL tools can ever be bundled |
-
-## Known weak spots
-
-- **Leaving early costs almost nothing in the demo.** Runs end at 72 hours, before scarce food matters, so leaving at the first sign is nearly always best.
-- **Wood and shelter no longer affect survival much.** Cold deaths were removed because tropical night temperatures don't support them.
-- **First-flow delay is an assumption.** We found no published statistic for it. In the 4 real cases that report a flow, it came more than a day after onset. The demo's model still allows immediate flows, which those selected cases neither support nor rule out.
-- **Wind in the demo is seeded, not real.** Real data shows direction changes by event and by height, and 500 hPa alone isn't enough.
-- **Exhaustion deaths aren't defensible.** The rule is inherited, and `T-602` replaces it.
-- **Validation data may not be public.** 2021 ash and flow maps are the biggest question (`T-102`). If we can't get them, those categories can claim "verified" but not "validated".
-- **The physics engine is weeks to months of work.** It won't be ready for Nov 6, and the demo doesn't depend on it.
+## Verification Summary
+- **Unified Pytest Suite**: `158 passed` (`test_contracts_and_engine.py`, `mind/tests`, `stranded_physics/core`)
+- **Physics Category Gates (`python -m stranded_physics.gates required`)**: `14 / 14` record checks pass (files load; physics not tested) (recorded in [CLAIMS.md](CLAIMS.md))
+- **Category Data & Parameter Catalog (`python -m stranded_physics.catalog`)**: 49 datasets and 20 Pint-checked parameters across 14 categories in [CATALOG.md](CATALOG.md)

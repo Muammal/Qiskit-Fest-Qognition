@@ -12,5 +12,9 @@
     "hash": "1ff40ffe823c1fd3a428b6899a8a47d7fcbed42005de222f600a223f38f56d0d",
     "value": 23.416666666666664,
     "verdict": "PASS"
+  },
+  "atmos.records_and_units": {
+    "hash": "478fe46a799d37fc70275e3bc5d279a199591c6d68b2a7c4e6390ce6a550f9b5",
+    "verdict": "PASS"
   }
 }

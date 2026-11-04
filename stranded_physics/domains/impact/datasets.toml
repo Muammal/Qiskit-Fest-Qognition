@@ -1,1 +1,14 @@
 # One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+
+[[dataset]]
+id = "brown_fatalities"
+kind = "table"
+url = "https://static-content.springer.com/esm/art%3A10.1186%2Fs13617-017-0067-4/MediaObjects/13617_2017_67_MOESM1_ESM.xlsx"
+retrieved_utc = "2026-11-04T01:34:57.062373+00:00"
+sha256 = "684628f12bb794fca105a8d9ba52f99e01da5f5fccdf041b28aa18a0f727bfd4"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Brown et al. 2017, Volcanic fatalities database, DOI 10.1186/s13617-017-0067-4, supplementary material 1. The article page returned a bot challenge, so its licence text could not be read."
+split = "holdout"
+content_check = "min_bytes:1000"
+notes = "file: raw/brown_fatalities.xlsx"

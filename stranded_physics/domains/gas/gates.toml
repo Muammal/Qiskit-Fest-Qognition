@@ -1,1 +1,9 @@
 # One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+
+[[gate]]
+id = "gas.records_and_units"
+title = "Gas parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/gas'); load_datasets(p/'datasets.toml', 'gas'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/gas/datasets.toml", "stranded_physics/domains/gas/params.toml"]
+required = true

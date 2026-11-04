@@ -1,7 +1,7 @@
 {
   "storm-beryl-peak": {
     "closest_km": 75.53214107195339,
-    "hash": "efe83704cb09f1554d1af93f4dad5135c58fbdc5cbabff2ebf62bbd10ff998f9",
+    "hash": "eb8016426878049ce96391fd52ff027bb2e127eface0f6ca6462df50d26acc91",
     "peak_m_s": 42.63812758951193,
     "time_utc": "2024-07-01T15:00:00Z",
     "verdict": "NO_TARGET"
@@ -17,6 +17,10 @@
   },
   "storm-model": {
     "hash": "42ff8be04832b170c63fe6f3b4f6e482a61ec126b15526cfe0e2f4c4774cf8fe",
+    "verdict": "PASS"
+  },
+  "storm.records_and_units": {
+    "hash": "412629815bd6ba11c5c6fe5b67ccbdd3c8851e05683e01cda3b4007e966d1871",
     "verdict": "PASS"
   }
 }

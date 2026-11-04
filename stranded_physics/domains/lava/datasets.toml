@@ -1,1 +1,40 @@
 # One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+
+[[dataset]]
+id = "heimaey_museum"
+kind = "case_study"
+url = "https://safnahus.vestmannaeyjar.is/page/heimaey-the-eruption-1973"
+retrieved_utc = "2026-11-03T22:48:49.922645+00:00"
+sha256 = "d34f9f71eabb14de2da1dd937ba895ef62b641b9d6033c542eae4c94fbaf6f5e"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Safnahus Vestmannaeyja, Heimaey: the eruption 1973"
+split = "reference"
+content_check = "min_bytes:500"
+notes = "file: raw/heimaey_museum.html"
+
+[[dataset]]
+id = "heimaey_usgs"
+kind = "case_study"
+url = "https://pubs.usgs.gov/gip/heimaey/"
+retrieved_utc = "2026-11-03T22:45:34.920447+00:00"
+sha256 = "4a636cba308bdd2dec0729f743f3c26cab86c6de0ab5b80f15eef888cf8961f3"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Williams, R. S., Jr., and J. G. Moore, Man Against Volcano: The Eruption on Heimaey, USGS General Interest Publication"
+split = "calibration"
+content_check = "min_bytes:1000"
+notes = "file: raw/heimaey_usgs.html"
+
+[[dataset]]
+id = "heimaey_wiki"
+kind = "case_study"
+url = "https://en.wikipedia.org/wiki/Eldfell"
+retrieved_utc = "2026-11-03T22:48:52.449474+00:00"
+sha256 = "18b600284d401b650ced184798e52592bb5d6684ba1154cc2180fa2d1ec225d7"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "not confirmed"
+split = "reference"
+content_check = "min_bytes:1000"
+notes = "file: raw/heimaey_wiki.html"
