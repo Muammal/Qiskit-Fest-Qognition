@@ -744,7 +744,7 @@ class IslandVisualizerApp:
 
         # 4. Step Number Buttons
         self.step_buttons: List[UIButton] = []
-        step_choices = [12, 24, 36, 48]
+        step_choices = [6, 12, 24, 36]  # The engine stops at 36 steps.
         st_y = top_y + 395
         btn_w = 250
         for i, steps in enumerate(step_choices):
@@ -1101,7 +1101,7 @@ class IslandVisualizerApp:
             self.preview_mini_map = self._generate_mini_map(self.seed, size=300)
             return
 
-        step_choices = [12, 24, 36, 48]
+        step_choices = [6, 12, 24, 36]  # The engine stops at 36 steps.
         for i, btn in enumerate(self.step_buttons):
             if btn.check_hover(pos):
                 self.max_steps = step_choices[i]
@@ -1421,7 +1421,7 @@ class IslandVisualizerApp:
         st_lbl = self.font_title.render("3. Simulation Step Horizon (2 Hours per Turn)", True, COLOR_TEXT_MAIN)
         self.canvas.blit(st_lbl, (col2_x + 24, col2_y + 365))
 
-        step_choices = [12, 24, 36, 48]
+        step_choices = [6, 12, 24, 36]  # The engine stops at 36 steps.
         for i, st_btn in enumerate(self.step_buttons):
             st_btn.is_active = (self.max_steps == step_choices[i])
             st_btn.check_hover(mouse_pos)
@@ -1441,9 +1441,9 @@ class IslandVisualizerApp:
 
         bullet_lines = [
             "  * Quantum Mind: Belief states represented as 2-qubit amplitudes with non-commuting projection angles.",
-            "  * Order Effect: Experiencing [Storm -> Find Food] yields distinct actions compared to [Find Food -> Storm].",
+            "  * Order Effect: From the same state, [Tremor -> Gas] and [Gas -> Tremor] shift P(protect) by .33, against .04 in the control.",
             "  * Stress Model: Physiological stress maps to a simulated dephasing channel (stress model); no hardware decoherence is driven live.",
-            "  * Survival Metric: Dehydration triggers lethal failure at 24h, Starvation at 72h. Maintain shelter to reduce exposure."
+            "  * Survival: Without water, death comes at about 58 h. All rates are assumed. Maintain shelter to reduce exposure."
         ]
         for i, bl in enumerate(bullet_lines):
             self.canvas.blit(self.font_body.render(bl, True, COLOR_TEXT_MUTED), (hints_box.x + 18, hints_box.y + 40 + i * 26))
