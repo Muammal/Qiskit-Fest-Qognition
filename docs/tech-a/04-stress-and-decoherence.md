@@ -133,6 +133,26 @@ Order gap at lam=1, prefix=[storm] before the swapped pair (q_S=0.69, q_D=0.59, 
   [gas_plume, injury]  vs reversed: |Pa-Pb| = 0.00e+00,  Pa = 0.637926 = classical total exactly
 ```
 
+Same prefix=[storm], [tremor, gas_plume] pair, swept over lam (cited in
+`demo-pack/tech-a/03-stress-turns-quantum-mind-classical.md`'s "0.140"
+claim; `docs/tech-a/figures/order_effect_vs_lambda.png` plots the full
+curve):
+```
+$ python3 -c "
+from mind.belief import prepare_belief, run_events
+from mind.model import bloch_vector, p_protect_closed_form
+qS,qD,eta=0.69,0.59,-0.7853897988344999
+rho0 = prepare_belief(0.85)
+a = run_events(rho0, ['storm','tremor','gas_plume'], 0.0)
+b = run_events(rho0, ['storm','gas_plume','tremor'], 0.0)
+xa,ya,za = bloch_vector(a); xb,yb,zb=bloch_vector(b)
+pa,pb=(1-za)/2,(1-zb)/2
+Pa=p_protect_closed_form(pa,xa,qS,qD,eta); Pb=p_protect_closed_form(pb,xb,qS,qD,eta)
+print('gap at lam=0:', Pa-Pb)
+"
+gap at lam=0: 0.13981761515248126
+```
+
 ## Limits and honest claims
 
 - "We model stress as dephasing" — a specific, named, falsifiable physical

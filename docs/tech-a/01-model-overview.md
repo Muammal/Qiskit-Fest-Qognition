@@ -68,13 +68,13 @@ order-gap + decoherence text -> reason                    (05)
 
 ```
 $ SDL_VIDEODRIVER=dummy python -m pytest -q test_contracts_and_engine.py mind/tests
-62 passed in 1.45s
+67 passed in 7.26s
 ```
 
-31 original repo tests (unchanged) + 31 Tech A tests (6 model, 6 belief,
-4 decoherence, 15 quantum_mind), including every one of the 7 pre-existing
-mind-related tests the plan (Section 2) requires to stay green, run
-against `quantum_decide` via `monkeypatch`
+31 original repo tests (unchanged) + 36 Tech A tests (6 model, 6 belief,
+4 decoherence, 15 quantum_mind, 5 circuits), including every one of the 7
+pre-existing mind-related tests the plan (Section 2) requires to stay
+green, run against `quantum_decide` via `monkeypatch`
 (`mind/tests/test_quantum_mind.py::test_repo_compatibility`).
 
 ## Limits and honest claims

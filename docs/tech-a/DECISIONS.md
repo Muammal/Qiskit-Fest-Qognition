@@ -302,4 +302,38 @@ fabricated comparison. If Brodin wants the full 45-minute exploration,
 it can be done as a follow-up without touching the validated model.
 **Evidence:** `docs/tech-a/07-validation-report.md` Section 4.
 
+## Stage 9: overclaim audit (2026-11-03, stage 9, status: accepted)
+**Context:** a fresh-context subagent (no access to this session's
+reasoning) audited every file under `docs/tech-a/` and `demo-pack/tech-a/`,
+plus `engine/gui.py`'s user-visible strings, against
+`07-validation-report.md` and the hard rule against hardware/advantage/
+real-decoherence claims, per the plan's Stage 9 instruction.
+**Findings and fixes (in-ownership, applied directly):**
+1. `01-model-overview.md` cited a stale `"62 passed in 1.45s"` (predates
+   Stage 6's 5 circuit tests). Fixed to `"67 passed in 7.26s"` and the
+   test-count breakdown, matching `07-validation-report.md`.
+2. `demo-pack/tech-a/01-why-an-unsure-evacuee-waits.md` cited `0.356` /
+   `0.631` (the curve's true numerical minimum, accurate but never pasted
+   anywhere as a cited command+output) instead of the already-sourced
+   `0.36` / `0.64` (`02-deliberation-unitary.md`'s `p=0.5` calibration
+   values). Fixed to cite the already-sourced numbers.
+3. `demo-pack/tech-a/03-stress-turns-quantum-mind-classical.md`'s `0.140`
+   order-gap-at-lam=0 claim was accurate (independently reproduced by the
+   subagent) but had no pasted command+output anywhere in `docs/tech-a/`.
+   Flagged as a judgment call; closed by adding the citation to
+   `04-stress-and-decoherence.md` directly in this session.
+**Findings in `engine/gui.py` (out of ownership - not edited; reported):**
+Three of four matched exactly what Stage 5's `tech-a/integration` PR
+already fixes (line ~702 "real delay decoherence", line ~1419 "driving
+real IBM quantum physical decoherence", the ~1748-1753/1897 decoherence-
+meter formula) - the audit re-surfaced the same issues against this
+branch (which doesn't have the unmerged PR's changes), confirming Stage
+5's fix list was complete for what it covered. One new finding: the
+section header at line ~1413, `"SIMULATION DYNAMICS & QUANTUM HARDWARE
+SPECIFICATION"`, reinforces the hardware impression alongside line 1419.
+Not in Stage 5's original fix list; relayed to Tech C via an addendum to
+`08-integration-notes.md` on `tech-a/integration`, not touched here.
+**Evidence:** subagent audit transcript (this session); `git diff` on the
+two fixed files, reviewed before accepting.
+
 

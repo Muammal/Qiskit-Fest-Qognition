@@ -2,10 +2,10 @@
 
 An agent who is genuinely unsure whether the danger is real protects
 *less* than either an agent who knows they're safe or one who knows
-they're in danger — the model's `P(protect)` dips to 0.356 at maximum
+they're in danger — the model's `P(protect)` dips to 0.36 at maximum
 uncertainty, below both the "safe" conditional (0.69) and the "danger"
 conditional (0.59), and below what simply averaging those two would give
-(0.631 at the same point). This mirrors a well-documented human pattern
+(0.64 at the same point). This mirrors a well-documented human pattern
 (the Tversky & Shafir 1992 disjunction effect), not a quirk of this one
 game. In our 200-seed volcano batch, this didn't show up as a consistent
 *delay* in when agents evacuated — the two minds usually `hide` on the
