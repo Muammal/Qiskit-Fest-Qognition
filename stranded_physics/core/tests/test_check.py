@@ -37,7 +37,9 @@ def test_an_anchor_never_counts_as_agreement():
 
 def test_a_prediction_without_held_out_data_never_counts_as_agreement():
     not_held_out = {**PREDICTION, "split": "calibration"}
-    assert check.sort_gates([(not_held_out, "PASS")], "here")["agrees"] == []
+    filed = check.sort_gates([(not_held_out, "PASS")], "here")
+    assert filed["agrees"] == []
+    assert "not a blind test" in filed["unscored"][0]
 
 
 def test_no_target_is_reported_and_never_passes():

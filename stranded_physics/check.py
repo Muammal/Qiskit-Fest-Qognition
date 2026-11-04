@@ -77,6 +77,8 @@ def sort_gates(rows: list[tuple[dict, str]], card_id: str) -> dict[str, list[str
             sorted_rows["agrees" if verdict == "PASS" else "disagrees"].append(title)
         elif verdict == "FAIL":
             sorted_rows["anchors_failing"].append(title)
+        elif verdict == "PASS" and gate.get("role") == "prediction":
+            sorted_rows["unscored"].append(f"{title} (passed, but not a blind test, so it isn't counted)")
         elif verdict != "PASS":
             sorted_rows["unscored"].append(f"{title} ({verdict})")
     return sorted_rows

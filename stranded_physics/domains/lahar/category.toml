@@ -5,5 +5,5 @@ owner = ""
 first_model = "LAHARZ, then shallow water"
 owns = "channel flow depth and arrival, rain triggers"
 must_not_own = "rain and ash production"
-outputs = []
+outputs = ["lahar.depth"]
 wanted = ["2021 lahar chronology", "Rain-trigger thresholds"]

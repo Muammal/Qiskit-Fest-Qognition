@@ -46,7 +46,7 @@ required = false
 target = 60.0  # Hours after 8 April 00:00 UTC: midday on 10 April.
 tolerance = 12.0  # The source gives only the date.
 role = "prediction"
-split = "holdout"
+split = "reference"  # Not blind: the grain model changed after the first run missed Barbados. See workboard/ENGINE_STATUS.md.
 source = "'ce qui va impacter l'ile de la Barbade des le 10 avril', st_vincent_ipgp in disaster_data/case_studies.json"
 
 [[gate]]
@@ -60,5 +60,5 @@ required = false
 target = 1.0  # Share of land cells with at least 0.01 kg/m2, about 10 micrometres of ash.
 tolerance = 0.05
 role = "prediction"
-split = "holdout"
+split = "reference"  # Not blind: the grain model changed after the first run missed Barbados. See workboard/ENGINE_STATUS.md.
 source = "'Des le 11 avril, toute l'ile de Saint-Vincent est entierement recouverte', st_vincent_ipgp in disaster_data/case_studies.json. The threshold is an assumption."

@@ -5,19 +5,19 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 | Category | Status | Owner | Datasets | Parameters | First model |
 |---|---|---|---|---|---|
-| agent | model | unclaimed | 0 | 0 | Tobler walking, ISO 7933 heat strain, load carriage |
-| atmos | model | unclaimed | 0 | 0 | reanalysis forcing replayed per event |
-| eruption | model | unclaimed | 0 | 0 | source timeline and plume rise |
+| agent | model | unclaimed | 0 | 1 | Tobler walking, ISO 7933 heat strain, load carriage |
+| atmos | model | unclaimed | 2 | 1 | reanalysis forcing replayed per event |
+| eruption | model | unclaimed | 3 | 40 | source timeline and plume rise |
 | exposure | model | unclaimed | 0 | 0 | fragility curves |
 | gas | model | unclaimed | 0 | 0 | Gaussian plume |
 | impact | data_only | unclaimed | 0 | 0 | none yet |
-| lahar | model | unclaimed | 0 | 0 | LAHARZ, then shallow water |
+| lahar | model | unclaimed | 0 | 5 | LAHARZ, then shallow water |
 | lava | model | unclaimed | 0 | 0 | dome footprint |
-| pdc | model | unclaimed | 0 | 0 | energy cone, then depth-averaged flow |
+| pdc | model | unclaimed | 0 | 6 | energy cone, then depth-averaged flow |
 | seismic | data_only | unclaimed | 0 | 0 | none yet |
-| storm | model | unclaimed | 0 | 0 | Holland 1980 wind profile |
-| tephra | model | unclaimed | 0 | 0 | Suzuki source with Gaussian fallout |
-| terrain | model | unclaimed | 3 | 8 | hydrological routing on the real DEM |
+| storm | model | unclaimed | 1 | 10 | Holland 1980 wind profile |
+| tephra | model | unclaimed | 0 | 27 | Suzuki source with Gaussian fallout |
+| terrain | model | unclaimed | 3 | 11 | hydrological routing on the real DEM |
 | tsunami | data_only | unclaimed | 0 | 0 | none yet |
 
 ## agent: Human body and movement
@@ -37,6 +37,11 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 **Must not own:** ash, storms as events
 
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| upper_wind_st_vincent | wind by pressure level | reference | no | A model forecast from a coarse grid cell, not an observation. |
+| weather_st_vincent | surface weather | reference | no | ERA5-based values from a coarse grid cell, not a station. Island rain is likely understated. |
+
 **Still wanted:**
 - ERA5 pressure levels before 2021 (needs a free CDS account)
 - Local rain gauges around La Soufriere
@@ -46,6 +51,12 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 **Owns:** catalogues, VEI by island size, precursors, case timelines, phases, mass rate, tremor and gas signs
 
 **Must not own:** how material travels once it leaves the vent
+
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| st_vincent_plumes | research paper text | reference | no | Text extracted from the HTML article. |
+| st_vincent_ipgp | observatory summary | reference | no | Text extracted from the web page, in French. |
+| st_vincent_cole_accepted | research paper | reference | no | Plain text for reading sits beside it as st_vincent_cole_accepted.txt. |
 
 **Still wanted:**
 - Erupted mass by phase for St Vincent 2021
@@ -125,6 +136,10 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 **Owns:** cyclone tracks and rates, storm wind and rain as forcing
 
 **Must not own:** everyday weather, lahar triggers
+
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| ibtracs_beryl_2024 | storm best track | reference | no | beryl_2024.csv holds only Beryl 2024's rows and a few columns, cut from the full file, whose sha256 is 70a0191dfa495e49a4dd49d1c38e0451d48467bbcb789bdaf2dc01e8cc8744dc. The URL is the archive's usual path, and its exact match to the file held should be confirmed in T-104. |
 
 **Still wanted:**
 - Local storm rainfall records
