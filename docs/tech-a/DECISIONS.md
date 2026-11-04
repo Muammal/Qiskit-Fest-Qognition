@@ -159,3 +159,24 @@ only matter for `det(U)` and for the gate-level circuit in Stage 6.
 random `(q_S, q_D, eta)` triples, `max|U^T U - I| < 1e-10`,
 `det(U) == 1` to `1e-9`) and `test_gate_circuit_matches_closed_form`.
 
+## D2: Eruption and ash_fall (2026-11-03, stage 2, status: accepted)
+**Context:** `eruption` and `ash_fall` are unambiguous threat evidence
+(Section 4.4), unlike the ambiguous signs (`tremor`, `gas_plume`, etc.).
+They need a belief update that can't be "wrong" in the way a rotation can.
+**Decision:** Projective collapse onto `|danger>`:
+`rho -> Pi rho Pi / Tr(Pi rho Pi)`, `Pi = |danger><danger|`. From any
+starting belief this sets `x=y=0`, `z=-1` (`P(danger)=1`), and is
+idempotent.
+**Alternatives considered:** a large-angle rotation toward `|danger>` —
+rejected: a fixed rotation can overshoot `|danger>` and rotate back toward
+`|safe>` depending on the starting angle, which real unambiguous evidence
+should never do. A collapse structurally cannot overshoot.
+**Consequences:** `mind/belief.py`'s `apply_event` branches on
+`COLLAPSE_EVENTS = {"eruption", "ash_fall"}` before consulting the
+rotation-angle table. The Stage 6 gate-circuit version of the model can
+only represent rotation-only event histories, since collapse is not a
+unitary gate — documented in `06-circuits-and-hardware.md`.
+**Evidence:** `mind/tests/test_belief.py::test_collapse_on_eruption_is_idempotent_and_certain`;
+`03-events-and-order-effects.md` "Eruption collapse" walk-through
+(`x=0, y=0, z=-1, P(danger)=1`, idempotent to `max|diff|=0.0`).
+
