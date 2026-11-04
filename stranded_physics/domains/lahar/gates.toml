@@ -12,6 +12,7 @@ required = true
 id = "lahar-trigger-timing"
 title = "Frames with a lahar in the St Vincent run (reported, no target)"
 kind = "validation"
+scenario = "st_vincent_2021"
 command = "python -m stranded_physics.validation.st_vincent_flows lahar_frames"
 inputs = ["stranded_physics/domains/lahar/*.py", "stranded_physics/domains/lahar/params.toml", "stranded_physics/validation/st_vincent_flows.py"]
 required = false

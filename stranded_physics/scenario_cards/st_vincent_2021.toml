@@ -1,0 +1,5 @@
+# A scenario card lists the parts of the engine a scenario uses. Check one with: python -m stranded_physics.check <this file>
+id = "st_vincent_2021"
+title = "La Soufriere, St Vincent, April 2021"
+place = "real"
+uses = ["terrain", "atmos", "eruption", "tephra", "pdc", "lahar", "agent"]

@@ -1,0 +1,47 @@
+{
+  "pdc-first-flow-time": {
+    "hash": "e4b8806abad96435debea598204a4fe05353b7cc6fd5759fe87ee4e3b0ed6ddf",
+    "value": 69.5,
+    "verdict": "PASS"
+  },
+  "pdc-model": {
+    "hash": "7f7681ae906371d756e109cca97dc7924d3639e2e9ff7f7f1fb08d989b622396",
+    "verdict": "PASS"
+  },
+  "pdc-reaches-west-sea": {
+    "hash": "6f1bae0c7f42243456bc2f4c5a682449c4e4db61dda13006fccabd8b56a8a7e3",
+    "max_reach_km": 8.137428367510187,
+    "reached_km2": 30.5694,
+    "sea_cells": 143,
+    "sea_off_west": 0.4405594405594406,
+    "slowest_arrival_min": 2.214449972559225,
+    "southeast_reach_km": 8.137428367510187,
+    "value": 1.0,
+    "verdict": "PASS",
+    "west_sea": 1.0
+  },
+  "pdc-sea-only-on-west": {
+    "hash": "31842c85289efb2b8e4320e88f934df7c544df3205c420aeab97c967c98326f0",
+    "max_reach_km": 8.137428367510187,
+    "reached_km2": 30.5694,
+    "sea_cells": 143,
+    "sea_off_west": 0.4405594405594406,
+    "slowest_arrival_min": 2.214449972559225,
+    "southeast_reach_km": 8.137428367510187,
+    "value": 0.4405594405594406,
+    "verdict": "FAIL",
+    "west_sea": 1.0
+  },
+  "pdc-southeast-reach": {
+    "hash": "243ec8022324fda50771ea807d11e6b088f5441571454338535ead48f240b658",
+    "max_reach_km": 8.137428367510187,
+    "reached_km2": 30.5694,
+    "sea_cells": 143,
+    "sea_off_west": 0.4405594405594406,
+    "slowest_arrival_min": 2.214449972559225,
+    "southeast_reach_km": 8.137428367510187,
+    "value": 8.137428367510187,
+    "verdict": "FAIL",
+    "west_sea": 1.0
+  }
+}

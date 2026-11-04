@@ -8,7 +8,7 @@
     "forest_valley_mean_m": 6.722789011050619,
     "forest_valley_median_m": 5.986432646291007,
     "forest_valley_p90_m": 13.51908535080284,
-    "hash": "ba4b56a372556de882bc3baaa4425f2c1381b094b4fa89fe97ca10a9002ee8ce",
+    "hash": "79a9b185a971037cee7e6c485f7d34d25422edb820c22c0426a1af6652c7a59c",
     "open_all_cells": 4210,
     "open_all_mean_m": 1.8091167580902947,
     "open_all_median_m": 1.2288711947665307,
@@ -19,22 +19,34 @@
     "open_valley_p90_m": 4.913430736244322,
     "verdict": "NO_TARGET"
   },
+  "terrain-channels-against-bare-earth": {
+    "bare_earth_channel_cells": 4672,
+    "hash": "eb575e8d6a05a1b9eaefe58012b9088216546afe2ab1e4ac71c2afd2df4b39bd",
+    "shared_share": 0.9881931267130508,
+    "surface_channel_cells": 4743,
+    "verdict": "NO_TARGET"
+  },
   "terrain-island-area": {
-    "hash": "902079983630eeabcfb782617268cf6e4663a90629e74cb7b27f07e200398884",
+    "hash": "3fb46aa868feea7745cabeb97bde677cf632c0f70c31fcc9e7879b7c5699d680",
     "value": 346.8744,
     "verdict": "PASS"
   },
+  "terrain-land-drains-to-sea": {
+    "hash": "2eb41f91378839b64d75ae0bc7161fdf23a6853c9af104f63d641d9fea5d63da",
+    "value": 1.0,
+    "verdict": "PASS"
+  },
   "terrain-resampling": {
-    "hash": "81ff121d7a9f893134956c67f246ddf0d7b50fdebd6808edfb9025b328677679",
+    "hash": "ed302a1ef2bae29611d25aed7b01f07e8cbbd94614565d1f027790a410f2d340",
     "verdict": "PASS"
   },
   "terrain-summit-height": {
-    "hash": "94222c8bfb38643fb841a2eb35e9ef1b5a50047aa7d4ec547921842b8eefab41",
+    "hash": "67104c4b8a3c8636039b55040cf18d3c3133d0ad2ede1562b98dfeec4f9ab9e6",
     "value": 1202.269177321371,
     "verdict": "PASS"
   },
   "terrain-summit-location": {
-    "hash": "998b1dc9e515c886559833722a24d0846578f922f583cf41c6fd5446ba1805dc",
+    "hash": "d6b66a807d693d6b1d40bc27f17d8c51393a81e8264a23c93330f9a0d401d672",
     "value": 2006.8881312840347,
     "verdict": "FAIL"
   }
