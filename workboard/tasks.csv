@@ -6,7 +6,7 @@ T-101,WS1,Move collected data into category records,,todo,T-001,,specs/T-101.md,
 T-102,WS1,Week one data hunt: St Vincent 2021 validation data,,todo,,,specs/T-102.md,,2026-11-04
 T-103,WS1,EM-DAT export,,todo,,,specs/T-103.md,,2026-11-04
 T-104,WS1,Confirm dataset licences,,todo,T-101,,specs/T-104.md,,2026-11-04
-T-201,WS2,terrain T1: real St Vincent DEM and land cover,,todo,T-001,,specs/T-201.md,,2026-11-04
+T-201,WS2,terrain T1: real St Vincent DEM and land cover,Claude,claimed,T-001,terrain-resampling;terrain-summit-height;terrain-summit-location;terrain-island-area;terrain-canopy-bias,specs/T-201.md,physics/T-201-terrain,2026-11-04
 T-202,WS2,terrain T1: drainage and static hazard zones,,todo,T-201,,specs/T-202.md,,2026-11-04
 T-301,WS3,atmos T1: replay real wind column and rain,,todo,T-001,,specs/T-301.md,,2026-11-04
 T-302,WS3,storm T1: Holland wind profile and cyclone rates,,todo,T-301,,specs/T-302.md,,2026-11-04
