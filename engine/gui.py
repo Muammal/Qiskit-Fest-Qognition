@@ -715,7 +715,7 @@ class IslandVisualizerApp:
         )
         self.btn_mind_classical = UIButton(
             (col2_x + 555, top_y + 36, card_w, 80), "Classical Rational Mind", self.font_title,
-            subtext="Deterministic utility: ATUS-mapped activity weights plus hand-set urgency",
+            subtext="Deterministic utility from hand-set urgency weights",
             subfont=self.font_small, active_color=COLOR_BLUE, icon="classical"
         )
 
@@ -1990,7 +1990,7 @@ class IslandVisualizerApp:
         elif self.mind_type == "classical_mixture":
             engine_name, engine_col = "Classical Mixture Control (λ=1, Zero Coherence)", COLOR_CYAN
         else:
-            engine_name, engine_col = "Classical ATUS Rational Utility (Argmax)", COLOR_BLUE
+            engine_name, engine_col = "Classical Rule-Based Utility (Argmax)", COLOR_BLUE
 
         lines = [
             ("Decision Engine:", engine_name, engine_col),
