@@ -7,6 +7,8 @@
 
 > **"Can quantum probability explain why humans make counterintuitive survival decisions under extreme environmental stress?"**
 
+> **Start here:** the project notebook, [`notebooks/stranded_quantum_cognition.ipynb`](notebooks/stranded_quantum_cognition.ipynb), states what is real, what is a model, and where this falls short. Engine results are in [`workboard/ENGINE_STATUS.md`](workboard/ENGINE_STATUS.md).
+
 **Quantum Cognition Simulation** is an interactive multi-scenario cognitive modeling and physical hazard platform. The system simulates human decision-making under existential pressure by contrasting a **2-qubit quantum cognition architecture**—alongside **6 quantum cognition models adapted from published papers and open-source code** (exhibiting non-commuting order effects, Tversky–Shafir interference, Belief Entropy QLBN, Busemeyer dynamic Hamiltonians, and Lindblad open-system decoherence)—against a **zero-coherence classical mixture control ($\lambda=1$)** and an empirical **classical rational baseline** (derived from Bureau of Labor Statistics American Time Use Survey utility priors and calibrated against 49 real-world volcanic/disaster datasets).
 
 ---
