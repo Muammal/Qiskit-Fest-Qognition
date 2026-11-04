@@ -18,7 +18,7 @@ from stranded_physics.packs.builder import Pack, build_pack
 from stranded_physics.st_vincent import TIME, UTM, VENT_XY, to_utm
 
 SCENARIO_TIME = replace(TIME, n=48)  # 96 hours, so the published first flow, 21:30 UTC on 10 April, is followed by a night of activity.
-CONTRACT_GRID = GridSpec(UTM, 688000., 1481000., 500., 40, 40)  # The contract's 40 x 40 tiles, on the northern 20 km of the island.
+CONTRACT_GRID = GridSpec(UTM, 687000., 1481000., 500., 40, 40)  # The contract's 40 x 40 tiles, on the northern 20 km of the island.
 LOCAL_HOUR_AT_START = 20  # 00:00 UTC on 8 April is 20:00 the evening before, at UTC-4.
 # Village positions are from memory, to about 500 m, and every site is snapped to land below. Check these against a gazetteer.
 SPAWN_LONLAT = (-61.243, 13.283)  # Chateaubelair, west coast, in the 2021 red zone.

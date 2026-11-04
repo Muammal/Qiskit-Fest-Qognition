@@ -23,6 +23,19 @@ split = "reference"
 source = "Conservation of mass"
 
 [[gate]]
+id = "tephra-grain-convergence"
+title = "Island ash barely changes when the number of grain sizes doubles"
+kind = "verification"
+command = "python -m stranded_physics.validation.st_vincent_ash grain_convergence"
+inputs = ["stranded_physics/domains/tephra/*.py", "stranded_physics/domains/tephra/params.toml", "stranded_physics/domains/eruption/*.py", "stranded_physics/domains/eruption/params.toml", "stranded_physics/domains/eruption/facts.csv", "stranded_physics/domains/atmos/*.py", "stranded_physics/validation/*.py"]
+required = false
+target = 0.0
+tolerance = 0.1
+role = "anchor"
+split = "reference"
+source = "Numerical convergence: mean land load changes by under 10% when grain classes double"
+
+[[gate]]
 id = "tephra-barbados-first-ash"
 title = "Ash first reaches Barbados on 10 April 2021"
 kind = "validation"

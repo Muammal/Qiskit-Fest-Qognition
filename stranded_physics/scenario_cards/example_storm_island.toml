@@ -1,5 +1,0 @@
-# An example of a new scenario built from the same parts. Storm and tsunami have data but no models yet, so the check says it can't run.
-id = "example_storm_island"
-title = "Example: a storm and a tsunami on a fictional island"
-place = "fictional"
-uses = ["terrain", "atmos", "storm", "tsunami", "agent"]
