@@ -1,140 +1,136 @@
+"""Single simulation loop shared by CLI, batch exports and GUI.
+Supports both Volcano Eruption and Island Wilderness scenarios.
 """
-engine/simulation.py - Core Survival Game Loop and Timeline Serializer
-Owned by Tech C (Integration, Engine, Simulation).
-"""
-
+import copy
 import json
-import os
-import sys
 import random
-from typing import Any, Callable, Dict, List, Optional
-
-# Ensure contracts can be imported
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if BASE_DIR not in sys.path:
-    sys.path.insert(0, BASE_DIR)
-
+from pathlib import Path
 import contracts
-from engine.world import IslandWorld
+from engine.world import IslandWorld, MAP_SEED
 from engine.agent import SurvivalAgent
-from engine.events import EventGenerator
+from engine.events import EventGenerator, VOLCANIC
+from engine.volcano import VolcanoModel
+
+DEFAULT_STEPS = 36  # assumption: 72 hours, two hours per step
 
 
 class SimulationEngine:
-    """
-    Executes turn-based survival simulations, integrating world mechanics,
-    stochastic environmental hazards, and quantum/classical decision minds.
-    Outputs timeline.json for the frontend replay viewer.
-    """
-
-    def __init__(
-        self,
-        seed: int = 42,
-        mind_type: str = "quantum",
-        noise_source: str = "fake_backend",
-        decide_fn: Optional[Callable[[Dict[str, Any]], Dict[str, Any]]] = None
-    ):
-        self.seed = seed
-        self.mind_type = mind_type.lower()
+    def __init__(self, seed=42, mind_type='quantum', noise_source='stub', decide_fn=None, scenario='volcano'):
+        self.seed, self.mind_type = seed, mind_type.lower()
         self.noise_source = noise_source
-        self.world = IslandWorld(seed=seed)
-        self.agent = SurvivalAgent(start_pos=self.world.spawn_pos)
-        self.event_gen = EventGenerator(seed=seed)
-        
-        # Select decision policy: custom callable > contracts.quantum_decide > contracts.classical_decide
-        if decide_fn is not None:
-            self.decide_fn = decide_fn
-        elif self.mind_type == "quantum":
-            self.decide_fn = contracts.quantum_decide
+        self.scenario = scenario
+
+        if self.scenario == 'island':
+            self.world = IslandWorld(seed=seed, scenario='island')
+            self.initial_world = copy.deepcopy(self.world.export_dict())
+            self.agent = SurvivalAgent(self.world.spawn_pos)
+            self.event_gen = EventGenerator(seed)
+            self.volcano = VolcanoModel(seed, self.world, weather=self.event_gen.weather)
+            # In island mode, volcano remains dormant
+            self.volcano.erupts = False
+            self.volcano.onset_step = None
+            self.volcano.first_pdc_step = None
+            self.volcano.phases = ['unrest'] * DEFAULT_STEPS
+            self.volcano.world_events = ['none'] * DEFAULT_STEPS
+            self.volcano.hazard_by_step = [
+                {'new_lava': [], 'new_pdc': [], 'new_lahar': [], 'ash': 0.0}
+                for _ in range(DEFAULT_STEPS)
+            ]
+            self.event_gen.prepare(self.volcano)
         else:
-            self.decide_fn = contracts.classical_decide
+            self.world = IslandWorld(seed=MAP_SEED, scenario='volcano')
+            self.initial_world = copy.deepcopy(self.world.export_dict())
+            self.agent = SurvivalAgent(self.world.spawn_pos)
+            self.event_gen = EventGenerator(seed)
+            self.volcano = VolcanoModel(seed, self.world, weather=self.event_gen.weather)
+            self.event_gen.prepare(self.volcano)
 
-    def run(
-        self,
-        max_steps: int = 24,
-        step_callback: Optional[Callable[[Dict[str, Any], Any], None]] = None
-    ) -> Dict[str, Any]:
-        """
-        Executes the game loop for up to max_steps (e.g. 24 steps = 48 game hours / 2 days).
-        Returns timeline dictionary strictly matching contracts.py and timeline.json schema.
-        Optionally invokes step_callback(step_record, engine) on each simulation step.
-        """
-        random.seed(self.seed)
-        steps_log: List[Dict[str, Any]] = []
+        self.decide_fn = decide_fn or (contracts.quantum_decide if self.mind_type == 'quantum' else contracts.classical_decide)
+        self.steps = []
+        self.previous_action, self.previous_moved = 'rest', False
+        self.random_state = random.Random(seed).getstate()
 
-        for t in range(max_steps):
-            if not self.agent.is_alive:
-                break
-
-            # 1. State snapshot before action
-            current_state = self.agent.get_state()
-            contracts.validate_state(current_state)
-
-            # 2. Environmental Hazard Evaluation
-            in_shelter = self.world.is_in_shelter(self.agent.pos[0], self.agent.pos[1])
-            event = self.event_gen.step_event(
-                day=self.agent.day,
-                hour=self.agent.hour,
-                current_pos=self.agent.pos,
-                in_shelter=in_shelter,
-                injured=self.agent.injured
-            )
-
-            # 3. Apply immediate event impact to agent
-            self.agent.apply_event(event, in_shelter=in_shelter)
-
-            # State after event impact, presented to the mind
-            decision_state = self.agent.get_state()
-
-            # 4. Invoke Decision Mind (Quantum or Classical Contract)
-            decision = self.decide_fn(decision_state)
+    def step(self):
+        t = len(self.steps)
+        if not self.agent.is_alive or t >= DEFAULT_STEPS:
+            return None
+        world, agent = self.world, self.agent
+        hazard = self.volcano.hazard_by_step[t]
+        world.lava.update(map(tuple, hazard['new_lava']))
+        world.pdc.update(map(tuple, hazard['new_pdc']))
+        world.lahar.update(map(tuple, hazard['new_lahar']))
+        world.ash = hazard['ash']
+        event = self.event_gen.step_event(agent.day, agent.hour, agent.pos,
+                    world.is_in_shelter(*agent.pos), agent.injured,
+                    action=self.previous_action, world=world, energy=agent.needs['energy'],
+                    moved=self.previous_moved, t=t)
+        if event in VOLCANIC:
+            world.volcanic_sign_seen = True
+        agent.apply_event(event, world.is_in_shelter(*agent.pos),
+                          forest_cover=world.get_tile(*agent.pos) == 2)
+        state = agent.get_state()
+        # Isolate stub-policy/exploration randomness from other engines and GUI particles.
+        external_state = random.getstate()
+        random.setstate(self.random_state)
+        try:
+            decision = self.decide_fn(state)
             contracts.validate_decision(decision)
+            before = list(agent.pos)
+            # PDCs/lahars already arriving at the occupied tile cannot be outrun.
+            arriving = next((cause for tiles, cause in ((world.pdc, 'pyroclastic_flow'),
+                             (world.lahar, 'lahar')) if tuple(agent.pos) in tiles), None)
+            if arriving:
+                agent.is_alive, agent.cause_of_death = False, arriving
+            else:
+                agent.execute_action(decision['action'], world)
+            self.random_state = random.getstate()
+        finally:
+            random.setstate(external_state)
+        self.previous_action = decision['action']
+        self.previous_moved = before != agent.pos
+        sheltered = world.is_in_shelter(*agent.pos)
+        # assumption: ash reduces outdoor warmth/safety; shelter attenuates by 90%.
+        exposure = world.ash * (.1 if sheltered else 1)
+        # assumption: exposed open terrain loses heat in wet weather and darkness.
+        if not sheltered:
+            cover = .35 if world.get_tile(*agent.pos) == 2 else 1.0  # assumption: canopy reduces exposure 65%, not waterproof shelter
+            chill = cover * (.018 * world.ash + .035 * (self.event_gen.weather[t] != 'calm') + .025 * (agent.hour >= 20 or agent.hour <= 6))
+            agent.needs['warmth'] = max(0, agent.needs['warmth'] - chill)
+        agent.needs['warmth'] = max(0, agent.needs['warmth'] - .040 * exposure)
+        agent.needs['safety'] = max(0, agent.needs['safety'] - .025 * exposure)
+        agent.step_decay(sheltered, forest_cover=world.get_tile(*agent.pos) == 2)
+        # Flows persist as lethal deposits in this simplified scenario.
+        for tiles, cause in ((world.pdc, 'pyroclastic_flow'), (world.lahar, 'lahar'), (world.lava, 'lava')):
+            if tuple(agent.pos) in tiles:
+                agent.is_alive, agent.cause_of_death = False, cause
+                break
+        record = dict(t=t, state=state, event=event, action=decision['action'],
+                      probs=decision['probs'], reason=decision['reason'],
+                      pos_after=list(agent.pos), phase=self.volcano.phases[t])
+        self.steps.append(record)
+        return record
 
-            # 5. Resolve Action Effects on World and Agent
-            action = decision["action"]
-            narrative = self.agent.execute_action(action, self.world)
+    def timeline(self):
+        world = copy.deepcopy(self.world.export_dict())
+        world['initial_tiles'] = copy.deepcopy(self.initial_world['tiles'])
+        world.update(seed=self.seed, mind=self.mind_type, noise_source=self.noise_source, scenario=self.scenario)
+        world['volcano'] = self.volcano.export_dict()
+        world['volcano']['world_events'] = list(self.event_gen.world_events)
+        return dict(world=world, steps=self.steps, outcome='survived' if self.agent.is_alive else 'died',
+                    cause=self.agent.cause_of_death)
 
-            # 6. Natural Physiological Decay
-            in_shelter_after = self.world.is_in_shelter(self.agent.pos[0], self.agent.pos[1])
-            self.agent.step_decay(in_shelter=in_shelter_after)
+    def run(self, max_steps=DEFAULT_STEPS, step_callback=None):
+        while len(self.steps) < min(max_steps, DEFAULT_STEPS):
+            record = self.step()
+            if record is None:
+                break
+            if step_callback:
+                step_callback(record, self)
+        return self.timeline()
 
-            # 7. Record Step Log
-            step_record = {
-                "t": t,
-                "state": decision_state,
-                "event": event,
-                "action": action,
-                "probs": decision["probs"],
-                "reason": decision.get("reason", narrative)
-            }
-            steps_log.append(step_record)
-
-            # 8. Interactive Step Notification
-            if step_callback is not None:
-                step_callback(step_record, self)
-
-        outcome = "survived" if self.agent.is_alive else "died"
-        cause = self.agent.cause_of_death
-
-        timeline = {
-            "world": {
-                "width": self.world.width,
-                "height": self.world.height,
-                "tiles": self.world.tiles,
-                "seed": self.seed,
-                "mind": self.mind_type,
-                "noise_source": self.noise_source
-            },
-            "steps": steps_log,
-            "outcome": outcome,
-            "cause": cause
-        }
-        return timeline
-
-    def run_and_save(self, output_path: str, max_steps: int = 24) -> Dict[str, Any]:
-        """Runs the simulation and persists timeline.json to disk."""
-        timeline = self.run(max_steps=max_steps)
-        os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(timeline, f, indent=2)
+    def run_and_save(self, output_path, max_steps=DEFAULT_STEPS):
+        timeline = self.run(max_steps)
+        path = Path(output_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(timeline, indent=2), encoding='utf-8')
         return timeline

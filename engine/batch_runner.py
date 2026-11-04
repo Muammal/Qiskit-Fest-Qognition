@@ -13,27 +13,25 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-from engine.simulation import SimulationEngine
+from engine.simulation import SimulationEngine, DEFAULT_STEPS
 
 
-def run_batch_comparison(num_seeds: int = 20, max_steps: int = 24) -> Dict[str, Any]:
-    """
-    Executes paired simulations across identical world seeds for both
-    Quantum and Classical minds to measure decision divergence and survival delta.
-    """
+def run_batch_comparison(num_seeds: int = 20, max_steps: int = DEFAULT_STEPS) -> Dict[str, Any]:
+    """Compare synthetic heuristic stubs on paired event seeds."""
     records = []
     divergence_steps = 0
     total_steps = 0
 
-    print(f"[BatchRunner] Executing {num_seeds} paired seeds (Quantum vs Classical)...")
+    print(f"[BatchRunner] Synthetic heuristic-stub comparison: {num_seeds} paired seeds "
+          "(quantum-labelled vs classical-labelled stubs; no quantum or hardware results).")
 
     for seed in range(100, 100 + num_seeds):
         # 1. Run Quantum Mind
-        sim_q = SimulationEngine(seed=seed, mind_type="quantum", noise_source="fake_backend")
+        sim_q = SimulationEngine(seed=seed, mind_type="quantum", noise_source="stub")
         res_q = sim_q.run(max_steps=max_steps)
 
         # 2. Run Classical Mind on identical seed
-        sim_c = SimulationEngine(seed=seed, mind_type="classical", noise_source="ideal")
+        sim_c = SimulationEngine(seed=seed, mind_type="classical", noise_source="stub")
         res_c = sim_c.run(max_steps=max_steps)
 
         steps_q = len(res_q["steps"])
@@ -68,6 +66,13 @@ def run_batch_comparison(num_seeds: int = 20, max_steps: int = 24) -> Dict[str, 
     c_survival_rate = round((df["c_outcome"] == "survived").mean() * 100.0, 1)
 
     summary = {
+        "noise_source": "stub",
+        "provenance": {
+            "result_type": "synthetic_heuristic_stub",
+            "quantum_policy": "contracts.quantum_decide",
+            "classical_policy": "contracts.classical_decide",
+            "disclosure": "Synthetic heuristic-stub results; no quantum circuits or hardware runs.",
+        },
         "num_seeds": num_seeds,
         "total_evaluated_steps": total_steps,
         "total_divergences": divergence_steps,
@@ -79,46 +84,36 @@ def run_batch_comparison(num_seeds: int = 20, max_steps: int = 24) -> Dict[str, 
     return summary
 
 
-def curate_demo_pack(output_dir: str = "demo-pack"):
-    """
-    Curates and exports 4-5 signature runs for Product D/E:
-      1. Best Order-Effect Divergence Run
-      2. High-Stress Decoherence Run
-      3. Heroic Survival Run
-      4. Tragic Dehydration Death Run
-    """
+def curate_demo_pack(output_dir="demo-pack"):
+    """Search ordinary seeds for truthful illustrative stub runs."""
     os.makedirs(output_dir, exist_ok=True)
-    print(f"[DemoPack] Curating signature runs into '{output_dir}/'...")
-
-    # 1. Heroic Survival Run (Seed 1337)
-    sim_survive = SimulationEngine(seed=1337, mind_type="quantum", noise_source="ibm_hardware")
-    res_survive = sim_survive.run(max_steps=24)
-    with open(os.path.join(output_dir, "run_01_heroic_survival.json"), "w", encoding="utf-8") as f:
-        json.dump(res_survive, f, indent=2)
-
-    # 2. Dramatic Death Run (Seed 404)
-    sim_death = SimulationEngine(seed=404, mind_type="quantum", noise_source="fake_backend")
-    res_death = sim_death.run(max_steps=24)
-    with open(os.path.join(output_dir, "run_02_dramatic_death.json"), "w", encoding="utf-8") as f:
-        json.dump(res_death, f, indent=2)
-
-    # 3. Order-Effect Divergence Pair (Seed 202)
-    sim_q = SimulationEngine(seed=202, mind_type="quantum", noise_source="ideal")
-    res_q = sim_q.run(max_steps=24)
-    with open(os.path.join(output_dir, "run_03_order_effect_quantum.json"), "w", encoding="utf-8") as f:
-        json.dump(res_q, f, indent=2)
-
-    sim_c = SimulationEngine(seed=202, mind_type="classical", noise_source="ideal")
-    res_c = sim_c.run(max_steps=24)
-    with open(os.path.join(output_dir, "run_04_order_effect_classical.json"), "w", encoding="utf-8") as f:
-        json.dump(res_c, f, indent=2)
-
-    print(f"[DemoPack] Curated 4 runs exported successfully to {output_dir}/")
+    found = {}
+    for seed in range(2000):
+        q = SimulationEngine(seed=seed).run()
+        if not q["world"]["volcano"]["erupts"]:
+            continue
+        if q["outcome"] == "survived":
+            found.setdefault("run_01_heroic_survival", q)
+        if q["cause"] in ("pyroclastic_flow", "lahar", "lava"):
+            found.setdefault("run_02_dramatic_death", q)
+        if "run_03_order_effect_quantum" not in found:
+            c = SimulationEngine(seed=seed, mind_type="classical").run()
+            if any(a["action"] != b["action"] for a,b in zip(q["steps"],c["steps"])) and any("Order effect" in r["reason"] for r in q["steps"]):
+                found["run_03_order_effect_quantum"] = q
+                found["run_04_order_effect_classical"] = c
+        used = {timeline["world"]["seed"] for timeline in found.values()}
+        if seed not in used and any(r["state"]["stress"] > .4 and "Decoherence" in r["reason"] for r in q["steps"]):
+            found.setdefault("run_05_stress_decoherence", q)
+        if len(found) == 5:
+            break
+    if len(found) != 5:
+        raise RuntimeError(f"Seed search incomplete: {sorted(found)}")
+    for name, timeline in found.items():
+        with open(os.path.join(output_dir, name+".json"), "w", encoding="utf-8") as f:
+            json.dump(timeline, f, indent=2)
+    print("[DemoPack] Five searched stub runs exported:", {k:v["world"]["seed"] for k,v in found.items()})
 
 
 if __name__ == "__main__":
-    summary = run_batch_comparison(num_seeds=10, max_steps=20)
-    print(f"\n[Summary] Overall Divergence Rate: {summary['divergence_rate_pct']}%")
-    print(f"[Summary] Quantum Survival Rate: {summary['quantum_survival_rate_pct']}% | Classical: {summary['classical_survival_rate_pct']}%")
-    curate_demo_pack("demo-pack")
-
+    print(run_batch_comparison())
+    curate_demo_pack()
