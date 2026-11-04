@@ -64,12 +64,18 @@ def test_overall_result(parts, expected):
     assert check.overall(parts) == expected
 
 
-def test_a_scenario_using_a_part_with_no_model_cannot_run():
-    card = check.read_card(CARDS / "beryl_2024.toml")
+def test_a_scenario_using_a_part_with_no_model_cannot_run(tmp_path):
+    path = tmp_path / "wave.toml"
+    path.write_text('id = "wave"\ntitle = "A wave"\nplace = "fictional"\nuses = ["terrain", "tsunami"]\n', encoding="utf-8")
+    card = check.read_card(path)
     parts = [check.assess(category, card.id) for category in card.uses]
     assert check.overall(parts) == check.CANNOT_RUN
-    assert {"storm"} <= {p.category for p in parts if not p.has_model}
-    assert "No model yet" in check.report(card, parts) 
+    assert [p.category for p in parts if not p.has_model] == ["tsunami"]
+    assert "No model yet" in check.report(card, parts) and "fictional" in check.report(card, parts)
+
+
+def test_every_card_in_the_repo_is_readable():
+    assert len([check.read_card(path) for path in CARDS.glob("*.toml")]) >= 2
 
 
 def test_a_card_with_a_strange_part_or_key_is_refused(tmp_path):

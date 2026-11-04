@@ -1,0 +1,5 @@
+# A second real scenario built from the same parts: terrain, weather, mudflows and walking are reused, and only the storm is new.
+id = "beryl_2024"
+title = "Hurricane Beryl near St Vincent, July 2024"
+place = "real"
+uses = ["terrain", "atmos", "storm", "lahar", "agent"]

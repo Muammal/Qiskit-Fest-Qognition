@@ -1,1 +1,36 @@
 # One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+# No observed winds at St Vincent are held for Beryl yet, so the real-data results are reported, not scored.
+
+[[gate]]
+id = "storm-model"
+title = "Holland wind profile and track replay hold on test data"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/storm/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/storm/*.py", "stranded_physics/domains/storm/params.toml", "stranded_physics/domains/storm/tests/*.py"]
+required = false
+
+[[gate]]
+id = "storm-beryl-peak"
+title = "Peak modelled wind at Kingstown during Hurricane Beryl (reported, no target)"
+kind = "validation"
+scenario = "beryl_2024"
+command = "python -m stranded_physics.domains.storm.measure beryl_peak"
+inputs = ["stranded_physics/domains/storm/*.py", "stranded_physics/domains/storm/params.toml", "stranded_physics/domains/storm/datasets.toml"]
+required = false
+expect = "NO_TARGET"
+role = "prediction"
+split = "reference"
+source = "No wind observation at St Vincent is held for Beryl. A local record would turn this into a scored check."
+
+[[gate]]
+id = "storm-cyclone-rate"
+title = "Named storms per year near St Vincent since 1980 (reported, no target)"
+kind = "validation"
+scenario = "beryl_2024"
+command = "python -m stranded_physics.domains.storm.measure cyclone_rate"
+inputs = ["stranded_physics/domains/storm/*.py", "disaster_data/catalog/cyclones_near_study_islands.csv"]
+required = false
+expect = "NO_TARGET"
+role = "input"
+split = "reference"
+source = "Counted from disaster_data/catalog/cyclones_near_study_islands.csv, built from IBTrACS."
