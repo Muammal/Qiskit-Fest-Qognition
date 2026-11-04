@@ -36,3 +36,42 @@ kind = "verification"
 command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/agent'); load_datasets(p/'datasets.toml', 'agent'); load_parameters(p/'params.toml')\""
 inputs = ["stranded_physics/domains/agent/datasets.toml", "stranded_physics/domains/agent/params.toml"]
 required = true
+
+# Water and energy balance. Targets were committed before the model ran. They are anchors from Tipton et al. (2025), an editorial,
+# so they check that the model is in a sensible range. They don't validate it against evacuees.
+
+[[gate]]
+id = "agent-physiology"
+title = "Walking energy, sweat and needs match exact answers, and state keeps the frozen contract keys"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/agent/tests/test_physiology.py -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/agent/physiology.py", "stranded_physics/domains/agent/params.toml", "stranded_physics/domains/agent/tests/test_physiology.py"]
+required = true
+
+[[gate]]
+id = "agent-water-need-walking"
+title = "Water need when walking 8 hours in a day"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.agent.measure water_need_walking"
+inputs = ["stranded_physics/domains/agent/physiology.py", "stranded_physics/domains/agent/measure.py", "stranded_physics/domains/agent/params.toml"]
+required = false
+target = 4.0  # Litres a day.
+tolerance = 2.0
+role = "anchor"
+split = "reference"
+source = "Tipton et al. (2025), doi:10.1113/EP093194: 'This volume can easily increase towards 4 L day-1 and beyond to balance loss through sweating and respiration when ambulatory in hot conditions'"
+
+[[gate]]
+id = "agent-days-without-water"
+title = "Days to death with no water, walking 8 hours a day, starting hydrated"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.agent.measure days_without_water"
+inputs = ["stranded_physics/domains/agent/physiology.py", "stranded_physics/domains/agent/measure.py", "stranded_physics/domains/agent/params.toml"]
+required = false
+target = 3.0
+tolerance = 1.5
+role = "anchor"
+split = "reference"
+source = "Tipton et al. (2025), doi:10.1113/EP093194: death 'can occur in as little as 3 days in hot climates with no access to water'"
