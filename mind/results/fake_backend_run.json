@@ -1,0 +1,59 @@
+{
+  "backend": "fake_torino",
+  "calibration_source": "qiskit_ibm_runtime.fake_provider.FakeTorino snapshot",
+  "qiskit_version": "2.6.1",
+  "shots": 4000,
+  "seed_transpiler": 42,
+  "sampler_seed": 42,
+  "date": "2026-11-04T01:16:37.949012+00:00",
+  "q_safe": 0.69,
+  "q_danger": 0.59,
+  "eta": -0.7853897988344999,
+  "transpiled_gate_counts_reference_circuit": {
+    "sx": 11,
+    "rz": 10,
+    "cz": 2,
+    "measure": 1
+  },
+  "results": {
+    "tremor_then_gas_plume": {
+      "safety": 0.85,
+      "events": [
+        "tremor",
+        "gas_plume"
+      ],
+      "shots": 4000,
+      "p_sim": 0.37475,
+      "p_exact": 0.3744270482664796,
+      "standard_error": 0.007652310660724168,
+      "abs_diff": 0.00032295173352042683,
+      "diff_over_se": 0.042203165532469986,
+      "within_4se": true
+    },
+    "gas_plume_then_tremor": {
+      "safety": 0.85,
+      "events": [
+        "gas_plume",
+        "tremor"
+      ],
+      "shots": 4000,
+      "p_sim": 0.567,
+      "p_exact": 0.5561417596033503,
+      "standard_error": 0.007855700204765958,
+      "abs_diff": 0.010858240396649621,
+      "diff_over_se": 1.3822116569649716,
+      "within_4se": true
+    },
+    "tversky_shafir_p0.5": {
+      "safety": 0.5,
+      "events": [],
+      "shots": 4000,
+      "p_sim": 0.37525,
+      "p_exact": 0.36,
+      "standard_error": 0.0075894663844041105,
+      "abs_diff": 0.015249999999999986,
+      "diff_over_se": 2.009363929898656,
+      "within_4se": true
+    }
+  }
+}

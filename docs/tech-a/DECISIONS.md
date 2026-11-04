@@ -250,3 +250,34 @@ the reflex overrides it.
 and `test_repo_compatibility[test_urgent_thirst_beats_warning_in_both_stubs]`
 passed.
 
+## D9: Integration edits (2026-11-03, stage 5, status: accepted)
+**Context:** recorded on branch `tech-a/integration` (not this branch);
+see that branch's `docs/tech-a/DECISIONS.md` and `08-integration-notes.md`
+for the full entry. Summary: one PR on `tech-a/integration`, not merged
+by Tech A, touching exactly `contracts.py`, `engine/simulation.py`,
+`engine/gui.py`, `engine/batch_runner.py`.
+
+## D7: Hardware decoherence (2026-11-03, stage 6, status: accepted)
+**Context:** Stress-driven decoherence could either stay as the exact,
+fast phase-damping channel used in-game (Stage 3), with real delay-gate
+hardware physics explored only offline, or actual delay circuits could run
+live during gameplay to compute decoherence from real/simulated gate
+timing.
+**Decision:** Exact phase damping in-game (already built, Stage 3); delay
+circuits as an offline experiment only (`mind/experiments/delay_experiment.py`),
+never called during a `SimulationEngine` step. Brodin confirmed this
+2026-11-03, before Stage 6 began (matching what Stages 1-4 had already
+built).
+**Alternatives considered:** live delay circuits in the sim - rejected:
+too slow for a real-time game loop (a single fake-backend circuit run
+takes much longer than the <10ms/decision budget, Stage 4), not
+reproducible run-to-run, and `RISKS_AND_FAQ.md` states the sim never calls
+hardware live.
+**Consequences:** `mind/circuits.py` and `mind/experiments/` exist purely
+for offline verification and for producing `mind/results/hardware_circuits.qpy`
+for Tech B's eventual hardware job - no code path from `quantum_decide`
+ever imports or calls them.
+**Evidence:** `mind/tests/test_circuits.py` (5 tests, including the
+transpiled gate counts and the 4-SE fake-backend check);
+`06-circuits-and-hardware.md`.
+
