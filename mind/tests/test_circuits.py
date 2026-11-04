@@ -7,7 +7,6 @@ skip the slow ones with `pytest -q mind/tests -m "not slow"`.
 import numpy as np
 import pytest
 from qiskit import transpile
-from qiskit_ibm_runtime.fake_provider import FakeTorino
 
 from mind.belief import prepare_belief, run_events
 from mind.circuits import build_coherence_probe_circuit, build_decision_circuit
@@ -38,6 +37,7 @@ def test_decision_circuit_statevector_matches_closed_form():
 
 @pytest.mark.slow
 def test_transpiled_gate_counts_on_fake_torino():
+    FakeTorino = pytest.importorskip('qiskit_ibm_runtime.fake_provider').FakeTorino
     backend = FakeTorino()
     qc = build_decision_circuit(0.85, ["tremor", "gas_plume"], Q_S, Q_D, ETA)
     tqc = transpile(qc, backend=backend, optimization_level=3, seed_transpiler=42)
@@ -50,6 +50,7 @@ def test_transpiled_gate_counts_on_fake_torino():
 
 @pytest.mark.slow
 def test_fake_backend_estimates_within_4_standard_errors():
+    pytest.importorskip('qiskit_ibm_runtime')
     from mind.experiments.run_fake_backend import run_fake_backend_experiment
 
     summary, _circuits = run_fake_backend_experiment(shots=4000)
@@ -68,6 +69,7 @@ def test_delay_requires_scheduled_transpile_or_is_a_noop_in_this_backend():
     plan's guidance is correct in general (multi-qubit circuits needing
     idle-padding alignment) and costs nothing in this simpler circuit.
     """
+    FakeTorino = pytest.importorskip('qiskit_ibm_runtime.fake_provider').FakeTorino
     backend = FakeTorino()
     from qiskit_aer.primitives import SamplerV2
 

@@ -1,29 +1,40 @@
 # Quantum Cognition Simulation: Decision-Making & Multi-Scenario Survival
 
-[![Integration Tests](https://img.shields.io/badge/tests-31%20passed-brightgreen.svg)](#daily-integration--testing)
+[![Integration Tests](https://img.shields.io/badge/tests-142%20passed-brightgreen.svg)](#daily-integration--testing)
 [![Qiskit](https://img.shields.io/badge/Qiskit-2.x-6929C4.svg)](https://qiskit.org/)
-[![Status](https://img.shields.io/badge/Multi--Scenario-Integrated-success.svg)](#architecture--team-boundaries)
+[![Status](https://img.shields.io/badge/Tech%20A%20%2B%20B%20%2B%20C-Unified-success.svg)](#unified-track-documentation-tech-a--tech-b--tech-c)
 [![Resolution](https://img.shields.io/badge/Resolution-1600%C3%97900%20(Fullscreen%20Scaled)-blueviolet.svg)](#fullscreen--interactive-controls)
 
 > **"Can quantum probability explain why humans make counterintuitive survival decisions under extreme environmental stress?"**
 
-**Quantum Cognition Simulation** is an interactive multi-scenario cognitive modeling sandbox built for an advanced quantum hackathon. The system simulates human decision-making under existential pressure by contrasting a **2-qubit quantum cognition circuit** (exhibiting non-commuting order effects, constructive interference, and physiological stress decoherence) against an empirical **classical rational baseline** (derived from American Time Use Survey utility priors).
+**Quantum Cognition Simulation** is an interactive multi-scenario cognitive modeling and physical hazard platform. The system simulates human decision-making under existential pressure by contrasting a **2-qubit quantum cognition architecture** (exhibiting non-commuting order effects, Tversky–Shafir interference, and physiological stress decoherence) against a **zero-coherence classical mixture control** and an empirical **classical rational baseline** (derived from American Time Use Survey utility priors and calibrated against 49 real-world volcanic/disaster datasets).
+
+---
+
+## Unified Track Documentation (Tech A + Tech B + Tech C)
+
+Detailed technical documentation explaining how **Tech A**, **Tech B**, and **Tech C** work both **separately** and **together**:
+
+- **[How Tech A, Tech B, and Tech C Work Together & Separately (`docs/TECH_A_B_C_INTEGRATION.md`)](docs/TECH_A_B_C_INTEGRATION.md)** — Complete end-to-end architecture, frozen `contracts.py` boundary, step-by-step turn lifecycle, causal isolation guarantees, and 3-way cognitive benchmarking.
+- **[Tech A: 2-Qubit Quantum Cognitive Architecture (`docs/TECH_A_QUANTUM_MIND.md`)](docs/TECH_A_QUANTUM_MIND.md)** — Density-matrix belief tracking, non-commuting $R_y(\theta)R_z(\phi)$ event gates, projective collapse, phase-damping decoherence under stress, deliberation unitary $U(q_S, q_D, \eta)$, and Qiskit circuits (`mind/`).
+- **[Tech B: Empirical Disaster Calibration, Classical Priors & Physics Framework (`docs/TECH_B_PHYSICS_AND_PRIORS.md`)](docs/TECH_B_PHYSICS_AND_PRIORS.md)** — 49 empirical disaster datasets (anchored on the April 2021 La Soufrière eruption on St. Vincent), ATUS classical utility priors, and the 14-domain unit-checked (`pint`) `stranded_physics/` framework.
+- **[Tech C: World Generation, Volcanic Hazard Engine, Physiological Agent & GUI (`docs/TECH_C_ENGINE_WORLD_AND_GUI.md`)](docs/TECH_C_ENGINE_WORLD_AND_GUI.md)** — Dual-scenario $40 \times 40$ world generator, priority-flood drainage, Tobler hiking Dijkstra routing, active vs. deposited PDC/lahar/surge hazards, physiological agent, and 1600×900 Pygame visualizer (`engine/`).
 
 ---
 
 ## Visual Interface & Simulation Showcase
 
-The application features a modern 1600×900 visualizer with dynamic vector graphics, atmospheric particle systems, aspect-scaled fullscreen scaling, and real-time cognitive telemetry.
+The application features an engineered 1600×900 research & tactical visualizer with dynamic relief shading, atmospheric particle systems, aspect-scaled fullscreen rendering, and real-time cognitive telemetry.
 
 ### 1. Scenario Selection Hub (`Screen 0`)
-The initial screen presented on launch allows players to choose their survival environment: **Island Wilderness** or **Volcano Evacuation**. Features interactive hover glows, metadata pill badges, and direct keyboard navigation (`[1]` / `[2]`).
+The initial screen presented on launch allows users to choose their survival environment: **Island Wilderness** or **Volcano Evacuation**. Features interactive hover states, metadata pill badges, and direct keyboard navigation (`[1]` / `[2]`).
 
 ![Scenario Selection Hub](docs/images/01_event_choice_hub.png)
 
 ---
 
 ### 2. Scenario Configuration & Seed Hub (`Screen 1`)
-An interactive pre-flight dashboard equipped with real-time procedural minimap generation, seed steppers (±1, ±10, ±100, randomize), cognitive architecture toggles (**2-Qubit Quantum Mind** vs **Classical Rational Mind**), scenario presets, and configurable simulation horizons (12, 24, 36 steps).
+An interactive pre-flight dashboard equipped with real-time procedural minimap generation, seed steppers (±1, ±10, ±100, randomize), cognitive architecture toggles (**2-Qubit Quantum Mind** vs **Classical Rational Mind**), scenario presets, and configurable simulation horizons (12, 24, 36, 48 steps).
 
 ![Scenario Configuration & Seed Hub](docs/images/02_home_configuration.png)
 
@@ -37,14 +48,14 @@ Real-time 40×40 procedural island simulation. Features animated survival agent 
 ---
 
 ### 4. Volcano Eruption Evacuation Simulation (`Screen 2 - Volcano Mode`)
-Calibrated 40×40 volcanic topography with active central caldera, dynamic seismic tremors, lava meanders, fast pyroclastic density currents (PDCs), toxic ash fallout, dynamic hazard risk zoning (Safe / Caution / Danger), and BFS shortest-path evacuation paths to coastal assembly zones.
+Calibrated 40×40 volcanic topography with active central caldera, priority-flood drainage channels, dynamic seismic tremors, steepest-descent lava flows, valley-confined pyroclastic density currents (PDCs), peripheral thermal surges, rain-reactivated lahars, wind-advected ash fallout, hazard risk zoning (Safe / Caution / Danger), and Tobler least-time evacuation paths to coastal assembly zones.
 
 ![Volcano Eruption Evacuation](docs/images/04_volcano_evacuation_sim.png)
 
 ---
 
 ### 5. Mission Debrief & Comparative Analysis (`Debrief Modal`)
-End-of-event telemetry modal summarizing the agent's survival outcome, cause of death (if fatal), full step-by-step decision trajectory, and quantum vs classical cognitive divergence with instant replay capabilities.
+End-of-event telemetry modal summarizing the agent's survival outcome, cause of death (if fatal), stress & decoherence metrics, and instant replay or mind-switching capabilities.
 
 ![Mission Debrief Modal](docs/images/05_mission_debrief.png)
 
@@ -52,145 +63,96 @@ End-of-event telemetry modal summarizing the agent's survival outcome, cause of 
 
 ## Dual Simulation Scenarios
 
-Players can explore two fundamentally distinct environmental and psychological challenges:
+Users can explore two distinct environmental and psychological challenges:
 
 ### 🏝️ Scenario A: Island Wilderness Survival
-- **Procedural Topography**: Unique 40×40 archipelago generated from a procedural seed with organic coastline harmonics, dense pine forests, freshwater springs, and alpine snowcaps.
+- **Procedural Topography**: Unique 40×40 archipelago generated from a procedural seed with organic coastline harmonics, dense pine forests, freshwater springs, and alpine ridges.
 - **Resource Economy**: Full survival loop including wood harvesting, food foraging, shelter construction, and hydration management.
-- **Stochastic Environment**: Dynamic weather transitions (Markov rain, maritime storms, freezing nights) and territorial wildlife encounters (wild boars).
+- **Stochastic Environment**: Dynamic weather transitions (Markov rain, maritime storms, freezing nights) and wildlife encounters.
 - **Quantum Mechanics**: Superposition exploration walks across uncharted land and belief interference under cold exposure.
 
 ### 🌋 Scenario B: Volcano Eruption Evacuation
-- **Calibrated Geography**: Fixed 40×40 volcanic island featuring a central volcanic crater, radial drainage valleys, and designated coastal assembly points (250m per tile scale).
-- **Hazard Clock**: Seeded hidden unrest, precursory tremors, sulfur gas plumes, explosive eruptions, lava flows, and lethal pyroclastic surges.
-- **Emergency Routing**: Dynamic evacuation zoning with automated BFS pathfinding guiding the agent away from danger zones toward clean water springs and rescue points.
-- **Quantum Mechanics**: Order effects under seismic warnings (e.g. tremor then gas plume vs gas plume then tremor) and rapid threat-induced decoherence.
+- **Calibrated Geography**: Fixed 40×40 volcanic island (`250m` per tile scale) featuring a ~1000m central volcanic crater, priority-flood radial drainage valleys, clean springs, and two separated coastal assembly points.
+- **Coupled Hazard Clock**: Seeded hidden unrest, precursory tremors, sulfur gas plumes, explosive eruptions, steepest-descent lava flows, active vs. deposited PDCs, dilute thermal surges, rain-reactivated lahars, and anisotropic wind-advected ash grids.
+- **Tobler Emergency Routing**: Dynamic evacuation zoning with automated Dijkstra least-time pathfinding (using Tobler's hiking function over slope, vegetation, and ash load) guiding the agent away from danger zones toward clean water springs and rescue assembly points.
+- **Quantum Mechanics**: Order effects under seismic warnings (`tremor` $\to$ `gas_plume` vs. `gas_plume` $\to$ `tremor`), disjunction interference under ambiguity, and stress-induced phase damping ($\lambda$).
 
 ---
 
 ## Architecture & Codebase Layout
 
-The project enforces clean separation between the shared physics/world engine, cognitive models, frozen contracts, and frontend visualizers:
-
 ```
 QWC/
-├── contracts.py                  # Frozen interfaces, state validation & heuristic stubs
-├── requirements.txt              # Pinned dependency environment (pygame-ce, qiskit, pytest)
+├── contracts.py                  # Frozen interfaces, state validation & ATUS classical baseline
+├── requirements.txt              # Core dependencies (pygame-ce, qiskit, qiskit-aer, numpy, pytest)
+├── requirements-physics.txt      # Physics track dependencies (pint, numpy, pytest)
 ├── main.py                       # Unified entrypoint (GUI, CLI demo, batch benchmark, tests)
-├── test_contracts_and_engine.py  # Comprehensive integration test suite (31 tests)
-├── timeline.json                 # Standardized simulation run output schema
-├── docs/                         # Theory, mathematical models & assets
-│   ├── images/                   # High-resolution screenshots of the UI and simulation
-│   │   ├── 01_event_choice_hub.png
-│   │   ├── 02_home_configuration.png
-│   │   ├── 03_island_survival_sim.png
-│   │   ├── 04_volcano_evacuation_sim.png
-│   │   └── 05_mission_debrief.png
+├── test_contracts_and_engine.py  # Tech C + integration test suite (62 tests)
+├── mind/                         # Tech A: 2-Qubit Quantum Cognitive Architecture
+│   ├── model.py                  # Deliberation unitary U(q_S, q_D, eta) & Tversky-Shafir calibration
+│   ├── belief.py                 # Density-matrix belief state, Ry*Rz event gates & collapse
+│   ├── decoherence.py            # Stress -> phase-damping channel E_lambda(rho)
+│   ├── quantum_mind.py           # quantum_decide, classical_mixture_decide & reflex layer
+│   ├── circuits.py               # Gate-level Qiskit circuits transpiled for FakeTorino
+│   ├── experiments/              # Validation scripts & figure generators
+│   └── tests/                    # Tech A unit & circuit test suite (37 tests)
+├── stranded_physics/             # Tech B: Verification-First 14-Domain Physics Framework
+│   ├── core/                     # Pint unit registry, FieldStore, Parameter, verdicts & 43 tests
+│   ├── domains/                  # 14 self-contained physical hazard domains (terrain, pdc, tephra, etc.)
+│   ├── packs/                    # Topological ScenarioPack (.npz) builder & SHA-256 verification
+│   ├── runtime/                  # Causal perceive(), AgentBody & PackSimulation
+│   ├── catalog.py                # Automated parameter & provenance catalog builder
+│   └── gates.py                  # Pre-registered verification & validation gate runner
+├── disaster_data/                # Tech B: 49 Curated Real-World Volcano & Weather Datasets
+│   ├── REPORT.md                 # Empirical calibration report (2021 La Soufrière St. Vincent, etc.)
+│   └── manifest.json             # SHA-256 dataset provenance manifest
+├── engine/                       # Tech C: World, Volcano, Agent, Loop & Interactive Visualizer
+│   ├── world.py                  # Dual-scenario DEM, priority-flood drainage & Tobler Dijkstra paths
+│   ├── volcano.py                # Seeded wind, ash grid, active PDC/lahar, surge & lava model
+│   ├── agent.py                  # Physiology, Tobler walking budget, ration eating & fatal checks
+│   ├── events.py                 # Markov weather & activity-linked event generator
+│   ├── simulation.py             # Turn-based simulation loop emitting timeline.json
+│   ├── batch_runner.py           # 3-model batch comparison & demo curation
+│   ├── gui.py                    # 1600x900 interactive Pygame Research & Tactical Visualizer
+│   ├── gui_map.py                # Auxiliary relief & hazard map renderer
+│   └── gui_panels.py             # Auxiliary panel & modal helpers
+├── docs/                         # Architecture guides, theoretical models & screenshots
+│   ├── TECH_A_B_C_INTEGRATION.md # How Tech A, Tech B, and Tech C work together & separately
+│   ├── TECH_A_QUANTUM_MIND.md    # Tech A standalone & mathematical documentation
+│   ├── TECH_B_PHYSICS_AND_PRIORS.md # Tech B empirical data, priors & physics documentation
+│   ├── TECH_C_ENGINE_WORLD_AND_GUI.md # Tech C world, volcano, agent & GUI documentation
 │   ├── VOLCANO_MODEL.md          # Volcanic hazard assumptions, constants & JSON schema
-│   ├── 01_THEORY_AND_ARCHITECTURAL_FOUNDATIONS.md
-│   └── 03_CODEBASE_IMPLEMENTATION_AND_MODULES.md
-├── engine/                       # World, volcano, agents & simulation engine
-│   ├── world.py                  # Dual-scenario map generator (procedural island & fixed volcano)
-│   ├── volcano.py                # Hazard model (unrest, lava, PDCs, ash fallout)
-│   ├── agent.py                  # Physiological state, needs decay, lethal thresholds & movement
-│   ├── events.py                 # Environmental weather & contextual activity triggers
-│   ├── simulation.py             # Shared simulation loop emitting timeline.json
-│   ├── batch_runner.py           # Multi-seed batch comparison & demo curation
-│   └── gui.py                    # 1600x900 interactive Pygame UI with vector graphics & particles
-└── demo-pack/                    # Curated signature runs for frontend replay
-    ├── run_01_heroic_survival.json
-    ├── run_02_dramatic_death.json
-    ├── run_03_order_effect_quantum.json
-    ├── run_04_order_effect_classical.json
-    └── run_05_stress_decoherence.json
+│   ├── tech-a/                   # Detailed Stage 1-9 Tech A derivation notes & figures
+│   └── images/                   # High-resolution screenshots of the UI and simulation
+└── demo-pack/                    # Curated signature runs & Tech A validation JSONs
 ```
-
----
-
-## Frozen Contracts (`contracts.py`)
-
-All cognitive decision engines plug into the strict interface defined in `contracts.py`:
-
-### Primitive Constants
-- **`ACTIONS`**: `["forage", "drink", "build_shelter", "rest", "explore", "craft", "hide"]`
-- **`EVENTS`**: `["storm", "injury", "find_food", "animal", "cold_night", "none", "tremor", "gas_plume", "eruption", "ash_fall"]`
-- **`TILE_TYPES`**: `{0: "water", 1: "plains", 2: "forest", 3: "mountain", 4: "shelter"}`
-
-### Interface Signatures
-```python
-def get_prior(state: dict) -> dict:
-    """Baseline habit distribution derived from physiological needs and ATUS tables."""
-
-def classical_decide(state: dict) -> dict:
-    """Rational classical decision baseline (deterministic prior utility argmax)."""
-
-def quantum_decide(state: dict) -> dict:
-    """2-Qubit quantum cognition decision engine (Qiskit 2.x)."""
-
-def explore_step(pos: list, world: Any, mode: str = "quantum") -> list:
-    """Discrete step generator: quantum walk superposition spread vs classical Brownian walk."""
-```
-
-### Standardized Decision Schema
-Every step output adheres strictly to:
-```json
-{
-  "action": "hide",
-  "probs": {
-    "forage": 0.05,
-    "drink": 0.05,
-    "build_shelter": 0.15,
-    "rest": 0.10,
-    "explore": 0.05,
-    "craft": 0.05,
-    "hide": 0.55
-  },
-  "reason": "Order effect: injury followed by storm induces constructive fear interference -> prioritizing safety"
-}
-```
-
----
-
-## The Quantum Cognition Model
-
-### 1. Non-Commuting Order Effects
-Classical Bayesian models assume events commute:
-$$P(A \cap B) = P(B \cap A)$$
-
-In human cognition under crisis, mental operators do not commute ($[U_A, U_B] \neq 0$). Experiencing an **injury followed by a storm** collapses the agent's belief state into defensive constructive interference favoring `hide` and `build_shelter`. Conversely, experiencing a **storm followed by an injury** channels beliefs toward physical recuperation (`rest`).
-
-### 2. Stress as Environmental Decoherence
-In physics, open quantum systems undergo decoherence ($T_1$ relaxation and $T_2$ dephasing) when coupled to a thermal bath. In this simulation, critical physiological stress (dehydration, hypothermia, acute predator threat):
-- Dampens cognitive interference patterns.
-- Decays off-diagonal density matrix terms, collapsing the pure quantum state into a classical mixed distribution.
-- Mechanistically replicates cognitive "tunnel vision" and survival panic.
 
 ---
 
 ## Quickstart & Launch Commands
 
 ### 1. Interactive Graphical Visualizer (Recommended)
-Launch the full desktop application:
+Launch the full 1600×900 desktop application:
 ```bash
 python main.py
 ```
-This boots into the **Event Choice Hub**, where you can pick Island Survival or Volcano Evacuation, tweak seed/mind parameters, and run the real-time simulation.
+This boots into the **Event Choice Hub**, where you can pick **Island Wilderness Survival** or **Volcano Eruption Evacuation**, configure seed and cognitive architecture parameters, and run the real-time simulation.
 
 ### 2. Headless & CLI Execution Modes
 ```bash
-# Launch GUI directly with specific parameters
-python main.py --seed 42 --mind quantum --scenario island
+# Launch GUI directly into a specific scenario and seed
+python main.py --seed 42 --mind quantum --scenario volcano
 
-# ASCII terminal replay demo
-python main.py --demo --seed 101
+# ASCII terminal live survival run
+python main.py --demo --seed 101 --mind quantum --scenario volcano
 
-# Multi-seed batch divergence benchmark (Quantum vs Classical)
+# Multi-seed batch comparison (Quantum vs Classical Mixture vs Classical Rational)
 python main.py --batch
 
 # Regenerate curated demo-pack/ timelines
 python main.py --curate
 
-# Run the automated test suite
+# Run the integration test suite
 python main.py --test
 ```
 
@@ -209,27 +171,27 @@ python main.py --test
 | **Simulation View** | `RIGHT ARROW` or `N` | **Step Forward** single 2-hour turn |
 | **Simulation View** | `Q` or `[Mind Toggle]` Button | **Toggle Mind Live** (Quantum Mind $\leftrightarrow$ Classical Baseline) |
 | **Simulation View** | `1` / `2` / `3` or `[Speed]` Button | **Cycle Speed** (1.0× normal, 2.5× fast, 6.0× instant) |
-| **Simulation View** | `E` | **Toggle Evacuation Map Overlay** (zones, assembly points, BFS paths) |
-| **Simulation View** | `TAB` or `[Log]` Button | **Toggle Chronological Action History Overlay** |
+| **Simulation View** | `E` | **Toggle Evacuation Map Overlay** (zones, assembly points, Dijkstra paths) |
+| **Simulation View** | `TAB` or `[Action Log]` Button | **Toggle Chronological Action History Overlay** (mouse wheel scrolls) |
 | **Simulation View** | `R` | **Reset Current Run** |
 | **Simulation View** | `ESC` or `H` or `[Menu]` Button | **Return to Home Configuration Screen** |
 
 ---
 
-## Daily Integration Testing
+## Daily Integration & Verification Testing
 
-The test suite validates contract integrity, terrain generation, physiological decay rates, volcanic hazards, agent movement, and GUI interaction:
+Run the unified test suite across **Tech A**, **Tech B**, and **Tech C**:
 
 ```bash
-python -m pytest test_contracts_and_engine.py -v
+python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -v
 ```
-All **31 integration tests** pass consistently across platforms.
 
 ---
 
 ## Citations & Theoretical References
 
-1. **Busemeyer, J. R., & Wang, Z. (2014).** *Quantum model of cognition and decision.* Current Directions in Psychological Science.
-2. **Pothos, E. M., & Busemeyer, J. R. (2022).** *Quantum cognition.* Annual Review of Psychology.
-3. **Qiskit Development Team (2025).** *Qiskit: An Open-source Framework for Quantum Computing.*
-4. **Bureau of Labor Statistics (BLS).** *American Time Use Survey (ATUS) Summary Tables.*
+1. **Busemeyer, J. R., & Bruza, P. D. (2012).** *Quantum Models of Cognition and Decision.* Cambridge University Press.
+2. **Pothos, E. M., & Busemeyer, J. R. (2022).** *Quantum cognition.* Annual Review of Psychology, 73, 749–778.
+3. **Tversky, A., & Shafir, E. (1992).** *The disjunction effect in choice under uncertainty.* Psychological Science, 3(5), 305–309.
+4. **Tobler, W. (1993).** *Three Presentations on Geographical Analysis and Modeling.* NCGIA Technical Report 93-1.
+5. **Bureau of Labor Statistics (BLS).** *American Time Use Survey (ATUS) Summary Tables.*

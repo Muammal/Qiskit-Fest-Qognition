@@ -32,6 +32,14 @@ MAGENTA = "\033[95m"
 BLUE = "\033[94m"
 RESET = "\033[0m"
 
+TILE_CHARS = {
+    0: f"{BLUE}~{RESET}",
+    1: f"{YELLOW}.{RESET}",
+    2: f"{GREEN}^{RESET}",
+    3: f"{RESET}M{RESET}",
+    4: f"{MAGENTA}S{RESET}"
+}
+
 
 def render_ascii_map(world: IslandWorld, agent_pos: list, radius: int = 5) -> str:
     """Renders a 2D ASCII local viewport centered on agent."""

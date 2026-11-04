@@ -4,7 +4,7 @@ Numerical probabilities are scenario assumptions, not measured island rates.
 """
 import random
 
-VOLCANIC = ('tremor', 'gas_plume', 'eruption', 'ash_fall')
+VOLCANIC = ('tremor', 'gas_plume', 'eruption', 'ash_fall')  # source: frozen contract event names
 WEATHER_TRANSITIONS = {  # assumption: persistent two-hour weather transitions
     'calm': (.78, .19, .03), 'rain': (.22, .65, .13), 'storm': (.12, .38, .50)}
 

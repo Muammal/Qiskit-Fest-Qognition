@@ -789,10 +789,21 @@ class IslandVisualizerApp:
             "reason": "Initial baseline belief state."
         }
         self.current_event = "none"
+        self.current_weather = "calm"
+        self.wind_deg = 0.0
         self.step_idx = 0
+        self.history_scroll = 0
         self.show_debrief_modal = False
         self.show_history_overlay = False
         self.is_paused = False
+        self.bubble_text = ""
+        self.bubble_timer = 0.0
+        self.char_screen_x = (self.agent.pos[0] + 0.5) * TILE_SIZE
+        self.char_screen_y = (self.agent.pos[1] + 0.5) * TILE_SIZE
+        self.char_target_x = self.char_screen_x
+        self.char_target_y = self.char_screen_y
+        if hasattr(self, "weather"):
+            self.weather.particles.clear()
 
     def step_forward(self):
         """Advances the simulation by one 2-hour step."""
@@ -808,6 +819,8 @@ class IslandVisualizerApp:
         self.step_idx += 1
         event, action = record["event"], record["action"]
         self.current_event = event
+        self.current_weather = self.event_gen.weather[self.step_idx - 1]
+        self.wind_deg = self.engine.volcano.hazard_by_step[self.step_idx - 1].get("wind_deg", 0.0)
         self.current_decision = record
 
         # Smooth avatar position target
@@ -829,9 +842,61 @@ class IslandVisualizerApp:
             "decision": record,
             "narrative": reason
         })
+        self.history_scroll = max(0, len(self.history) - 16)
 
         if not self.agent.is_alive or self.step_idx >= self.max_steps:
             self.show_debrief_modal = True
+
+    def handle_event(self, event, v_mouse: Optional[Tuple[int, int]] = None) -> bool:
+        if v_mouse is None:
+            v_mouse = self.get_virtual_mouse_pos()
+        if event.type == pygame.QUIT:
+            return False
+
+        elif event.type == pygame.VIDEORESIZE:
+            if not self.is_fullscreen:
+                self.window_w, self.window_h = max(800, event.w), max(450, event.h)
+                self.screen = pygame.display.set_mode((self.window_w, self.window_h), pygame.RESIZABLE)
+
+        elif event.type == pygame.MOUSEWHEEL and self.show_history_overlay:
+            self.history_scroll = max(0, min(max(0, len(self.history) - 7), self.history_scroll - event.y))
+
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_F11:
+                self.toggle_fullscreen()
+            elif self.app_state == "event_choice":
+                if event.key in (pygame.K_1, pygame.K_KP1):
+                    self._handle_event_choice_click(self.btn_choice_island.rect.center)
+                elif event.key in (pygame.K_2, pygame.K_KP2):
+                    self._handle_event_choice_click(self.btn_choice_volcano.rect.center)
+            elif event.key == pygame.K_SPACE and self.app_state == "sim":
+                self.is_paused = not self.is_paused
+            elif event.key in (pygame.K_RIGHT, pygame.K_n) and self.app_state == "sim":
+                self.step_forward()
+            elif event.key == pygame.K_q and self.app_state == "sim":
+                self._toggle_mind()
+            elif event.key == pygame.K_e:
+                self.show_evacuation_map = not self.show_evacuation_map
+            elif event.key == pygame.K_TAB and self.app_state == "sim":
+                self.show_history_overlay = not self.show_history_overlay
+            elif event.key == pygame.K_ESCAPE:
+                if self.show_history_overlay:
+                    self.show_history_overlay = False
+                elif self.show_debrief_modal:
+                    self.show_debrief_modal = False
+                elif self.app_state == "sim":
+                    self.app_state = "home"
+                elif self.app_state == "home":
+                    self.app_state = "event_choice"
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.app_state == "event_choice":
+                self._handle_event_choice_click(v_mouse)
+            elif self.app_state == "home":
+                self._handle_home_click(v_mouse)
+            elif self.app_state == "sim":
+                self._handle_sim_click(v_mouse)
+        return True
 
     def run(self):
         running = True
@@ -853,49 +918,8 @@ class IslandVisualizerApp:
                 set_cursor_safely(pygame.SYSTEM_CURSOR_ARROW)
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if self.handle_event(event, v_mouse) is False:
                     running = False
-
-                elif event.type == pygame.VIDEORESIZE:
-                    if not self.is_fullscreen:
-                        self.window_w, self.window_h = max(800, event.w), max(450, event.h)
-                        self.screen = pygame.display.set_mode((self.window_w, self.window_h), pygame.RESIZABLE)
-
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_F11:
-                        self.toggle_fullscreen()
-                    elif self.app_state == "event_choice":
-                        if event.key in (pygame.K_1, pygame.K_KP1):
-                            self._handle_event_choice_click(self.btn_choice_island.rect.center)
-                        elif event.key in (pygame.K_2, pygame.K_KP2):
-                            self._handle_event_choice_click(self.btn_choice_volcano.rect.center)
-                    elif event.key == pygame.K_SPACE and self.app_state == "sim":
-                        self.is_paused = not self.is_paused
-                    elif event.key == pygame.K_RIGHT and self.app_state == "sim":
-                        self.step_forward()
-                    elif event.key == pygame.K_q and self.app_state == "sim":
-                        self._toggle_mind()
-                    elif event.key == pygame.K_e:
-                        self.show_evacuation_map = not self.show_evacuation_map
-                    elif event.key == pygame.K_TAB and self.app_state == "sim":
-                        self.show_history_overlay = not self.show_history_overlay
-                    elif event.key == pygame.K_ESCAPE:
-                        if self.show_history_overlay:
-                            self.show_history_overlay = False
-                        elif self.show_debrief_modal:
-                            self.show_debrief_modal = False
-                        elif self.app_state == "sim":
-                            self.app_state = "home"
-                        elif self.app_state == "home":
-                            self.app_state = "event_choice"
-
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    if self.app_state == "event_choice":
-                        self._handle_event_choice_click(v_mouse)
-                    elif self.app_state == "home":
-                        self._handle_home_click(v_mouse)
-                    elif self.app_state == "sim":
-                        self._handle_sim_click(v_mouse)
 
             # Character Smooth Interpolation (Lerp)
             self.char_screen_x += (self.char_target_x - self.char_screen_x) * 12.0 * dt
@@ -1956,7 +1980,7 @@ class IslandVisualizerApp:
         pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (hx + 30, log_y + 28), (hx + hw - 30, log_y + 28), 1)
 
         row_y = log_y + 40
-        visible_records = self.history[-16:]
+        visible_records = self.history[self.history_scroll : self.history_scroll + 16]
         for rec in visible_records:
             t_num = f"#{rec['t']:02d}"
             ev = rec["event"].upper()

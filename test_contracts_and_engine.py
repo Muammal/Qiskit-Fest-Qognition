@@ -6,6 +6,7 @@ Owned by Tech C (Integration, Contracts, Engine).
 import os
 import glob
 import json
+import math
 import pytest
 import contracts
 from engine.world import IslandWorld
@@ -315,7 +316,8 @@ def test_movement_warning_water_and_lava():
     a.apply_event('tremor',False)
     route = w.path(a.pos,w.assembly_points)
     a.execute_action('hide',w)
-    assert a.pos == list(route[8])
+    assert tuple(a.pos) in route[1:]
+    assert w.route_minutes(route[:route.index(tuple(a.pos))+1]) <= 120
     a.execute_action('hide',w)
     a.execute_action('hide',w)
     assert w.zones[a.pos[1]][a.pos[0]] == 0
@@ -328,9 +330,9 @@ def test_movement_warning_water_and_lava():
     reroute = w.path(start,w.assembly_points)
     assert tuple(route[1]) not in reroute
     a.injured = True
-    assert a.movement_budget(w) == 4
+    assert a.movement_budget(w) == 60
     a.hour = 22
-    assert a.movement_budget(w) < 4
+    assert a.movement_budget(w) < 60
 
 
 def test_contextual_events_and_three_day_physiology():
@@ -366,7 +368,8 @@ def test_volcanic_order_effect_and_lethal_overlay():
     sim = SimulationEngine(seed=1,decide_fn=lambda s: dict(action='rest',probs={'rest':1},reason='test'))
     sim.world.pdc.add(tuple(sim.agent.pos))
     sim.step()
-    assert sim.agent.cause_of_death == 'pyroclastic_flow'
+    assert sim.agent.is_alive and sim.agent.injured
+    assert not sim.world.walkable(sim.agent.pos)
 
 
 def test_arriving_flow_cannot_be_outrun_by_hide():
@@ -374,6 +377,7 @@ def test_arriving_flow_cannot_be_outrun_by_hide():
     sim.agent.volcanic_sign_seen = True
     start = list(sim.agent.pos)
     sim.volcano.hazard_by_step[0]['new_pdc'] = [tuple(start)]
+    sim.volcano.hazard_by_step[0]['active_pdc'] = [tuple(start)]
     sim.step()
     assert sim.agent.pos == start
     assert sim.agent.cause_of_death == 'pyroclastic_flow'
@@ -498,7 +502,7 @@ def test_forest_canopy_does_not_replace_built_shelter():
         sim.event_gen.world_events = ['none'] * 36
         sim.event_gen.uniforms = [.99] * 36
         for hazard in sim.volcano.hazard_by_step:
-            hazard.update(ash=1, new_pdc=[], new_lahar=[], new_lava=[])
+            hazard.update(ash=1, ash_grid=['9'*40]*40, new_pdc=[], new_lahar=[], new_lava=[], active_pdc=[], active_lahar=[], surge=[])
         sim.run(12)
     assert sheltered.agent.is_alive
     assert sheltered.agent.needs['warmth'] > bare.agent.needs['warmth'] + .4
@@ -553,3 +557,395 @@ def test_gui_event_choice_card_click():
     app._handle_mouse_click((app.card2_rect.left + 50, app.card2_rect.top + 50))
     assert app.app_state == "home"
     assert app.scenario == "volcano"
+
+def test_elevation_land_and_peak():
+    w = IslandWorld()
+    assert all((w.elevation[y][x]>0)==bool(w.get_tile(x,y)) for y in range(40) for x in range(40))
+    peak=max((w.elevation[y][x],(x,y)) for y in range(40) for x in range(40))
+    import math
+    assert 950<peak[0]<1100 and math.dist(peak[1],w.vent)<=2
+
+
+def test_drainage_descends_to_coast():
+    w=IslandWorld()
+    assert len(w.valleys)>=2 and w.stream_tiles==w.valleys[0][1:]
+    for valley in w.valleys:
+        assert all(w.elevation[b[1]][b[0]]<=w.elevation[a[1]][a[0]] for a,b in zip(valley,valley[1:]))
+        assert any(w.get_tile(*q)==0 for q in w.neighbors(valley[-1]))
+    for p,q in w.drainage.items():
+        assert w.elevation[q[1]][q[0]]<w.elevation[p[1]][p[0]]
+
+
+def test_assembly_separation_and_fastest_route():
+    import math
+    w=IslandWorld()
+    angles=[math.atan2(y-w.vent[1],x-w.vent[0]) for x,y in w.assembly_points]
+    assert math.acos(math.cos(angles[0]-angles[1]))>=math.pi/3
+    assert len(w.routes_from_spawn)==len(w.assembly_points)
+    assert w.route_minutes(w.route_from_spawn)==min(map(w.route_minutes,w.routes_from_spawn))
+
+
+def test_tobler_flat_and_slopes():
+    import math
+    w=IslandWorld()
+    a,b=(10,20),(11,20)
+    w.tiles[20][11]=1
+    w.elevation[20][10]=w.elevation[20][11]=100
+    assert w.travel_minutes(a,b)==pytest.approx(.25/(6*math.exp(-3.5*.05)*.6)*60)
+    w.elevation[20][11]=200
+    assert w.travel_minutes(a,b)>w.travel_minutes(b,a)
+
+
+def test_least_time_route_against_independent_relaxation():
+    w=IslandWorld()
+    start=tuple(w.spawn_pos)
+    distances={start:0.}
+    frontier=[start]
+    while frontier:
+        p=frontier.pop(0)
+        for q in w.neighbors(p):
+            if w.walkable(q):
+                cost=distances[p]+w.travel_minutes(p,q)
+                if cost<distances.get(q,float('inf'))-1e-10:
+                    distances[q]=cost
+                    frontier.append(q)
+    assert w.route_minutes(w.path(start,w.assembly_points))==pytest.approx(min(distances[p] for p in w.assembly_points))
+
+
+def test_minimum_movement_and_hot_start():
+    w=IslandWorld()
+    a=SurvivalAgent(w.spawn_pos)
+    target=next(q for q in w.neighbors(tuple(a.pos)) if w.walkable(q))
+    w.pdc.add(tuple(a.pos))
+    a.movement_budget=lambda world:.0001
+    a.walk_to(w,[target])
+    assert tuple(a.pos)==target
+
+
+def _controlled_engine(action='rest'):
+    sim=SimulationEngine(seed=1,decide_fn=lambda s:dict(action=action,probs={action:1},reason='controlled'))
+    sim.event_gen.world_events=['none']*36
+    sim.event_gen.uniforms=[.99]*36
+    return sim
+
+
+def test_active_flow_start_and_end_lethality():
+    sim=_controlled_engine()
+    sim.volcano.hazard_by_step[0]['active_pdc']=[tuple(sim.agent.pos)]
+    sim.step()
+    assert sim.agent.cause_of_death=='pyroclastic_flow'
+    sim=_controlled_engine('forage')
+    target=sim.world.route_from_spawn[-1]
+    sim.world.food_tiles=[target]
+    sim.agent.pos=list(sim.world.route_from_spawn[-2])
+    sim.volcano.hazard_by_step[0]['active_lahar']=[target]
+    sim.step()
+    assert sim.agent.cause_of_death=='lahar'
+
+
+def test_dry_lahar_deposit_passable():
+    sim=_controlled_engine()
+    sim.world.lahar.add(tuple(sim.agent.pos))
+    sim.step()
+    assert sim.agent.is_alive and sim.world.walkable(sim.agent.pos)
+
+
+def test_surge_injures_without_killing():
+    sim=_controlled_engine()
+    sim.volcano.hazard_by_step[0]['surge']=[tuple(sim.agent.pos)]
+    sim.step()
+    assert sim.agent.is_alive and sim.agent.injured and sim.agent.stress>.15
+
+
+def test_rain_reactivates_lahars():
+    from engine.volcano import VolcanoModel
+    w=IslandWorld()
+    weather=['rain' if i%2 else 'calm' for i in range(36)]
+    model=VolcanoModel(1,w,weather=weather)
+    wet=[h for t,h in enumerate(model.hazard_by_step) if h['active_lahar']]
+    assert len(wet)>1 and any(not h['new_lahar'] for h in wet)
+    assert all(not h['active_lahar'] for t,h in enumerate(model.hazard_by_step) if weather[t]=='calm')
+
+
+def test_wind_ash_grid_and_pulse_recurrence():
+    from engine.volcano import VolcanoModel
+    import math
+    w=IslandWorld()
+    model=VolcanoModel(1,w)
+    covered=set()
+    repeated=False
+    for t,h in enumerate(model.hazard_by_step):
+        assert len(h['ash_grid'])==40 and all(len(row)==40 and set(row)<=set('0123456789') for row in h['ash_grid'])
+        assert 0<=h['wind_deg']<360
+        assert set(h['surge']).isdisjoint(h['active_pdc'])
+        assert set(h['new_pdc'])==set(h['active_pdc'])-covered
+        repeated |= bool(covered.intersection(h['active_pdc']))
+        covered.update(h['new_pdc'])
+        if t:
+            assert abs((h['wind_deg']-model.hazard_by_step[t-1]['wind_deg']+180)%360-180)<=6.01
+    h=model.hazard_by_step[-1]
+    assert len(set(''.join(h['ash_grid'])))>3 and repeated
+    angle=math.radians(h['wind_deg'])
+    dx,dy=round(8*math.sin(angle)),round(-8*math.cos(angle))
+    assert int(h['ash_grid'][20+dy][20+dx])>int(h['ash_grid'][20-dy][20-dx])
+
+
+def test_lava_descends_and_is_rate_limited():
+    from engine.volcano import VolcanoModel
+    w=IslandWorld()
+    lava=set()
+    for h in VolcanoModel(1,w).hazard_by_step:
+        assert len(h['new_lava'])<=2
+        batch = set(h['new_lava'])
+        for p in h['new_lava']:
+            assert p==w.vent or any(q in lava | batch and w.elevation[p[1]][p[0]]<=w.elevation[q[1]][q[0]] for q in w.neighbors(p))
+            lava.add(p)
+
+
+def test_food_depletes_and_auto_eats_at_any_action():
+    w=IslandWorld()
+    a=SurvivalAgent(w.spawn_pos)
+    w.food_tiles=[tuple(a.pos)]
+    a.execute_action('forage',w)
+    a.execute_action('forage',w)
+    assert a.inventory['food']==1
+    a.needs['hunger']=.1
+    a.execute_action('hide',w)
+    assert a.inventory['food']==0 and a.needs['hunger']==pytest.approx(.5)
+    b=SurvivalAgent(w.spawn_pos)
+    b.inventory['food']=4
+    w.depleted_food.clear()
+    b.execute_action('forage',w)
+    assert b.inventory['food']==4 and not w.depleted_food
+
+
+def test_rest_accelerates_healing():
+    w=IslandWorld()
+    a,b=SurvivalAgent(w.spawn_pos),SurvivalAgent(w.spawn_pos)
+    for agent in (a,b):
+        agent.injured=True
+        agent.injury_cooldown=4
+    for _ in range(2):
+        a.execute_action('rest',w)
+        b.execute_action('hide',w)
+    assert not a.injured and b.injured and b.injury_cooldown==2
+
+
+def test_existing_shelter_keeps_wood():
+    w=IslandWorld()
+    a=SurvivalAgent(w.spawn_pos)
+    w.set_shelter(*a.pos)
+    a.inventory['wood']=6
+    a.execute_action('build_shelter',w)
+    assert a.inventory['wood']==6
+
+
+def test_boar_escape_depends_on_fatigue():
+    a=SurvivalAgent()
+    a.apply_event('animal',False)
+    assert not a.injured
+    a.needs['energy']=.2
+    a.apply_event('animal',False)
+    assert a.injured
+
+
+def test_eruption_safety_stress_and_hidden_mind_state():
+    sim=_controlled_engine('hide')
+    sim.event_gen.world_events=['eruption']*36
+    sim.step()
+    zone=sim.world.zones[sim.agent.pos[1]][sim.agent.pos[0]]
+    assert sim.agent.needs['safety']<=(.8,.5,.3)[zone]
+    assert sim.agent.stress>=(.3,.45,.6)[zone]
+    assert sim.agent.needs['morale']<.8
+    assert set(sim.steps[0]['state'])==set(SurvivalAgent().get_state())
+
+
+def test_evacuation_summary_matches_records():
+    timeline=_controlled_engine('hide').run()
+    e=timeline['evacuation']
+    assert len(timeline['world']['weather'])==36
+    for label,zone in [('left_danger_step',2),('reached_safe_step',0)]:
+        matching=[r['t'] for r in timeline['steps'] if (timeline['world']['evacuation_map']['zones'][r['pos_after'][1]][r['pos_after'][0]]!=2 if zone==2 else timeline['world']['evacuation_map']['zones'][r['pos_after'][1]][r['pos_after'][0]]==0)]
+        assert e[label]==(matching[0] if matching else None)
+    if e['margin_hours'] is not None:
+        assert e['margin_hours']==2*(e['first_pdc_step']-e['reached_safe_step'])
+
+
+def test_gui_event_history_weather_and_replay_reset():
+    os.environ['SDL_VIDEODRIVER']='dummy'
+    import pygame
+    from engine.gui import IslandVisualizerApp, TILE_SIZE
+    app=IslandVisualizerApp(start_screen='sim')
+    app.max_steps=36
+    for _ in range(12):
+        app.step_forward()
+    app.show_debrief_modal=False
+    app.show_history_overlay=True
+    app.history_scroll=0
+    app.handle_event(pygame.event.Event(pygame.MOUSEWHEEL,y=-2))
+    assert app.history_scroll==2
+    app.handle_event(pygame.event.Event(pygame.KEYDOWN,key=pygame.K_ESCAPE))
+    assert app.app_state=='sim' and not app.show_history_overlay
+    assert app.current_weather==app.event_gen.weather[app.step_idx-1]
+    app._init_simulation()
+    assert app.char_screen_x==(app.agent.pos[0]+.5)*TILE_SIZE and not app.bubble_timer and not app.weather.particles
+    assert app.handle_event(pygame.event.Event(pygame.QUIT)) is False
+
+
+def test_world_mutations_are_isolated():
+    a,b=IslandWorld(),IslandWorld()
+    a.elevation[20][20]=1
+    a.food_tiles.clear()
+    a.pdc.add((20,20))
+    assert b.elevation[20][20]>900 and b.food_tiles and not b.pdc
+
+
+def test_forage_does_not_seek_distant_food():
+    w = IslandWorld()
+    a = SurvivalAgent(w.spawn_pos)
+    w.food_tiles = [w.assembly_points[0]]
+    before = list(a.pos)
+    a.execute_action('forage', w)
+    assert a.pos == before
+    assert not a.inventory['food']
+
+
+def test_dirty_stream_does_not_force_remote_spring_trip():
+    w = IslandWorld()
+    a = SurvivalAgent(w.spawn_pos)
+    w.ash_grid = ['9'*40]*40
+    before = list(a.pos)
+    a.needs['thirst'] = .2
+    a.execute_action('drink', w)
+    assert a.pos == before
+    assert a.needs['thirst'] == .5
+
+
+def test_drink_is_not_a_hidden_evacuation():
+    w = IslandWorld()
+    a = SurvivalAgent(w.spawn_pos)
+    a.apply_event('tremor', False)
+    assert a.volcanic_sign_seen
+    before = list(a.pos)
+    a.needs['thirst'] = .2
+    a.execute_action('drink', w)
+    # The stream is right beside camp, so a warning must not send the agent to a far spring.
+    assert math.dist(a.pos, before) <= 3
+    assert a.needs['thirst'] > .2
+
+
+def test_warned_agent_outside_danger_still_takes_nearest_water():
+    w = IslandWorld()
+    a = SurvivalAgent(w.spawn_pos)
+    a.apply_event('tremor', False)
+    near_stream = next(p for p in w.stream_tiles[::-1] if w.zones[p[1]][p[0]] != 0)
+    outside = next(((x, y) for y in range(40) for x in range(40)
+                    if w.get_tile(x, y) and w.zones[y][x] == 1
+                    and 2 < math.dist((x, y), near_stream) <= 4
+                    and all(math.dist((x, y), s) > 8 for s in w.clean_springs)), None)
+    assert outside is not None
+    a.pos = list(outside)
+    a.needs['thirst'] = .2
+    a.execute_action('drink', w)
+    assert min(math.dist(a.pos, p) for p in w.stream_tiles) <= 2
+    assert min(math.dist(a.pos, p) for p in w.clean_springs) > 2
+
+
+def test_springs_and_assembly_points_are_separate_tiles():
+    w = IslandWorld()
+    assert not set(w.clean_springs) & set(w.assembly_points)
+    assert set(w.clean_springs) <= set(w.freshwater_tiles)
+    for spring, point in zip(w.clean_springs, w.assembly_points):
+        assert math.dist(spring, point) <= 2
+        assert w.zones[spring[1]][spring[0]] == 0
+
+
+def test_camp_is_down_the_valley_not_on_the_crater():
+    w = IslandWorld()
+    assert math.dist(w.spawn_pos, w.vent) >= 5
+    assert w.zones[w.spawn_pos[1]][w.spawn_pos[0]] == 2
+    assert w.get_tile(*w.spawn_pos) == 2
+
+
+def test_food_concentrates_near_main_channels():
+    w = IslandWorld()
+    channels = [p for v in w.valleys for p in v]
+    near = sum(any(math.dist(f, c) <= 3 for c in channels) for f in w.food_tiles)
+    assert near >= .6 * len(w.food_tiles)
+
+
+def test_morale_recovers_only_when_safe_fed_and_quiet():
+    sim = _controlled_engine('rest')
+    agent, world = sim.agent, sim.world
+    agent.pos = list(world.assembly_points[0])
+    agent.needs.update(morale=.5, hunger=.8, thirst=.8)
+    agent.recent_events = ['none', 'none', 'none']
+    sim._recover_morale()
+    assert agent.needs['morale'] == pytest.approx(.53)
+    agent.recent_events = ['none', 'none', 'eruption']
+    sim._recover_morale()
+    assert agent.needs['morale'] == pytest.approx(.53)
+    agent.recent_events = ['none', 'none', 'none']
+    agent.needs['thirst'] = .2
+    sim._recover_morale()
+    assert agent.needs['morale'] == pytest.approx(.53)
+    agent.needs['thirst'] = .8
+    agent.pos = list(world.spawn_pos)
+    sim._recover_morale()
+    assert agent.needs['morale'] == pytest.approx(.53)
+
+
+def test_ignoring_the_volcano_is_usually_fatal_and_leaving_is_not():
+    def decide(action):
+        return {'action': action, 'probs': {action: 1.}, 'reason': 'test'}
+
+    def stay(state):
+        return decide('drink' if state['needs']['thirst'] < .6 else 'forage')
+
+    def leave(state):
+        return decide('hide')
+
+    survived = {'stay': [], 'leave': []}
+    for seed in range(60):
+        for name, policy in (('stay', stay), ('leave', leave)):
+            run = SimulationEngine(seed=seed, mind_type='classical', noise_source='stub', decide_fn=policy).run()
+            if run['world']['volcano']['erupts']:
+                survived[name].append(run['cause'] not in ('pyroclastic_flow', 'lahar', 'lava'))
+    assert sum(survived['stay']) / len(survived['stay']) <= .3
+    assert sum(survived['leave']) / len(survived['leave']) >= .85
+
+
+def test_repeated_pulses_reactivate_old_deposits():
+    from engine.volcano import VolcanoModel
+    world = IslandWorld()
+    for seed in range(12):
+        model = VolcanoModel(seed, world)
+        pulses = [set(map(tuple, h['active_pdc'])) for h in model.hazard_by_step
+                  if h['active_pdc']]
+        if pulses:
+            assert all(pulses[0] <= pulse for pulse in pulses)
+            deposited = set()
+            for hazard in model.hazard_by_step:
+                active = set(map(tuple, hazard['active_pdc']))
+                new = set(map(tuple, hazard['new_pdc']))
+                assert new == active - deposited
+                deposited |= new
+
+
+def test_pdc_first_pulse_covers_proximal_cone():
+    from engine.volcano import VolcanoModel, PDC_APRON_RADIUS
+    import math
+    w = IslandWorld()
+    proximal = {p for row in w.valleys for p in row if math.dist(p, w.vent) <= PDC_APRON_RADIUS}
+    for seed in range(16):
+        model = VolcanoModel(seed, w)
+        if model.erupts:
+            assert proximal <= set(model.hazard_by_step[model.first_pdc_step]['active_pdc'])
+
+
+def test_tropical_ash_discomfort_is_not_hypothermia():
+    sim = _controlled_engine()
+    sim.agent.needs['warmth'] = 0
+    sim.volcano.hazard_by_step[0].update(ash=1, ash_grid=['9'*40]*40)
+    sim.step()
+    assert sim.agent.is_alive and sim.agent.needs['warmth'] > 0
