@@ -57,6 +57,8 @@ class SimulationEngine:
             self.volcano = VolcanoModel(seed, self.world, weather=self.event_gen.weather)
             self.event_gen.prepare(self.volcano)
 
+        self.agent.scenario = scenario
+
         if decide_fn:
             self.decide_fn = decide_fn
         elif self.mind_type == 'quantum':
@@ -127,7 +129,8 @@ class SimulationEngine:
         agent.needs['energy'] = max(0, agent.needs['energy'] - .035 * exposure)  # assumption: breathing ash fatigue
         # assumption: absent a temperature model, tropical discomfort is not lethal cold.
         # Ash still reduces comfort and energy; it is not a hypothermia diagnosis.
-        agent.needs['warmth'] = max(.05, agent.needs['warmth'])
+        if self.scenario == 'volcano':
+            agent.needs['warmth'] = max(.05, agent.needs['warmth'])
         agent.step_decay(sheltered, forest_cover=world.get_tile(*agent.pos) == 2)
         self._eruption_feelings()
         self._recover_morale()
@@ -152,6 +155,8 @@ class SimulationEngine:
         self.agent.needs['energy'] = max(.03, self.agent.needs['energy'] - .06)  # assumption: injury alone leaves a minimal mobility reserve
 
     def _eruption_feelings(self):
+        if self.scenario == "island":
+            return
         agent, world = self.agent, self.world
         if any(e in VOLCANIC for e in agent.recent_events):
             zone = world.zones[agent.pos[1]][agent.pos[0]]
@@ -161,6 +166,8 @@ class SimulationEngine:
                 agent.needs['morale'] = max(0., agent.needs['morale'] - .01)  # assumption: unrest morale cost in harm's way
 
     def _recover_morale(self):
+        if self.scenario == "island":
+            return
         agent, zone = self.agent, self.world.zones[self.agent.pos[1]][self.agent.pos[0]]
         quiet = agent.recent_events[-1] not in VOLCANIC
         if quiet and zone == 0 and not agent.injured and min(agent.needs['hunger'], agent.needs['thirst']) > .3:
