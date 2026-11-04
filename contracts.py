@@ -171,8 +171,8 @@ def classical_decide(state: Dict[str, Any]) -> Dict[str, Any]:
     return decision
 
 
-def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
-    """Tech A responsibility: 2-qubit decision circuit. Heuristic stub with no circuits until then."""
+def _quantum_decide_stub(state: Dict[str, Any]) -> Dict[str, Any]:
+    """Heuristic stub, kept as a fallback if mind.quantum_mind is unavailable."""
     validate_state(state)
     recent = state.get("recent_events", [])
     stress = state.get("stress", 0.0)
@@ -242,6 +242,23 @@ def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
     }
     validate_decision(decision)
     return decision
+
+
+try:
+    from mind.quantum_mind import quantum_decide as _quantum_decide_impl
+except ImportError:
+    _quantum_decide_impl = None
+
+
+def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
+    """Tech A responsibility: 2-qubit decision circuit.
+
+    Delegates to mind.quantum_mind.quantum_decide; falls back to the
+    heuristic stub if mind/ is unavailable.
+    """
+    if _quantum_decide_impl is not None:
+        return _quantum_decide_impl(state)
+    return _quantum_decide_stub(state)
 
 
 def explore_step(pos: List[int], world: Any, mode: str = "quantum") -> List[int]:

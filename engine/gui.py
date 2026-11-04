@@ -69,6 +69,12 @@ from engine.agent import SurvivalAgent
 from engine.events import EventGenerator, VOLCANIC
 from engine.simulation import SimulationEngine, DEFAULT_STEPS
 
+try:
+    from mind.decoherence import decoherence_strength
+except ImportError:
+    def decoherence_strength(stress):
+        return min(1.0, max(0.0, (stress - 0.4) / 0.5))
+
 
 # -----------------------------------------------------------------------------
 # Configuration & High-Resolution Display Constants
@@ -693,7 +699,7 @@ class IslandVisualizerApp:
         card_w = 515
         self.btn_mind_quantum = UIButton(
             (col2_x + 24, top_y + 36, card_w, 80), "2-Qubit Quantum Mind", self.font_title,
-            subtext="Non-commuting belief rotations + real delay decoherence under stress",
+            subtext="Non-commuting belief rotations + simulated dephasing (stress model)",
             subfont=self.font_small, active_color=COLOR_PURPLE, icon="quantum"
         )
         self.btn_mind_classical = UIButton(
@@ -1367,13 +1373,13 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, hints_box, border_radius=8)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, hints_box, 1, border_radius=8)
 
-        h_title = self.font_sub.render("SIMULATION DYNAMICS & QUANTUM HARDWARE SPECIFICATION", True, COLOR_CYAN)
+        h_title = self.font_sub.render("SIMULATION DYNAMICS & COGNITIVE MODEL SPECIFICATION", True, COLOR_CYAN)
         self.canvas.blit(h_title, (hints_box.x + 18, hints_box.y + 14))
 
         bullet_lines = [
             "  * Quantum Mind: Belief states represented as 2-qubit amplitudes with non-commuting projection angles.",
             "  * Order Effect: Experiencing [Storm -> Find Food] yields distinct actions compared to [Find Food -> Storm].",
-            "  * Hardware Stress: Physiological stress increases delay-gate duration, driving real IBM quantum physical decoherence.",
+            "  * Stress Model: Physiological stress maps to a simulated dephasing channel (stress model); no hardware decoherence is driven live.",
             "  * Survival Metric: Dehydration triggers lethal failure at 24h, Starvation at 72h. Maintain shelter to reduce exposure."
         ]
         for i, bl in enumerate(bullet_lines):
@@ -1736,9 +1742,7 @@ class IslandVisualizerApp:
             "Stress", self.agent.stress, COLOR_RED if self.agent.stress > 0.6 else COLOR_YELLOW
         )
 
-        decoherence_pct = 0.0
-        if self.agent.stress > 0.4:
-            decoherence_pct = min(1.0, (self.agent.stress - 0.4) / 0.5)
+        decoherence_pct = decoherence_strength(self.agent.stress)
         self.draw_progress_bar(
             panel_x + 32 + bar_w, stress_y, bar_w, 17,
             "Decoherence", decoherence_pct, COLOR_PURPLE
@@ -1885,7 +1889,7 @@ class IslandVisualizerApp:
         lines = [
             ("Decision Engine:", engine_name, engine_col),
             ("World Environment:", f"Seed #{self.seed} ({scen_str}, 40x40 Grid, 1600 Tiles)", COLOR_TEXT_MAIN),
-            ("Final Stress & Noise:", f"{int(self.agent.stress*100)}% Stress  |  Decoherence: {int(max(0, self.agent.stress - 0.4)/0.5 * 100)}% off-diagonal decay", COLOR_CYAN),
+            ("Final Stress & Noise:", f"{int(self.agent.stress*100)}% Stress  |  Decoherence: {int(decoherence_strength(self.agent.stress) * 100)}% off-diagonal decay (stress model)", COLOR_CYAN),
             ("Physiological State:", f"Hunger: {int(self.agent.needs['hunger']*100)}% | Thirst: {int(self.agent.needs['thirst']*100)}% | Warmth: {int(self.agent.needs['warmth']*100)}%", COLOR_TEXT_MAIN),
             ("Resource Harvest:", f"Gathered {self.agent.inventory.get('wood',0)} Timber | Consumed Rations | Crafted Tools: {self.agent.inventory.get('tools',0)}", COLOR_TEXT_MUTED)
         ]
