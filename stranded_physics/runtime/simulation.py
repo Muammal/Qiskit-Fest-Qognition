@@ -87,20 +87,30 @@ class PackWorld:
                                    "clean_springs": [list(p) for p in self.clean_springs]}}
 
 
+class Shared:
+    """What never differs between people on one pack: the map, walking routes and hazard frames. Holds nothing about any person."""
+
+    def __init__(self, pack: ScenarioPack) -> None:
+        self.world = PackWorld(pack)
+        self.fields: dict[XY, TravelField] = {}
+        self.hazards: list[dict] | None = None
+
+
 class PackSimulation:
     """Same surface as SimulationEngine: step(), run(), timeline(), world, agent, steps."""
 
-    def __init__(self, pack: ScenarioPack, mind_type: str = "quantum", noise_source: str = "stub", decide_fn=None, allow_out_of_domain: bool = False, person: int = 0) -> None:
+    def __init__(self, pack: ScenarioPack, mind_type: str = "quantum", noise_source: str = "stub", decide_fn=None, allow_out_of_domain: bool = False, person: int = 0, shared: "Shared | None" = None) -> None:
         breaches = [k for k, v in pack.verdicts.items() if v == "OUT_OF_DOMAIN"]
         if breaches and not allow_out_of_domain:
             raise InterfaceError(f"pack is outside its models' valid range: {breaches}")
         self.pack, self.mind_type, self.noise_source = pack, mind_type.lower(), noise_source
         self.seed = pack.seed
         self.decide_fn = decide_fn or _mind(self.mind_type)
-        self.world = PackWorld(pack)
+        self.shared = Shared(pack) if shared is None else shared
+        self.world = self.shared.world
         self.agent = AgentBody(tuple(pack.sites["spawn"][person]), self.world.to_tile(pack.sites["spawn"][person]), pack.t0_local_hour)
         self.recent_events = ["none", "none"]
-        self._fields: dict[XY, TravelField] = {}
+        self._fields = self.shared.fields
         self._walked = (0., 0., 0.)  # Seconds, metres and metres climbed in the current step.
         self.steps: list[dict] = []
         self.warned = False
@@ -245,7 +255,12 @@ class PackSimulation:
                 "first_pdc_step": int(finite.min() // self.pack.time.dt_s) if finite.size else None,
                 "phases": [PHASE_NAMES[int(p)] for p in phase],
                 "world_events": [r["event"] for r in self.steps],
-                "hazard_by_step": [self._hazard_at(t) for t in range(self.pack.time.n)]}
+                "hazard_by_step": self._hazards()}
+
+    def _hazards(self) -> list[dict]:
+        if self.shared.hazards is None:
+            self.shared.hazards = [self._hazard_at(t) for t in range(self.pack.time.n)]
+        return self.shared.hazards
 
     def _hazard_at(self, step: int) -> dict:
         t_s = step * self.pack.time.dt_s

@@ -95,6 +95,13 @@ class TestPlaying:
         assert {s["phase"] for s in run["steps"]} == {"none"}
         assert run["world"]["volcano"]["erupts"] is False
 
+    def test_sharing_the_map_and_routes_changes_nobodys_result(self):
+        from stranded_physics.runtime.simulation import PackSimulation
+        pack, together = self.play(scenario(TERRAIN, WEATHER, person(mind="quantum"), person(mind="classical", start_lon=-61.226, start_lat=13.317), SHELTER))
+        apart = [PackSimulation(pack, mind_type=mind, person=index).run() for index, mind in enumerate(("quantum", "classical"))]
+        assert [run["steps"] for run in together] == [run["steps"] for run in apart]
+        assert [run["outcome"] for run in together] == [run["outcome"] for run in apart]
+
     def test_food_near_a_person_lifts_hunger_when_they_forage(self):
         def forage(state):
             return {"action": "forage", "probs": {"forage": 1.}, "reason": "test"}
