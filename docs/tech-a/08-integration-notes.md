@@ -153,6 +153,16 @@ speed - see `05-decision-rule-and-reflexes.md`), so "(Qiskit 2.x)" is
 true of the verification, not of what executes live each step. Tech C's
 call whether that distinction needs surfacing in the GUI.
 
+**Also not changed, found by the Stage 9 overclaim audit (fresh-context
+subagent, run against `tech-a/quantum-mind`, which doesn't have this PR's
+changes yet):** line ~1413, the section header
+`"SIMULATION DYNAMICS & QUANTUM HARDWARE SPECIFICATION"`. On its own it's
+borderline, but it sits directly above the line ~1419 fix above and
+reinforces the same false "runs on real hardware" impression that fix is
+meant to remove. Not in the plan's original four-location list, so not
+touched in this PR; flagged here so Tech C can fold it into this same
+review pass rather than finding it separately later.
+
 **Evidence:** `test_gui_module`, `test_gui_home_and_end_screen`,
 `test_gui_fullscreen_and_aspect_scaling`, `test_gui_event_choice_and_scenarios`
 (all in the required full-suite run) still pass with
