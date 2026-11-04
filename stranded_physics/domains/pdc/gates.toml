@@ -72,3 +72,82 @@ kind = "verification"
 command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/pdc'); load_datasets(p/'datasets.toml', 'pdc'); load_parameters(p/'params.toml')\""
 inputs = ["stranded_physics/domains/pdc/datasets.toml", "stranded_physics/domains/pdc/params.toml"]
 required = true
+
+# T2: a depth-averaged solver. Its settings were committed before it existed, and the real-world targets match T1's.
+# The targets were already known from T1, so these checks are blind to the result, but not to the target.
+
+[[gate]]
+id = "pdc-t2-solver"
+title = "Depth-averaged solver matches exact answers: dam break, lake at rest, parabolic bowl, friction"
+kind = "verification"
+command = "python -m pytest stranded_physics/solvers/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/solvers/tests/*.py"]
+required = true
+
+[[gate]]
+id = "pdc-t2-volume"
+title = "Released flow volume is conserved on the real island"
+kind = "verification"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 volume_error"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+target = 0.0
+tolerance = 0.000001
+role = "anchor"
+split = "reference"
+source = "Conservation of volume, counting what leaves into the sea"
+
+[[gate]]
+id = "pdc-t2-reaches-west-sea"
+title = "T2: dense flows reach the sea on the west flank"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 west_sea"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+target = 1.0
+tolerance = 0.0
+role = "prediction"
+split = "holdout"
+source = "Cole et al.: flows 'reached the sea in the Larikai and the Roseau valleys on the western and south-western flank of the volcano only'"
+
+[[gate]]
+id = "pdc-t2-sea-only-on-west"
+title = "T2: share of flow cells touching the sea that lie off the west flank"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 sea_off_west"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+target = 0.0
+tolerance = 0.1
+role = "prediction"
+split = "holdout"
+source = "Cole et al.: flows 'reached the sea in the Larikai and the Roseau valleys on the western and south-western flank of the volcano only'"
+
+[[gate]]
+id = "pdc-t2-southeast-reach"
+title = "T2: flows on the southeast flank stop near the crater"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 southeast_reach_km"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+target = 1.8
+tolerance = 1.0
+role = "prediction"
+split = "holdout"
+source = "Cole et al.: PDCs 'extended short distances (approximately 1 km) down valleys to the southeast'"
+
+[[gate]]
+id = "pdc-t2-grid-sensitivity"
+title = "T2: how far the furthest reach moves between 180 m and 90 m cells (reported, no target)"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 grid_sensitivity"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+expect = "NO_TARGET"
+role = "input"
+split = "reference"
+source = "Real terrain has no exact answer, so this sizes the grid's effect rather than passing or failing it."
