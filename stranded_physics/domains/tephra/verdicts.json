@@ -1,0 +1,20 @@
+{
+  "tephra-barbados-first-ash": {
+    "hash": "cbe044351051ab9daa6daae4cc2c2adf9c7678151dd2ce03eccf148b07d205e5",
+    "verdict": "NOT_RUN"
+  },
+  "tephra-island-cover": {
+    "hash": "2663293024e234cb09e7bf48464508ec0a107b808cc55dfec21636e5c641ba3f",
+    "value": 0.999089295722025,
+    "verdict": "PASS"
+  },
+  "tephra-mass-balance": {
+    "hash": "1956b8e338ed7d0bc274f16bc0c48e01acb8f98e6c6be43abf1c3259e66a8048",
+    "value": 3.9313227608482356e-09,
+    "verdict": "PASS"
+  },
+  "tephra-model": {
+    "hash": "8bc4eb0443c05801798adbb9f79a745dc8f80450025579d4caf822ee095ce506",
+    "verdict": "PASS"
+  }
+}

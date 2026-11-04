@@ -1,1 +1,399 @@
-# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+# Event inputs and assumptions; source times are not predictions.
+
+# Cited from memory; task supplies H_km = 2 V^0.241; original paper unavailable offline.
+[[parameter]]
+id = "eruption.mastin_coefficient"
+value = 2.0
+unit = "dimensionless"
+valid_min = 2.0
+valid_max = 2.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1016/j.jvolgeores.2009.01.008 ; height versus DRE volume-rate relation"
+
+# Cited from memory; task-specified Mastin exponent.
+[[parameter]]
+id = "eruption.mastin_exponent"
+value = 0.241
+unit = "dimensionless"
+valid_min = 0.241
+valid_max = 0.241
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1016/j.jvolgeores.2009.01.008 ; height versus DRE volume-rate relation"
+
+# Task-specified dense-rock density; mass is directly proportional to this choice.
+[[parameter]]
+id = "eruption.dre_density"
+value = 2500.0
+unit = "kg/m**3"
+valid_min = 2500.0
+valid_max = 2500.0
+role = "convention"
+status = "assumption"
+
+# Cited from memory; task-specified stratified-plume coefficient.
+[[parameter]]
+id = "eruption.mtt_coefficient"
+value = 5.0
+unit = "dimensionless"
+valid_min = 5.0
+valid_max = 5.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1098/rspa.1956.0011 ; stratified buoyant plume maximum height"
+
+# Cited from memory; task-specified plume scaling.
+[[parameter]]
+id = "eruption.mtt_flux_power"
+value = 0.25
+unit = "dimensionless"
+valid_min = 0.25
+valid_max = 0.25
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1098/rspa.1956.0011 ; stratified buoyant plume maximum height"
+
+# Cited from memory; task-specified plume scaling.
+[[parameter]]
+id = "eruption.mtt_frequency_power"
+value = -0.75
+unit = "dimensionless"
+valid_min = -0.75
+valid_max = -0.75
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1098/rspa.1956.0011 ; stratified buoyant plume maximum height"
+
+# Exact unit convention.
+[[parameter]]
+id = "eruption.metres_per_km"
+value = 1000.0
+unit = "dimensionless"
+valid_min = 1000.0
+valid_max = 1000.0
+role = "convention"
+status = "assumption"
+
+# Date-only 8 April tremor/gas in IPGP, placed at noon UTC as requested.
+[[parameter]]
+id = "eruption.escalation_epoch"
+value = 1617883200.0
+unit = "s"
+valid_min = 1617883200.0
+valid_max = 1617883200.0
+role = "convention"
+status = "assumption"
+
+# No quantitative detection probability supplied; independent Bernoulli draws per run-up frame.
+[[parameter]]
+id = "eruption.tremor_probability"
+value = 0.5
+unit = "dimensionless"
+valid_min = 0.5
+valid_max = 0.5
+role = "convention"
+status = "assumption"
+
+# No quantitative detection probability supplied; independent Bernoulli draws per run-up frame.
+[[parameter]]
+id = "eruption.gas_probability"
+value = 0.5
+unit = "dimensionless"
+valid_min = 0.5
+valid_max = 0.5
+role = "convention"
+status = "assumption"
+
+# Above-vent column surrogate for events lacking height; strong mass and transport sensitivity, not fitted.
+[[parameter]]
+id = "eruption.default_height"
+value = 12000.0
+unit = "m"
+valid_min = 12000.0
+valid_max = 12000.0
+role = "convention"
+status = "assumption"
+
+# IPGP reports about 8 km without an explicit datum; treated as above vent, not an altitude conversion.
+[[parameter]]
+id = "eruption.first_height"
+value = 8000.0
+unit = "m"
+valid_min = 8000.0
+valid_max = 8000.0
+role = "convention"
+status = "assumption"
+
+# Half-hour column activity for unresolved pulses; RSAM spike lengths are not plume-emission durations.
+[[parameter]]
+id = "eruption.default_duration"
+value = 1800.0
+unit = "s"
+valid_min = 1800.0
+valid_max = 1800.0
+role = "convention"
+status = "assumption"
+
+# Taylor section 3.1 gives 4.3-4.8 h visible plume duration; lower end applied from seismic onset as a column proxy.
+[[parameter]]
+id = "eruption.first_duration"
+value = 15480.0
+unit = "s"
+valid_min = 15480.0
+valid_max = 15480.0
+role = "convention"
+status = "assumption"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e01_epoch"
+value = 1617972060.0
+unit = "s"
+valid_min = 1617972060.0
+valid_max = 1617972060.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e01"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e02_epoch"
+value = 1617994740.0
+unit = "s"
+valid_min = 1617994740.0
+valid_max = 1617994740.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e02"
+
+# Derived 18:59-04:30 continuous pulsatory plume interval in Cole section 4.
+[[parameter]]
+id = "eruption.e02_duration"
+value = 34260.0
+unit = "s"
+valid_min = 34260.0
+valid_max = 34260.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e02"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e03_epoch"
+value = 1618030440.0
+unit = "s"
+valid_min = 1618030440.0
+valid_max = 1618030440.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.5194/acp-23-15209-2023 ; section 3.1"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e04_epoch"
+value = 1618036620.0
+unit = "s"
+valid_min = 1618036620.0
+valid_max = 1618036620.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e04"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e05_epoch"
+value = 1618039440.0
+unit = "s"
+valid_min = 1618039440.0
+valid_max = 1618039440.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e05"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e06_epoch"
+value = 1618047300.0
+unit = "s"
+valid_min = 1618047300.0
+valid_max = 1618047300.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e06"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e07_epoch"
+value = 1618051620.0
+unit = "s"
+valid_min = 1618051620.0
+valid_max = 1618051620.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e07"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e08_epoch"
+value = 1618056120.0
+unit = "s"
+valid_min = 1618056120.0
+valid_max = 1618056120.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e08"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e09_epoch"
+value = 1618059240.0
+unit = "s"
+valid_min = 1618059240.0
+valid_max = 1618059240.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e09"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e10_epoch"
+value = 1618064820.0
+unit = "s"
+valid_min = 1618064820.0
+valid_max = 1618064820.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e10"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e11_epoch"
+value = 1618071600.0
+unit = "s"
+valid_min = 1618071600.0
+valid_max = 1618071600.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e11"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e12_epoch"
+value = 1618079400.0
+unit = "s"
+valid_min = 1618079400.0
+valid_max = 1618079400.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e12"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e13_epoch"
+value = 1618089600.0
+unit = "s"
+valid_min = 1618089600.0
+valid_max = 1618089600.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e13"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e14_epoch"
+value = 1618095720.0
+unit = "s"
+valid_min = 1618095720.0
+valid_max = 1618095720.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e14"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e15_epoch"
+value = 1618102260.0
+unit = "s"
+valid_min = 1618102260.0
+valid_max = 1618102260.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e15"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e16_epoch"
+value = 1618109040.0
+unit = "s"
+valid_min = 1618109040.0
+valid_max = 1618109040.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e16"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e17_epoch"
+value = 1618117140.0
+unit = "s"
+valid_min = 1618117140.0
+valid_max = 1618117140.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e17"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e18_epoch"
+value = 1618127700.0
+unit = "s"
+valid_min = 1618127700.0
+valid_max = 1618127700.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e18"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e19_epoch"
+value = 1618137360.0
+unit = "s"
+valid_min = 1618137360.0
+valid_max = 1618137360.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e19"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e20_epoch"
+value = 1618147440.0
+unit = "s"
+valid_min = 1618147440.0
+valid_max = 1618147440.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e20"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e21_epoch"
+value = 1618164660.0
+unit = "s"
+valid_min = 1618164660.0
+valid_max = 1618164660.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e21"
+
+# UTC event input, exact passage retained in facts.csv; no prediction score.
+[[parameter]]
+id = "eruption.e22_epoch"
+value = 1618172520.0
+unit = "s"
+valid_min = 1618172520.0
+valid_max = 1618172520.0
+role = "input"
+status = "literature"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e22"

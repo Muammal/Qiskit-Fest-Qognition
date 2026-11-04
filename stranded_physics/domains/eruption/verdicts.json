@@ -1,0 +1,11 @@
+{
+  "eruption-model": {
+    "hash": "19acfa2c6f9ad0885f38cfd1d5c1834639d36a12cd81c2f285fbe7ebda57a2d0",
+    "verdict": "PASS"
+  },
+  "eruption-plume-scaling": {
+    "hash": "cbc87cfbbffc6c76a774e70649b5f55de8a6f5e54894fefb3a478b341d5417d7",
+    "value": 0.2409999999999999,
+    "verdict": "PASS"
+  }
+}
