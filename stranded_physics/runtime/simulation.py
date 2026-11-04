@@ -7,12 +7,14 @@ import numpy as np
 
 import contracts
 from stranded_physics.core.api import InterfaceError, ScenarioPack, XY
+from stranded_physics.domains.agent.physiology import advance, cause_of_death, needs, pandolf_watts
 from stranded_physics.domains.agent.walking import TravelField, travel_field, walk
 from stranded_physics.runtime.body import AgentBody, to_state
 from stranded_physics.runtime.perception import perceive
 
 STEP_MINUTES = 120
 SUBSTEP_MINUTES = 5  # Hazard contact is checked at this resolution along a walk.
+DRINK_REACH_M = 400.  # assumption: close enough to a stream to drink from it.
 STORM_RAIN_MM_H = 5.  # assumption: T0 threshold; a `convention` value in the frozen event mapping.
 PHASE_NAMES = {0: "unrest", 1: "escalating", 2: "erupting", 3: "fading"}
 TILE_CODES = {"water": 0, "plains": 1, "forest": 2, "mountain": 3, "shelter": 4}
@@ -87,6 +89,7 @@ class PackSimulation:
         self.agent = AgentBody(tuple(pack.sites["spawn"][0]), list(self.world.spawn_pos), pack.t0_local_hour)
         self.recent_events = ["none", "none"]
         self._fields: dict[XY, TravelField] = {}
+        self._walked = (0., 0., 0.)  # Seconds, metres and metres climbed in the current step.
         self.steps: list[dict] = []
         self.warned = False
 
@@ -133,6 +136,7 @@ class PackSimulation:
         goal = self._walk_goal(action)
         grid = self.pack.grid
         spare_s = 0.
+        seconds, metres, climbed = 0., 0., 0.
         for minute in range(0, STEP_MINUTES, SUBSTEP_MINUTES):
             clock = t_s + minute * 60.
             cell = grid.locate(self.agent.xy_m)
@@ -141,7 +145,10 @@ class PackSimulation:
                 budget = spare_s + SUBSTEP_MINUTES * 60. * (.5 if self.agent.injured else 1.)
                 reached, spare_s = walk(self._field(goal), cell, budget, (grid.ny, grid.nx))
                 if reached != cell:
-                    self.agent.xy_m = grid.centre(*reached)
+                    start, end = self.agent.xy_m, grid.centre(*reached)
+                    rise = self.pack.sample("terrain.elevation", end) - self.pack.sample("terrain.elevation", start)
+                    seconds, metres, climbed = seconds + SUBSTEP_MINUTES * 60., metres + math.dist(start, end), climbed + max(0., rise)
+                    self.agent.xy_m = end
             if self.pack.sample("pdc.arrival", self.agent.xy_m) <= clock and self.pack.sample("pdc.active", self.agent.xy_m, clock):
                 self.agent.alive, self.agent.cause = False, "pyroclastic_flow"
                 break
@@ -151,20 +158,20 @@ class PackSimulation:
             if self.pack.has("lava.footprint") and self.pack.sample("lava.footprint", self.agent.xy_m, clock) > 0:
                 self.agent.alive, self.agent.cause = False, "lava"
                 break
+        self._walked = (seconds, metres, climbed)
         self.agent.tile = self.world.to_tile(self.agent.xy_m)
 
     def _needs(self, action: str, event: str) -> None:
-        """Placeholder rates, all `assumption`. They exist so minds can run, not to be cited."""
+        """Water, food and fatigue from the balance model. Safety and stress are still labelled assumptions."""
         body = self.agent
-        body.thirst = max(0., body.thirst - 1 / 36)
-        body.hunger = max(0., body.hunger - .025)
+        seconds, metres, climbed = self._walked
+        speed = metres / seconds if seconds else 0.
+        grade = 100. * climbed / metres if metres else 0.
         water = self._walk_goal("drink")
-        if action == "drink" and water and math.dist(water, body.xy_m) < 400:
-            body.thirst = min(1., body.thirst + .65)
-        if action == "rest":
-            body.energy = min(1., body.energy + .3)
-        else:
-            body.energy = max(0., body.energy - .025)
+        body.balance = advance(body.balance, STEP_MINUTES / 60., seconds / 3600., pandolf_watts(speed, grade) if seconds else 0.,
+                               drank=bool(action == "drink" and water and math.dist(water, body.xy_m) < DRINK_REACH_M), rested=action == "rest")
+        current = needs(body.balance)
+        body.thirst, body.hunger, body.energy = current["thirst"], current["hunger"], current["energy"]
         if event in ("tremor", "gas_plume", "eruption", "ash_fall"):
             self.warned = True
             body.safety = max(0., body.safety - .1)
@@ -172,8 +179,9 @@ class PackSimulation:
         body.hour += 2
         if body.hour >= 24:
             body.hour, body.day = body.hour - 24, body.day + 1
-        if body.alive and body.thirst <= 1e-9:
-            body.alive, body.cause = False, "dehydration"
+        cause = cause_of_death(body.balance)
+        if body.alive and cause:
+            body.alive, body.cause = False, cause
 
     def step(self) -> dict | None:
         t = len(self.steps)

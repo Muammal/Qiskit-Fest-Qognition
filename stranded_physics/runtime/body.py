@@ -1,7 +1,9 @@
-"""T0 agent body, and the adapter to the frozen contract. WS6 replaces the placeholder physiology."""
+"""The agent's body, and the adapter to the frozen contract. Water, food and fatigue come from domains/agent/physiology.py."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+
+from stranded_physics.domains.agent.physiology import Body, start_body
 
 STATE_KEYS = {"day", "hour", "pos", "needs", "stress", "injured", "inventory", "recent_events"}
 NEED_KEYS = {"hunger", "thirst", "warmth", "energy", "safety", "morale"}
@@ -9,7 +11,7 @@ NEED_KEYS = {"hunger", "thirst", "warmth", "energy", "safety", "morale"}
 
 @dataclass
 class AgentBody:
-    """Placeholder physiology. The rates are `assumption` values until ISO 7933 and friends arrive."""
+    """Needs a mind can see, plus the hidden balance behind thirst, hunger and energy."""
 
     xy_m: tuple[float, float]
     tile: list[int]
@@ -26,6 +28,10 @@ class AgentBody:
     alive: bool = True
     cause: str | None = None
     inventory: dict[str, int] = field(default_factory=lambda: {"wood": 0, "food": 0, "tools": 0})
+    balance: Body = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.balance = start_body(self.thirst, self.hunger, self.energy)
 
 
 def to_state(body: AgentBody, recent_events: list[str]) -> dict:
