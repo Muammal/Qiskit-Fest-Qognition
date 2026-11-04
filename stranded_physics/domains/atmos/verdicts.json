@@ -1,0 +1,16 @@
+{
+  "atmos-model": {
+    "hash": "01132377785e95a6bd506a086ee1ea013b52c1bc15eacb87daedf6015bf1feb9",
+    "verdict": "PASS"
+  },
+  "atmos-wind-200hpa-bearing": {
+    "hash": "23d1e386c49da34c8a04bf643eedf51a8288b0b81388aab0c44f8cb3cba67bdc",
+    "value": 70.0,
+    "verdict": "PASS"
+  },
+  "atmos-wind-200hpa-speed": {
+    "hash": "04e7786c3eab621ef64709cb963e372b12992b61be7cad53d4268fd90e80bc12",
+    "value": 23.416666666666664,
+    "verdict": "PASS"
+  }
+}

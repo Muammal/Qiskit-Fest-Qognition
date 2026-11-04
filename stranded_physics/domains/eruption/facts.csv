@@ -1,0 +1,23 @@
+id,time_utc,column_height_m,duration_s,source_file,quote
+e01,2021-04-09T12:41:00Z,,,st_vincent_cole_accepted.txt,"The initial explosion of the eruption occurred at 12:41 UTC, on 9th April and was followed by a P second, smaller explosion at 18:59 UTC."
+e02,2021-04-09T18:59:00Z,,34260,st_vincent_cole_accepted.txt,The continuous pulsatory nature of the explosive activity from 18:59 UTC on 9th April until 04:30 on 10th April is consistent with the deposit character of U1
+e03,2021-04-10T04:54:00Z,,,st_vincent_plumes.txt,The explosive events identified with the ABI instrument suggest that the eruption entered a third phase at 04:54 UTC on 10 April.
+e04,2021-04-10T06:37:00Z,,,st_vincent_cole_accepted.txt,10th 06:37 07:50 P U1
+e05,2021-04-10T07:24:00Z,,,st_vincent_cole_accepted.txt,10th 07:24 11 end of sequence consistent with RSAM spikes at
+e06,2021-04-10T09:35:00Z,,,st_vincent_cole_accepted.txt,10th 09.35 U U2
+e07,2021-04-10T10:47:00Z,,,st_vincent_cole_accepted.txt,"10th 10.47 NU2 (05:35 LT, 09:35 UTC), with visible fallout."
+e08,2021-04-10T12:02:00Z,,,st_vincent_cole_accepted.txt,10th 12.02 Axisymmetric plume in RadiF. Plume travels ESE.
+e09,2021-04-10T12:54:00Z,,,st_vincent_cole_accepted.txt,"10th 12.54 AU2 Minor ashfall begun across Barbados mid-morning,"
+e10,2021-04-10T14:27:00Z,,,st_vincent_cole_accepted.txt,10th 14.27 14 M 14.40 U2 Boundary uncertainty: Distinctive ash-rich deposits
+e11,2021-04-10T16:20:00Z,,,st_vincent_cole_accepted.txt,10th 16.20 16.30 U2 locations (six explosions here)
+e12,2021-04-10T18:30:00Z,,,st_vincent_cole_accepted.txt,10th18.30 13 18.50 separated by fine ash. Proximal localities have
+e13,2021-04-10T21:20:00Z,,,st_vincent_cole_accepted.txt,10th18.30 13 18.50 separated by fine ash. Proximal localities have U3 fallout separated by PDC (and co-PDC ash). 21.20 19 21.30 U3 Distinctive RSAM peak consistent with the first PDC
+e14,2021-04-10T23:02:00Z,,,st_vincent_cole_accepted.txt,10th 23.02 20 23.10 U4 Ash-rich layer with some coarser lapilli. Although U4
+e15,2021-04-11T00:51:00Z,,,st_vincent_cole_accepted.txt,11th 00.51 21 01.00 U5 Coarse scoria-rich deposits. Prominent in deposits
+e16,2021-04-11T02:44:00Z,,,st_vincent_cole_accepted.txt,"11th 02.44 16 02.50 U5 across island, forming carapace on Windward"
+e17,2021-04-11T04:59:00Z,,,st_vincent_cole_accepted.txt,11th 04.59 11 05.10 U5 sequences.
+e18,2021-04-11T07:55:00Z,,,st_vincent_cole_accepted.txt,11th 07.55 13 08.10 ?U5 3nd Explosion in this sequence cuts power across the
+e19,2021-04-11T10:36:00Z,,,st_vincent_cole_accepted.txt,"11th 20 10.36 13 10.50 U6 Number of fine-grained ash layers, rich in"
+e20,2021-04-11T13:24:00Z,,,st_vincent_cole_accepted.txt,11th 22 13.24 22 13.40 U6 accretionary lapilli. Limited to Western flanks of
+e21,2021-04-11T18:11:00Z,,,st_vincent_cole_accepted.txt,11th 18.11 11 18.20 U6 volcano. PDC generation continues at this time.
+e22,2021-04-11T20:22:00Z,,,st_vincent_cole_accepted.txt,11th 18.11 11 18.20 U6 volcano. PDC generation continues at this time. 24 25 Eruption columns predominantly carried to Leeward 26 USCR 12th20.2212 20.20 U6

@@ -1,1 +1,232 @@
-# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+# Uncalibrated T1 transport assumptions and numerical conventions.
+
+# Standard gravity convention; spatial variation neglected.
+[[parameter]]
+id = "tephra.gravity"
+value = 9.80665
+unit = "m/s**2"
+valid_min = 9.80665
+valid_max = 9.80665
+role = "convention"
+status = "assumption"
+
+# Dense spherical fine-ash approximation; Stokes speed is proportional to density contrast.
+[[parameter]]
+id = "tephra.particle_density"
+value = 2500.0
+unit = "kg/m**3"
+valid_min = 2500.0
+valid_max = 2500.0
+role = "convention"
+status = "assumption"
+
+# Constant near-surface air density throughout descent; altitude dependence neglected.
+[[parameter]]
+id = "tephra.air_density"
+value = 1.2
+unit = "kg/m**3"
+valid_min = 1.2
+valid_max = 1.2
+role = "convention"
+status = "assumption"
+
+# Constant air viscosity; temperature dependence neglected.
+[[parameter]]
+id = "tephra.air_viscosity"
+value = 1.8e-05
+unit = "Pa*s"
+valid_min = 1.8e-05
+valid_max = 1.8e-05
+role = "convention"
+status = "assumption"
+
+# Task-specified creeping-flow validity bound; reject larger particle Reynolds numbers.
+[[parameter]]
+id = "tephra.stokes_re_limit"
+value = 1.0
+unit = "dimensionless"
+valid_min = 1.0
+valid_max = 1.0
+role = "convention"
+status = "assumption"
+
+# Surface wind measurement height, specified in task.
+[[parameter]]
+id = "tephra.wind_height_10m"
+value = 10.0
+unit = "m"
+valid_min = 10.0
+valid_max = 10.0
+role = "convention"
+status = "assumption"
+
+# Fixed 500 hPa geometric height; pressure-height variability neglected.
+[[parameter]]
+id = "tephra.wind_height_500"
+value = 5850.0
+unit = "m"
+valid_min = 5850.0
+valid_max = 5850.0
+role = "convention"
+status = "assumption"
+
+# Fixed 200 hPa geometric height; pressure-height variability neglected.
+[[parameter]]
+id = "tephra.wind_height_200"
+value = 12400.0
+unit = "m"
+valid_min = 12400.0
+valid_max = 12400.0
+role = "convention"
+status = "assumption"
+
+# Suzuki functional form cited from memory: Suzuki 1983, Arc Volcanism, pp. 95-113.
+# Uncalibrated release-shape choice; changes release heights, winds and arrival times.
+[[parameter]]
+id = "tephra.suzuki_a"
+value = 4.0
+unit = "dimensionless"
+valid_min = 4.0
+valid_max = 4.0
+role = "convention"
+status = "assumption"
+
+# Uncalibrated release-shape choice; controls concentration around the release maximum.
+[[parameter]]
+id = "tephra.suzuki_lambda"
+value = 1.0
+unit = "dimensionless"
+valid_min = 1.0
+valid_max = 1.0
+role = "convention"
+status = "assumption"
+
+# Equal-height midpoint bins; numerical approximation to a continuous column.
+[[parameter]]
+id = "tephra.release_bins"
+value = 12
+unit = "dimensionless"
+valid_min = 12
+valid_max = 12
+role = "convention"
+status = "assumption"
+
+# Constant isotropic horizontal diffusion; controls spread and point-load tails.
+[[parameter]]
+id = "tephra.diffusivity"
+value = 1000.0
+unit = "m**2/s"
+valid_min = 1000.0
+valid_max = 1000.0
+role = "convention"
+status = "assumption"
+
+# 20 micrometre representative fine ash; used only where Stokes Reynolds number is <= 1.
+[[parameter]]
+id = "tephra.fine_diameter"
+value = 2e-05
+unit = "m"
+valid_min = 2e-05
+valid_max = 2e-05
+role = "convention"
+status = "assumption"
+
+# Illustrative fine mass fraction; no supplied measured grain-size distribution.
+[[parameter]]
+id = "tephra.fine_fraction"
+value = 0.3
+unit = "dimensionless"
+valid_min = 0.3
+valid_max = 0.3
+role = "convention"
+status = "assumption"
+
+# Illustrative medium mass fraction; no supplied measured grain-size distribution.
+[[parameter]]
+id = "tephra.medium_fraction"
+value = 0.4
+unit = "dimensionless"
+valid_min = 0.4
+valid_max = 0.4
+role = "convention"
+status = "assumption"
+
+# Illustrative coarse mass fraction; fractions sum to one without fitting.
+[[parameter]]
+id = "tephra.coarse_fraction"
+value = 0.3
+unit = "dimensionless"
+valid_min = 0.3
+valid_max = 0.3
+role = "convention"
+status = "assumption"
+
+# Labelled constant-terminal-speed law for medium ash, outside the Stokes calculation.
+[[parameter]]
+id = "tephra.medium_settling"
+value = 0.5
+unit = "m/s"
+valid_min = 0.5
+valid_max = 0.5
+role = "convention"
+status = "assumption"
+
+# Labelled constant-terminal-speed law for coarse ash; shape and drag variation unresolved.
+[[parameter]]
+id = "tephra.coarse_settling"
+value = 5.0
+unit = "m/s"
+valid_min = 5.0
+valid_max = 5.0
+role = "convention"
+status = "assumption"
+
+# Wide analytic quadrature domain: six standard deviations around every packet centre.
+[[parameter]]
+id = "tephra.budget_sigma"
+value = 6.0
+unit = "dimensionless"
+valid_min = 6.0
+valid_max = 6.0
+role = "convention"
+status = "assumption"
+
+# Quadrature points per dimension for independent Gaussian mass integration.
+[[parameter]]
+id = "tephra.budget_points"
+value = 241
+unit = "dimensionless"
+valid_min = 241
+valid_max = 241
+role = "convention"
+status = "assumption"
+
+# Requested first-arrival detection threshold, not a measured sensitivity.
+[[parameter]]
+id = "tephra.barbados_threshold"
+value = 0.001
+unit = "kg/m**2"
+valid_min = 0.001
+valid_max = 0.001
+role = "convention"
+status = "assumption"
+
+# Requested island-cover load threshold, not a measured isopach.
+[[parameter]]
+id = "tephra.island_threshold"
+value = 0.01
+unit = "kg/m**2"
+valid_min = 0.01
+valid_max = 0.01
+role = "convention"
+status = "assumption"
+
+# Requested reproducibility seed; ash itself is deterministic.
+[[parameter]]
+id = "tephra.validation_seed"
+value = 1
+unit = "dimensionless"
+valid_min = 1
+valid_max = 1
+role = "convention"
+status = "assumption"
