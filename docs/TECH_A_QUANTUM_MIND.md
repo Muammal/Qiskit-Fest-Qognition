@@ -113,3 +113,4 @@ python -m pytest mind/tests -m "not slow" -v
 # Re-generate all Tech A validation experiments and figures
 python -m mind.experiments.run_all
 ```
+
