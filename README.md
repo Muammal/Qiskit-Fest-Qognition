@@ -161,7 +161,7 @@ start site/index.html
 | **Simulation View** | `SPACE` | **Play / Pause** auto-stepping |
 | **Simulation View** | `RIGHT ARROW` or `N` | **Step Forward** single 2-hour turn |
 | **Simulation View** | `Q` or `[Mind Toggle]` Button | **Cycle Mind Live** (`Quantum` $\to$ `Classical Mixture` $\to$ `Classical Rational`) |
-| **Simulation View** | `1` / `2` / `3` or `[Speed]` Button | **Cycle Speed** (1.0× normal, 2.5× fast, 6.0× instant) |
+| **Simulation View** | `[Speed]` Button | **Cycle Speed** (0.5×, 1×, 2×, 4×) |
 | **Simulation View** | `E` | **Toggle Evacuation Map Overlay** (zones, assembly points, Dijkstra paths) |
 | **Simulation View** | `TAB` or `[Action Log]` Button | **Toggle Chronological Action History Overlay** (mouse wheel scrolls) |
 | **Simulation View** | `R` | **Reset Current Run** |
