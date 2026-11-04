@@ -105,7 +105,7 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 2. **9 Simplified Stand-In Solvers themed on April 2021 La Soufrière (`stranded_physics/scenarios.py`)**:
    - `StVincentTerrain`, `StVincentAtmos`, `HollandStorm`, `SoufriereEruption` (Mastin 2009 plume law), `SuzukiTephra`, `GaussianGas`, `EnergyConePDC` (Malin & Sheridan 1982), `LaharzLahar`, and `DomeLava`.
    - Builds tamper-evident `.npz` scenario packs (`build_st_vincent_pack`) replayed by `PackSimulation` with Tobler slope/ash locomotion (`--engine physics`).
-3. **Empirical ATUS Priors & Grover DTQW (`data/priors.json`, `contracts.py`)**:
+3. **ATUS Reference Data, Not Yet Used in Decisions, & Grover DTQW (`data/priors.json`, `contracts.py`)**:
    - BLS American Time Use Survey Table A-1 baseline weights + 4-direction **Grover-coined Discrete-Time Quantum Walk** ($G = 2|s\rangle\langle s| - I_4$) in `explore_step(mode="quantum")`.
 
 ---

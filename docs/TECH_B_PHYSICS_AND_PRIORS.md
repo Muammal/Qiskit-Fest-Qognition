@@ -80,7 +80,10 @@ Calling `build_st_vincent_pack(seed=1)` executes all 9 `T1` solvers in topologic
 
 ---
 
-## 4. Empirical ATUS Priors (`data/priors.json`), Classical Baseline & Grover DTQW (`contracts.py`)
+## 4. ATUS Reference Data (`data/priors.json`), Classical Baseline & Grover DTQW (`contracts.py`)
+
+> **Status:** `contracts.get_prior` does not use these ATUS numbers. It loads the file, but decisions use flat weights plus hand-set urgency boosts.
+
 
 1. **Empirical BLS ATUS Priors (`data/priors.json` & `contracts.get_prior`)**:
    - [`data/priors.json`](../data/priors.json) stores Bureau of Labor Statistics (BLS) American Time Use Survey (ATUS) Summary Table A-1 baseline human activity weights and physiological urgency multipliers, loaded automatically into `contracts.ATUS_PRIORS_META`.

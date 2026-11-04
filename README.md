@@ -68,8 +68,8 @@ End-of-event telemetry modal summarizing the agent's survival outcome, cause of 
 
 ```
 QWC/
-├── contracts.py                  # Frozen interfaces, Grover DTQW explore_step & ATUS classical baseline
-├── data/priors.json              # Empirical BLS ATUS Table A-1 baseline activity weights & multipliers
+├── contracts.py                  # Frozen interfaces, Grover DTQW explore_step & rule-based classical baseline
+├── data/priors.json              # ATUS reference hours, loaded but not used in decisions, & hand-set urgency boosts
 ├── requirements.txt              # Core dependencies (pygame-ce, qiskit, qiskit-aer, numpy, pytest)
 ├── requirements-physics.txt      # Physics track dependencies (pint, numpy, pytest)
 ├── main.py                       # Unified entrypoint (GUI, CLI demo, batch benchmark, physics engine)
