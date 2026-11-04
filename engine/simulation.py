@@ -1,5 +1,6 @@
 """Single simulation loop shared by CLI, batch exports and GUI.
-Supports both Volcano Eruption and Island Wilderness scenarios.
+Supports both Volcano Eruption and Island Wilderness scenarios,
+selectable cognitive models, and optional scripted event overrides.
 """
 import copy
 import json
@@ -20,16 +21,18 @@ DEFAULT_STEPS = 36  # assumption: 72 hours, two hours per step
 
 
 class SimulationEngine:
-    def __init__(self, seed=42, mind_type='quantum', noise_source='stub', decide_fn=None, scenario='volcano'):
+    def __init__(self, seed=42, mind_type='quantum', noise_source='stub', decide_fn=None,
+                 scenario='volcano', scripted_events=None):
         self.seed, self.mind_type = seed, mind_type.lower()
         self.noise_source = noise_source
         self.scenario = scenario
+        self.scripted_events = scripted_events
 
         if self.scenario == 'island':
             self.world = IslandWorld(seed=seed, scenario='island')
             self.initial_world = copy.deepcopy(self.world.export_dict())
             self.agent = SurvivalAgent(self.world.spawn_pos)
-            self.event_gen = EventGenerator(seed)
+            self.event_gen = EventGenerator(seed, scripted_events=scripted_events)
             self.volcano = VolcanoModel(seed, self.world, weather=self.event_gen.weather)
             # In island mode, volcano remains dormant
             self.volcano.erupts = False
@@ -50,7 +53,7 @@ class SimulationEngine:
             self.world = IslandWorld(seed=MAP_SEED, scenario='volcano')
             self.initial_world = copy.deepcopy(self.world.export_dict())
             self.agent = SurvivalAgent(self.world.spawn_pos)
-            self.event_gen = EventGenerator(seed)
+            self.event_gen = EventGenerator(seed, scripted_events=scripted_events)
             self.volcano = VolcanoModel(seed, self.world, weather=self.event_gen.weather)
             self.event_gen.prepare(self.volcano)
 

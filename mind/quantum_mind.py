@@ -5,6 +5,17 @@ delegates to (Stage 5). Stateless: belief is rebuilt from `state` on every
 call, so results depend only on the input state (and, for decision_rule
 "sample", the caller's global `random` state - SimulationEngine.step
 isolates that per seed).
+
+Supports selectable research-paper-backed quantum cognition models via
+`cognition_model`:
+- `"default"` (or `"qr_unitary"`): 2-qubit SO(4) deliberation unitary calibrated
+  to Tversky & Shafir (1992).
+- `"busemeyer_hamiltonian"`: Busemeyer (2009/2012) continuous-time 2-qubit
+  Hamiltonian U(t) = exp(-i*t*(pi/2)*(H_a + H_c)) (`jbusemey/ChoiceModeling`).
+- `"qlbn_entropy"`: Huang et al. (2019) & Moreira & Wichert (2016) parameter-free
+  Quantum-Like Bayesian Network using belief entropy (`Insight137/insight137-eap`).
+- `"lindblad_open"`: Broekaert et al. (2020) & Yearsley & Busemeyer (2016) GKSL
+  Lindblad open-system master equation (`hwilner/open-system-decision-dynamics`).
 """
 import copy
 import random
@@ -12,6 +23,12 @@ import random
 import contracts
 
 from mind.belief import prepare_belief, run_events
+from mind.cognition_models import (
+    belief_degree_huang,
+    evolve_lindblad,
+    p_protect_busemeyer,
+    p_protect_qlbn,
+)
 from mind.config import (
     CARRY_ON,
     CF_DANGER_SAFETY,
@@ -27,7 +44,9 @@ from mind.decoherence import decoherence_strength
 from mind.model import bloch_vector, p_protect_closed_form
 
 __all__ = [
-    "decision_probs", "quantum_decide", "classical_mixture_decide",
+    "decision_probs",
+    "quantum_decide",
+    "classical_mixture_decide",
     "decoherence_strength",
 ]
 
@@ -57,11 +76,28 @@ def _q_safe_danger(state):
     return _clamp_q(q_S), _clamp_q(q_D)
 
 
-def _p_protect_for_events(safety, events, lam, q_S, q_D):
+def _p_protect_for_events(safety, events, lam, q_S, q_D, cognition_model="default"):
     rho = run_events(prepare_belief(safety), events, lam)
-    x, _y, z = bloch_vector(rho)
+    if cognition_model == "lindblad_open" and lam > 0.0:
+        rho = evolve_lindblad(
+            rho,
+            omega=0.35 * (1.0 - lam),
+            dephase_rate=1.2 * lam,
+            commit_rate=0.15 * lam,
+            t_final=1.0,
+            n_steps=20,
+        )
+    x, y, z = bloch_vector(rho)
     p = (1 - z) / 2
-    return p, x, p_protect_closed_form(p, x, q_S, q_D, ETA)
+
+    if cognition_model == "busemeyer_hamiltonian":
+        p_prot = p_protect_busemeyer(rho, q_S, q_D, gamma=0.65, t=1.0)
+    elif cognition_model == "qlbn_entropy":
+        p_prot, _db = p_protect_qlbn(p, x, q_S, q_D)
+    else:
+        p_prot = p_protect_closed_form(p, x, q_S, q_D, ETA)
+
+    return p, x, float(p_prot), (float(x), float(y), float(z)), rho
 
 
 def decision_probs(p_protect, prior):
@@ -97,7 +133,7 @@ def _choose_action(probs, decision_rule):
     return max(probs, key=probs.get)
 
 
-def _order_gap(state, lam, q_S, q_D):
+def _order_gap(state, lam, q_S, q_D, cognition_model="default"):
     events = state["recent_events"]
     non_none = [i for i, e in enumerate(events) if e != "none"]
     if len(non_none) < 2:
@@ -107,16 +143,23 @@ def _order_gap(state, lam, q_S, q_D):
     swapped = list(events)
     swapped[i_a], swapped[i_b] = swapped[i_b], swapped[i_a]
 
-    _p, _x, p_protect_original = _p_protect_for_events(
-        state["needs"]["safety"], events, lam, q_S, q_D)
-    _p2, _x2, p_protect_swapped = _p_protect_for_events(
-        state["needs"]["safety"], swapped, lam, q_S, q_D)
+    _p, _x, p_protect_original, _b1, _r1 = _p_protect_for_events(
+        state["needs"]["safety"], events, lam, q_S, q_D, cognition_model=cognition_model)
+    _p2, _x2, p_protect_swapped, _b2, _r2 = _p_protect_for_events(
+        state["needs"]["safety"], swapped, lam, q_S, q_D, cognition_model=cognition_model)
 
     gap = p_protect_original - p_protect_swapped
     return gap, events[i_a], events[i_b]
 
 
-def _decide(state, *, force_lam=None, suppress_order_gap=False, decision_rule=None):
+def _decide(
+    state,
+    *,
+    force_lam=None,
+    suppress_order_gap=False,
+    decision_rule=None,
+    cognition_model="default",
+):
     contracts.validate_state(state)
     decision_rule = decision_rule or DECISION_RULE
 
@@ -125,9 +168,19 @@ def _decide(state, *, force_lam=None, suppress_order_gap=False, decision_rule=No
     stress = state["stress"]
     lam = decoherence_strength(stress) if force_lam is None else force_lam
 
-    p, x, p_protect = _p_protect_for_events(
-        state["needs"]["safety"], state["recent_events"], lam, q_S, q_D)
+    p, x, p_protect, bloch, rho = _p_protect_for_events(
+        state["needs"]["safety"],
+        state["recent_events"],
+        lam,
+        q_S,
+        q_D,
+        cognition_model=cognition_model,
+    )
     p_classical = (1 - p) * q_S + p * q_D
+
+    # Compute companion paper-backed metrics for diagnostic transparency
+    d_b_huang = belief_degree_huang(p, q_S, q_D)
+    p_busemeyer = p_protect_busemeyer(rho, q_S, q_D, gamma=0.65, t=1.0)
 
     probs = decision_probs(p_protect, prior)
     rule_action = _choose_action(probs, decision_rule)
@@ -140,7 +193,7 @@ def _decide(state, *, force_lam=None, suppress_order_gap=False, decision_rule=No
 
     gap = None
     if not suppress_order_gap:
-        gap, event_a, event_b = _order_gap(state, lam, q_S, q_D)
+        gap, event_a, event_b = _order_gap(state, lam, q_S, q_D, cognition_model=cognition_model)
         if gap is not None and abs(gap) > ORDER_GAP_REPORT_THRESHOLD:
             pct = gap * 100
             reason += (
@@ -159,23 +212,28 @@ def _decide(state, *, force_lam=None, suppress_order_gap=False, decision_rule=No
         "probs": probs,
         "reason": reason,
         "quantum": {
-            "p_danger": p,
-            "p_protect": p_protect,
-            "p_classical": p_classical,
-            "lam": lam,
-            "q_safe": q_S,
-            "q_danger": q_D,
-            "order_gap": gap,
+            "p_danger": float(p),
+            "p_protect": float(p_protect),
+            "p_classical": float(p_classical),
+            "coherence": float(abs(x)),
+            "bloch": list(bloch),
+            "lam": float(lam),
+            "q_safe": float(q_S),
+            "q_danger": float(q_D),
+            "order_gap": float(gap) if gap is not None else None,
             "reflex": reflex,
             "decision_rule": decision_rule,
+            "cognition_model": cognition_model,
+            "d_b_huang": float(d_b_huang),
+            "p_protect_busemeyer": float(p_busemeyer),
         },
     }
     contracts.validate_decision(decision)
     return decision
 
 
-def quantum_decide(state):
-    return _decide(state)
+def quantum_decide(state, cognition_model="default"):
+    return _decide(state, cognition_model=cognition_model)
 
 
 def classical_mixture_decide(state):

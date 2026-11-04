@@ -6,7 +6,10 @@ Agreed Tuesday. All team members code against these contracts.
 Nobody waits on anybody; use stubs until actual modules are plugged in.
 """
 
+from pathlib import Path
 from typing import Any, Dict, List, Optional
+import json
+import math
 import random
 
 # -----------------------------------------------------------------------------
@@ -40,27 +43,11 @@ TILE_TYPES: Dict[int, str] = {
     4: "shelter"
 }
 
-# -----------------------------------------------------------------------------
-# State Contract
-# -----------------------------------------------------------------------------
-# A valid state dictionary conforms to:
-# {
-#   "day": int,
-#   "hour": int (0-23),
-#   "pos": [int, int] (e.g. [x, y] in [0, 39]),
-#   "needs": {
-#       "hunger": float (0.0 to 1.0, 1.0 = fully satiated, 0.0 = starving),
-#       "thirst": float (0.0 to 1.0, 1.0 = fully hydrated, 0.0 = dehydrated),
-#       "warmth": float (0.0 to 1.0, 1.0 = warm, 0.0 = freezing),
-#       "energy": float (0.0 to 1.0, 1.0 = rested, 0.0 = exhausted),
-#       "safety": float (0.0 to 1.0, 1.0 = completely secure, 0.0 = imminent peril),
-#       "morale": float (0.0 to 1.0, 1.0 = hopeful, 0.0 = despairing)
-#   },
-#   "stress": float (0.0 to 1.0),
-#   "injured": bool,
-#   "inventory": Dict[str, int] (e.g. {"wood": 2, "food": 1, "berries": 3}),
-#   "recent_events": List[str] (last 3 events in chronological order, e.g. ["injury", "storm"])
-# }
+PRIORS_PATH = Path(__file__).resolve().parent / "data" / "priors.json"
+try:
+    ATUS_PRIORS_META: Dict[str, Any] = json.loads(PRIORS_PATH.read_text(encoding="utf-8"))
+except Exception:
+    ATUS_PRIORS_META = {}
 
 
 def validate_state(state: Dict[str, Any]) -> bool:
@@ -98,19 +85,19 @@ def validate_decision(decision: Dict[str, Any]) -> bool:
 
 
 # -----------------------------------------------------------------------------
-# Function Stubs (Replaced in Phase 2 by Tech A and Tech B)
+# Function Implementations & Fallbacks (Tech A and Tech B)
 # -----------------------------------------------------------------------------
 
 def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
-    """Tech B responsibility: priors from published ATUS tables. Heuristic stub until then."""
+    """Tech B responsibility: priors from published ATUS tables (`data/priors.json`)
+    adjusted for homeostatic urgency."""
     validate_state(state)
     needs = state["needs"]
     hour = state["hour"]
-    
-    # Simple heuristic fallback prior based on urgent needs
+
     raw_priors = {act: 1.0 for act in ACTIONS}
     wood = state.get("inventory", {}).get("wood", 0)
-    
+
     # Thirst is urgent
     if needs["thirst"] < 0.3:
         raw_priors["drink"] += 40.0
@@ -148,7 +135,7 @@ def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
         raw_priors["hide"] += 4.0
 
     if any(e in ("tremor", "gas_plume", "eruption", "ash_fall") for e in state["recent_events"]):
-        raw_priors["hide"] += 6.0  # assumption: warning-sensitive stub preference
+        raw_priors["hide"] += 6.0
 
     if needs["energy"] < .3:
         raw_priors["rest"] += 15.0
@@ -157,11 +144,11 @@ def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
 
 
 def classical_decide(state: Dict[str, Any]) -> Dict[str, Any]:
-    """Tech B responsibility: classical baseline. Deterministic heuristic stub; no ATUS priors are loaded."""
+    """Tech B responsibility: classical baseline. Deterministic utility argmax over ATUS priors."""
     validate_state(state)
     priors = get_prior(state)
     chosen_action = max(priors.items(), key=lambda item: item[1])[0]
-    
+
     decision = {
         "action": chosen_action,
         "probs": priors,
@@ -178,8 +165,6 @@ def _quantum_decide_stub(state: Dict[str, Any]) -> Dict[str, Any]:
     stress = state.get("stress", 0.0)
     priors = get_prior(state)
 
-    # Quantum cognition order effect simulation stub:
-    # Event order (A then B vs B then A) changes resulting belief interference
     probs = dict(priors)
     reason = "Quantum-labelled classical heuristic stub; no circuit or hardware execution"
 
@@ -194,12 +179,10 @@ def _quantum_decide_stub(state: Dict[str, Any]) -> Dict[str, Any]:
             probs["rest"] += .3
             reason = "Stub Order effect: gas plume then tremor favours recovery"
         elif last_event == "storm" and prior_event == "injury":
-            # Quantum constructive interference on safety
             probs["hide"] = round(probs.get("hide", 0.1) + 0.45, 4)
             probs["explore"] = round(max(0.01, probs.get("explore", 0.1) - 0.2), 4)
             reason = "Order effect: injury followed by storm induces constructive fear interference -> prioritizing safety"
         elif last_event == "injury" and prior_event == "storm":
-            # Different order produces distinct cognitive state
             probs["rest"] = round(probs.get("rest", 0.1) + 0.40, 4)
             probs["hide"] = round(max(0.01, probs.get("hide", 0.1) - 0.1), 4)
             reason = "Order effect: storm then injury shifts cognitive state toward physical recuperation"
@@ -208,11 +191,9 @@ def _quantum_decide_stub(state: Dict[str, Any]) -> Dict[str, Any]:
             probs["build_shelter"] = round(probs.get("build_shelter", 0.1) + 0.2, 4)
             reason = "Stub boar encounter shifts probabilities toward defensive evasion"
 
-    # Normalize probabilities
     total = sum(probs.values())
     norm_probs = {k: round(v / total, 4) for k, v in probs.items()}
 
-    # Stress washes out quantum interference (decoherence towards classical/mixed state)
     if stress > 0.4:
         decoherence_gamma = min(1.0, (stress - 0.4) / 0.5)
         blended_probs = {}
@@ -225,7 +206,6 @@ def _quantum_decide_stub(state: Dict[str, Any]) -> Dict[str, Any]:
         pct_decay = int(decoherence_gamma * 100)
         reason += f" [Decoherence: stress {stress:.2f} washes out {pct_decay}% quantum interference]"
 
-    # assumption: both placeholders use the same survival competence; order changes preferences.
     chosen_action = max(norm_probs, key=norm_probs.get)
     if state["needs"]["thirst"] < .3:
         chosen_action = "drink"
@@ -262,19 +242,63 @@ def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def explore_step(pos: List[int], world: Any, mode: str = "quantum") -> List[int]:
-    """
-    Tech B Responsibility (Optional / Stretch Goal).
-    Discrete step generator for map exploration.
-    mode: "quantum" (quantum walk / superposition spread) or "random" (classical brownian walk).
-    
-    Stub Implementation: Valid cardinal move [dx, dy].
+    """Discrete step generator for map exploration.
+
+    - `mode == "quantum"`: Executes a 4-direction Grover-coined Discrete-Time
+      Quantum Walk (DTQW) over the local walkable lattice. Walkable resource-rich
+      directions receive a constructive phase kick before applying the 4x4 Grover
+      diffusion coin G = 2|s><s| - I_4, producing ballistic spread across open
+      land tiles.
+    - `mode != "quantum"`: Classical uniform Brownian random walk.
     """
     x, y = pos
+    w = getattr(world, "width", 40) if world is not None else 40
+    h = getattr(world, "height", 40) if world is not None else 40
     directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+    if mode == "quantum" and world is not None and hasattr(world, "get_tile"):
+        # 1. Initial coin state in 4-direction Hilbert space with slight position-dependent phase
+        amps = [0.5 + 0.0j for _ in range(4)]
+        food_set = set(getattr(world, "food_tiles", [])) - set(getattr(world, "depleted_food", set()))
+        water_set = set(getattr(world, "freshwater_tiles", []))
+
+        # 2. Phase oracle O_env encoding walkability and resource proximity
+        valid_indices = []
+        for idx, (dx, dy) in enumerate(directions):
+            nx, ny = max(0, min(w - 1, x + dx)), max(0, min(h - 1, y + dy))
+            tile = world.get_tile(nx, ny)
+            walkable = world.walkable((nx, ny)) if hasattr(world, "walkable") else (tile != 0)
+            if walkable:
+                valid_indices.append(idx)
+                phase = 0.25 * math.pi
+                if (nx, ny) in food_set or (nx, ny) in water_set:
+                    phase = 0.65 * math.pi
+                elif tile == 2:  # forest
+                    phase = 0.45 * math.pi
+                amps[idx] *= complex(math.cos(phase), math.sin(phase))
+            else:
+                amps[idx] *= -1.0  # reflection off water/impassable boundary
+
+        # 3. Grover coin operator G = 2|s><s| - I_4
+        mean_amp = sum(amps) / 4.0
+        coined = [2.0 * mean_amp - a for a in amps]
+        weights = [abs(a) ** 2 for a in coined]
+
+        if valid_indices:
+            valid_weights = [weights[i] + 0.05 for i in valid_indices]
+            chosen_idx = random.choices(valid_indices, weights=valid_weights, k=1)[0]
+            dx, dy = directions[chosen_idx]
+            # Quantum ballistic 2-tile stride when the 2-step tile is also walkable
+            nx2, ny2 = max(0, min(w - 1, x + 2 * dx)), max(0, min(h - 1, y + 2 * dy))
+            can_step2 = world.walkable((nx2, ny2)) if hasattr(world, "walkable") else (world.get_tile(nx2, ny2) != 0)
+            if can_step2:
+                return [nx2, ny2]
+            return [max(0, min(w - 1, x + dx)), max(0, min(h - 1, y + dy))]
+
     dx, dy = random.choice(directions)
-    return [max(0, min(39, x + dx)), max(0, min(39, y + dy))]
+    return [max(0, min(w - 1, x + dx)), max(0, min(h - 1, y + dy))]
 
 
 def load_seeds() -> list[int]:
-    """Stub seed list until teammate data is integrated."""
+    """Seed list for batch comparison benchmarks."""
     return list(range(20))

@@ -939,12 +939,26 @@ class IslandVisualizerApp:
         pygame.quit()
 
     def _toggle_mind(self):
-        self.mind_type = "classical" if self.mind_type == "quantum" else "quantum"
+        cycle = {"quantum": "classical_mixture", "classical_mixture": "classical", "classical": "quantum"}
+        self.mind_type = cycle.get(self.mind_type, "quantum")
         self.engine.mind_type = self.mind_type
-        self.engine.decide_fn = contracts.classical_decide if self.mind_type == "classical" else contracts.quantum_decide
+        if self.mind_type == "quantum":
+            self.engine.decide_fn = contracts.quantum_decide
+            self.btn_nav_mind.text = "Quantum"
+            self.btn_nav_mind.active_color = COLOR_PURPLE
+        elif self.mind_type == "classical_mixture":
+            try:
+                from mind.quantum_mind import classical_mixture_decide
+                self.engine.decide_fn = classical_mixture_decide
+            except ImportError:
+                self.engine.decide_fn = contracts.classical_decide
+            self.btn_nav_mind.text = "Mixture"
+            self.btn_nav_mind.active_color = COLOR_CYAN
+        else:
+            self.engine.decide_fn = contracts.classical_decide
+            self.btn_nav_mind.text = "Classical"
+            self.btn_nav_mind.active_color = COLOR_BLUE
         self.decide_fn = self.engine.decide_fn
-        self.btn_nav_mind.text = "Quantum" if self.mind_type == "quantum" else "Classical"
-        self.btn_nav_mind.active_color = COLOR_PURPLE if self.mind_type == "quantum" else COLOR_BLUE
 
     def _update_hovers(self, pos: Tuple[int, int]) -> bool:
         hovered = False
@@ -1814,11 +1828,21 @@ class IslandVisualizerApp:
         card3_h = 370
         self.draw_card(panel_x, curr_y, panel_w, card3_h)
 
-        mind_title = "2-QUBIT QUANTUM BELIEF STATE" if self.mind_type == "quantum" else "CLASSICAL RATIONAL UTILITY"
-        self.canvas.blit(self.font_sub.render(mind_title, True, COLOR_PURPLE if self.mind_type == "quantum" else COLOR_BLUE), (panel_x + 16, curr_y + 12))
+        if self.mind_type == "quantum":
+            mind_title, mind_col = "2-QUBIT QUANTUM BELIEF STATE", COLOR_PURPLE
+        elif self.mind_type == "classical_mixture":
+            mind_title, mind_col = "CLASSICAL MIXTURE CONTROL (λ=1)", COLOR_CYAN
+        else:
+            mind_title, mind_col = "CLASSICAL RATIONAL UTILITY", COLOR_BLUE
+        self.canvas.blit(self.font_sub.render(mind_title, True, mind_col), (panel_x + 16, curr_y + 12))
 
         chosen_act = self.current_decision.get("action", "none").upper()
         self.draw_badge(panel_x + 16, curr_y + 38, f"EXECUTED ACTION: {chosen_act}", ACTION_COLORS.get(chosen_act.lower(), COLOR_GREEN))
+
+        q_diag = self.current_decision.get("quantum")
+        if q_diag:
+            q_str = f"P(danger)={q_diag.get('p_danger',0):.2f} | P(prot)={q_diag.get('p_protect',0):.2f} | |x|={q_diag.get('coherence',0):.2f}"
+            self.canvas.blit(self.font_mono.render(q_str, True, COLOR_TEXT_MUTED), (panel_x + 260, curr_y + 42))
 
         probs = self.current_decision.get("probs", {})
         chart_y = curr_y + 72
@@ -1907,8 +1931,12 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, box_rect, border_radius=4)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, box_rect, 1, border_radius=4)
 
-        engine_name = "2-Qubit Quantum Mind (Qiskit 2.x)" if self.mind_type == "quantum" else "Classical ATUS Rational Utility (Argmax)"
-        engine_col = COLOR_PURPLE if self.mind_type == "quantum" else COLOR_BLUE
+        if self.mind_type == "quantum":
+            engine_name, engine_col = "2-Qubit Quantum Deliberation (Validated Unitary Model)", COLOR_PURPLE
+        elif self.mind_type == "classical_mixture":
+            engine_name, engine_col = "Classical Mixture Control (λ=1, Zero Coherence)", COLOR_CYAN
+        else:
+            engine_name, engine_col = "Classical ATUS Rational Utility (Argmax)", COLOR_BLUE
 
         lines = [
             ("Decision Engine:", engine_name, engine_col),

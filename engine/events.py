@@ -1,6 +1,8 @@
 """Persistent weather and common-random-number contextual events.
 
 Numerical probabilities are scenario assumptions, not measured island rates.
+Supports optional `scripted_events: dict[int, str] | None` for deterministic
+order-effect counterfactual demonstrations (per 08-integration-notes.md §5).
 """
 import random
 
@@ -10,9 +12,10 @@ WEATHER_TRANSITIONS = {  # assumption: persistent two-hour weather transitions
 
 
 class EventGenerator:
-    def __init__(self, seed=42, horizon=36):
+    def __init__(self, seed=42, horizon=36, scripted_events=None):
         rng = random.Random(seed + 1009)  # assumption: independent weather stream
         self.weather, self.uniforms, self.cold_draws = [], [], []
+        self.scripted_events = dict(scripted_events) if scripted_events else {}
         weather = 'calm'
         for _ in range(horizon):
             weather = rng.choices(('calm', 'rain', 'storm'), WEATHER_TRANSITIONS[weather])[0]
@@ -26,6 +29,8 @@ class EventGenerator:
         self.world_events = [self.world_event(t, (8+2*t) % 24, volcano) for t in range(len(self.weather))]
 
     def world_event(self, t, hour, volcano):
+        if t in self.scripted_events:
+            return self.scripted_events[t]
         sign = volcano.world_events[t]
         if sign != 'none':
             return sign
@@ -42,6 +47,8 @@ class EventGenerator:
         if t is None:
             t = self.index
             self.index += 1
+        if t in self.scripted_events:
+            return self.scripted_events[t]
         base = self.world_events[t] if self.world_events else ('storm' if self.weather[t] == 'storm' else 'none')
         if base in VOLCANIC:
             return base

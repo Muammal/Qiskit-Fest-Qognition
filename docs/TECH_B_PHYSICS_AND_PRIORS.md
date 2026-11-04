@@ -2,8 +2,8 @@
 
 > **Track Scope**: Tech B anchors the simulation in real-world geophysical, meteorological, and behavioral data. It provides:
 > 1. **Empirical Disaster & Human-Response Datasets (`disaster_data/`)** — 49 curated datasets across 6 historical eruptions (anchored on the April 2021 La Soufrière eruption on St. Vincent).
-> 2. **Verification-First Multi-Domain Physics Engine (`stranded_physics/`)** — A 14-domain unit-checked (`pint`) physical modeling and scenario-pack framework with pre-registered validation gates (`gates.py`) and strict anti-future-leakage perception (`perceive()`).
-> 3. **Classical Rational Baseline & ATUS Priors (`contracts.get_prior`, `contracts.classical_decide`)** — Physiological utility weighting grounded in American Time Use Survey (ATUS) activity tables.
+> 2. **Verification-First Multi-Domain Physics Engine (`stranded_physics/` & `stranded_physics/scenarios.py`)** — A 14-domain unit-checked (`pint`) physical modeling framework, 9 concrete **T1 physical domain solvers** for the April 2021 La Soufrière eruption (`build_st_vincent_pack`), pre-registered validation gates (`gates.py`), and strict anti-future-leakage perception (`perceive()`).
+> 3. **Empirical ATUS Priors (`data/priors.json`), Classical Rational Baseline & Grover DTQW (`contracts.py`)** — Physiological utility weighting grounded in Bureau of Labor Statistics American Time Use Survey (ATUS) Table A-1 activity weights and a 4-direction **Grover-coined Discrete-Time Quantum Walk (DTQW)** in `explore_step()`.
 
 ---
 
@@ -15,7 +15,7 @@ Tech B is designed so that physical hazard solvers, unit conversions, and datase
 flowchart TD
     DD["disaster_data/\n49 Empirical Datasets\n(Smithsonian GVP, NOAA, Open-Meteo, 2021 La Soufrière)"] --> CAL["Calibration Split\nopen_for_calibration()"]
     DD --> HOLD["Holdout Split\nopen_for_validation()"]
-    CAL --> DOM["14 Physics Domains\n(terrain, atmos, eruption, tephra, pdc,\nlahar, lava, gas, seismic, tsunami, storm,\nexposure, agent, impact)"]
+    CAL --> DOM["T1 Physics Solvers (stranded_physics/scenarios.py)\n(StVincentTerrain, StVincentAtmos, HollandStorm,\nSoufriereEruption, SuzukiTephra, GaussianGas,\nEnergyConePDC, LaharzLahar, DomeLava)"]
     DOM --> FS["Unit-Checked FieldStore (pint)\n& Dependency Graph Topological Sort"]
     FS --> PACK["Immutable ScenarioPack (.npz)\nwith SHA-256 Content Hash & Domain Verdicts"]
     PACK --> PERC["Local Causal Perception\nperceive(pack, xy_m, t_s)"]
@@ -47,64 +47,56 @@ Located in [`disaster_data/`](../disaster_data/) and documented in [`disaster_da
 ### 3.1 Strict Unit & Provenance Enforcement (`stranded_physics/core/`)
 - **[`api.py`](../stranded_physics/core/api.py)**: Wraps physical quantities in a shared `pint.UnitRegistry` (`Q_`). Every `Parameter` must declare:
   - Physical `value` and `valid_range` with matching physical dimensions (e.g., meters `"m"`, velocity `"m/s"`, mass load `"kg/m^2"`).
-  - Explicit `role` (`"input"`, `"anchor"`, or `"prediction"`) and `status` (`"literature"`, `"calibrated"`, `"convention"`, or `"assumption"`).
+  - Explicit `role` (`"input"`, `"anchor"`, `"calibrated"`, `"prediction"`, or `"convention"`) and `status` (`"literature"`, `"measured"`, `"derived"`, or `"assumption"`).
   - Every non-assumption parameter **must** carry a bibliographic citation (`source`), or `InterfaceError` is raised at load time.
 - **[`records.py`](../stranded_physics/core/records.py)**: Enforces strict separation between calibration and validation data:
   - `open_for_calibration()` refuses any dataset marked `split="holdout"`.
   - `open_for_validation()` refuses any dataset marked `split="calibration"`.
-- **[`fields.py`](../stranded_physics/core/fields.py)**: `FieldStore` and `ScopedFields` manage 1D time-series (`TimeSpec`), 2D spatial grids (`GridSpec` with CRS checking and automatic regridding), and 3D spatiotemporal arrays.
-  - Rejects `NaN`/`Inf` values, duplicate writes, and shape mismatches.
-  - Enforces **domain encapsulation**: a domain module can only read fields declared in its `inputs` tuple and can only write fields in its own category namespace (`outputs`).
+- **[`fields.py`](../stranded_physics/core/fields.py)**: `FieldStore` and `ScopedFields` manage 1D time-series (`TimeAxis`), 2D spatial grids (`GridSpec` with CRS checking and automatic regridding), and 3D spatiotemporal arrays.
 
-### 3.2 The 14 Physics Domains (`stranded_physics/domains/`)
-Each domain folder is self-contained (verified by AST import tests in `test_interfaces.py` so domains never cross-import each other) and contains its own `README.md`, `parameters.toml`, and `sources.toml`:
+### 3.2 Concrete T1 Physical Solvers for La Soufrière 2021 (`stranded_physics/scenarios.py`)
+[`stranded_physics/scenarios.py`](../stranded_physics/scenarios.py) implements 9 concrete `T1` physical domain solvers driven by [`disaster_data/scenarios/st_vincent_2021.json`](../disaster_data/scenarios/st_vincent_2021.json):
 
-| Domain ID | Physical Scope & Primary Fields |
-|---|---|
-| `terrain` | Elevation (`terrain.elevation`), land mask (`terrain.land_mask`), slope, drainage, and hazard zones (`terrain.zone`). |
-| `atmos` | Wind speed (`atmos.wind_speed`), wind direction (`atmos.wind_from_deg`), and rainfall rate (`atmos.rain_rate`). |
-| `eruption` | Eruptive phase (`eruption.phase`), seismic tremor (`eruption.tremor`), explosion acoustics (`eruption.explosion`), and mass eruption rate (`eruption.mer`). |
-| `tephra` | Advection-diffusion ash fallout and cumulative tephra mass load (`tephra.deposit_load` in $\text{kg/m}^2$). |
-| `pdc` | Valley-confined pyroclastic density current arrival time (`pdc.arrival`), active flow mask (`pdc.active`), and dynamic pressure. |
-| `lahar` | Rain-triggered volcanic mudflow depth (`lahar.depth`) and valley inundation. |
-| `lava` | Steepest-descent effusive lava flow footprint (`lava.footprint`). |
-| `gas` | Downwind $\text{SO}_2$ / volcanic gas plume concentration (`gas.so2_ppm`). |
-| `seismic` | Ground shaking intensity and felt tremor radius. |
-| `tsunami` | Coastal runup and wave arrival hazard. |
-| `storm` | Tropical storm rainfall and wind exposure. |
-| `exposure` | Local thermal, respiratory, and ash-load dose experienced at agent coordinates. |
-| `agent` | Biomechanical locomotion (Tobler hiking speed over slope and ash) and hydration/energy expenditure. |
-| `impact` | Vulnerability thresholds and survival/fatality evaluation. |
+| Solver Class | Domain | Physical Model & Primary Outputs |
+|---|---|---|
+| [`StVincentTerrain`](../stranded_physics/scenarios.py) | `terrain` | Somma caldera rim, Rabacca/Wallibou radial drainage channels, land mask, slope ($\text{deg}$), and NEMO hazard zones (`terrain.zone`). |
+| [`StVincentAtmos`](../stranded_physics/scenarios.py) | `atmos` | 36-step empirical ERA5/Open-Meteo wind speed ($\text{m/s}$), bearing ($\text{deg}$), temperature ($\text{degC}$), and precipitation ($\text{mm/h}$). |
+| [`HollandStorm`](../stranded_physics/scenarios.py) | `storm` | Tropical squall wind amplification (`storm.wind_speed`) and coastal surge footprint (`storm.surge`). |
+| [`SoufriereEruption`](../stranded_physics/scenarios.py) | `eruption` | Eruptive phase progression, Mastin (2009) plume height $H = 2.0\,\text{MER}^{0.241}$, RSAM seismic tremor, and explosion acoustics. |
+| [`SuzukiTephra`](../stranded_physics/scenarios.py) | `tephra` | Anisotropic downwind advective-diffusive tephra fallout accumulation (`tephra.load` in $\text{kg/m}^2$). |
+| [`GaussianGas`](../stranded_physics/scenarios.py) | `gas` | Downwind $\text{SO}_2$ gas plume concentration (`gas.so2` in $\text{mg/m}^3$). |
+| [`EnergyConePDC`](../stranded_physics/scenarios.py) | `pdc` | Malin & Sheridan (1982) energy-cone pyroclastic density current dynamic pressure ($\text{kPa}$) channelized down drainage valleys. |
+| [`LaharzLahar`](../stranded_physics/scenarios.py) | `lahar` | Rainfall-remobilized volcanic mudflow dynamic pressure (`lahar.dynamic_pressure` in $\text{Pa}$). |
+| [`DomeLava`](../stranded_physics/scenarios.py) | `lava` | Summit crater dome extrusion footprint (`lava.footprint`). |
+
+Calling `build_st_vincent_pack(seed=1)` executes all 9 `T1` solvers in topological order and returns a SHA-256 content-hashed `ScenarioPack` ready for `PackSimulation` or `--engine physics`.
 
 ### 3.3 Scenario Pack Builder & Causal Perception (`packs/` & `runtime/`)
 - **[`packs/builder.py`](../stranded_physics/packs/builder.py)**: Topologically sorts domain modules from producer to consumer (`dependency_order`), runs them for a given `seed`, checks domain validity (`check_validity`), and serializes read-only NumPy arrays into a compressed `.npz` archive with a tamper-evident SHA-256 `content_hash`.
 - **[`runtime/perception.py`](../stranded_physics/runtime/perception.py)**: `perceive(pack, xy_m, t_s)` samples the `ScenarioPack` **strictly at the agent's current coordinates `(x, y)` and current clock `t_s`**.
-  - Verified by `test_minds_cannot_see_the_future`: modifying a pack's future PDC arrival, tremor, or tephra arrays after step $t$ produces bit-for-bit identical agent states and events up to step $t$.
-- **[`runtime/simulation.py`](../stranded_physics/runtime/simulation.py)**: `PackSimulation` replays any `ScenarioPack` with any decision function (`contracts.quantum_decide` or `contracts.classical_decide`), advancing the agent in 5-minute substeps (`SUBSTEP_MINUTES = 5`) and emitting a `timeline()` dictionary with the exact same JSON schema as Tech C's `SimulationEngine`.
-
-### 3.4 Pre-Registered Validation Gates (`gates.py`)
-- **[`gates.py`](../stranded_physics/gates.py)** and **[`core/verdicts.py`](../stranded_physics/core/verdicts.py)**: Evaluates verification and validation gates using Wilson score confidence intervals (`wilson_interval`), refusing to pass rare-event gates on insufficient sample sizes (`INSUFFICIENT_DATA`) and invalidating stale verdicts whenever a target or tolerance changes.
+- **[`runtime/simulation.py`](../stranded_physics/runtime/simulation.py)**: `PackSimulation` replays any `ScenarioPack` with any decision function (`contracts.quantum_decide` or `contracts.classical_decide`), advancing the agent in 5-minute substeps (`SUBSTEP_MINUTES = 5`) and emitting a `timeline()` dictionary compatible with the Tech C GUI and Product D web viewer.
 
 ---
 
-## 4. Classical Rational Baseline (`contracts.py`)
+## 4. Empirical ATUS Priors (`data/priors.json`), Classical Baseline & Grover DTQW (`contracts.py`)
 
-Tech B also defines the **Classical Rational Mind** (`contracts.get_prior` and `contracts.classical_decide`):
-1. **ATUS Activity Priors (`get_prior`)**: Computes baseline action utilities from the agent's 6 physiological needs (`hunger`, `thirst`, `warmth`, `energy`, `safety`, `morale`), inventory (`wood`, `food`), injury status, time of day (`hour`), and recent environmental events (`storm`, `cold_night`, `animal`, `tremor`, `gas_plume`, `eruption`, `ash_fall`).
-2. **Deterministic Utility Maximization (`classical_decide`)**: Evaluates the normalized prior distribution $P_{\text{prior}}(a|\text{state})$ and selects the rational utility maximum:
-   $$a^* = \arg\max_{a \in \text{ACTIONS}} P_{\text{prior}}(a \mid \text{state})$$
-   Unlike Tech A's quantum mind, `classical_decide` has **zero belief superposition**, **zero interference ($\eta = 0$)**, and **no order sensitivity** to the sequence in which recent events occurred.
+1. **Empirical BLS ATUS Priors (`data/priors.json` & `contracts.get_prior`)**:
+   - [`data/priors.json`](../data/priors.json) stores Bureau of Labor Statistics (BLS) American Time Use Survey (ATUS) Summary Table A-1 baseline human activity weights and physiological urgency multipliers, loaded automatically into `contracts.ATUS_PRIORS_META`.
+2. **Deterministic Utility Maximization (`contracts.classical_decide`)**:
+   - Evaluates the normalized prior distribution $P_{\text{prior}}(a|\text{state})$ and selects $a^* = \arg\max_{a \in \text{ACTIONS}} P_{\text{prior}}(a \mid \text{state})$.
+3. **4-Direction Grover-Coined Discrete-Time Quantum Walk (`contracts.explore_step`)**:
+   - When `mode="quantum"`, `explore_step(pos, world, mode="quantum")` evolves a 4-direction coin state $(|N\rangle, |S\rangle, |E\rangle, |W\rangle)$ over 3 steps using the $4\times 4$ **Grover diffusion coin**:
+     $$G = 2|s\rangle\langle s| - I_4, \qquad |s\rangle = \frac{1}{2}(1, 1, 1, 1)^T$$
+     coupled to a local environmental phase oracle $O_{\text{env}} = \text{diag}(e^{i\phi_N}, e^{i\phi_S}, e^{i\phi_E}, e^{i\phi_W})$ that constructively amplifies movement toward shelter, fresh water, and food while suppressing movement toward volcanic hazards.
 
 ---
 
 ## 5. Running Tech B Standalone
 
 ```bash
-# Run all 43 verification-first core interface, unit, pack, and causality tests
+# Run all verification-first core interface, unit, pack, and causality tests
 python -m pytest stranded_physics/core -v
 
-# Check validation gates and generate catalog
-python -m stranded_physics.gates
-python -m stranded_physics.catalog
+# Run a live terminal simulation using the T1 St. Vincent Physics Pack
+python main.py --demo --engine physics --seed 101 --mind quantum
 ```
-

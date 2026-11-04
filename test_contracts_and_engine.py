@@ -170,6 +170,10 @@ def test_gui_module():
     assert len(app.history) == 1
     app.draw()
     app._handle_sim_click(app.btn_nav_mind.rect.center)
+    from mind.quantum_mind import classical_mixture_decide as _cmd
+    assert app.engine.decide_fn is _cmd
+    assert app.engine.mind_type == 'classical_mixture'
+    app._handle_sim_click(app.btn_nav_mind.rect.center)
     assert app.engine.decide_fn is contracts.classical_decide
     assert app.engine.mind_type == 'classical'
     app.step_forward()
@@ -949,3 +953,76 @@ def test_tropical_ash_discomfort_is_not_hypothermia():
     sim.volcano.hazard_by_step[0].update(ash=1, ash_grid=['9'*40]*40)
     sim.step()
     assert sim.agent.is_alive and sim.agent.needs['warmth'] > 0
+
+
+def test_st_vincent_physics_pack_and_simulation():
+    from stranded_physics.scenarios import build_st_vincent_pack, st_vincent_scenario
+    from stranded_physics.runtime.simulation import PackSimulation
+    scen = st_vincent_scenario(erupts=True)
+    assert scen.name == 'st_vincent_2021'
+    pack = build_st_vincent_pack(seed=7)
+    assert (pack.contract_grid.nx, pack.contract_grid.ny) == (40, 40)
+    assert pack.time.n == 36
+    sim = PackSimulation(pack, mind_type='quantum')
+    step0 = sim.step()
+    assert contracts.validate_state(step0['state']) is True
+    assert step0['action'] in contracts.ACTIONS
+
+
+def test_scripted_events_counterfactual_order_effect():
+    from mind.quantum_mind import quantum_decide as qm_decide
+    order_ab = {0: 'tremor', 1: 'gas_plume', 2: 'ash_fall'}
+    order_ba = {0: 'gas_plume', 1: 'tremor', 2: 'ash_fall'}
+    sim_ab = SimulationEngine(
+        seed=12, mind_type='quantum', decide_fn=qm_decide,
+        scripted_events=order_ab
+    )
+    sim_ba = SimulationEngine(
+        seed=12, mind_type='quantum', decide_fn=qm_decide,
+        scripted_events=order_ba
+    )
+    s0_ab = sim_ab.step()
+    s1_ab = sim_ab.step()
+    s0_ba = sim_ba.step()
+    s1_ba = sim_ba.step()
+    assert s0_ab['event'] == 'tremor' and s1_ab['event'] == 'gas_plume'
+    assert s0_ba['event'] == 'gas_plume' and s1_ba['event'] == 'tremor'
+
+
+def test_grover_dtqw_explore_step_and_atus_priors():
+    assert 'source' in contracts.ATUS_PRIORS_META
+    assert 'ATUS' in contracts.ATUS_PRIORS_META['source']
+    w = IslandWorld()
+    pos = [20, 20]
+    new_pos_q = contracts.explore_step(pos, w, mode='quantum')
+    new_pos_c = contracts.explore_step(pos, w, mode='classical')
+    assert 0 <= abs(new_pos_q[0] - pos[0]) + abs(new_pos_q[1] - pos[1]) <= 4
+    assert 0 <= abs(new_pos_c[0] - pos[0]) + abs(new_pos_c[1] - pos[1]) <= 4
+
+
+def test_quantum_mind_alternative_cognition_models():
+    from mind.quantum_mind import quantum_decide as qm_decide
+    state = {
+        'day': 1,
+        'hour': 12,
+        'pos': [15, 15],
+        'needs': {
+            'hunger': 0.5,
+            'thirst': 0.5,
+            'warmth': 0.8,
+            'energy': 0.7,
+            'safety': 0.6,
+            'morale': 0.7,
+        },
+        'stress': 0.35,
+        'injured': False,
+        'inventory': {'wood': 1, 'food': 0},
+        'recent_events': ['tremor', 'gas_plume'],
+    }
+    for model_name in ('default', 'busemeyer_hamiltonian', 'qlbn_entropy', 'lindblad_open'):
+        d = qm_decide(state, cognition_model=model_name)
+        assert contracts.validate_decision(d) is True
+        assert d['quantum']['cognition_model'] == model_name
+        assert 'p_protect_busemeyer' in d['quantum']
+        assert 'd_b_huang' in d['quantum']
+        assert 'order_gap' in d['quantum']

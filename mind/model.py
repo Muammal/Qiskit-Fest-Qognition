@@ -4,8 +4,34 @@ Two qubits: qubit 0 is belief (|0>=safe, |1>=danger), qubit 1 is decision
 (|0>=carry on, |1>=protect). Basis index = belief + 2*decision, so the
 decision qubit always starts at |carry>: only two input columns of U
 matter, u = U|safe,carry> and w = U|danger,carry>.
+
+Also exports research-paper-backed deliberation models from
+`mind.cognition_models` (`busemeyer_hamiltonian`, `busemeyer_hamiltonian_U`,
+`p_protect_busemeyer`, `belief_degree_huang`, `p_protect_qlbn`).
 """
 import numpy as np
+
+from mind.cognition_models import (
+    belief_degree_huang,
+    belief_distance_huang,
+    busemeyer_hamiltonian,
+    busemeyer_hamiltonian_U,
+    p_protect_busemeyer,
+    p_protect_qlbn,
+)
+
+__all__ = [
+    "kappa_max",
+    "build_U",
+    "p_protect_closed_form",
+    "bloch_vector",
+    "busemeyer_hamiltonian",
+    "busemeyer_hamiltonian_U",
+    "p_protect_busemeyer",
+    "belief_distance_huang",
+    "belief_degree_huang",
+    "p_protect_qlbn",
+]
 
 
 def kappa_max(q_S, q_D):
