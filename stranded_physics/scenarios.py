@@ -427,3 +427,4 @@ def st_vincent_scenario(erupts: bool | None = True) -> ScenarioSpec:
 def build_st_vincent_pack(seed: int = 1, erupts: bool | None = True) -> ScenarioPack:
     """Builds and returns a SHA-256 content-hashed ScenarioPack for St. Vincent 2021."""
     return build_pack(st_vincent_scenario(erupts=erupts), seed=seed)
+

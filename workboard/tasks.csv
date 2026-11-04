@@ -1,24 +1,24 @@
 id,ws,title,owner,status,depends,gate_ids,spec,branch,updated
-T-001,WS0,Review and freeze interfaces v0.1,Mohamed,review,,,specs/T-001.md,,2026-11-04
-T-002,WS0,Add the physics CI workflow,Claude,review,T-001,,specs/T-002.md,,2026-11-04
-T-100,WS1,Collect open disaster data,Claude,review,,,specs/T-100.md,,2026-11-04
-T-101,WS1,Move collected data into category records,,todo,T-001,,specs/T-101.md,,2026-11-04
-T-102,WS1,Week one data hunt: St Vincent 2021 validation data,,todo,,,specs/T-102.md,,2026-11-04
+T-001,WS0,Review and freeze interfaces v0.1,Mohamed,done,,,specs/T-001.md,pre-main,2026-11-04
+T-002,WS0,Add the physics CI workflow,Claude,done,T-001,,specs/T-002.md,pre-main,2026-11-04
+T-100,WS1,Collect open disaster data,Claude,done,,,specs/T-100.md,pre-main,2026-11-04
+T-101,WS1,Move collected data into category records,Antigravity,done,T-001,,specs/T-101.md,pre-main,2026-11-04
+T-102,WS1,Week one data hunt: St Vincent 2021 validation data,Antigravity,done,,,specs/T-102.md,pre-main,2026-11-04
 T-103,WS1,EM-DAT export,,todo,,,specs/T-103.md,,2026-11-04
-T-104,WS1,Confirm dataset licences,,todo,T-101,,specs/T-104.md,,2026-11-04
-T-201,WS2,terrain T1: real St Vincent DEM and land cover,,todo,T-001,,specs/T-201.md,,2026-11-04
-T-202,WS2,terrain T1: drainage and static hazard zones,,todo,T-201,,specs/T-202.md,,2026-11-04
-T-301,WS3,atmos T1: replay real wind column and rain,,todo,T-001,,specs/T-301.md,,2026-11-04
-T-302,WS3,storm T1: Holland wind profile and cyclone rates,,todo,T-301,,specs/T-302.md,,2026-11-04
-T-401,WS4,eruption T1: source timeline for St Vincent 2021,,todo,T-001,,specs/T-401.md,,2026-11-04
-T-402,WS4,tephra T1: Suzuki and Gaussian fallout,,todo,T-401;T-301,,specs/T-402.md,,2026-11-04
-T-403,WS4,gas T1: Gaussian SO2 plume,,todo,T-401;T-301,,specs/T-403.md,,2026-11-04
-T-501,WS5,pdc T1: energy cone runout,,todo,T-201;T-401,,specs/T-501.md,,2026-11-04
-T-502,WS5,lahar T1: LAHARZ with rain trigger,,todo,T-201;T-301;T-402,,specs/T-502.md,,2026-11-04
+T-104,WS1,Confirm dataset licences,Antigravity,review,T-101,,specs/T-104.md,pre-main,2026-11-04
+T-201,WS2,terrain T1: real St Vincent DEM and land cover,Antigravity,done,T-001,terrain.records_and_units,specs/T-201.md,pre-main,2026-11-04
+T-202,WS2,terrain T1: drainage and static hazard zones,Antigravity,done,T-201,terrain.records_and_units,specs/T-202.md,pre-main,2026-11-04
+T-301,WS3,atmos T1: replay real wind column and rain,Antigravity,done,T-001,atmos.records_and_units,specs/T-301.md,pre-main,2026-11-04
+T-302,WS3,storm T1: Holland wind profile and cyclone rates,Antigravity,done,T-301,storm.records_and_units,specs/T-302.md,pre-main,2026-11-04
+T-401,WS4,eruption T1: source timeline for St Vincent 2021,Antigravity,done,T-001,eruption.records_and_units,specs/T-401.md,pre-main,2026-11-04
+T-402,WS4,tephra T1: Suzuki and Gaussian fallout,Antigravity,done,T-401;T-301,tephra.records_and_units,specs/T-402.md,pre-main,2026-11-04
+T-403,WS4,gas T1: Gaussian SO2 plume,Antigravity,done,T-401;T-301,gas.records_and_units,specs/T-403.md,pre-main,2026-11-04
+T-501,WS5,pdc T1: energy cone runout,Antigravity,done,T-201;T-401,pdc.records_and_units,specs/T-501.md,pre-main,2026-11-04
+T-502,WS5,lahar T1: LAHARZ with rain trigger,Antigravity,done,T-201;T-301;T-402,lahar.records_and_units,specs/T-502.md,pre-main,2026-11-04
 T-503,WS5,T2 shared depth-averaged solver,,todo,T-501;T-502,,specs/T-503.md,,2026-11-04
-T-504,WS5,lava T1: dome footprint,,todo,T-401,,specs/T-504.md,,2026-11-04
-T-601,WS6,agent T1: Tobler movement on real terrain,,todo,T-201,,specs/T-601.md,,2026-11-04
-T-602,WS6,agent T1: real physiology mapped to contract needs,,todo,T-001,,specs/T-602.md,,2026-11-04
-T-603,WS6,exposure T1: shelter and lethality,,todo,T-402;T-501,,specs/T-603.md,,2026-11-04
-T-604,WS6,legacy_pack wrapper and --engine switch,,todo,T-001,,specs/T-604.md,,2026-11-04
-T-701,WS1,End-to-end St Vincent 2021 pack and report,,todo,T-402;T-501;T-502;T-601,,specs/T-701.md,,2026-11-04
+T-504,WS5,lava T1: dome footprint,Antigravity,done,T-401,lava.records_and_units,specs/T-504.md,pre-main,2026-11-04
+T-601,WS6,agent T1: Tobler movement on real terrain,Antigravity,done,T-201,agent.records_and_units,specs/T-601.md,pre-main,2026-11-04
+T-602,WS6,agent T1: real physiology mapped to contract needs,Antigravity,done,T-001,agent.records_and_units,specs/T-602.md,pre-main,2026-11-04
+T-603,WS6,exposure T1: shelter and lethality,Antigravity,done,T-402;T-501,exposure.records_and_units,specs/T-603.md,pre-main,2026-11-04
+T-604,WS6,legacy_pack wrapper and --engine switch,Antigravity,done,T-001,,specs/T-604.md,pre-main,2026-11-04
+T-701,WS1,End-to-end St Vincent 2021 pack and report,Antigravity,done,T-402;T-501;T-502;T-601,,specs/T-701.md,pre-main,2026-11-04

@@ -86,47 +86,47 @@ GRID_DIM = 40
 TILE_SIZE = MAP_SIZE / GRID_DIM  # 22.5 px per tile
 FPS = 60
 
-# Palette Definitions - Grounded, Human-Native Research & Tactical Survival Palette
-COLOR_BG = (17, 20, 26)           # Deep Graphite Base (Matte, comfortable to eyes)
-COLOR_PANEL_BG = (25, 30, 38)     # Tactical Slate Console Surface
-COLOR_PANEL_ALT = (20, 24, 31)    # Recessed Sub-panel / Cavity
-COLOR_CARD_BORDER = (44, 52, 64)  # 1px Technical Hairline Border
-COLOR_CARD_HOVER = (68, 78, 94)   # Clean Steel Edge Highlight (Non-neon)
+# Palette Definitions - Clash of Clans / Hay Day Tactile Village & Island Game Palette
+COLOR_BG = (62, 40, 22)           # Carved Oak & Warm Timber Backdrop
+COLOR_PANEL_BG = (250, 239, 212)  # Sunlit Cream Parchment Card Surface
+COLOR_PANEL_ALT = (234, 216, 178) # Recessed Sand-Parchment Sub-panel
+COLOR_CARD_BORDER = (106, 64, 28) # Chunky Carved Walnut Frame
+COLOR_CARD_HOVER = (224, 148, 24) # Royal Trophy Gold Highlight
 
-COLOR_TEXT_MAIN = (240, 244, 248) # Off-white Titanium (readable, zero glare)
-COLOR_TEXT_MUTED = (152, 164, 178)# Slate Technical Grey
-COLOR_TEXT_HINT = (100, 112, 126) # Metadata & Coordinate Grey
+COLOR_TEXT_MAIN = (54, 32, 14)    # Deep Espresso Timber Ink (High contrast on parchment)
+COLOR_TEXT_MUTED = (108, 72, 36)  # Warm Chestnut Brown
+COLOR_TEXT_HINT = (138, 96, 52)   # Caramel Wood Grain
 
-# Human-Native Semantic Accents (Organic Earth, Foliage & Mineral)
-COLOR_GREEN = (46, 139, 87)       # Deep Forest Sea-Green (Pine / Life / Survival)
-COLOR_GREEN_DARK = (28, 88, 56)   # Dense Moss / Canopy
-COLOR_CYAN = (64, 136, 178)       # Mineral Hydration Blue (Natural water, non-neon)
-COLOR_CYAN_LIGHT = (100, 168, 208)# Clear Alpine Spring
-COLOR_PURPLE = (110, 100, 170)    # SMR Cobalt / Deep Indigo (Quantum math, non-neon)
-COLOR_PURPLE_LIGHT = (145, 135, 200)
-COLOR_YELLOW = (205, 148, 42)     # Warm Field Amber (Caution / Nutrition)
-COLOR_RED = (188, 54, 54)         # Rust Iron Crimson (Lethal Hazard / Critical)
-COLOR_BLUE = (68, 108, 168)       # Classical Rational Slate-Blue
-COLOR_ORANGE = (212, 94, 46)      # Volcanic Terracotta / Magma
-COLOR_GOLD = (214, 162, 54)       # Sun / Timber Ochre
+# Supercell Village & Elixir Accents
+COLOR_GREEN = (62, 168, 32)       # Clash Emerald / Hay Day Meadow Green
+COLOR_GREEN_DARK = (38, 118, 20)  # Deep Orchard Canopy
+COLOR_CYAN = (28, 146, 208)       # Crystal Lagoon / Elixir Blue
+COLOR_CYAN_LIGHT = (88, 192, 242) # Sparkling Spring Water
+COLOR_PURPLE = (146, 58, 196)     # Quantum Elixir Amethyst
+COLOR_PURPLE_LIGHT = (182, 108, 226)
+COLOR_YELLOW = (218, 134, 14)     # Clash Gold Coin Amber
+COLOR_RED = (212, 48, 38)         # Dragon Fire Ruby
+COLOR_BLUE = (44, 108, 184)       # Royal Banner Blue
+COLOR_ORANGE = (224, 96, 24)      # Harvest Pumpkin / Lava Ember
+COLOR_GOLD = (206, 128, 12)       # Royal Trophy Gold
 
-# Tile Base Colors - Organic Earth & Satellite Cartography
+# Tile Base Colors - Hay Day / Clash of Clans Lush Island Diorama
 TILE_COLORS = {
-    0: (22, 44, 70),     # Deep Ocean Mineral Navy
-    1: (182, 156, 104),  # Coastal Sands / Sunlit Grassland
-    2: (32, 82, 52),     # Dense Pine Forest Canopy
-    3: (78, 86, 96),     # Granite & Basalt Rock Crag
-    4: (152, 94, 46)     # Handcrafted Cedar Shelter
+    0: (48, 168, 214),   # Sparkling Turquoise Lagoon
+    1: (122, 196, 64),   # Sunlit Village Meadow Lawn
+    2: (58, 152, 38),    # Lush Orchard & Pine Canopy
+    3: (146, 132, 116),  # Stepped Highland Stone Crag
+    4: (212, 82, 42)     # Cozy Red-Roofed Village Hut
 }
 
 ACTION_COLORS = {
-    "forage": (46, 139, 87),         # Forest Green
-    "drink": (64, 136, 178),         # Mineral Blue
-    "build_shelter": (180, 110, 48), # Timber Cedar
-    "rest": (110, 100, 170),         # Deep Indigo
-    "explore": (205, 148, 42),       # Earth Amber
-    "craft": (140, 150, 164),        # Tool Steel
-    "hide": (188, 54, 54)            # Alert Rust
+    "forage": (62, 168, 32),         # Harvest Green
+    "drink": (28, 146, 208),         # Crystal Spring Blue
+    "build_shelter": (212, 118, 34), # Carpenter Gold-Timber
+    "rest": (146, 58, 196),          # Elixir Amethyst
+    "explore": (218, 134, 14),       # Compass Gold
+    "craft": (118, 96, 76),          # Blacksmith Iron-Wood
+    "hide": (212, 48, 38)            # Red Alert Shield
 }
 
 ISLAND_PRESETS = [
@@ -361,43 +361,54 @@ class UIButton:
         if self.ripple_timer > 0:
             self.ripple_timer = max(0.0, self.ripple_timer - dt)
 
-        dy = 1 if self.is_pressed else 0
+        dy = 2 if self.is_pressed else 0
         draw_rect = pygame.Rect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height)
 
-        # 1. Subtle drop shadow
-        if not self.is_pressed:
-            shadow_surf = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
-            pygame.draw.rect(shadow_surf, (0, 0, 0, 90), (0, 0, self.rect.width, self.rect.height), border_radius=4)
-            surface.blit(shadow_surf, (self.rect.x, self.rect.y + 1))
-
-        # 2. Body fill and borders (Tactile, non-AI styling)
+        # Determine button fill & 3D bottom bevel color (Supercell chunky tactile style)
         if self.is_active:
-            bg = (min(255, self.active_color[0] // 4 + self.bg_color[0]),
-                  min(255, self.active_color[1] // 4 + self.bg_color[1]),
-                  min(255, self.active_color[2] // 4 + self.bg_color[2]))
+            bg = (
+                max(60, min(255, int(self.active_color[0] * 0.22 + 248 * 0.78))),
+                max(60, min(255, int(self.active_color[1] * 0.22 + 236 * 0.78))),
+                max(60, min(255, int(self.active_color[2] * 0.22 + 202 * 0.78))),
+            )
             border = self.active_color
-            border_w = 1
+            lip_col = (max(0, border[0] - 45), max(0, border[1] - 45), max(0, border[2] - 45))
+            border_w = 3
         elif self.is_hovered:
-            bg = (min(255, self.bg_color[0] + 16), min(255, self.bg_color[1] + 16), min(255, self.bg_color[2] + 20))
+            bg = (min(255, self.bg_color[0] + 12), min(255, self.bg_color[1] + 10), min(255, self.bg_color[2] + 8))
             border = COLOR_CARD_HOVER
-            border_w = 1
+            lip_col = (138, 84, 18)
+            border_w = 2
         else:
             bg = self.bg_color
             border = self.border_color
-            border_w = 1
+            lip_col = (max(0, bg[0] - 55), max(0, bg[1] - 50), max(0, bg[2] - 45))
+            border_w = 2
 
-        pygame.draw.rect(surface, bg, draw_rect, border_radius=4)
-        pygame.draw.rect(surface, border, draw_rect, border_w, border_radius=4)
+        # 1. Chunky 3D bottom bevel lip
+        if not self.is_pressed:
+            lip_rect = pygame.Rect(self.rect.x, self.rect.y + 3, self.rect.width, self.rect.height)
+            pygame.draw.rect(surface, lip_col, lip_rect, border_radius=10)
+
+        # 2. Main button body & top glossy specular strip
+        pygame.draw.rect(surface, bg, draw_rect, border_radius=10)
+        gloss_h = max(4, draw_rect.height // 2 - 2)
+        gloss_surf = pygame.Surface(( max(1, draw_rect.width - 8), gloss_h), pygame.SRCALPHA)
+        gloss_surf.fill((255, 255, 255, 65))
+        surface.blit(gloss_surf, (draw_rect.x + 4, draw_rect.y + 3))
+        pygame.draw.rect(surface, border, draw_rect, border_w, border_radius=10)
 
         # Click ripple flash
         if self.ripple_timer > 0:
-            alpha = int((self.ripple_timer / 0.25) * 80)
+            alpha = int((self.ripple_timer / 0.25) * 90)
             rip_surf = pygame.Surface((draw_rect.width, draw_rect.height), pygame.SRCALPHA)
             rip_surf.fill((255, 255, 255, alpha))
             surface.blit(rip_surf, (draw_rect.x, draw_rect.y))
 
-        # Text & Vector Icon Assembly
-        txt_col = COLOR_TEXT_MAIN if (self.is_active or self.is_hovered) else self.text_color
+        # Auto-contrast text color (bright cream text on dark/vivid action buttons, espresso ink on parchment)
+        lum = 0.299 * bg[0] + 0.587 * bg[1] + 0.114 * bg[2]
+        txt_col = (255, 250, 238) if lum < 155 else COLOR_TEXT_MAIN
+        icon_col = (255, 240, 190) if lum < 155 else (self.active_color if self.is_active else border)
 
         display_text = self.text
         max_txt_w = draw_rect.width - (36 if self.icon else 14)
@@ -416,13 +427,13 @@ class UIButton:
             content_y = draw_rect.y + (draw_rect.height - total_h) // 2
 
             if self.icon:
-                draw_vector_icon(surface, self.icon, content_x, content_y + (txt_surf.get_height() - icon_sz) // 2, icon_sz, border)
+                draw_vector_icon(surface, self.icon, content_x, content_y + (txt_surf.get_height() - icon_sz) // 2, icon_sz, icon_col)
                 tx = content_x + icon_sz + 8
             else:
                 tx = content_x
             surface.blit(txt_surf, (tx, content_y))
 
-            sub_col = self.active_color if self.is_active else COLOR_TEXT_MUTED
+            sub_col = self.active_color if self.is_active else ((245, 230, 200) if lum < 155 else COLOR_TEXT_MUTED)
             sub_w = draw_rect.width - 16
             sub_display = self.subtext
             if self.subfont.size(sub_display)[0] > sub_w:
@@ -439,7 +450,7 @@ class UIButton:
 
             if self.icon:
                 icon_y = draw_rect.y + (draw_rect.height - icon_sz) // 2
-                draw_vector_icon(surface, self.icon, content_x, icon_y, icon_sz, border)
+                draw_vector_icon(surface, self.icon, content_x, icon_y, icon_sz, icon_col)
                 tx = content_x + icon_sz + 8
             else:
                 tx = content_x
@@ -672,13 +683,13 @@ class IslandVisualizerApp:
 
         self.btn_choice_island = UIButton(
             (c1_x + 35, btn_y, btn_w, 48),
-            "INITIATE ISLAND SURVIVAL  →", self.font_title,
-            bg_color=(28, 64, 44), active_color=COLOR_GREEN, icon="tree"
+            "INITIATE ISLAND SURVIVAL  >>", self.font_title,
+            bg_color=(56, 158, 28), active_color=COLOR_GREEN, icon="tree"
         )
         self.btn_choice_volcano = UIButton(
             (c2_x + 35, btn_y, btn_w, 48),
-            "INITIATE VOLCANO EVACUATION  →", self.font_title,
-            bg_color=(118, 46, 32), active_color=COLOR_ORANGE, icon="volcano"
+            "INITIATE VOLCANO EVACUATION  >>", self.font_title,
+            bg_color=(214, 78, 24), active_color=COLOR_ORANGE, icon="volcano"
         )
 
     def _build_home_buttons(self):
@@ -744,7 +755,7 @@ class IslandVisualizerApp:
         # 5. Launch Button
         self.btn_launch = UIButton(
             (col2_x + 24, top_y + 490, 1046, 68), "LAUNCH SURVIVAL SIMULATION", self.font_hero,
-            bg_color=(21, 128, 61), active_color=COLOR_GREEN, icon="launch"
+            bg_color=(56, 164, 28), active_color=COLOR_GREEN, icon="launch"
         )
         self.btn_hero_launch = self.btn_launch
 
@@ -762,10 +773,10 @@ class IslandVisualizerApp:
         # Debrief modal buttons
         mx = WINDOW_WIDTH // 2
         my = WINDOW_HEIGHT // 2
-        self.btn_modal_replay = UIButton((mx - 340, my + 175, 150, 46), "Replay Run", self.font_sub, bg_color=(36, 68, 96), active_color=COLOR_CYAN, icon="replay")
-        self.btn_modal_switch = UIButton((mx - 175, my + 175, 175, 46), "Compare Mind", self.font_sub, bg_color=(56, 48, 84), active_color=COLOR_PURPLE, icon="compare")
-        self.btn_modal_scenario = UIButton((mx + 15, my + 175, 175, 46), "Change Scenario", self.font_sub, bg_color=(84, 52, 36), active_color=COLOR_ORANGE, icon="menu")
-        self.btn_modal_home = UIButton((mx + 205, my + 175, 135, 46), "Settings", self.font_sub, bg_color=(36, 42, 52), active_color=COLOR_CARD_HOVER, icon="home")
+        self.btn_modal_replay = UIButton((mx - 340, my + 175, 150, 46), "Replay Run", self.font_sub, bg_color=(36, 138, 198), active_color=COLOR_CYAN, icon="replay")
+        self.btn_modal_switch = UIButton((mx - 175, my + 175, 175, 46), "Compare Mind", self.font_sub, bg_color=(138, 56, 186), active_color=COLOR_PURPLE, icon="compare")
+        self.btn_modal_scenario = UIButton((mx + 15, my + 175, 175, 46), "Change Scenario", self.font_sub, bg_color=(214, 96, 28), active_color=COLOR_ORANGE, icon="menu")
+        self.btn_modal_home = UIButton((mx + 205, my + 175, 135, 46), "Settings", self.font_sub, bg_color=(112, 74, 38), active_color=COLOR_CARD_HOVER, icon="home")
         self.btn_modal_close = UIButton((mx + 390, my - 225, 34, 34), "X", self.font_title, bg_color=COLOR_PANEL_BG)
 
         # History log modal close
@@ -1166,14 +1177,18 @@ class IslandVisualizerApp:
     def draw_event_choice_screen(self, mouse_pos: Tuple[int, int]):
         self.canvas.fill(COLOR_BG)
 
-        # Header Navigation Strip
-        header_y = 28
-        title_surf = self.font_hero.render("QUANTUM COGNITION SIMULATION", True, COLOR_TEXT_MAIN)
-        self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, header_y))
+        # Supercell-Style Golden Wood Ribbon Header
+        header_y = 18
+        rib_rect = pygame.Rect(WINDOW_WIDTH // 2 - 390, header_y, 780, 74)
+        pygame.draw.rect(self.canvas, (94, 54, 22), (rib_rect.x, rib_rect.y + 4, rib_rect.width, rib_rect.height), border_radius=14)
+        pygame.draw.rect(self.canvas, (244, 188, 58), rib_rect, border_radius=14)
+        pygame.draw.rect(self.canvas, (118, 68, 24), rib_rect, 3, border_radius=14)
+        title_surf = self.font_hero.render("QUANTUM COGNITION SIMULATION", True, (58, 32, 10))
+        self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, header_y + 12))
 
-        sub_str = "SURVIVAL DEPLOYMENT SELECTOR  •  COGNITIVE ARCHITECTURE UNDER CRISIS"
-        sub_surf = self.font_sub.render(sub_str, True, COLOR_TEXT_MUTED)
-        self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, header_y + 36))
+        sub_str = "VILLAGE & ISLAND SURVIVAL EXPEDITION  •  QUANTUM vs CLASSICAL MINDS"
+        sub_surf = self.font_sub.render(sub_str, True, (96, 56, 18))
+        self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, header_y + 44))
 
         # 1px Subtle divider line
         pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (170, header_y + 70), (WINDOW_WIDTH - 170, header_y + 70), 1)
@@ -1268,7 +1283,7 @@ class IslandVisualizerApp:
         # -------------------------------------------------------------
         # Footer Technical Shortcut Bar
         # -------------------------------------------------------------
-        footer_w, footer_h = 620, 32
+        footer_w, footer_h = 760, 34
         footer_x = (WINDOW_WIDTH - footer_w) // 2
         footer_y = WINDOW_HEIGHT - 54
         foot_rect = pygame.Rect(footer_x, footer_y, footer_w, footer_h)
@@ -1295,14 +1310,18 @@ class IslandVisualizerApp:
         self.btn_home_fs.check_hover(mouse_pos)
         self.btn_home_fs.draw(self.canvas)
 
-        # Header Title
-        title_surf = self.font_hero.render("QUANTUM COGNITION SIMULATION", True, COLOR_TEXT_MAIN)
-        self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, 22))
+        # Header Ribbon
+        rib_rect = pygame.Rect(WINDOW_WIDTH // 2 - 410, 12, 820, 72)
+        pygame.draw.rect(self.canvas, (94, 54, 22), (rib_rect.x, rib_rect.y + 4, rib_rect.width, rib_rect.height), border_radius=12)
+        pygame.draw.rect(self.canvas, (244, 188, 58), rib_rect, border_radius=12)
+        pygame.draw.rect(self.canvas, (118, 68, 24), rib_rect, 3, border_radius=12)
+        title_surf = self.font_hero.render("QUANTUM COGNITION SIMULATION", True, (58, 32, 10))
+        self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, 20))
 
         scen_tag = "VOLCANO ERUPTION EVACUATION" if self.scenario == "volcano" else "ISLAND WILDERNESS SURVIVAL"
-        sub_str = f"DEPLOYMENT: {scen_tag}  •  2-QUBIT COGNITIVE ENGINE  •  QISKIT 2.x"
-        sub_surf = self.font_sub.render(sub_str, True, COLOR_TEXT_MUTED)
-        self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, 58))
+        sub_str = f"EXPEDITION: {scen_tag}  •  2-QUBIT QUANTUM COGNITIVE ENGINE"
+        sub_surf = self.font_sub.render(sub_str, True, (96, 56, 18))
+        self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, 52))
 
         # Left Reconnaissance Card: Live Island Mini-Map (430 x 760)
         col1_x = 32
@@ -1460,17 +1479,27 @@ class IslandVisualizerApp:
 
     def draw_map_navigation_bar(self, mouse_pos: Tuple[int, int]):
         bar_bg = pygame.Surface((MAP_SIZE, 52), pygame.SRCALPHA)
-        bar_bg.fill((16, 23, 38, 235))
+        bar_bg.fill((78, 48, 24, 242))
         self.canvas.blit(bar_bg, (0, 0))
-        pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (0, 52), (MAP_SIZE, 52), 1)
+        pygame.draw.line(self.canvas, (228, 174, 58), (0, 50), (MAP_SIZE, 50), 2)
+        pygame.draw.line(self.canvas, (52, 30, 14), (0, 52), (MAP_SIZE, 52), 2)
 
         self.btn_nav_pause.text = "Play" if self.is_paused else "Pause"
         self.btn_nav_pause.icon = "play" if self.is_paused else "pause"
 
         self.btn_nav_speed.text = f"Speed {self.speed_multiplier}x"
-        self.btn_nav_mind.text = "Quantum" if self.mind_type == "quantum" else "Classical"
-        self.btn_nav_mind.icon = "quantum" if self.mind_type == "quantum" else "classical"
-        self.btn_nav_mind.active_color = COLOR_PURPLE if self.mind_type == "quantum" else COLOR_BLUE
+        if self.mind_type == "quantum":
+            self.btn_nav_mind.text = "Quantum"
+            self.btn_nav_mind.icon = "quantum"
+            self.btn_nav_mind.active_color = COLOR_PURPLE
+        elif self.mind_type == "classical_mixture":
+            self.btn_nav_mind.text = "Mixture"
+            self.btn_nav_mind.icon = "quantum"
+            self.btn_nav_mind.active_color = COLOR_CYAN
+        else:
+            self.btn_nav_mind.text = "Classical"
+            self.btn_nav_mind.icon = "classical"
+            self.btn_nav_mind.active_color = COLOR_BLUE
 
         self.btn_nav_fs.text = "Window" if self.is_fullscreen else "Fullscreen"
         self.btn_nav_fs.icon = "windowed" if self.is_fullscreen else "fullscreen"
@@ -1493,14 +1522,16 @@ class IslandVisualizerApp:
                 if tile == 0:
                     is_fresh = (x, y) in self.world.freshwater_tiles
                     if is_fresh:
-                        flow = math.sin(t_time * 3.5 + x * 0.5 + y * 0.5) * 12
-                        base = (54, max(40, min(145, 118 + int(flow))), 154)
+                        flow = math.sin(t_time * 3.5 + x * 0.5 + y * 0.5) * 10
+                        base = (52, max(150, min(225, 192 + int(flow))), 242)
                         pygame.draw.rect(self.canvas, base, rect)
-                        pygame.draw.circle(self.canvas, (170, 210, 235), (rx + rw // 2, ry + rh // 2), 2)
+                        pygame.draw.circle(self.canvas, (225, 248, 255), (rx + rw // 2, ry + rh // 2), 3)
                     else:
-                        wave = math.sin(t_time * 1.8 + x * 0.35 + y * 0.45) * 6
-                        c = (22, max(36, min(56, int(44 + wave))), 70)
+                        wave = math.sin(t_time * 2.0 + x * 0.4 + y * 0.4) * 8
+                        c = (38, max(135, min(185, int(162 + wave))), 212)
                         pygame.draw.rect(self.canvas, c, rect)
+                        if (x + y) % 5 == 0:
+                            pygame.draw.line(self.canvas, (145, 222, 248), (rx + 4, ry + rh // 2), (rx + rw - 5, ry + rh // 2), 1)
 
                 elif tile == 1:
                     has_water_adj = any(
@@ -1508,54 +1539,69 @@ class IslandVisualizerApp:
                         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]
                     )
                     if has_water_adj:
-                        # Coastal dunes / beach sand
-                        color = (186, 164, 122)
-                        speck = (166, 144, 102)
+                        # Golden Hay Day / Clash Beach Sand with warm shoreline lip
+                        color = (244, 214, 142) if (x + y) % 2 == 0 else (236, 204, 132)
+                        speck = (218, 182, 108)
                     else:
-                        # Prairie grassland / meadow
-                        color = (96, 126, 74)
-                        speck = (82, 110, 62)
+                        # Signature Clash of Clans / Hay Day Checkerboard Emerald Meadow
+                        color = (126, 202, 68) if (x + y) % 2 == 0 else (114, 190, 58)
+                        speck = (96, 168, 44)
                     pygame.draw.rect(self.canvas, color, rect)
-                    pygame.draw.rect(self.canvas, speck, (rx + 4, ry + 4, 3, 3))
+                    pygame.draw.circle(self.canvas, speck, (rx + 6, ry + 6), 2)
+                    if not has_water_adj and (x * 7 + y * 13) % 11 == 0:
+                        # Tiny sunlit village wildflower
+                        pygame.draw.circle(self.canvas, (255, 232, 92), (rx + rw - 6, ry + rh - 6), 2)
 
                 elif tile == 2:
-                    # Forest canopy
-                    pygame.draw.rect(self.canvas, (32, 82, 52), rect)
-                    pygame.draw.circle(self.canvas, (24, 70, 42), (rx + rw // 2, ry + rh // 2), rw // 2 - 1)
+                    # Lush Hay Day Puffy Orchard / Pine Tree on Checkerboard Grass
+                    grass = (118, 194, 62) if (x + y) % 2 == 0 else (108, 182, 54)
+                    pygame.draw.rect(self.canvas, grass, rect)
+                    # Drop shadow & trunk
+                    pygame.draw.ellipse(self.canvas, (72, 128, 34), (rx + 3, ry + rh - 7, rw - 6, 5))
+                    pygame.draw.rect(self.canvas, (124, 76, 36), (rx + rw // 2 - 2, ry + rh - 8, 4, 5))
+                    # Layered puffy foliage crowns
+                    pygame.draw.circle(self.canvas, (44, 136, 32), (rx + rw // 2, ry + rh // 2), rw // 2 - 2)
+                    pygame.draw.circle(self.canvas, (72, 174, 46), (rx + rw // 2 - 1, ry + rh // 2 - 2), rw // 2 - 4)
+                    pygame.draw.circle(self.canvas, (112, 208, 72), (rx + rw // 2 - 2, ry + rh // 2 - 4), max(2, rw // 4))
                     if (x, y) in self.world.food_tiles:
-                        pygame.draw.circle(self.canvas, (178, 54, 54), (rx + 6, ry + 6), 3)
-                        pygame.draw.circle(self.canvas, (178, 54, 54), (rx + 15, ry + 8), 3)
+                        # Bright ruby & gold harvest fruit clusters
+                        pygame.draw.circle(self.canvas, (232, 52, 42), (rx + 6, ry + 7), 3)
+                        pygame.draw.circle(self.canvas, (248, 196, 42), (rx + rw - 6, ry + 8), 3)
 
                 elif tile == 3:
-                    # Mountain granite crag & snow peak
-                    pygame.draw.rect(self.canvas, (78, 86, 96), rect)
-                    p1 = (rx + rw // 2, ry + 3)
-                    p2 = (rx + 3, ry + rh - 3)
-                    p3 = (rx + rw - 3, ry + rh - 3)
-                    pygame.draw.polygon(self.canvas, (62, 70, 80), [p1, p2, p3])
-                    pygame.draw.polygon(self.canvas, (224, 228, 234), [p1, (rx + rw // 2 - 4, ry + 8), (rx + rw // 2 + 4, ry + 8)])
+                    # 3D Stepped Highland Rock & Terracotta Crag
+                    pygame.draw.rect(self.canvas, (102, 168, 52), rect)
+                    pygame.draw.rect(self.canvas, (118, 102, 88), (rx + 1, ry + 4, rw - 2, rh - 3), border_radius=4)
+                    p1 = (rx + rw // 2, ry + 2)
+                    p2 = (rx + 2, ry + rh - 3)
+                    p3 = (rx + rw - 2, ry + rh - 3)
+                    pygame.draw.polygon(self.canvas, (154, 138, 122), [p1, p2, p3])
+                    pygame.draw.polygon(self.canvas, (248, 244, 236), [p1, (rx + rw // 2 - 4, ry + 8), (rx + rw // 2 + 4, ry + 8)])
 
                 elif tile == 4:
-                    # Crafted cedar shelter
-                    pygame.draw.rect(self.canvas, (82, 110, 62), rect)
-                    p_roof = [(rx + rw // 2, ry + 2), (rx + 2, ry + rh - 3), (rx + rw - 2, ry + rh - 3)]
-                    pygame.draw.polygon(self.canvas, (142, 92, 54), p_roof)
-                    ember_glow = int(math.sin(t_time * 5.0) * 25)
-                    pygame.draw.circle(self.canvas, (214, max(80, min(160, 128 + ember_glow)), 48), (rx + rw // 2, ry + rh - 5), 3)
+                    # Cozy Clash / Hay Day Timber Cottage with Red Tile Roof & Golden Window
+                    pygame.draw.rect(self.canvas, (122, 196, 64), rect)
+                    pygame.draw.rect(self.canvas, (198, 146, 84), (rx + 3, ry + 8, rw - 6, rh - 10), border_radius=2)
+                    pygame.draw.rect(self.canvas, (108, 66, 30), (rx + 3, ry + 8, rw - 6, rh - 10), 1, border_radius=2)
+                    p_roof = [(rx + rw // 2, ry + 1), (rx + 1, ry + 10), (rx + rw - 1, ry + 10)]
+                    pygame.draw.polygon(self.canvas, (218, 68, 38), p_roof)
+                    pygame.draw.polygon(self.canvas, (128, 36, 18), p_roof, 1)
+                    ember_glow = int(math.sin(t_time * 5.0) * 20)
+                    pygame.draw.rect(self.canvas, (255, max(190, min(245, 220 + ember_glow)), 92), (rx + rw // 2 - 2, ry + 11, 5, 5), border_radius=1)
 
         # Volcano Caldera & Hazards (if volcano scenario)
         if self.scenario == "volcano":
             vx, vy = self.world.vent
             vrx = int(vx * TILE_SIZE + TILE_SIZE / 2)
             vry = int(vy * TILE_SIZE + TILE_SIZE / 2)
-            pygame.draw.circle(self.canvas, (48, 38, 38), (vrx, vry), 15)
-            pygame.draw.circle(self.canvas, (188, 54, 42), (vrx, vry), 10)
-            pygame.draw.circle(self.canvas, (214, 112, 46), (vrx, vry), 5)
+            pygame.draw.circle(self.canvas, (82, 54, 42), (vrx, vry), 17)
+            pygame.draw.circle(self.canvas, (218, 62, 32), (vrx, vry), 11)
+            pygame.draw.circle(self.canvas, (255, 196, 48), (vrx, vry), 6)
 
             # Evacuation Map Overlay
             if self.show_evacuation_map:
                 overlay = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
-                colors = ((46, 120, 68, 35), (185, 135, 35, 45), (180, 50, 40, 65))
+                colors = ((62, 168, 32, 28), (228, 152, 24, 42), (218, 52, 38, 62))
                 for y, row in enumerate(self.world.zones):
                     for x, zone in enumerate(row):
                         if self.world.get_tile(x, y):
@@ -1567,11 +1613,14 @@ class IslandVisualizerApp:
 
                 points = [(int(x * TILE_SIZE + TILE_SIZE // 2), int(y * TILE_SIZE + TILE_SIZE // 2)) for x, y in self.world.route_from_spawn]
                 if len(points) > 1:
-                    pygame.draw.lines(overlay, (90, 165, 210, 200), False, points, 2)
+                    pygame.draw.lines(overlay, (255, 238, 120, 230), False, points, 3)
 
                 for x, y in self.world.assembly_points:
-                    pygame.draw.circle(overlay, (52, 148, 88), (int(x * TILE_SIZE + TILE_SIZE // 2), int(y * TILE_SIZE + TILE_SIZE // 2)), 7)
-                    pygame.draw.circle(overlay, (240, 244, 248), (int(x * TILE_SIZE + TILE_SIZE // 2), int(y * TILE_SIZE + TILE_SIZE // 2)), 3)
+                    ax_px = int(x * TILE_SIZE + TILE_SIZE // 2)
+                    ay_px = int(y * TILE_SIZE + TILE_SIZE // 2)
+                    pygame.draw.circle(overlay, (56, 168, 32), (ax_px, ay_px), 8)
+                    pygame.draw.circle(overlay, (255, 244, 198), (ax_px, ay_px), 8, 2)
+                    pygame.draw.circle(overlay, (255, 244, 198), (ax_px, ay_px), 3)
                 self.canvas.blit(overlay, (0, 0))
 
             # Active Hazards: Lava, PDC, Lahar
@@ -1581,45 +1630,42 @@ class IslandVisualizerApp:
                 ry = int(round(y * TILE_SIZE))
                 rw = int(round((x + 1) * TILE_SIZE)) - rx
                 rh = int(round((y + 1) * TILE_SIZE)) - ry
-                pulse = math.sin(t_time * 3.5 + x + y) * 15
-                pygame.draw.rect(hazard_surf, (204, max(50, min(110, int(72 + pulse))), 32, 160), (rx, ry, rw, rh))
+                pulse = math.sin(t_time * 3.5 + x + y) * 18
+                pygame.draw.rect(hazard_surf, (238, max(70, min(145, int(105 + pulse))), 24, 190), (rx, ry, rw, rh), border_radius=3)
 
             for x, y in getattr(self.world, "pdc", set()):
                 rx = int(round(x * TILE_SIZE))
                 ry = int(round(y * TILE_SIZE))
                 rw = int(round((x + 1) * TILE_SIZE)) - rx
                 rh = int(round((y + 1) * TILE_SIZE)) - ry
-                pygame.draw.rect(hazard_surf, (70, 66, 68, 140), (rx, ry, rw, rh))
+                pygame.draw.rect(hazard_surf, (92, 78, 74, 155), (rx, ry, rw, rh))
 
             for x, y in getattr(self.world, "lahar", set()):
                 rx = int(round(x * TILE_SIZE))
                 ry = int(round(y * TILE_SIZE))
                 rw = int(round((x + 1) * TILE_SIZE)) - rx
                 rh = int(round((y + 1) * TILE_SIZE)) - ry
-                pygame.draw.rect(hazard_surf, (88, 62, 38, 140), (rx, ry, rw, rh))
+                pygame.draw.rect(hazard_surf, (118, 82, 48, 160), (rx, ry, rw, rh))
 
             ash_val = getattr(self.world, "ash", 0.0)
             if ash_val > 0.02:
                 ash_surf = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
-                ash_surf.fill((120, 120, 120, int(60 * ash_val)))
+                ash_surf.fill((110, 102, 94, int(65 * ash_val)))
                 hazard_surf.blit(ash_surf, (0, 0))
 
             self.canvas.blit(hazard_surf, (0, 0))
 
-        # Cartographic Scale & Minimalist Compass Overlays
-        # Bottom-left Scale bar
-        scale_box = pygame.Rect(14, MAP_SIZE - 32, 150, 22)
-        pygame.draw.rect(self.canvas, (17, 20, 26, 210), scale_box, border_radius=3)
-        pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, scale_box, 1, border_radius=3)
-        self.canvas.blit(self.font_small.render("SCALE: 1 TILE = 250m", True, COLOR_TEXT_HINT), (scale_box.x + 8, scale_box.y + 3))
+        # Village Wooden Signpost Scale & Compass Overlays
+        scale_box = pygame.Rect(14, MAP_SIZE - 34, 156, 24)
+        pygame.draw.rect(self.canvas, (248, 234, 198), scale_box, border_radius=6)
+        pygame.draw.rect(self.canvas, (106, 64, 28), scale_box, 2, border_radius=6)
+        self.canvas.blit(self.font_small.render("SCALE: 1 TILE = 250m", True, COLOR_TEXT_MAIN), (scale_box.x + 10, scale_box.y + 4))
 
-        # Top-right Compass indicator
-        comp_box = pygame.Rect(MAP_SIZE - 68, 60, 56, 22)
-        pygame.draw.rect(self.canvas, (17, 20, 26, 210), comp_box, border_radius=3)
-        pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, comp_box, 1, border_radius=3)
-        self.canvas.blit(self.font_small.render("N  ▲", True, COLOR_TEXT_MUTED), (comp_box.x + 14, comp_box.y + 3))
+        comp_box = pygame.Rect(MAP_SIZE - 72, 60, 60, 24)
+        pygame.draw.rect(self.canvas, (248, 234, 198), comp_box, border_radius=6)
+        pygame.draw.rect(self.canvas, (106, 64, 28), comp_box, 2, border_radius=6)
+        self.canvas.blit(self.font_small.render("N  ▲", True, COLOR_TEXT_MAIN), (comp_box.x + 16, comp_box.y + 4))
 
-        # Selected tile reticle (tactical corner brackets, not neon cyan)
         if self.selected_tile:
             tx, ty = self.selected_tile
             sx = int(tx * TILE_SIZE)
@@ -1627,26 +1673,20 @@ class IslandVisualizerApp:
             sw = int(TILE_SIZE)
             sh = int(TILE_SIZE)
             s_rect = pygame.Rect(sx, sy, sw, sh)
-            pygame.draw.rect(self.canvas, COLOR_CARD_HOVER, s_rect, 1)
-            # Corner ticks
-            c_len = 4
-            pygame.draw.lines(self.canvas, COLOR_GOLD, False, [(sx, sy + c_len), (sx, sy), (sx + c_len, sy)], 1)
-            pygame.draw.lines(self.canvas, COLOR_GOLD, False, [(sx + sw - c_len, sy), (sx + sw, sy), (sx + sw, sy + c_len)], 1)
-            pygame.draw.lines(self.canvas, COLOR_GOLD, False, [(sx, sy + sh - c_len), (sx, sy + sh), (sx + c_len, sy + sh)], 1)
-            pygame.draw.lines(self.canvas, COLOR_GOLD, False, [(sx + sw - c_len, sy + sh), (sx + sw, sy + sh), (sx + sw, sy + sh - c_len)], 1)
+            pygame.draw.rect(self.canvas, (255, 215, 48), s_rect, 2, border_radius=3)
 
-        pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (MAP_SIZE, 0), (MAP_SIZE, WINDOW_HEIGHT), 1)
+        pygame.draw.line(self.canvas, (94, 54, 22), (MAP_SIZE, 0), (MAP_SIZE, WINDOW_HEIGHT), 4)
 
     def draw_atmosphere(self):
         hour = self.agent.hour
         if hour >= 21 or hour <= 5:
             night_surf = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
-            night_surf.fill((10, 15, 30, 115))
+            night_surf.fill((18, 28, 58, 95))
             self.canvas.blit(night_surf, (0, 0))
 
         if self.current_event == "cold_night":
             frost_surf = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
-            frost_surf.fill((140, 180, 220, 38))
+            frost_surf.fill((160, 210, 245, 42))
             self.canvas.blit(frost_surf, (0, 0))
 
         ash_val = getattr(self.world, "ash", 0.0)
@@ -1655,44 +1695,53 @@ class IslandVisualizerApp:
     def draw_character(self):
         cx, cy = int(self.char_screen_x), int(self.char_screen_y + self.char_bob)
 
-        # Ground Shadow
-        shadow_surf = pygame.Surface((26, 12), pygame.SRCALPHA)
-        pygame.draw.ellipse(shadow_surf, (0, 0, 0, 85), (0, 0, 26, 12))
-        self.canvas.blit(shadow_surf, (cx - 13, cy + 7))
+        # Ground Drop Shadow
+        shadow_surf = pygame.Surface((28, 12), pygame.SRCALPHA)
+        pygame.draw.ellipse(shadow_surf, (0, 0, 0, 95), (0, 0, 28, 12))
+        self.canvas.blit(shadow_surf, (cx - 14, cy + 7))
 
-        # Torso & Clothing (Field Parka)
-        body_color = (192, 112, 42) if not self.agent.injured else (172, 48, 48)
-        pygame.draw.rect(self.canvas, body_color, (cx - 6, cy - 7, 12, 14), border_radius=2)
+        # Boots
+        pygame.draw.circle(self.canvas, (92, 52, 22), (cx - 4, cy + 8), 3)
+        pygame.draw.circle(self.canvas, (92, 52, 22), (cx + 4, cy + 8), 3)
 
-        # Head & Watch Cap
-        pygame.draw.circle(self.canvas, (244, 204, 164), (cx, cy - 12), 7)
-        pygame.draw.circle(self.canvas, (48, 64, 96), (cx, cy - 14), 7, 2)
-        # Satchel
-        pygame.draw.rect(self.canvas, (110, 68, 36), (cx + 4, cy - 5, 5, 8), border_radius=1)
+        # Villager Tunic (Royal Blue/Emerald or Ruby when injured) with Gold Belt
+        body_color = (48, 136, 214) if not self.agent.injured else (212, 48, 38)
+        pygame.draw.rect(self.canvas, body_color, (cx - 7, cy - 7, 14, 14), border_radius=4)
+        pygame.draw.rect(self.canvas, (62, 36, 16), (cx - 7, cy - 7, 14, 14), 1, border_radius=4)
+        pygame.draw.line(self.canvas, (244, 192, 52), (cx - 6, cy + 1), (cx + 6, cy + 1), 2)
 
-        # Injury Cross
+        # Villager Head & Sunlit Straw/Explorer Hat
+        pygame.draw.circle(self.canvas, (252, 214, 174), (cx, cy - 12), 7)
+        pygame.draw.circle(self.canvas, (82, 48, 22), (cx, cy - 12), 7, 1)
+        pygame.draw.circle(self.canvas, (52, 32, 16), (cx - 2, cy - 12), 1)
+        pygame.draw.circle(self.canvas, (52, 32, 16), (cx + 2, cy - 12), 1)
+        # Hat brim & crown
+        pygame.draw.ellipse(self.canvas, (238, 188, 72), (cx - 10, cy - 20, 20, 6))
+        pygame.draw.ellipse(self.canvas, (112, 68, 24), (cx - 10, cy - 20, 20, 6), 1)
+
+        # Injury Cross Badge
         if self.agent.injured:
-            pygame.draw.circle(self.canvas, COLOR_RED, (cx - 10, cy - 16), 6)
-            pygame.draw.line(self.canvas, COLOR_TEXT_MAIN, (cx - 13, cy - 16), (cx - 7, cy - 16), 2)
-            pygame.draw.line(self.canvas, COLOR_TEXT_MAIN, (cx - 10, cy - 19), (cx - 10, cy - 13), 2)
+            pygame.draw.circle(self.canvas, COLOR_RED, (cx - 11, cy - 16), 6)
+            pygame.draw.line(self.canvas, (255, 255, 255), (cx - 14, cy - 16), (cx - 8, cy - 16), 2)
+            pygame.draw.line(self.canvas, (255, 255, 255), (cx - 11, cy - 19), (cx - 11, cy - 13), 2)
 
-        # Shelter Shield
+        # Shelter Shield Badge
         if self.world.is_in_shelter(self.agent.pos[0], self.agent.pos[1]):
-            pygame.draw.polygon(self.canvas, COLOR_GREEN, [(cx, cy - 25), (cx - 7, cy - 18), (cx + 7, cy - 18)])
+            pygame.draw.polygon(self.canvas, COLOR_GREEN, [(cx, cy - 27), (cx - 7, cy - 20), (cx + 7, cy - 20)])
 
-        # Speech / Thought Bubble (Tactical readout bubble)
+        # Supercell Parchment Speech Bubble
         if self.bubble_timer > 0 and self.bubble_text:
             text_surf = self.font_bubble.render(self.bubble_text, True, COLOR_TEXT_MAIN)
-            tw, th = text_surf.get_width() + 18, text_surf.get_height() + 10
+            tw, th = text_surf.get_width() + 20, text_surf.get_height() + 12
             bx = max(10, min(MAP_SIZE - tw - 10, cx - tw // 2))
-            by = cy - 50
+            by = cy - 54
 
             b_rect = pygame.Rect(bx, by, tw, th)
-            pygame.draw.rect(self.canvas, COLOR_PANEL_BG, b_rect, border_radius=4)
+            pygame.draw.rect(self.canvas, (252, 244, 220), b_rect, border_radius=8)
             b_border = COLOR_PURPLE if self.mind_type == "quantum" else COLOR_BLUE
-            pygame.draw.rect(self.canvas, b_border, b_rect, 1, border_radius=4)
-            pygame.draw.polygon(self.canvas, COLOR_PANEL_BG, [(cx - 4, by + th), (cx + 4, by + th), (cx, by + th + 5)])
-            self.canvas.blit(text_surf, (bx + 9, by + 5))
+            pygame.draw.rect(self.canvas, b_border, b_rect, 2, border_radius=8)
+            pygame.draw.polygon(self.canvas, (252, 244, 220), [(cx - 5, by + th), (cx + 5, by + th), (cx, by + th + 6)])
+            self.canvas.blit(text_surf, (bx + 10, by + 6))
 
     def draw_tile_tooltip(self, mouse_pos: Tuple[int, int]):
         mx, my = mouse_pos
@@ -1860,10 +1909,11 @@ class IslandVisualizerApp:
             lbl_col = COLOR_GOLD if is_top else COLOR_TEXT_MAIN
             self.canvas.blit(self.font_mono.render(f"{lbl_txt:12s}", True, lbl_col), (panel_x + 16, chart_y))
 
-            bar_rect = pygame.Rect(panel_x + 125, chart_y + 3, chart_w, 12)
-            pygame.draw.rect(self.canvas, (17, 20, 26), bar_rect, border_radius=2)
-            fill_w = max(2, int(p * chart_w))
-            pygame.draw.rect(self.canvas, act_color, (panel_x + 125, chart_y + 3, fill_w, 12), border_radius=2)
+            bar_rect = pygame.Rect(panel_x + 125, chart_y + 3, chart_w, 13)
+            pygame.draw.rect(self.canvas, (68, 42, 22), bar_rect, border_radius=5)
+            fill_w = max(3, int(p * chart_w))
+            pygame.draw.rect(self.canvas, act_color, (panel_x + 125, chart_y + 3, fill_w, 13), border_radius=5)
+            pygame.draw.rect(self.canvas, (255, 255, 255), (panel_x + 126, chart_y + 4, max(1, fill_w - 2), 4), border_radius=2)
 
             pct_lbl = self.font_mono.render(f"{p*100:4.1f}%", True, COLOR_TEXT_MUTED)
             self.canvas.blit(pct_lbl, (panel_x + 135 + chart_w, chart_y))
@@ -1911,11 +1961,9 @@ class IslandVisualizerApp:
         mw, mh = 860, 520
         mx, my = (WINDOW_WIDTH - mw) // 2, (WINDOW_HEIGHT - mh) // 2
         m_rect = pygame.Rect(mx, my, mw, mh)
-        pygame.draw.rect(self.canvas, COLOR_PANEL_BG, m_rect, border_radius=6)
-
         survived = self.agent.is_alive
         border_col = COLOR_GOLD if survived else COLOR_RED
-        pygame.draw.rect(self.canvas, border_col, m_rect, 1, border_radius=6)
+        self.draw_card(mx, my, mw, mh, border_color=border_col, border_width=3)
 
         m_title = "MISSION COMPLETE: 72h SURVIVAL MASTERED" if survived else f"MISSION OVER: SURVIVOR PERISHED ({str(self.agent.cause_of_death).upper()})"
         m_color = COLOR_GOLD if survived else COLOR_RED
@@ -2039,32 +2087,39 @@ class IslandVisualizerApp:
         self.canvas.blit(tip, (hx + 30, hy + hh - 34))
 
     # -------------------------------------------------------------------------
-    # UI Utility Helpers
+    # UI Utility Helpers - Clash of Clans / Hay Day Carved Wood & Parchment Style
     # -------------------------------------------------------------------------
-    def draw_card(self, x: int, y: int, w: int, h: int, border_color: Optional[Tuple[int, int, int]] = None, border_width: int = 1):
-        pygame.draw.rect(self.canvas, COLOR_PANEL_BG, (x, y, w, h), border_radius=4)
-        pygame.draw.rect(self.canvas, border_color or COLOR_CARD_BORDER, (x, y, w, h), border_width, border_radius=4)
+    def draw_card(self, x: int, y: int, w: int, h: int, border_color: Optional[Tuple[int, int, int]] = None, border_width: int = 2):
+        # 1. Warm drop shadow
+        pygame.draw.rect(self.canvas, (38, 22, 10), (x + 2, y + 4, w, h), border_radius=12)
+        # 2. Outer carved oak border & golden inner trim
+        outer_col = border_color or COLOR_CARD_BORDER
+        pygame.draw.rect(self.canvas, outer_col, (x, y, w, h), border_radius=12)
+        pygame.draw.rect(self.canvas, (232, 184, 72), (x + 3, y + 3, w - 6, h - 6), border_radius=10)
+        # 3. Sunlit cream parchment interior
+        pygame.draw.rect(self.canvas, COLOR_PANEL_BG, (x + 5, y + 5, w - 10, h - 10), border_radius=8)
+        # 4. Corner brass rivets
+        for rx_c, ry_c in ((x + 10, y + 10), (x + w - 10, y + 10), (x + 10, y + h - 10), (x + w - 10, y + h - 10)):
+            pygame.draw.circle(self.canvas, (124, 76, 30), (rx_c, ry_c), 3)
+            pygame.draw.circle(self.canvas, (244, 198, 76), (rx_c - 1, ry_c - 1), 2)
 
     def draw_pill_tag(self, x: int, y: int, text: str, color: Tuple[int, int, int]) -> int:
-        txt_surf = self.font_small.render(text, True, color)
+        txt_surf = self.font_small.render(text, True, (255, 250, 240))
         pw = txt_surf.get_width() + 20
         ph = 26
         pill_rect = pygame.Rect(x, y, pw, ph)
-        pill_surf = pygame.Surface((pw, ph), pygame.SRCALPHA)
-        pill_surf.fill((color[0], color[1], color[2], 25))
-        self.canvas.blit(pill_surf, (x, y))
-        pygame.draw.rect(self.canvas, color, pill_rect, 1, border_radius=13)
+        pygame.draw.rect(self.canvas, color, pill_rect, border_radius=13)
+        pygame.draw.rect(self.canvas, (72, 42, 18), pill_rect, 2, border_radius=13)
         self.canvas.blit(txt_surf, (x + 10, y + (ph - txt_surf.get_height()) // 2))
         return pw
 
     def draw_badge(self, x: int, y: int, text: str, color: Tuple[int, int, int]):
-        txt_surf = self.font_sub.render(text, True, color)
-        bg_rect = pygame.Rect(x, y, txt_surf.get_width() + 16, txt_surf.get_height() + 8)
-        badge_surf = pygame.Surface((bg_rect.width, bg_rect.height), pygame.SRCALPHA)
-        badge_surf.fill((color[0], color[1], color[2], 35))
-        self.canvas.blit(badge_surf, (x, y))
-        pygame.draw.rect(self.canvas, color, bg_rect, 1, border_radius=5)
-        self.canvas.blit(txt_surf, (x + 8, y + 4))
+        txt_surf = self.font_sub.render(text, True, (255, 252, 242))
+        bg_rect = pygame.Rect(x, y, txt_surf.get_width() + 18, txt_surf.get_height() + 8)
+        pygame.draw.rect(self.canvas, (68, 40, 18), (bg_rect.x, bg_rect.y + 2, bg_rect.width, bg_rect.height), border_radius=7)
+        pygame.draw.rect(self.canvas, color, bg_rect, border_radius=7)
+        pygame.draw.rect(self.canvas, (255, 232, 168), bg_rect, 1, border_radius=7)
+        self.canvas.blit(txt_surf, (x + 9, y + 4))
 
     def draw_progress_bar(self, x: int, y: int, w: int, h: int, label: str, value: float, color: Tuple[int, int, int]):
         lbl_surf = self.font_mono.render(f"{label:11s}", True, COLOR_TEXT_MAIN)
@@ -2072,14 +2127,22 @@ class IslandVisualizerApp:
 
         bar_x = x + 95
         bar_w = w - 145
-        track_rect = pygame.Rect(bar_x, y + 2, bar_w, h - 4)
-        pygame.draw.rect(self.canvas, (15, 23, 42), track_rect, border_radius=3)
+        track_rect = pygame.Rect(bar_x, y + 2, bar_w, h - 2)
+        # Carved dark wood trough with gold rim
+        pygame.draw.rect(self.canvas, (68, 42, 22), track_rect, border_radius=6)
+        pygame.draw.rect(self.canvas, (148, 98, 44), track_rect, 1, border_radius=6)
 
-        fill_w = max(0, min(bar_w, int(bar_w * value)))
+        fill_w = max(0, min(bar_w - 2, int((bar_w - 2) * value)))
         if fill_w > 0:
-            pygame.draw.rect(self.canvas, color, (bar_x, y + 2, fill_w, h - 4), border_radius=3)
+            fill_rect = pygame.Rect(bar_x + 1, y + 3, fill_w, h - 4)
+            pygame.draw.rect(self.canvas, color, fill_rect, border_radius=5)
+            # Supercell glossy top highlight strip
+            gloss_rect = pygame.Rect(bar_x + 2, y + 4, max(1, fill_w - 2), max(2, (h - 4) // 2))
+            gloss_s = pygame.Surface((gloss_rect.width, gloss_rect.height), pygame.SRCALPHA)
+            gloss_s.fill((255, 255, 255, 95))
+            self.canvas.blit(gloss_s, (gloss_rect.x, gloss_rect.y))
 
-        val_surf = self.font_mono.render(f"{int(value * 100):3d}%", True, COLOR_TEXT_MUTED)
+        val_surf = self.font_mono.render(f"{int(value * 100):3d}%", True, COLOR_TEXT_MAIN)
         self.canvas.blit(val_surf, (bar_x + bar_w + 8, y))
 
 

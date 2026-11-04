@@ -1,1 +1,21 @@
 # One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "agent.tobler_v0"
+value = 6.0
+unit = "km/hour"
+valid_min = 2.0
+valid_max = 10.0
+role = "input"
+status = "literature"
+source = "Tobler (1993) NCGIA Technical Report 93-1 Eq. 1"
+
+[[parameter]]
+id = "agent.tobler_slope_k"
+value = 3.5
+unit = "dimensionless"
+valid_min = 1.0
+valid_max = 6.0
+role = "input"
+status = "literature"
+source = "Tobler (1993) NCGIA Technical Report 93-1 Eq. 1"

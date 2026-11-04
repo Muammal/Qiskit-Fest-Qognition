@@ -1,1 +1,21 @@
 # One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "tephra.suzuki_beta"
+value = 4.0
+unit = "dimensionless"
+valid_min = 1.0
+valid_max = 10.0
+role = "input"
+status = "literature"
+source = "Suzuki (1983) Arc Volcanism: Physics and Tectonics pp. 95-112"
+
+[[parameter]]
+id = "tephra.diffusion_kh"
+value = 250.0
+unit = "m^2/s"
+valid_min = 10.0
+valid_max = 5000.0
+role = "input"
+status = "literature"
+source = "Bonadonna et al. (2005) J. Geophys. Res. 110:B08209"

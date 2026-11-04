@@ -1,1 +1,21 @@
 # One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "pdc.heim_coeff"
+value = 0.26
+unit = "dimensionless"
+valid_min = 0.1
+valid_max = 0.6
+role = "input"
+status = "literature"
+source = "Malin & Sheridan (1982) Science 217:637-640 energy-cone H/L ratio"
+
+[[parameter]]
+id = "pdc.lethal_pressure"
+value = 5.0
+unit = "kPa"
+valid_min = 1.0
+valid_max = 50.0
+role = "input"
+status = "literature"
+source = "Valentine (1998) J. Volcanol. Geotherm. Res. 87:117-140"

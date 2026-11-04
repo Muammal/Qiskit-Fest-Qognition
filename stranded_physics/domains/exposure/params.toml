@@ -1,1 +1,11 @@
 # One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "exposure.roof_collapse_load"
+value = 300.0
+unit = "kg/m^2"
+valid_min = 50.0
+valid_max = 1000.0
+role = "input"
+status = "literature"
+source = "Spence et al. (2005) Bull. Volcanol. 67:589-602 Table 3"

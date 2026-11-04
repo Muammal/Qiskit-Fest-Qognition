@@ -120,7 +120,13 @@ class PackSimulation:
             clock = t_s + minute * 60.
             if goal is not None:
                 remaining = math.dist(goal, self.agent.xy_m)
-                stride = WALK_M_PER_S * SUBSTEP_MINUTES * 60. * (.5 if self.agent.injured else 1.)
+                if self.pack.has('terrain.slope'):
+                    slope_deg = float(self.pack.sample('terrain.slope', self.agent.xy_m))
+                    ash_load = float(self.pack.sample('tephra.deposit_load', self.agent.xy_m, clock)) if self.pack.has('tephra.deposit_load') else 0.0
+                    speed_m_s = (6.0 / 3.6) * math.exp(-3.5 * abs(math.tan(math.radians(slope_deg)) + 0.05)) * 0.45 / (1.0 + 0.08 * ash_load)
+                else:
+                    speed_m_s = WALK_M_PER_S
+                stride = speed_m_s * SUBSTEP_MINUTES * 60. * (.5 if self.agent.injured else 1.)
                 if remaining > 1.:
                     share = min(1., stride / remaining)
                     candidate = (self.agent.xy_m[0] + (goal[0] - self.agent.xy_m[0]) * share,

@@ -1,1 +1,20 @@
 # One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "storm.holland_b"
+value = 1.35
+unit = "dimensionless"
+valid_min = 0.9
+valid_max = 2.5
+role = "input"
+status = "literature"
+source = "Holland (1980) Monthly Weather Review 108:1212-1218 Table 1"
+
+[[parameter]]
+id = "storm.rain_threshold"
+value = 5.0
+unit = "mm/hour"
+valid_min = 1.0
+valid_max = 50.0
+role = "convention"
+status = "assumption"

@@ -1,1 +1,21 @@
 # One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "eruption.peak_mer"
+value = 15000000.0
+unit = "kg/s"
+valid_min = 10000.0
+valid_max = 1000000000.0
+role = "input"
+status = "literature"
+source = "Mastin et al. (2009) J. Volcanol. Geotherm. Res. 186:10-21 VEI 4 column scaling"
+
+[[parameter]]
+id = "eruption.mastin_exponent"
+value = 0.241
+unit = "dimensionless"
+valid_min = 0.15
+valid_max = 0.35
+role = "input"
+status = "literature"
+source = "Mastin et al. (2009) J. Volcanol. Geotherm. Res. 186:10-21 Eq. 1"

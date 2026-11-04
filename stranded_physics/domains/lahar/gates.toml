@@ -1,1 +1,9 @@
 # One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+
+[[gate]]
+id = "lahar.records_and_units"
+title = "Lahar parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/lahar'); load_datasets(p/'datasets.toml', 'lahar'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/lahar/datasets.toml", "stranded_physics/domains/lahar/params.toml"]
+required = true

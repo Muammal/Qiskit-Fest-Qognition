@@ -1,1 +1,9 @@
 # One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+
+[[gate]]
+id = "pdc.records_and_units"
+title = "Pdc parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/pdc'); load_datasets(p/'datasets.toml', 'pdc'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/pdc/datasets.toml", "stranded_physics/domains/pdc/params.toml"]
+required = true

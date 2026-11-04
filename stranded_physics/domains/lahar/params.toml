@@ -1,1 +1,11 @@
 # One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "lahar.rain_trigger"
+value = 3.5
+unit = "mm/hour"
+valid_min = 0.5
+valid_max = 50.0
+role = "input"
+status = "literature"
+source = "Iverson (1997) Reviews of Geophysics 35:245-296"

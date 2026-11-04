@@ -15,6 +15,8 @@
 
 Detailed technical documentation explaining how **Tech A**, **Tech B**, **Tech C**, and **Product D** work both **separately** and **together**:
 
+- **[Full System Report & Production Readiness Audit (`docs/FULL_SYSTEM_REPORT.md`)](docs/FULL_SYSTEM_REPORT.md)** — Master technical report covering end-to-end architecture, complete Tech B status audit (`14/14` gates `PASS`), Clash of Clans / Hay Day UI design, and production verification.
+- **[Full System Presentation Slide Deck (`docs/PRESENTATION_SLIDES.md`)](docs/PRESENTATION_SLIDES.md)** — 14-slide presentation deck with Mermaid diagrams, equations, screenshots, and live demo guide.
 - **[New Implementations & Published Quantum Cognition Models Report (`docs/NEW_IMPLEMENTATIONS_REPORT.md`)](docs/NEW_IMPLEMENTATIONS_REPORT.md)** — Complete report of all newly implemented features and the **6 peer-reviewed Quantum Cognition models** (`jbusemey/ChoiceModeling`, `Insight137/insight137-eap`, `hwilner/open-system-decision-dynamics`, `ljaustc/QRL`, `WileQ/QCog`, `robertcprice/nQPU`).
 - **[How Tech A, Tech B, Tech C, and Product D Work Together & Separately (`docs/TECH_A_B_C_INTEGRATION.md`)](docs/TECH_A_B_C_INTEGRATION.md)** — Complete end-to-end architecture, frozen `contracts.py` boundary, step-by-step turn lifecycle, causal isolation guarantees, and 3-way cognitive benchmarking.
 - **[Tech A: 2-Qubit Quantum Cognitive Architecture (`docs/TECH_A_QUANTUM_MIND.md`)](docs/TECH_A_QUANTUM_MIND.md)** — Density-matrix belief tracking, non-commuting $R_y(\theta)R_z(\phi)$ event gates, projective collapse, Kraus & Lindblad decoherence under stress, deliberation unitary $U(q_S, q_D, \eta)$, 6 published cognition models (`mind/cognition_models.py`), and Qiskit circuits (`mind/`).

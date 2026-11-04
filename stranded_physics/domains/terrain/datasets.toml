@@ -1,1 +1,14 @@
 # One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+
+[[dataset]]
+id = "natural_earth_land"
+kind = "vector"
+url = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zip"
+retrieved_utc = "2026-11-03T22:41:36.130375+00:00"
+sha256 = "e547d749445eaa0964aba76738090ec88f5e63c4585122170f98c67a7ea922dc"
+licence = "Public domain, stated in the Natural Earth terms read in raw/natural_earth_terms.html"
+licence_confirmed = true
+citation = "Made with Natural Earth. Free vector and raster map data @ naturalearthdata.com. ne_10m_land"
+split = "reference"
+content_check = "min_bytes:1000"
+notes = "file: raw/ne_10m_land.zip"

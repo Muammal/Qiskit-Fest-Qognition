@@ -1,1 +1,11 @@
 # One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "gas.peak_so2_flux"
+value = 85.0
+unit = "kg/s"
+valid_min = 0.1
+valid_max = 2000.0
+role = "input"
+status = "literature"
+source = "Carn et al. (2016) J. Volcanol. Geotherm. Res. 311:99-134"

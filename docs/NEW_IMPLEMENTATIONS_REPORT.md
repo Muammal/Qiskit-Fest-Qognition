@@ -136,3 +136,4 @@ $env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py mind
 ```
 
 - **Result**: **`155 passed, 3 skipped`** (100% pass rate across all unit, contract, physics, GUI, and quantum cognition model tests).
+
