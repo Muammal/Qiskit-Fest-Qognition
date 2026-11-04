@@ -1,27 +1,14 @@
 """Belief preparation, event gates and collapse (TECH_A_BUILD_PLAN.md Section 4.4).
 
 Operates on the belief qubit alone, as a 2x2 density matrix: |0> = safe,
-|1> = danger. Rotation angles and collapse events will move to
-mind/config.py in Stage 4, which consolidates every constant; they live
-here for now since Stage 2 has no config.py dependency yet.
+|1> = danger. EVENT_GATES and COLLAPSE_EVENTS now live in mind/config.py
+(Stage 4 consolidation); re-exported here since mind/tests/test_belief.py
+imports them from this module.
 """
 import numpy as np
 
+from mind.config import COLLAPSE_EVENTS, EVENT_GATES
 from mind.decoherence import apply_phase_damping
-
-# event -> (rotation axis, angle). No angle is +-pi/2 (Section 4.4 "angle
-# rule"): that would reset the belief to 50/50 under full decoherence.
-EVENT_GATES = {
-    "tremor": ("ry", np.pi / 3),
-    "gas_plume": ("rx", 3 * np.pi / 5),
-    "storm": ("ry", np.pi / 3),
-    "animal": ("ry", np.pi / 3),
-    "injury": ("rx", 2 * np.pi / 3),
-    "cold_night": ("rx", np.pi / 6),
-    "find_food": ("ry", -np.pi / 4),
-}
-
-COLLAPSE_EVENTS = {"eruption", "ash_fall"}
 
 _DANGER_PROJECTOR = np.array([[0.0, 0.0], [0.0, 1.0]], dtype=complex)
 

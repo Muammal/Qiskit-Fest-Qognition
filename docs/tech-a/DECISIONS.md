@@ -208,3 +208,45 @@ $ python -c "from mind.decoherence import decoherence_strength as d; print(d(0.1
 0.0 0.9285714285714285 1.0
 ```
 
+## D3: Decision rule (2026-11-03, stage 4, status: accepted)
+**Context:** `decision_probs` gives a 7-action probability dict; something
+must turn it into one chosen action. Section 4.7 offers `argmax` (matching
+Tech C's classical/quantum stubs) vs Born-rule sampling.
+**Decision:** Default `argmax(probs)`. A `"sample"` mode exists behind
+`quantum_decide(state, decision_rule=...)`/`_decide`'s `decision_rule`
+param, drawing from `probs` via the global `random` (reproducible per seed
+since `SimulationEngine.step` isolates `random`'s state around `decide_fn`).
+**Alternatives considered:** Born-rule sampling by default — rejected: it
+would add sampling noise on top of the quantum-vs-classical-mixture
+comparison, making Stage 7's batch statistics (survival rate, evacuation
+delay) noisier and harder to attribute to the model rather than to RNG.
+**Consequences:** `mind/config.py`'s `DECISION_RULE = "argmax"`.
+`mind/tests/test_quantum_mind.py::test_determinism_seeded_run` depends on
+this: two `SimulationEngine(seed=7, decide_fn=quantum_decide).run()` calls
+must give identical action lists, which only holds with no sampling in the
+default path.
+**Evidence:** `mind/tests/test_quantum_mind.py::test_determinism_seeded_run` passed.
+
+## D4: Reflex layer (2026-11-03, stage 4, status: accepted)
+**Context:** `test_urgent_thirst_beats_warning_in_both_stubs` (the existing
+repo suite) requires both `classical_decide` and `quantum_decide` to return
+`"drink"` when thirst is critical, regardless of competing signals.
+**Decision:** Keep Tech C's reflex layer, applied after the quantum rule:
+`thirst < 0.3 -> drink`; else `warmth < 0.4 -> build_shelter` (if
+`wood >= 2`) else `forage`. When it fires, the reason starts with
+`"Reflex (<kind>) overrides <rule_action> -> <action>."`, and
+`quantum.reflex` is set to `"thirst"` or `"warmth"` (else `None`) so later
+analysis (Stage 7) can exclude reflex-overridden steps from the
+quantum-vs-classical action-divergence count.
+**Alternatives considered:** removing the reflex — rejected: breaks the
+required repo test, and removes a documented, intentional "physiology
+overrides deliberation" design point the plan calls out explicitly.
+**Consequences:** `mind/quantum_mind.py`'s `_apply_reflex` runs after
+`_choose_action`; `probs` is left as the quantum layer computed it (the
+reflex changes only `action` and `reason`, not `probs`), so what the
+quantum layer "wanted" is still visible in the logged decision even when
+the reflex overrides it.
+**Evidence:** `mind/tests/test_quantum_mind.py::test_reflex_thirst_overrides`
+and `test_repo_compatibility[test_urgent_thirst_beats_warning_in_both_stubs]`
+passed.
+

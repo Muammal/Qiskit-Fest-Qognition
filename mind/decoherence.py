@@ -7,10 +7,12 @@ equals exactly (1-lam), so lam is a clean per-slot linear decay rate.
 """
 import numpy as np
 
+from mind.config import STRESS_FLOOR, STRESS_SPAN
+
 
 def decoherence_strength(stress):
-    """lam = clamp((stress - 0.2) / 0.7, 0, 1). D5."""
-    return float(np.clip((stress - 0.2) / 0.7, 0.0, 1.0))
+    """lam = clamp((stress - STRESS_FLOOR) / STRESS_SPAN, 0, 1). D5."""
+    return float(np.clip((stress - STRESS_FLOOR) / STRESS_SPAN, 0.0, 1.0))
 
 
 def apply_phase_damping(rho, lam):
