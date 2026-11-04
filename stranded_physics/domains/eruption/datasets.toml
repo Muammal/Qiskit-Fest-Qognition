@@ -1,1 +1,41 @@
 # One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+# licence_confirmed stays false until T-104 reads each licence page.
+
+[[dataset]]
+id = "st_vincent_plumes"
+kind = "research paper text"
+url = "https://acp.copernicus.org/articles/23/15209/2023/acp-23-15209-2023.html"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "86ed930485587cf9325b72d0c958f4e3547f25a19b85e220e2dbd7b4d103aec3"
+licence = "CC BY 4.0 as stated by Atmospheric Chemistry and Physics, to be read in T-104"
+citation = "Atmospheric Chemistry and Physics 23, 15209 (2023). doi:10.5194/acp-23-15209-2023"
+split = "reference"
+content_check = "min_bytes:50000"
+notes = "Text extracted from the HTML article."
+licence_confirmed = false
+
+[[dataset]]
+id = "st_vincent_ipgp"
+kind = "observatory summary"
+url = "https://www.ipgp.fr/actus-et-agenda/actualites/retour-sur-leruption-de-la-soufriere-de-saint-vincent-et-les-grenadines/"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "fe3a5fff7e33e2b2833699711dc267a7c89a971b2b6d79b515a524d66fc915f5"
+licence = "To be read in T-104"
+citation = "IPGP summary of the 2021 St Vincent eruption"
+split = "reference"
+content_check = "min_bytes:5000"
+notes = "Text extracted from the web page, in French."
+licence_confirmed = false
+
+[[dataset]]
+id = "st_vincent_cole_accepted"
+kind = "research paper"
+url = "https://ueaeprints.uea.ac.uk/id/eprint/91119/1/SP539_2022_292.pdf"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "92f4b691d16eac890f1557f3d5b528fe79cea244bba29b5c57cd3640bcbf69e2"
+licence = "To be read in T-104"
+citation = "Cole et al., Geological Society Special Publication 539. Accepted manuscript"
+split = "reference"
+content_check = "min_bytes:1000000"
+notes = "Plain text for reading sits beside it as st_vincent_cole_accepted.txt."
+licence_confirmed = false

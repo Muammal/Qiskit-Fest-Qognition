@@ -1,1 +1,28 @@
 # One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+# licence_confirmed stays false until T-104 reads each licence page.
+
+[[dataset]]
+id = "upper_wind_st_vincent"
+kind = "wind by pressure level"
+url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=13.33&longitude=-61.18&timezone=UTC&start_date=2021-04-01&end_date=2024-12-31&hourly=wind_direction_10m%2Cwind_direction_500hPa%2Cwind_speed_500hPa%2Cwind_direction_200hPa%2Cwind_speed_200hPa"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "b3160f832e2894912aa14f1b6070b17ae7796c60529d3d078bf9b941df1644e1"
+licence = "Open-Meteo Historical Forecast API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com historical forecast data"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "A model forecast from a coarse grid cell, not an observation."
+licence_confirmed = false
+
+[[dataset]]
+id = "weather_st_vincent"
+kind = "surface weather"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=13.33&longitude=-61.18&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "0e2af2b2233229191df205a6314f55cbbd97a6a46fd68876719dc8583fffb885"
+licence = "Open-Meteo Archive API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com ERA5-based archive"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "ERA5-based values from a coarse grid cell, not a station. Island rain is likely understated."
+licence_confirmed = false
