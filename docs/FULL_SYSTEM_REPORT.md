@@ -1,4 +1,4 @@
-# Quantum Cognition Simulation — Full System Report & Production Readiness Audit
+# Quantum Cognition Simulation — Full System Report
 
 ## 1. System Overview & How Everything Works
 
@@ -7,10 +7,10 @@
 1. **Tech A (`mind/`) — 2-Qubit Quantum Cognitive Architecture & 6 Published Models**:
    - Represents the survivor's internal belief state on $\mathcal{H}_{\text{belief}} \otimes \mathcal{H}_{\text{action}}$ ($\mathbb{C}^2 \otimes \mathbb{C}^2$).
    - Evolves beliefs through non-commuting hazard gates $R_y(\theta_e)R_z(\phi_e)$ (`tremor`, `gas_plume`, `storm`, `animal`, `injury`, `cold_night`, `find_food`) or projective measurement collapse (`eruption`, `ash_fall`), interleaved with physiological stress decoherence $\lambda(\text{stress})$.
-   - Implements **6 published, peer-reviewed Quantum Cognition models** in [`mind/cognition_models.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/mind/cognition_models.py) alongside Qiskit 2.x circuit builders in [`mind/circuits.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/mind/circuits.py).
+   - Implements **6 quantum cognition models adapted from published papers** in [`mind/cognition_models.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/mind/cognition_models.py) alongside Qiskit 2.x circuit builders in [`mind/circuits.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/mind/circuits.py).
 2. **Tech B (`stranded_physics/`, `disaster_data/`, `data/priors.json`, `contracts.py`) — Empirical Disaster Calibration, Multi-Domain Physics Engine, ATUS Priors & Grover Quantum Walk**:
    - Curates **49 real-world volcanic, seismic, tsunami, cyclone, and ERA5 weather datasets** in [`disaster_data/`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/disaster_data/), registered across **14 domain categories** in [`stranded_physics/domains/`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/domains/) with SHA-256 verification and strict `calibration` vs. `holdout` split enforcement.
-   - Implements **9 concrete `T1` physical domain solvers** for the April 2021 La Soufrière eruption on St. Vincent in [`stranded_physics/scenarios.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py) (`build_st_vincent_pack`), replayed with Tobler slope/ash locomotion by [`PackSimulation`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/runtime/simulation.py).
+   - Implements **9 simplified stand-in solvers** for the April 2021 La Soufrière eruption on St. Vincent in [`stranded_physics/scenarios.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py) (`build_st_vincent_pack`), replayed with Tobler slope/ash locomotion by [`PackSimulation`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/runtime/simulation.py).
    - Provides empirical Bureau of Labor Statistics (BLS) American Time Use Survey (ATUS) baseline activity priors in [`data/priors.json`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/data/priors.json) and a 4-direction **Grover-coined Discrete-Time Quantum Walk (DTQW)** in [`contracts.explore_step()`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/contracts.py).
 3. **Tech C (`engine/`, `main.py`) — Dual-Scenario World, Volcano Engine, Agent Physiology & Clash of Clans / Hay Day UI**:
    - Generates a $40\times 40$ tile island (`250m` per tile) in either **Volcano Evacuation** mode (priority-flood drainage, Tobler Dijkstra evacuation paths, active vs. deposited PDCs/lahars, dilute thermal surges, wind-advected ash) or **Island Wilderness Survival** mode.
@@ -28,7 +28,7 @@
 | Tech B Component | Implementation Location | Status | Verification |
 | :--- | :--- | :--- | :--- |
 | **1. Frozen Physics Interfaces & Pint Unit Registry (`WS0: T-001, T-002`)** | [`stranded_physics/core/api.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/core/api.py), [`fields.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/core/fields.py), [`records.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/core/records.py), [`verdicts.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/core/verdicts.py) | **DONE** | `43/43` tests in `stranded_physics/core/tests/test_interfaces.py` |
-| **2. 49 Empirical Disaster Datasets & Category Records (`WS1: T-100, T-101, T-102`)** | [`disaster_data/manifest.json`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/disaster_data/manifest.json) + all 14 `stranded_physics/domains/<cat>/datasets.toml` & `params.toml` | **DONE** | [`workboard/CATALOG.md`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/workboard/CATALOG.md) & [`workboard/CLAIMS.md`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/workboard/CLAIMS.md) (`14/14` gates `PASS`) |
+| **2. 49 Empirical Disaster Datasets & Category Records (`WS1: T-100, T-101, T-102`)** | [`disaster_data/manifest.json`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/disaster_data/manifest.json) + all 14 `stranded_physics/domains/<cat>/datasets.toml` & `params.toml` | **DONE** | [`workboard/CATALOG.md`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/workboard/CATALOG.md) & [`workboard/CLAIMS.md`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/workboard/CLAIMS.md) (14/14 record checks pass (settings and data files load; the physics is not tested against reality)) |
 | **3. Terrain & Drainage T1 Solver (`WS2: T-201, T-202`)** | `StVincentTerrain` in [`stranded_physics/scenarios.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py) | **DONE** | `test_st_vincent_physics_pack_and_simulation` |
 | **4. Atmosphere & Holland Storm T1 Solvers (`WS3: T-301, T-302`)** | `StVincentAtmos`, `HollandStorm` in [`stranded_physics/scenarios.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py) | **DONE** | `atmos.records_and_units: PASS`, `storm.records_and_units: PASS` |
 | **5. Eruption, Suzuki Tephra & Gaussian Gas T1 Solvers (`WS4: T-401, T-402, T-403`)** | `SoufriereEruption`, `SuzukiTephra`, `GaussianGas` in [`stranded_physics/scenarios.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py) | **DONE** | `eruption`, `tephra`, `gas` gates `PASS` |
@@ -65,7 +65,7 @@ All automated test suites, validation scripts, and physics gates pass out of the
 ```powershell
 # 1. Full Unified Test Suite (Tech A + Tech B + Tech C + GUI)
 $env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q
-# -> 155 passed, 3 skipped
+# -> 158 passed
 
 # 2. Tech A Validation Report & 6-Paper Cross-Check
 python -m mind.experiments.validate
@@ -74,6 +74,6 @@ python -m mind.experiments.validate
 # 3. Tech B 14-Category Verification Gates & Catalog
 python -m stranded_physics.gates required
 python -m stranded_physics.catalog
-# -> 14/14 PASS
+# -> 14/14 record checks pass (files load; physics not tested)
 ```
 

@@ -1249,11 +1249,11 @@ class IslandVisualizerApp:
         # Corner Sector Badge
         self.draw_badge(c2_x + 28, c_y + 24, "SECTOR 02: CALDERA", COLOR_ORANGE)
         self.canvas.blit(self.font_title.render("VOLCANO ERUPTION EVACUATION", True, COLOR_TEXT_MAIN), (c2_x + 28, c_y + 56))
-        self.canvas.blit(self.font_small.render("Calibrated Topography  •  Seismic Unrest  •  Emergency Routing", True, COLOR_TEXT_MUTED), (c2_x + 28, c_y + 82))
+        self.canvas.blit(self.font_small.render("Fictional Island Terrain  •  Seismic Unrest  •  Emergency Routing", True, COLOR_TEXT_MUTED), (c2_x + 28, c_y + 82))
         pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (c2_x + 24, c_y + 108), (c2_x + card_w - 24, c_y + 108), 1)
 
         desc2 = (
-            "A calibrated stratovolcano enters rapid precursory unrest. The agent must interpret tremor and "
+            "A fictional stratovolcano enters rapid precursory unrest. The agent must interpret tremor and "
             "gas warnings, navigate around expanding lava flows and toxic ash deposition, and execute "
             "shortest-path routes to designated coastal assembly zones."
         )
@@ -1264,7 +1264,7 @@ class IslandVisualizerApp:
         self.canvas.blit(self.font_sub.render("TECHNICAL SPECIFICATIONS", True, COLOR_GOLD), (c2_x + 28, f_y2))
         f_y2 += 28
         specs2 = [
-            ("Grid Matrix", "40 × 40 cells (Calibrated basalt topography)", COLOR_CYAN),
+            ("Grid Matrix", "40 × 40 cells (Fictional terrain, assumed rates)", COLOR_CYAN),
             ("Corridors", "Central caldera, radial valleys & coastal assembly", COLOR_ORANGE),
             ("Hazards", "Advancing lava, ash deposition, lethal PDCs & lahars", COLOR_RED),
             ("Cognitive Model", "Stress-induced decoherence & threat prioritization", COLOR_PURPLE)
@@ -1980,7 +1980,7 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, box_rect, 1, border_radius=4)
 
         if self.mind_type == "quantum":
-            engine_name, engine_col = "2-Qubit Quantum Deliberation (Validated Unitary Model)", COLOR_PURPLE
+            engine_name, engine_col = "2-Qubit Quantum Deliberation (Checked Against Qiskit)", COLOR_PURPLE
         elif self.mind_type == "classical_mixture":
             engine_name, engine_col = "Classical Mixture Control (λ=1, Zero Coherence)", COLOR_CYAN
         else:

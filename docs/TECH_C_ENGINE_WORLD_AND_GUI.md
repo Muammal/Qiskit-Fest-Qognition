@@ -7,7 +7,7 @@
 ## 1. Architectural Overview
 
 Tech C orchestrates the 2-hour turn-based simulation loop across a $40 \times 40$ tile island grid ($250\text{ m}$ per tile, $10\text{ km} \times 10\text{ km}$ domain) over a default 36-step ($72\text{-hour}$) horizon. It supports two distinct simulation scenarios selectable from the GUI Event Choice Hub or CLI (`--scenario`) and two execution backends (`--engine {legacy,physics}`):
-1. **`scenario="volcano"` (Calibrated Volcanic Island Evacuation)**: Fixed volcanic island topography (`MAP_SEED = 104729`) with a $1000\text{ m}$ central caldera, priority-flood drainage valleys, Tobler hiking routes to coastal assembly points, and seeded volcanic unrest/eruption timelines.
+1. **`scenario="volcano"` (Fictional Volcanic Island Evacuation)**: Fixed volcanic island topography (`MAP_SEED = 104729`) with a $1000\text{ m}$ central caldera, priority-flood drainage valleys, Tobler hiking routes to coastal assembly points, and seeded volcanic unrest/eruption timelines.
 2. **`scenario="island"` (Procedural Wilderness Survival)**: Seed-driven procedural archipelago with organic coastline harmonics, resource gathering, shelter building, wildlife encounters, and Grover-coined quantum vs. classical exploration walks.
 
 ```mermaid
