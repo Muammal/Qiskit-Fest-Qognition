@@ -1,0 +1,9 @@
+id = "eruption"
+title = "Eruption source and unrest"
+status = "model"
+owner = ""
+first_model = "source timeline and plume rise"
+owns = "catalogues, VEI by island size, precursors, case timelines, phases, mass rate, tremor and gas signs"
+must_not_own = "how material travels once it leaves the vent"
+outputs = []
+wanted = ["Erupted mass by phase for St Vincent 2021", "Column heights by event"]

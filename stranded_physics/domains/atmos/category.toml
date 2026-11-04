@@ -1,0 +1,9 @@
+id = "atmos"
+title = "Everyday weather and wind"
+status = "model"
+owner = ""
+first_model = "reanalysis forcing replayed per event"
+owns = "wind column by pressure level, rain, temperature, humidity"
+must_not_own = "ash, storms as events"
+outputs = []
+wanted = ["ERA5 pressure levels before 2021 (needs a free CDS account)", "Local rain gauges around La Soufriere"]

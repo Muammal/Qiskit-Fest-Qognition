@@ -1,0 +1,9 @@
+id = "pdc"
+title = "Pyroclastic density currents"
+status = "model"
+owner = ""
+first_model = "energy cone, then depth-averaged flow"
+owns = "flow arrival, runout, deposit, surge margin"
+must_not_own = "what triggers a collapse"
+outputs = []
+wanted = ["2021 PDC deposit polygons", "Primary paper on the first flow timing", "FlowDat or similar runout statistics"]

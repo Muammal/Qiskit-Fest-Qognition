@@ -1,0 +1,9 @@
+id = "lava"
+title = "Lava and dome growth"
+status = "model"
+owner = ""
+first_model = "dome footprint"
+owns = "dome footprint, effusion rate, flow front"
+must_not_own = "island-wide flows, since 2021 built a dome"
+outputs = []
+wanted = ["Dome growth rate from observatory reports"]

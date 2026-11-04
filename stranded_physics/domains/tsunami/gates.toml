@@ -1,0 +1,1 @@
+# One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.

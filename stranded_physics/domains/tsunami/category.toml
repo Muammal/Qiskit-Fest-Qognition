@@ -1,0 +1,9 @@
+id = "tsunami"
+title = "Tsunamis"
+status = "data_only"
+owner = ""
+first_model = ""
+owns = "NOAA volcanic tsunami records, runups"
+must_not_own = "a wave solver, for now"
+outputs = []
+wanted = []
