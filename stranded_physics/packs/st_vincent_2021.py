@@ -35,19 +35,23 @@ def _nearest(mask: np.ndarray, point: XY) -> XY:
     return float(xs[best]), float(ys[best])
 
 
-def sites(spawn: str = "chateaubelair") -> dict[str, list[XY]]:
+def place_sites(start_lonlat: tuple[float, float], assembly_lonlat: list[tuple[float, float]], vent: XY) -> dict[str, list[XY]]:
     """Sites from the real surface: people on land, and water at the nearest real channel, not at a chosen spot."""
     domain = Terrain()
     store = FieldStore()
     domain.run(ScopedFields(store, domain.id, domain.inputs, domain.outputs), np.random.default_rng(0))
     land = store.get("terrain.land_mask", "dimensionless") > 0
     channels = land & (store.get("terrain.flow_accumulation", "m**2") >= TERRAIN["channel_area"])
-    wanted = [to_utm(SPAWNS[spawn]), *[to_utm(p) for p in ASSEMBLY_LONLAT]]
+    wanted = [to_utm(start_lonlat), *[to_utm(p) for p in assembly_lonlat]]
     placed = [_nearest(land, point) for point in wanted]
     for point, site in zip(wanted, placed):
         if math.dist(point, site) > MOST_SNAP_M:
             raise InterfaceError(f"site {point} is {math.dist(point, site):.0f} m from land; check its coordinates")
-    return {"spawn": [placed[0]], "vent": [VENT_XY], "assembly": placed[1:], "water": [_nearest(channels, point) for point in placed]}
+    return {"spawn": [placed[0]], "vent": [vent], "assembly": placed[1:], "water": [_nearest(channels, point) for point in placed]}
+
+
+def sites(spawn: str = "chateaubelair") -> dict[str, list[XY]]:
+    return place_sites(SPAWNS[spawn], list(ASSEMBLY_LONLAT), VENT_XY)
 
 
 def scenario(spawn: str = "chateaubelair") -> ScenarioSpec:

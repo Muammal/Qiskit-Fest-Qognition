@@ -1,5 +1,56 @@
-# A scenario card lists the parts of the engine a scenario uses. Check one with: python -m stranded_physics.check <this file>
+# A scenario is a list of entities. Check it with: python -m stranded_physics.check <this file>
 id = "st_vincent_2021"
 title = "La Soufriere, St Vincent, April 2021"
 place = "real"
-uses = ["terrain", "atmos", "eruption", "tephra", "pdc", "lahar", "agent"]
+start_utc = "2021-04-08T00:00:00+00:00"
+hours = 96
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "weather"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "eruption"
+source = "replay"
+event = "st_vincent_2021"
+
+[[entity]]
+kind = "ash"
+source = "replay"
+
+[[entity]]
+kind = "flow"
+source = "replay"
+
+[[entity]]
+kind = "mudflow"
+source = "replay"
+
+[[entity]]
+kind = "person"
+source = "dials"
+name = "Richmond"
+start_lon = -61.226
+start_lat = 13.317
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "Barrouallie"
+lon = -61.267
+lat = 13.233
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "Colonarie"
+lon = -61.14
+lat = 13.24

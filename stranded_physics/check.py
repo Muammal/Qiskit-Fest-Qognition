@@ -15,9 +15,10 @@ from pathlib import Path
 from stranded_physics import gates
 from stranded_physics.core.api import InterfaceError
 from stranded_physics.core.records import load_parameters
+from stranded_physics.entities.api import parse_scenario
 
 CARD_KEYS = {"id", "title", "place", "uses"}
-PLACES = ("real", "fictional")
+PLACES = ("real", "fictional", "generated")
 NOT_MODEL_FILES = {"__init__.py", "measure.py", "fetch.py"}
 CANNOT_RUN, NOT_VERIFIED = "CANNOT RUN", "NOT VERIFIED"
 NOT_VALIDATED, PARTLY, AGREES = "VERIFIED, NOT VALIDATED HERE", "PARTLY VALIDATED", "AGREES WITH EVERY SCORED OBSERVATION"
@@ -46,6 +47,9 @@ class PartReport:
 
 def read_card(path: Path) -> Card:
     table = tomllib.loads(path.read_text(encoding="utf-8"))
+    if "entity" in table:  # A full scenario file: its parts come from its entities.
+        scenario = parse_scenario(table, str(path))
+        return Card(scenario.id, scenario.title, scenario.place, scenario.uses())
     unknown = set(table) - CARD_KEYS
     missing = CARD_KEYS - set(table)
     if unknown or missing:

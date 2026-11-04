@@ -1,5 +1,25 @@
-# A second real scenario built from the same parts: terrain, weather, mudflows and walking are reused, and only the storm is new.
+# A second real scenario from the same parts: only the storm is new. Nobody can play it until Stage 4 of workboard/ENTITIES.md.
 id = "beryl_2024"
 title = "Hurricane Beryl near St Vincent, July 2024"
 place = "real"
-uses = ["terrain", "atmos", "storm", "lahar", "agent"]
+start_utc = "2024-06-30T00:00:00+00:00"
+hours = 72
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "weather"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "storm"
+source = "replay"
+event = "beryl_2024"
+site_lon = -61.227
+site_lat = 13.158
