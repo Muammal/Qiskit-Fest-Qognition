@@ -1,0 +1,170 @@
+[
+  {
+    "eruption": "Surtsey",
+    "year": 1966,
+    "lead_hours": 1.3333,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1966 | Surtsey | August 19 | W= | D= | V=x | T=(80 min)"
+  },
+  {
+    "eruption": "Hekla",
+    "year": 1970,
+    "lead_hours": 0.4167,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1970 | Hekla | May 5 | W= | D= | V=x | T=25 min"
+  },
+  {
+    "eruption": "Heimaey",
+    "year": 1973,
+    "lead_hours": 30.0,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1973 | Heimaey | January 23 | W= | D= | V=x | T=30 h"
+  },
+  {
+    "eruption": "Krafla",
+    "year": 1975,
+    "lead_hours": 0.25,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1975 | Krafla | December 20 | W= | D=x | V= | T=~15 min"
+  },
+  {
+    "eruption": "Krafla",
+    "year": 1977,
+    "lead_hours": 1.0,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1977 | Krafla | April 27 | W=x | D= | V= | T=(1 h)"
+  },
+  {
+    "eruption": "Krafla",
+    "year": 1977,
+    "lead_hours": 2.25,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1977 | Krafla | September 8 | W=x | D= | V= | T=2 ¼ h"
+  },
+  {
+    "eruption": "Krafla",
+    "year": 1980,
+    "lead_hours": 1.0833,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1980 | Krafla | March 16 | W=X | D= | V= | T=65 min"
+  },
+  {
+    "eruption": "Krafla",
+    "year": 1980,
+    "lead_hours": 5.0,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1980 | Krafla | July 10 | W=x | D= | V= | T=5 h"
+  },
+  {
+    "eruption": "Hekla",
+    "year": 1980,
+    "lead_hours": 0.3833,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1980 | Hekla | August 17 | W= | D= | V=x | T=23 min"
+  },
+  {
+    "eruption": "Krafla",
+    "year": 1980,
+    "lead_hours": 1.3667,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1980 | Krafla | October 18 | W=x | D= | V= | T=82 min"
+  },
+  {
+    "eruption": "Krafla",
+    "year": 1981,
+    "lead_hours": 7.0,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1981 | Krafla | January 30 | W=x | D= | V= | T=7 h"
+  },
+  {
+    "eruption": "Hekla",
+    "year": 1981,
+    "lead_hours": 4.0,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1981 | Hekla | April 9 | W= | D= | V=x | T=(4 h)"
+  },
+  {
+    "eruption": "Krafla",
+    "year": 1981,
+    "lead_hours": 1.2667,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1981 | Krafla | November 18 | W=x | D= | V= | T=76 min."
+  },
+  {
+    "eruption": "Grímsvötn",
+    "year": 1983,
+    "lead_hours": 9.0,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1983 | Grímsvötn | May 28 | W= | D=x | V= | T=~9 h"
+  },
+  {
+    "eruption": "Krafla",
+    "year": 1984,
+    "lead_hours": 4.4,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1984 | Krafla | September 4 | W=x | D= | V= | T=4 h 24 min"
+  },
+  {
+    "eruption": "Hekla",
+    "year": 1991,
+    "lead_hours": 0.5,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1991 | Hekla | January 17 | W= | D=x | V= | T=30 min"
+  },
+  {
+    "eruption": "Gjálp",
+    "year": 1996,
+    "lead_hours": 34.0,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1996 | Gjálp | September 30 | W=x | D= | V= | T=~34 h"
+  },
+  {
+    "eruption": "Grímsvötn",
+    "year": 1998,
+    "lead_hours": 6.0,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 1998 | Grímsvötn | December 28 | W= | D=x | V= | T=~6 h"
+  },
+  {
+    "eruption": "Hekla",
+    "year": 2000,
+    "lead_hours": 1.3167,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 2000 | Hekla | February 26 | W=x | D= | V= | T=79 min"
+  },
+  {
+    "eruption": "Grímsvötn",
+    "year": 2004,
+    "lead_hours": null,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 2004 | Grímsvötn | November 1 | W=x | D= | V= | T=2 ½−15 h"
+  },
+  {
+    "eruption": "Eyjafjallajökull",
+    "year": 2010,
+    "lead_hours": null,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 2010 | Eyjafjallajökull | Mar. 20 | W= | D= | V=x | T="
+  },
+  {
+    "eruption": "Eyjafjallajökull",
+    "year": 2010,
+    "lead_hours": 2.25,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 2010 | Eyjafjallajökull | April 14 | W=x | D= | V= | T=2 h 15 min"
+  },
+  {
+    "eruption": "Grímsvötn",
+    "year": 2011,
+    "lead_hours": 1.5,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 2011 | Grímsvötn | May 21 | W=x | D= | V= | T=90 min"
+  },
+  {
+    "eruption": "Bárðarbunga",
+    "year": 2014,
+    "lead_hours": 312.0,
+    "source_url": "https://www.frontiersin.org/articles/10.3389/feart.2018.00045",
+    "quote_or_row": "Iceland only. Table 1 row: 2014 | Bárðarbunga | August 29 | W=x | D= | V= | T=13 days"
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "gvp_html_pages",
+    "url": "https://volcano.si.edu/volcano.cfm?vn=360150",
+    "error": "HTTP 403 to scripts, so not cited. Same for the home page and the other volcano pages tried; GVP licence text could not be read."
+  },
+  {
+    "id": "st_vincent_paper",
+    "url": "https://www.nature.com/articles/s41467-022-31901-4",
+    "error": "Bot challenge page, not cited."
+  },
+  {
+    "id": "la_palma_paper",
+    "url": "https://www.nature.com/articles/s41598-022-23998-w",
+    "error": "Bot challenge page, not cited."
+  },
+  {
+    "id": "brown_article",
+    "url": "https://appliedvolc.biomedcentral.com/articles/10.1186/s13617-017-0067-4",
+    "error": "Bot challenge page, not cited. The supplementary xlsx itself was reachable on static-content.springer.com."
+  },
+  {
+    "id": "noaa_volcano_fields",
+    "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/volcano/event-data",
+    "error": "JavaScript shell with no text. The legends were read from its static bundle instead."
+  },
+  {
+    "id": "cole_par",
+    "url": "https://par.nsf.gov/biblio/10555826",
+    "error": "Item not found page, not cited."
+  },
+  {
+    "id": "pelee_erudit",
+    "url": "https://www.erudit.org/fr/revues/bshg/2010-n156-bshg02573/1036841ar/",
+    "error": "Landing page without article text, not cited."
+  },
+  {
+    "id": "pelee_paperspast",
+    "url": "https://paperspast.natlib.govt.nz/newspapers/GIST19020524.2.20",
+    "error": "Script-only response with no text, not cited."
+  },
+  {
+    "id": "emdat",
+    "url": "https://www.emdat.be/",
+    "error": "Needs registration. Not attempted, by instruction."
+  }
+]

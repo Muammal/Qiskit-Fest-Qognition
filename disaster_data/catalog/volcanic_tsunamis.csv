@@ -1,0 +1,139 @@
+area,causeCode,country,damageAmountOrder,damageAmountOrderTotal,damageMillionsDollars,damageMillionsDollarsTotal,day,deaths,deathsAmountOrder,deathsAmountOrderTotal,deathsTotal,earthquakeEventId,eqDepth,eqMagnitude,eventValidity,hour,housesDamaged,housesDamagedAmountOrder,housesDamagedAmountOrderTotal,housesDamagedTotal,housesDestroyed,housesDestroyedAmountOrder,housesDestroyedAmountOrderTotal,housesDestroyedTotal,id,injuries,injuriesAmountOrder,injuriesAmountOrderTotal,injuriesTotal,latitude,locationName,longitude,maxWaterHeight,minute,month,numDeposits,numRunups,oceanicTsunami,publish,regionCode,second,tsIntensity,tsMtIi,volcanoEventId,warningStatusId,year
+,6,GREECE,3,3,,,,,3,3,,5877,,,4,,,,,,,,,,3,,,,,36.4,THERA ISLAND (SANTORINI),25.4,90,,,28,2,True,True,50,,6,,1351,,-1610
+,6,GREECE,,,,,,,,,,,,6.2,4,,,,,,,,,,21,,,,,36.404,THERA ISLAND (SANTORINI),25.396,,,,0,0,True,True,50,,3,,4904,,46
+,6,INDONESIA,4,4,,,,,3,3,,,,,2,,,,,,,,,,39,,,,,-6.102,JAVA-S. JAVA,105.423,,,,0,4,True,True,60,,3.5,2,4562,,416
+,6,JAPAN,,,,,20,,3,3,,7341,,6.5,4,,,,,,,,,,61,,,,,31.6,N. KAGOSHIMA BAY,130.7,,,7,0,1,True,True,85,,1.5,1.5,844,,766
+,6,JAPAN,,,,,23,,,,,,,,4,,,,,,,,,,219,,,,,31.9,CHICHIJIMA-TOKAIDO,140,,,1,0,1,True,True,85,,,,2589,,1606
+,6,INDONESIA,,1,,,1,,1,1,,,,,3,,,,,,,,,,222,,,,,0.8,"GAMALAMA, TERNATE ISLAND",127.325,,,7,0,1,True,True,83,,1.5,,607,,1608
+,6,INDONESIA,,,,,11,,,,,6027,,,2,,,,,,,,,,285,,,,,-6.92,BANDA SEA,129.125,1.5,,11,0,1,True,True,83,,0,,457,,1659
+,6,JAPAN,1,1,,,,,1,1,,,,,4,,,,,,,1,1,,293,,,,,27.85,"TORISHIMA, RYUKYU ISLANDS",128.25,,,,0,1,True,True,85,,1,1,4467,,1664
+,6,INDONESIA,,,,,20,,,,,5980,,,-1,,,,,,,,,,310,,,,,1.375,N. MOLUCCAS ISLANDS,127.52,,,5,0,0,True,True,83,,,,,,1673
+,6,INDONESIA,,1,,,12,,,3,,5982,,,3,,,,,,,,1,,312,,,,,1.375,N. MOLUCCAS ISLANDS,127.52,,,8,0,1,True,True,83,,1,1,599,,1673
+,6,ICELAND,,,,,13,,,,,,,,1,,,,,,,,,,347,,,,,64,MOUNT HEKLA,-19.683,,,2,1,0,True,True,73,,,,4251,,1693
+,6,SPAIN,3,3,,,5,,,,,,,,3,,,,,,,,,,375,,,,,28.271,"TENERIFE, CANARY ISLANDS",-16.641,,,5,0,1,True,True,73,,,,4374,,1706
+,6,PHILIPPINES,,3,,,24,,,1,,1205,,,4,,,,,,,,3,,387,,,,,14.002,"TAAL, LUZON ISLAND",120.993,,,9,0,1,False,True,84,,,,752,,1716
+,6,PHILIPPINES,1,3,,,12,,,1,,1304,,,4,1,,,,,,,3,,431,,,,,14.002,"TAAL, LUZON ISLAND",120.993,,,8,0,1,False,True,84,,,,753,,1749
+,6,INDONESIA,,,,,,,,,,,,,-1,,,,,,,,,,508,,,,,,KALIMANTAN ISLAND,,,,,0,0,True,True,83,,,,,,1773
+,6,JAPAN,2,2,,,9,,,,,,,,4,,,,,,,,,,525,,,,,31.6,SW. KYUSHU ISLAND,130.7,6,,9,1,2,True,True,85,,1,0,4523,,1780
+,6,JAPAN,,,,,31,,,,,,,,4,,,,,,,,,,528,,,,,31.6,SW. KYUSHU ISLAND,130.7,,,10,0,1,True,True,85,,1,0,5904,,1780
+,6,JAPAN,1,1,,,11,15,1,1,38,,,,4,,,,,,,,,,529,,,,,31.58,SW. KYUSHU ISLAND,130.67,,,4,2,1,True,True,85,,1,1,859,,1781
+AK,6,USA,,,,,29,,,,,,,,1,,,,,,,,,,575,,,,,54,"BOGOSLOF ISLAND, AK",-167,,,5,0,2,True,True,87,,,,,,1796
+,6,JAPAN,,,,,21,,,,,,,,2,,,,,,,,,,577,,,,,31.6,SW. KYUSHU ISLAND,130.7,,,11,0,0,True,True,85,,,,7535,,1797
+,6,INDONESIA,1,4,,,10,,3,4,60000,,,,4,,,,,,,,4,,613,,,4,,-8.2,TAMBORA,118,4,,4,2,6,True,True,60,,1.5,2,367,,1815
+MP,6,USA TERRITORY,,,,,,,,,,,,,2,,,,,,,,,,623,,,,,19.67,"ASUNCION ISLAND, N. MARIANA ISLANDS",145.4,,,,0,1,True,True,81,,1,1,4582,,1819
+AK,6,USA,,,,,1,,,,,6650,,,2,,,,,,,,,,631,,,,,54.52,"E. ALEUTIAN ISLANDS, AK",-164.65,,,3,0,1,True,True,87,,0.5,,5044,,1820
+AK,6,USA,,,,,21,,,,,,,,-1,,,,,,,,,,654,,,,,54.77,"UNIMAK ISLAND, AK",-164.18,,,3,0,1,True,True,87,,0.5,,3164,,1825
+AK,6,USA,,,,,22,,,,,,,,-1,,,,,,,,,,657,,,,,55,"UNIMAK ISLAND, AK",-165,,,10,0,1,True,True,87,,,,,,1826
+AK,6,USA,,,,,,,,,,,,,-1,,,,,,,,,,659,,,,,,"E. ALEUTIAN ISLANDS, AK",,,,,0,0,True,True,87,,,,,,1827
+,6,GUADELOUPE (FRENCH TERRITORY),,,,,17,,,,,,,,1,,,,,,,,,,731,,,,,15.933,MARIE-GALANTE ISLAND,-61.267,,,2,0,1,True,True,74,,,,4187,,1843
+,6,NORTHWEST PACIFIC OCEAN,,,,,,,,,,,,,1,,,,,,,,,,773,,,,,20.6,PHILIPPINE SEA,134.8,,,,0,0,True,True,84,,,,,,1850
+,6,TAIWAN,,,,,29,,,,,,,,1,,,,,,,,,,809,,,,,24,E. TAIWAN-RYUKYU ISLANDS,121.83,,,10,0,0,True,True,84,,,,787,,1853
+,6,NORTHWEST PACIFIC OCEAN,,,,,15,,,,,,,,1,,,,,,,,,,816,,,,,20.9,PHILIPPINE SEA,134.8,,,1,0,0,True,True,84,,,,,,1854
+,6,RUSSIA,,,,,9,,,,,,,,4,,,,,,,,,,821,,,,,50.9,N. KURIL ISLANDS,155.5,,,7,0,0,True,True,86,,,,2840,,1854
+,6,INDONESIA,,3,,,2,,1,4,2806,1995,,,4,,,,,,,,3,,859,,,2,,3.67,SANGIHE ISLAND,125.5,,,3,1,2,True,True,83,,1,1,581,,1856
+AK,6,USA,,,,,26,,,,,,,,1,,,,,,,,,,862,,,,,54.6,"UNIMAK ISLAND, AK",-165,,,7,0,1,True,True,87,,,,5884,,1856
+AS,6,USA TERRITORY,,,,,12,,,,,,,,1,,,,,,,,,,958,,,,,-14.214,"MANUA ISLANDS, AMERICAN SAMOA",-169.59,,,9,0,1,True,True,81,,,,2065,,1866
+,6,PHILIPPINES,,3,,,30,,,1,,2179,,,1,,,,,,,,3,,1020,,,,,9.203,SULU SEA,124.673,,,4,0,1,True,True,84,,2,,679,,1871
+,6,INDONESIA,2,2,,,3,400,3,3,400,,,,4,,,,,,75,2,2,75,1022,,,,,2.28,RUANG,125.425,25,,3,1,6,True,True,83,,3.5,4.6,533,,1871
+HI,6,USA,,,,,4,,,,,,,,1,,,,,,,,,,1072,,,,,19.475,HAWAII,-155.608,,,5,0,1,True,True,80,,1,,,,1877
+,6,INDONESIA,,,,,,,,,,,,,1,,,,,,,,,,1108,,,,,,TAGRILAND ISLAND,,,,8,0,0,True,True,83,,,,,,1878
+,6,INDONESIA,4,4,,,27,34417,4,4,36417,,,,4,2,,,,,,4,4,,1142,,,,,-6.102,KRAKATAU,105.423,41,59,8,14,102,True,True,60,,4,5.1,2429,,1883
+,6,INDONESIA,,,,,10,,,,,,,,2,,,,,,,,,,1144,,,,,-6.102,JAVA-S. JAVA,105.423,,,10,0,1,True,True,60,,0,,5264,,1883
+,6,INDONESIA,,,,,,,,,,,,,2,,,,,,,,,,1145,,,,,-6.102,KRAKATAU,105.423,,,2,0,0,True,True,60,,0,,5285,,1884
+,6,INDONESIA,,,,,7,,,,,,,,-1,,,,,,,,,,1193,,,,,,"AURI, HALMAHERA",,,,1,0,0,True,True,83,,,,,,1892
+,6,INDONESIA,1,3,,,7,,,4,1532,,,,4,,,,,,,,3,,1197,,,,,3.67,"AWU VOLCANO, SANGIHE ISLAND",125.5,0.75,,6,0,6,True,True,83,,1,1,584,,1892
+,6,MARTINIQUE (FRENCH TERRITORY),,,,,8,,,4,28000,,,,2,12,,,,,,,,,1288,,,,,14.82,MOUNT PELEE,-61.17,2,6,5,0,1,True,True,74,,,,4193,,1902
+,6,MARTINIQUE (FRENCH TERRITORY),1,2,,,30,,,4,1500,,,,4,12,,,,,1,1,1,,1291,,,,,14.82,MOUNT PELEE,-61.17,3,49,8,0,3,True,True,74,,,,4508,,1902
+AK,6,USA,,,,,,,,,,,,,2,,,,,,,,,,1297,,,,,,"COOK INLET, AK",,,,8,0,1,True,True,87,,,,,,1903
+,6,SAMOA,,3,,,4,,,,,,,,2,,,,,,,,3,,1326,,,,,-13.612,MATAVANU VOLCANO,-172.525,,,8,0,0,True,True,81,,0.5,,2068,,1905
+,6,SAMOA,,,,,28,,,,,,,,2,,,,,,,,,,1346,,,,,-13.612,MATAVANU VOLCANO,-172.525,,,11,0,1,True,True,81,,,,7529,,1906
+,6,SAMOA,,,,,8,,,,,,,,2,,,,,,,,,,1356,,,,,-13.612,MATAVANU VOLCANO,-172.525,,,6,0,1,True,True,81,,,,7530,,1907
+,6,SAMOA,,,,,19,,,,,,,,2,,,,,,,,,,1357,,,,,-13.612,MATAVANU VOLCANO,-172.525,,,6,0,1,True,True,81,,,,7531,,1907
+,6,SAMOA,,,,,27,,,,,,,,2,,,,,,,,,,1358,,,,,-13.612,MATAVANU VOLCANO,-172.525,,,6,0,1,True,True,81,,,,7532,,1907
+,6,SAMOA,,,,,9,,,,,,,,2,,,,,,,,,,1359,,,,,-13.612,MATAVANU VOLCANO,-172.525,,,7,0,1,True,True,81,,,,7533,,1907
+,6,SAMOA,,,,,25,,,,,,,,2,,,,,,,,,,1360,,,,,-13.612,MATAVANU VOLCANO,-172.525,,,7,0,1,True,True,81,,,,7534,,1907
+,6,SAMOA,1,3,,,6,,,,,,,,4,,,,,,1,1,3,,1363,,,,,-13.612,MATAVANU VOLCANO,-172.525,3.6,,10,0,2,True,True,81,,,,4984,,1907
+,6,TONGA,,,,,,,,,,10011,,,2,,,,,,,,,,1365,,,,,-21.38,TONGA ISLANDS,-175.65,,,7,0,1,True,True,81,,0.5,,2029,,1907
+,6,PHILIPPINES,1,3,,,30,50,1,4,1335,8391,,,4,,,,1,,,1,3,543,1392,,,3,199,14.002,"TAAL, LUZON ISLAND",120.993,3,,1,2,2,False,True,84,,,,761,,1911
+,6,ICELAND,,1,,,,,,,,,,,1,,,,,,,,,,1452,,,,,63.63,ICELAND,-19.05,,,,0,0,True,True,73,,,,4238,,1918
+,6,INDONESIA,,,,,18,,,,,,,,1,2,,,,,,,,,1454,,,,,3.138,SULAWESI,125.491,0.08,30,7,0,2,True,True,83,,0,,4784,,1918
+,6,ITALY,1,1,,,22,,,1,4,,,,4,17,,,3,,,,1,10,1476,,,3,,38.789,STROMBOLI ISLAND,15.213,0.75,45,5,0,5,True,True,50,,4,,25,,1919
+,6,INDONESIA,,,,,26,,,,,,,,3,,,,,,,,,,1593,,,,,-6.102,KRAKATAU,105.423,4,,3,1,0,True,True,60,,0,,2431,,1928
+,6,INDONESIA,,,,,17,,,,,,,,1,,,,,,,,,,1624,,,,,-6.102,KRAKATAU,105.423,500,,3,0,0,True,True,60,,,,2433,,1930
+,6,PHILIPPINES,3,3,,,25,9,1,1,9,,,,1,,,,,,,,,,1666,,,,,12.77,E. SAMAR ISLAND,124.05,,,12,0,1,True,True,84,,1,0.5,697,,1933
+,6,PAPUA NEW GUINEA,1,1,,,29,,1,3,507,10010,,,4,,,,,,,,1,,1698,,,,,-4.271,RABAUL,152.203,2.5,,5,1,4,True,True,82,,1.5,1.3,1346,,1937
+,6,RUSSIA,,,,,13,,,,,,,,3,6,,,,,,,,,1769,,,,,48.092,N. KURIL ISLANDS,153.2,,,11,0,0,True,True,86,,,,7044,,1946
+,6,SOLOMON ISLANDS,,,,,22,,,,,,,,3,,,,,,,,,,1816,,,,,-9.02,KAVACHI,157.95,,,12,0,0,True,True,82,,,2.6,2208,,1951
+,6,JAPAN,,,,,16,,,,,,,,4,2,,,,,,,,,1824,,,,,31.888,MYOJINSHO SUBMARINE VOLCANO,139.918,0.28,50,9,1,1,True,True,85,,-1,-1,4850,,1952
+,6,JAPAN,,,,,23,,,,,,,,2,4,,,,,,,,,1825,,,,,31.888,MYOJINSHO SUBMARINE VOLCANO,139.918,0.05,20,9,1,1,True,True,85,0,-1,-1,4851,,1952
+,6,JAPAN,,1,,,24,,,1,31,,,,4,3,,,,,,,,,1826,,,,,31.888,MYOJINSHO SUBMARINE VOLCANO,139.918,0.46,23,9,1,1,True,True,85,0,,-1,4852,,1952
+,6,JAPAN,,,,,26,,,,,,,,4,3,,,,,,,,,1827,,,,,31.888,MYOJINSHO SUBMARINE VOLCANO,139.918,0.36,33,9,1,2,True,True,85,0,-1,-1,4853,,1952
+,6,JAPAN,,,,,11,,,,,,,,4,,,,,,,,,,1833,,,,,31.888,MYOJINSHO SUBMARINE VOLCANO,139.918,6,,3,2,2,True,True,85,,-1,-1,4518,,1953
+,6,PAPUA NEW GUINEA,1,1,,,27,,,,,,,,3,,,,,,,,,,1838,,,,,-2.4,BISMARCK SEA,147.4,,,6,1,1,True,True,82,,1,0.5,2071,,1953
+,6,RUSSIA,,,,,30,,,,,,,,2,6,,,,,,,,,1856,,,,,55.978,KAMCHATKA,160.587,0.3,11,3,1,13,True,True,86,,-2,-0.7,2952,,1956
+,6,VANUATU,,,,,7,,,,,,,,1,10,,,,,,,,,1882,,,,,-16.829,KUWAE VOLCANO,168.536,,0,10,0,1,True,True,82,,0,,5644,,1958
+,6,INDONESIA,,,,,30,,,4,1028,,,,2,,,,,,,,,,1942,,,3,624,-8.342,LESSER SUNDA: BALI: AGUNG VOLCANO,115.508,,,3,0,2,True,True,60,,2,,351,,1963
+,6,PHILIPPINES,,1,,,28,355,3,3,355,,,,4,,,,,,,,1,,1977,,,,,14.002,"TAAL, LUZON ISLAND",120.993,4.7,,9,1,1,False,True,84,,,,762,,1965
+,6,ANTARCTICA,,,,,4,,,,,,,,1,,,,,,,,,,1992,,,,,-63,"TELEPHONE BAY, DECEPCION ISLAND",-60.5,1,,12,0,1,True,True,71,,0,,4412,,1967
+,6,SOLOMON ISLANDS,,,,,6,,,,,,,,4,20,,,,,,,,,2043,,,,,-10.38,"TINAKULA, SANTA CRUZ ISLANDS",165.8,,,9,1,1,True,True,82,,,,2235,,1971
+,6,PAPUA NEW GUINEA,,,,,9,,,,,,,,2,,,,,,,,,,2054,,,,,-5.52,"RITTER ISLAND, PAPUA NEW GUINEA",148.121,,,10,1,1,True,True,82,,,,4704,,1972
+,6,PAPUA NEW GUINEA,,,,,17,,,,,,70,,4,,,,,,,,,,2069,,,,,-5.52,"RITTER ISLAND, PAPUA NEW GUINEA",148.121,0.5,,10,1,2,True,True,82,,,-1,4683,,1974
+,6,PAPUA NEW GUINEA,1,4,,86,18,,,1,4,,,,4,,,,,,30,1,1,,2229,,,,,-4.238,PAPUA NEW GUINEA,152.214,3,,9,1,4,True,True,82,,,1.2,2180,,1994
+,6,RUSSIA,1,1,,,2,,,,,,,,4,15,,,,,,,,,2392,,,,,54.05,"KARYMSKOYE, KAMCHATKA, RUSSIA",159.43,30,40,1,2,1,True,True,86,,,,2921,,1996
+,6,MARTINIQUE (FRENCH TERRITORY),1,1,,,20,,,,,,,,4,9,,,,,20,1,1,20,2433,,,,,14.82,MOUNT PELEE,-61.17,4,24,5,0,5,True,True,74,,,,4805,,1902
+,6,MONTSERRAT,1,1,,,12,,,,,,,,4,,,,,,,,,,2694,,,,,16.722,SOUFRIERE HILLS VOLCANO,-62.18,4,,7,3,5,True,True,74,,,,4542,,2003
+,6,PHILIPPINES,3,4,,,15,,1,1,12,,,,1,,,,,,,3,4,,2853,,,,,14.002,"TAAL, LUZON ISLAND",120.993,,,11,0,1,False,True,84,,,,754,0,1754
+,6,PHILIPPINES,,,,,21,3,1,1,3,,,,2,,,,,,,,,,2872,,,,,19.077,LUZON ISLAND,122.202,,,3,1,1,True,True,84,,,,777,,1969
+,6,SAINT VINCENT AND THE GRENADINES,,1,,,7,,,4,1680,,,,4,,,,,,,,,,2873,,,3,,13.33,SOUFRIERE VOLCANO,-61.18,1,,5,1,6,True,True,74,,,,4199,,1902
+AK,6,USA,,,,,,,,,,,,,2,,,,,,,,,,2874,,,,,59.37,"COOK INLET, AK",-153.42,,,,0,0,True,True,87,,,,4583,,1540
+,6,MONTSERRAT,1,1,,,20,,,,,,,,4,11,,,,,,,,,2877,,,,,16.722,SOUFRIERE HILLS VOLCANO,-62.18,1,20,5,0,4,True,True,74,,,,4623,4,2006
+,6,MONTSERRAT,,,,,20,,,,,,,,4,,,,,,,,,,2880,,,,,16.722,SOUFRIERE HILLS VOLCANO,-62.18,2,,1,1,3,True,True,74,,,,4708,,1999
+,6,GREECE,,,,,,,,,,,,,3,,,,,,,,,,3102,,,,,36.404,ISLAND OF THIRA,25.396,,,,0,1,True,True,50,,,,4845,,1050
+,6,ITALY,,,,,11,,,,,,,,3,,,,,,,,,,3107,,,,,37.734,CALABRIAN ARC,15.004,,,2,0,1,True,True,50,,,,4846,,1169
+,6,ITALY,,,,,3,,,,,,,7.7,2,,,,,,,,,,3138,,,,,40.821,BAY OF NAPLES,14.426,,,2,0,1,True,True,50,,3,,4847,,1690
+,6,ITALY,,,,,14,,,,,,,,2,10,,,,,,,,,3141,,,,,40.821,BAY OF NAPLES,14.426,,,5,0,5,True,True,50,,3,,1380,,1698
+,6,GREECE,,,,,,,,,,,,,1,,,,,,,,,,3148,,,,,36.404,ISLAND OF THIRA,25.396,,,5,0,0,True,True,50,,,,4848,,1707
+,6,ITALY,,,,,30,,,,,,,,2,,,,,,,,,,3150,,,,,40.821,CAMPANIA,14.426,,,6,0,1,True,True,50,,3,,4849,,1714
+,6,ITALY,,,,,,,,,,,,,-1,,,,,,,,,,3151,,,,,,BAY OF NAPLES,,,,,0,0,True,True,50,,2,,,,1719
+,6,ITALY,,,,,17,,,,,,,,1,,,,,,,,,,3221,,,,,40.817,CAMPANIA,14.433,,,5,0,3,True,True,50,,2,,1405,,1813
+,6,ITALY,,,,,2,,,,,,,,2,7,,,,,,,,,3373,,,,,,LIVORNO,,,30,2,0,0,True,True,50,,3,,,,1852
+,6,ITALY,1,1,,,,,,,,,,,4,,,,,,,,,,3395,,,,,38.789,STROMBOLI ISLAND,15.213,,,2,0,5,True,True,50,,4,,4844,,1954
+,6,ITALY,,,,,4,,,3,350,,,,4,,,,,,,,,,3413,,,3,300,40.821,TYRRHENIAN SEA,14.426,0.4,,4,0,0,True,True,50,,3,,1344,,1906
+,6,GREECE,,,,,,,,,,7795,,,1,,,,,,,,,,3473,,,,,36.404,THERA ISLAND (SANTORINI),25.396,,,,0,0,True,True,50,,,,5324,,-198
+,6,INDONESIA,,1,,,3,,,,,,,,1,,,,,,,,1,,3511,,,,,3.138,SULAWESI,125.491,5,,4,0,0,True,True,83,,,,4864,,1919
+AK,6,USA,,,,,8,,,,,,,,4,,,,,,,,,,3587,,,,,52.18,"KASATOCHI VOLCANO, ALEUTIAN IS, AK",-175.5,0.19,,8,0,2,True,True,87,,,,4924,0,2008
+,6,CONGO,,,,,28,,,,,,,,3,,,,,,,,,,3638,,,,,-1.408,NYAMURAGIRA,29.2,,,1,0,1,False,True,78,,,,1682,,1938
+,6,ITALY,,2,,,11,1,1,1,6,,,,4,9,,,,,,,,,4218,,,1,20,38.789,STROMBOLI ISLAND,15.213,2.5,52,9,1,2,True,True,50,,3,,26,,1930
+,6,INDONESIA,,,,,17,,,,,,,,1,,,,,,,,,,4702,,,,,-8.54,LESSER SUNDA ISLANDS,123.59,,,8,0,0,True,True,60,,,,447,,1983
+MP,6,USA TERRITORY,,,,,29,,,,,9172,,,4,11,,,,,,,,,4822,,,,,16.708,"SOUTH OF SARIGAN IS, N. MARIANA IS",145.97,0.04,46,5,0,1,True,True,81,50,,,5184,,2010
+,6,JAPAN,,,,,,,,,,,,,-1,,,,,,,,,,5457,,,,,,KYUSHU ISLAND,,,,7,0,0,True,True,85,,,,,,765
+,6,SOLOMON ISLANDS,,,,,,,,,,,,,3,,,,,,,,,,5478,,,,,-10.38,"TINAKULA, SANTA CRUZ ISLANDS",165.8,,,,0,0,True,True,82,,,,2234,,1966
+,6,ITALY,,,,,4,,,,,,,,1,,,,,,,,,,5480,,,,,38.789,STROMBOLI ISLAND,15.213,,,2,0,0,True,True,50,,,,1440,,1879
+,6,PAPUA NEW GUINEA,,3,,,,,,4,2000,,,,2,,,,,,,,3,,5482,,,,,-5.358,LONG ISLAND,147.12,,,,0,0,True,True,82,,,,1357,,1660
+,6,JAPAN,,,,,25,,,,,,,,4,,,,,,,,,,5566,,,,,31.888,MYOJINSHO SUBMARINE VOLCANO,139.918,0.05,,3,1,1,True,True,85,,-1,-1,6044,,1953
+,6,TONGA,,,,,30,,,,,,,,3,,,,,,,,,,5608,,,,,-19.75,TOFUA,-175.07,,,8,0,2,True,True,81,,,,6664,,1892
+,6,SOLOMON ISLANDS,1,1,,,26,,,,,,,,3,,,,,,,1,1,,5629,,,,,-10.38,"TINAKULA, SANTA CRUZ ISLANDS",165.8,,,3,0,1,True,True,82,,,,6684,,1897
+,6,PAPUA NEW GUINEA,,,,,9,,,,,,,,4,,,,,,,,,,5676,,,,,-3.608,"KADOVAR ISLAND, PAPUA NEW GUINEA",144.588,1,,2,0,1,True,True,82,,,,7104,,2018
+,6,GRENADA,,,,,24,,,,,,,,2,,,,,,,,,,5694,,,,,12.3,KICK 'EM JENNY VOLCANO,-61.63,2,,7,0,3,True,True,74,,,,7224,,1939
+,6,GRENADA,,,,,24,,,,,,,,1,,,,,,,,,,5695,,,,,12.3,KICK 'EM JENNY VOLCANO,-61.63,,,10,0,0,True,True,74,,,,4205,,1965
+,6,MARTINIQUE (FRENCH TERRITORY),,,,,6,,,,,,,,4,14,,,,,,,,,5696,,,,,14.602,FORT-DE-FRANCE,-61.065,1,4,6,0,1,True,True,74,,,,7564,,1902
+,6,MARTINIQUE (FRENCH TERRITORY),,,,,10,,,,,,,,4,0,,,,,,,,,5697,,,,,14.553,MARTINIQUE,-61.009,0.6,24,7,0,2,True,True,74,,,,7565,,1902
+,6,ITALY,,,,,28,,,,,,,,3,10,,,,,,,,,5716,,,,,38.789,STROMBOLI ISLAND,15.213,0.3,17,8,0,2,True,True,50,15,,,7424,,2019
+,6,INDONESIA,,,,,,2,1,1,2,,,,1,,,,,,,,,,5761,,,,,-8.54,LESSER SUNDA ISLANDS,123.59,,,12,0,0,True,True,60,,,,445,,1973
+,6,CAMEROON,,,,,21,,,4,1700,,,,4,,,,,,,,,,5808,,,3,300,6.25,LAKE NYOS,10.5,75,,8,0,1,True,True,77,,,,1719,,1986
+,6,TONGA,4,4,118.648,135.368,15,6,1,1,6,,,,4,4,182,3,3,182,284,3,3,284,5824,20,1,1,20,-20.536,TONGA ISLANDS,-175.382,22,14,1,0,837,True,True,81,45,,,7551,2,2022
+,6,TONGA,,,,,16,,,,,,,,4,,,,,,,,,,5825,,,,,-20.536,TONGA ISLANDS,-175.382,0.36,,1,0,1,True,True,81,,,,,,2022
+,6,TONGA,,,,,13,,,,,,,,4,,,,,,,,,,5827,,,,,-20.536,TONGA ISLANDS,-175.382,0.15,,1,0,1,True,True,81,,,,,,2022
+,6,INDONESIA,,1,,,,,,,,,,,1,,,,,,,,,,5863,,,,,0.32,N. MOLUCCAS ISLANDS,127.4,,,,0,0,True,True,83,,,,663,,1550
+,6,ITALY,,,,,9,,,,,,,,4,7,,,,,,,,,5865,,,,,38.789,STROMBOLI ISLAND,15.213,0.04,23,10,0,2,True,True,50,,,,7557,,2022
+,6,ITALY,,,,,4,,,,,,,,4,,,,,,,,,,5868,,,,,38.789,STROMBOLI ISLAND,15.213,0.75,,12,0,3,True,True,50,,,,7558,,2022
+,6,SAINT VINCENT AND THE GRENADINES,,,,,19,,,,,,,,4,,,,,,,,,,5905,,,,,13.33,SOUFRIERE VOLCANO,-61.18,0.1,,4,0,4,True,True,74,,,,7528,,2021
+,6,VANUATU,,,,,31,,,,,,,,4,18,,,,,,,,,5906,,,,,-16.68,EAST EPI VOLCANO,168.37,0.05,0,1,0,3,True,True,82,,,,7562,,2023
+,6,ITALY,,,,,19,,,,,,,,4,12,,,,,,,,,5912,,,,,38.789,STROMBOLI ISLAND,15.213,0.36,51,5,0,2,True,True,50,,,,7566,,2021
+,6,ITALY,,,,,3,,,1,1,,,,4,14,,,,,,,,,5913,,,1,1,38.789,STROMBOLI ISLAND,15.213,1.3,45,7,0,4,True,True,50,42,,,7364,,2019
+,6,JAPAN,,,,,17,,,,,,,,3,,,,,,,,,,5928,,,,,31.888,MYOJINSHO SUBMARINE VOLCANO,139.918,,,9,0,1,True,True,85,,,,7574,,1952
+,6,JAPAN,,,,,19,,,,,,,,3,,,,,,,,,,5972,,,,,31.888,MYOJINSHO SUBMARINE VOLCANO,139.918,,,6,0,0,True,True,85,,,,2594,,1915
+,6,ITALY,,,,,11,,,,,,,,3,,,,,,,,,,6084,,,,,38.789,STROMBOLI ISLAND,15.213,,,7,0,0,True,True,50,,,,7585,,2024
+,6,GREECE,,,,,27,,,,,,,,3,,,,,,,,,,6189,,,,,36.524,THERA ISLAND (SANTORINI),25.483,,,9,0,0,True,True,50,,,,7589,,1650
+,6,GREECE,,,,,4,,,1,20,,,,3,,,,,,,,,,6190,,,,,36.524,THERA ISLAND (SANTORINI),25.483,,,11,0,0,True,True,50,,,,7590,,1650
+,6,GREECE,,,,,6,,,,,,,,3,,,,,,,,,,6191,,,,,36.524,THERA ISLAND (SANTORINI),25.483,,,12,0,0,True,True,50,,,,7591,,1650

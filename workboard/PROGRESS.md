@@ -8,7 +8,7 @@
 |---|---|---|
 | Nov 6 demo, on `mohamed/tech-c-volcano` | Built and pushed, awaiting a hand-played run and team sign-off | Play one full run; agree `gui.py` with Muammal |
 | Physics engine, on `physics/main` | Interfaces done. **No real physics yet** | Review and freeze the interfaces (`T-001`) |
-| Real disaster data | In progress, not yet checked or pushed | Finish the report, then pass the data checker |
+| Real disaster data, in [`disaster_data/`](../disaster_data/) | Collected, checked and pushed, awaiting a separate full review | Review the facts; move them into category records (`T-101`) |
 
 ## Done
 
@@ -39,12 +39,17 @@ These come from a calibrated model with assumed rates, and the rates were tuned 
 
 Every model in this branch is a deliberate fake, so no result from it can be cited.
 
+### Real disaster data (`T-100`, in review)
+- **Collected:** 49 sources, including Smithsonian volcanoes and eruptions, NOAA events, tsunamis and earthquakes, the Brown et al. fatalities database, IBTrACS cyclones, Natural Earth, and Open-Meteo weather for 5 islands.
+- **Written up:** 6 eruption case studies with 76 quoted facts, 2 real-event scenarios, and a [report comparing the engine with the data](../disaster_data/REPORT.md).
+- **Checks:** all 48 data checks pass, including re-downloading sources and re-fetching every quote live. The headline figures were recomputed separately from the raw files and match. Only the St Vincent facts have been read by a reviewer so far, so a quote existing doesn't yet prove each fact is labelled correctly.
+- **Licences:** 33 of 49 are not confirmed (`T-104`). Check them before republishing any of this data.
+- **Raw files:** about 180 MB stays out of git. The manifest records each file's source and hash, and `tools/` can download them again.
+
 ## In progress
 
-- **Real disaster data (`T-100`):** Claude is working on it locally, with nothing pushed.
-  - **Downloaded:** Smithsonian volcanoes and eruptions, NOAA events, IBTrACS cyclones, Natural Earth, and Open-Meteo weather for 5 islands.
-  - **Drafted:** 6 eruption case studies with 76 quoted facts, and 2 real-event scenarios. These are **unverified** until the checker re-fetches every quote and a separate review is done.
-  - **Missing:** the report for the team.
+- **Full review of the case-study facts,** beyond St Vincent.
+- **Filling the categories (`T-101`):** the data sits in `disaster_data/` for now, and the 14 categories stay empty until it moves into their records.
 
 ## Waiting on people
 
@@ -62,7 +67,8 @@ Every model in this branch is a deliberate fake, so no result from it can be cit
 
 - **Leaving early costs almost nothing in the demo.** Runs end at 72 hours, before scarce food matters, so leaving at the first sign is nearly always best.
 - **Wood and shelter no longer affect survival much.** Cold deaths were removed because tropical night temperatures don't support them.
-- **First-flow delay is an assumption.** We found no published statistic for it.
+- **First-flow delay is an assumption.** We found no published statistic for it. In the 4 real cases that report a flow, it came more than a day after onset. The demo's model still allows immediate flows, which those selected cases neither support nor rule out.
+- **Wind in the demo is seeded, not real.** Real data shows direction changes by event and by height, and 500 hPa alone isn't enough.
 - **Exhaustion deaths aren't defensible.** The rule is inherited, and `T-602` replaces it.
 - **Validation data may not be public.** 2021 ash and flow maps are the biggest question (`T-102`). If we can't get them, those categories can claim "verified" but not "validated".
 - **The physics engine is weeks to months of work.** It won't be ready for Nov 6, and the demo doesn't depend on it.
