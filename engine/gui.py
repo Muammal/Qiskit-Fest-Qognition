@@ -130,17 +130,17 @@ ACTION_COLORS = {
 }
 
 ISLAND_PRESETS = [
-    {"label": "Archipelago (Seed 101)", "seed": 101, "tag": "Balanced | High Survival", "color": COLOR_GREEN},
-    {"label": "Arid Crag (Seed 105)", "seed": 105, "tag": "Arid Interior | Thirst Peril", "color": COLOR_ORANGE},
-    {"label": "Interference Lab (Seed 202)", "seed": 202, "tag": "Order Effect Divergence", "color": COLOR_PURPLE},
-    {"label": "Heroic Haven (Seed 777)", "seed": 777, "tag": "Timber Rich | Freshwater", "color": COLOR_CYAN}
+    {"label": "Island Seed 101", "seed": 101, "tag": "All minds survive", "color": COLOR_GREEN},
+    {"label": "Island Seed 105", "seed": 105, "tag": "All minds survive", "color": COLOR_ORANGE},
+    {"label": "Island Seed 202", "seed": 202, "tag": "All minds survive", "color": COLOR_PURPLE},
+    {"label": "Island Seed 777", "seed": 777, "tag": "All minds die", "color": COLOR_CYAN}
 ]
 
 VOLCANO_PRESETS = [
-    {"label": "Event Seed 101", "seed": 101, "tag": "Standard Unrest | Timed Pulse", "color": COLOR_CYAN},
-    {"label": "Event Seed 105", "seed": 105, "tag": "Rapid Escalation | Fast Lava", "color": COLOR_ORANGE},
-    {"label": "Event Seed 202", "seed": 202, "tag": "Order Effect Divergence", "color": COLOR_PURPLE},
-    {"label": "Event Seed 777", "seed": 777, "tag": "Severe PDC Surge | Eruption", "color": COLOR_RED}
+    {"label": "Event Seed 101", "seed": 101, "tag": "Erupts at +20 h | First flow +30 h", "color": COLOR_CYAN},
+    {"label": "Event Seed 105", "seed": 105, "tag": "No eruption | Unrest fades", "color": COLOR_ORANGE},
+    {"label": "Event Seed 202", "seed": 202, "tag": "No eruption | Unrest fades", "color": COLOR_PURPLE},
+    {"label": "Event Seed 777", "seed": 777, "tag": "Erupts at +36 h | First flow +46 h", "color": COLOR_RED}
 ]
 
 
@@ -715,7 +715,7 @@ class IslandVisualizerApp:
         )
         self.btn_mind_classical = UIButton(
             (col2_x + 555, top_y + 36, card_w, 80), "Classical Rational Mind", self.font_title,
-            subtext="Deterministic utility argmax derived from published ATUS summary tables",
+            subtext="Deterministic utility: ATUS-mapped activity weights plus hand-set urgency",
             subfont=self.font_small, active_color=COLOR_BLUE, icon="classical"
         )
 
@@ -880,11 +880,17 @@ class IslandVisualizerApp:
                     self._handle_event_choice_click(self.btn_choice_island.rect.center)
                 elif event.key in (pygame.K_2, pygame.K_KP2):
                     self._handle_event_choice_click(self.btn_choice_volcano.rect.center)
+            elif self.app_state == "home" and event.key == pygame.K_RETURN:
+                self._handle_home_click(self.btn_launch.rect.center)
+            elif self.app_state == "sim" and event.key == pygame.K_r:
+                self._init_simulation()
+            elif self.app_state == "sim" and event.key == pygame.K_h:
+                self.app_state = "home"
             elif event.key == pygame.K_SPACE and self.app_state == "sim":
                 self.is_paused = not self.is_paused
             elif event.key in (pygame.K_RIGHT, pygame.K_n) and self.app_state == "sim":
                 self.step_forward()
-            elif event.key == pygame.K_q and self.app_state == "sim":
+            elif event.key == pygame.K_q and self.app_state in ("sim", "home"):
                 self._toggle_mind()
             elif event.key == pygame.K_e:
                 self.show_evacuation_map = not self.show_evacuation_map
@@ -1442,7 +1448,7 @@ class IslandVisualizerApp:
         for i, bl in enumerate(bullet_lines):
             self.canvas.blit(self.font_body.render(bl, True, COLOR_TEXT_MUTED), (hints_box.x + 18, hints_box.y + 40 + i * 26))
 
-        tip_str = "Press [ENTER] to Launch  |  [F11] Fullscreen  |  [Q] Toggle Mind Model  |  Decoherence Modeling Active"
+        tip_str = "Press [ENTER] to Launch  |  [F11] Fullscreen  |  [Q] Toggle Mind Model"
         self.canvas.blit(self.font_sub.render(tip_str, True, COLOR_TEXT_HINT), (WINDOW_WIDTH // 2 - 320, WINDOW_HEIGHT - 28))
 
     # -------------------------------------------------------------------------
