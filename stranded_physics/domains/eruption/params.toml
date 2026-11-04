@@ -27,9 +27,9 @@ source = "https://doi.org/10.1016/j.jvolgeores.2009.01.008 ; height versus DRE v
 id = "eruption.dre_density"
 value = 2500.0
 unit = "kg/m**3"
-valid_min = 2500.0
-valid_max = 2500.0
-role = "convention"
+valid_min = 1500
+valid_max = 3000
+role = "input"
 status = "assumption"
 
 # Cited from memory; task-specified stratified-plume coefficient.
@@ -65,15 +65,6 @@ role = "input"
 status = "literature"
 source = "https://doi.org/10.1098/rspa.1956.0011 ; stratified buoyant plume maximum height"
 
-# Exact unit convention.
-[[parameter]]
-id = "eruption.metres_per_km"
-value = 1000.0
-unit = "dimensionless"
-valid_min = 1000.0
-valid_max = 1000.0
-role = "convention"
-status = "assumption"
 
 # Date-only 8 April tremor/gas in IPGP, placed at noon UTC as requested.
 [[parameter]]
@@ -90,9 +81,9 @@ status = "assumption"
 id = "eruption.tremor_probability"
 value = 0.5
 unit = "dimensionless"
-valid_min = 0.5
-valid_max = 0.5
-role = "convention"
+valid_min = 0
+valid_max = 1
+role = "input"
 status = "assumption"
 
 # No quantitative detection probability supplied; independent Bernoulli draws per run-up frame.
@@ -100,9 +91,9 @@ status = "assumption"
 id = "eruption.gas_probability"
 value = 0.5
 unit = "dimensionless"
-valid_min = 0.5
-valid_max = 0.5
-role = "convention"
+valid_min = 0
+valid_max = 1
+role = "input"
 status = "assumption"
 
 # Above-vent column surrogate for events lacking height; strong mass and transport sensitivity, not fitted.
@@ -110,9 +101,9 @@ status = "assumption"
 id = "eruption.default_height"
 value = 12000.0
 unit = "m"
-valid_min = 12000.0
-valid_max = 12000.0
-role = "convention"
+valid_min = 2000
+valid_max = 25000
+role = "input"
 status = "assumption"
 
 # IPGP reports about 8 km without an explicit datum; treated as above vent, not an altitude conversion.
@@ -120,9 +111,9 @@ status = "assumption"
 id = "eruption.first_height"
 value = 8000.0
 unit = "m"
-valid_min = 8000.0
-valid_max = 8000.0
-role = "convention"
+valid_min = 2000
+valid_max = 25000
+role = "input"
 status = "assumption"
 
 # Half-hour column activity for unresolved pulses; RSAM spike lengths are not plume-emission durations.
@@ -130,9 +121,9 @@ status = "assumption"
 id = "eruption.default_duration"
 value = 1800.0
 unit = "s"
-valid_min = 1800.0
-valid_max = 1800.0
-role = "convention"
+valid_min = 60
+valid_max = 21600
+role = "input"
 status = "assumption"
 
 # Taylor section 3.1 gives 4.3-4.8 h visible plume duration; lower end applied from seismic onset as a column proxy.
@@ -140,9 +131,9 @@ status = "assumption"
 id = "eruption.first_duration"
 value = 15480.0
 unit = "s"
-valid_min = 15480.0
-valid_max = 15480.0
-role = "convention"
+valid_min = 3600
+valid_max = 21600
+role = "input"
 status = "assumption"
 
 # UTC event input, exact passage retained in facts.csv; no prediction score.
@@ -172,8 +163,8 @@ source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e02"
 id = "eruption.e02_duration"
 value = 34260.0
 unit = "s"
-valid_min = 34260.0
-valid_max = 34260.0
+valid_min = 18000
+valid_max = 43200
 role = "input"
 status = "literature"
 source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e02"
@@ -397,3 +388,44 @@ valid_max = 1618172520.0
 role = "input"
 status = "literature"
 source = "https://doi.org/10.1144/SP539-2022-292 ; section 4 and Table 6, e22"
+
+# Requested total-mass reporting window starts 8 April 2021 00:00 UTC.
+[[parameter]]
+id = "eruption.mass_axis_start_epoch"
+value = 1617840000.0
+unit = "s"
+valid_min = 1617840000.0
+valid_max = 1617840000.0
+role = "convention"
+status = "assumption"
+
+# Requested total-mass reporting window ends 12 April 2021 00:00 UTC.
+[[parameter]]
+id = "eruption.mass_axis_end_epoch"
+value = 1618185600.0
+unit = "s"
+valid_min = 1618185600.0
+valid_max = 1618185600.0
+role = "convention"
+status = "assumption"
+
+# 48 samples span both endpoints; dt is 96 hours divided by 47, avoiding a mislabeled 94-hour endpoint.
+[[parameter]]
+id = "eruption.mass_axis_frames"
+value = 48
+unit = "dimensionless"
+valid_min = 48
+valid_max = 48
+role = "convention"
+status = "assumption"
+
+# Cole section 3, total DRE volume: 35.5e6 m3; multiplied by task-specified 2500 kg/m3. Whole eruption, not this axis.
+[[parameter]]
+id = "eruption.cole_whole_eruption_kg"
+value = 8.875e10
+unit = "kg"
+valid_min = 1e10
+valid_max = 2e11
+role = "input"
+status = "derived"
+source = "https://doi.org/10.1144/SP539-2022-292 ; section 3, paragraph comparing DRE 35.5 x 10^6 m3 with satellite volume; Table 4"

@@ -1,1 +1,101 @@
-# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+# Physical assumptions and measurement conventions; no calibration to local winds.
+
+# Round uncalibrated shape choice. Holland 1980 cyclostrophic form cited from memory: doi:10.1175/1520-0493(1980)108<1212:AAMOTW>2.0.CO;2, radial wind profile; original not read offline.
+[[parameter]]
+id = "storm.holland_b"
+value = 1.5
+unit = "dimensionless"
+valid_min = 0.5
+valid_max = 3.0
+role = "input"
+status = "assumption"
+
+# Task-specified spherical Earth approximation; regional ellipsoidal corrections neglected.
+[[parameter]]
+id = "storm.earth_radius"
+value = 6371000.0
+unit = "m"
+valid_min = 6350000.0
+valid_max = 6400000.0
+role = "input"
+status = "assumption"
+
+# Task-provided Kingstown measurement site; no independent station geolocation supplied.
+[[parameter]]
+id = "storm.kingstown_lon"
+value = -61.227
+unit = "degree"
+valid_min = -61.3
+valid_max = -61.1
+role = "input"
+status = "assumption"
+
+# Task-provided Kingstown measurement site.
+[[parameter]]
+id = "storm.kingstown_lat"
+value = 13.158
+unit = "degree"
+valid_min = 13.0
+valid_max = 13.3
+role = "input"
+status = "assumption"
+
+# Task-specified 2024-06-30 00:00 UTC hourly measurement start.
+[[parameter]]
+id = "storm.peak_axis_epoch"
+value = 1719705600.0
+unit = "s"
+valid_min = 1719705600.0
+valid_max = 1719705600.0
+role = "convention"
+status = "assumption"
+
+# Task-specified 72 hourly samples; last sample is start +71 hours.
+[[parameter]]
+id = "storm.peak_axis_frames"
+value = 72
+unit = "dimensionless"
+valid_min = 1
+valid_max = 168
+role = "convention"
+status = "assumption"
+
+# Deterministic storm replay; reproducibility seed does not change it.
+[[parameter]]
+id = "storm.validation_seed"
+value = 1
+unit = "dimensionless"
+valid_min = 1
+valid_max = 1
+role = "convention"
+status = "assumption"
+
+# Catalog observation window in disaster_data/calibration.json cyclone_rate_per_year_st_vincent.method and disaster_data/REPORT.md; includes zero-count years.
+[[parameter]]
+id = "storm.catalog_first_year"
+value = 1980
+unit = "dimensionless"
+valid_min = 1980
+valid_max = 1980
+role = "convention"
+status = "assumption"
+
+# Last complete archive year per disaster_data/calibration.json; do not infer coverage from years with events.
+[[parameter]]
+id = "storm.catalog_last_year"
+value = 2025
+unit = "dimensionless"
+valid_min = 2025
+valid_max = 2025
+role = "convention"
+status = "assumption"
+
+# Catalog selection radius in disaster_data/calibration.json and REPORT.md; storm centres, not impact footprints.
+[[parameter]]
+id = "storm.catalog_radius_km"
+value = 200.0
+unit = "km"
+valid_min = 200.0
+valid_max = 200.0
+role = "convention"
+status = "assumption"

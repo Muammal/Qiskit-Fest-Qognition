@@ -10,14 +10,14 @@ valid_max = 9.80665
 role = "convention"
 status = "assumption"
 
-# Dense spherical fine-ash approximation; Stokes speed is proportional to density contrast.
+# Constant dense spherical particle approximation; buoyancy and terminal speed depend on density contrast.
 [[parameter]]
 id = "tephra.particle_density"
 value = 2500.0
 unit = "kg/m**3"
-valid_min = 2500.0
-valid_max = 2500.0
-role = "convention"
+valid_min = 500
+valid_max = 3000
+role = "input"
 status = "assumption"
 
 # Constant near-surface air density throughout descent; altitude dependence neglected.
@@ -25,9 +25,9 @@ status = "assumption"
 id = "tephra.air_density"
 value = 1.2
 unit = "kg/m**3"
-valid_min = 1.2
-valid_max = 1.2
-role = "convention"
+valid_min = 0.1
+valid_max = 1.5
+role = "input"
 status = "assumption"
 
 # Constant air viscosity; temperature dependence neglected.
@@ -35,9 +35,9 @@ status = "assumption"
 id = "tephra.air_viscosity"
 value = 1.8e-05
 unit = "Pa*s"
-valid_min = 1.8e-05
-valid_max = 1.8e-05
-role = "convention"
+valid_min = 1e-05
+valid_max = 3e-05
+role = "input"
 status = "assumption"
 
 # Task-specified creeping-flow validity bound; reject larger particle Reynolds numbers.
@@ -65,9 +65,9 @@ status = "assumption"
 id = "tephra.wind_height_500"
 value = 5850.0
 unit = "m"
-valid_min = 5850.0
-valid_max = 5850.0
-role = "convention"
+valid_min = 5000
+valid_max = 6500
+role = "input"
 status = "assumption"
 
 # Fixed 200 hPa geometric height; pressure-height variability neglected.
@@ -75,9 +75,9 @@ status = "assumption"
 id = "tephra.wind_height_200"
 value = 12400.0
 unit = "m"
-valid_min = 12400.0
-valid_max = 12400.0
-role = "convention"
+valid_min = 10000
+valid_max = 14000
+role = "input"
 status = "assumption"
 
 # Suzuki functional form cited from memory: Suzuki 1983, Arc Volcanism, pp. 95-113.
@@ -86,9 +86,9 @@ status = "assumption"
 id = "tephra.suzuki_a"
 value = 4.0
 unit = "dimensionless"
-valid_min = 4.0
-valid_max = 4.0
-role = "convention"
+valid_min = 0.1
+valid_max = 20
+role = "input"
 status = "assumption"
 
 # Uncalibrated release-shape choice; controls concentration around the release maximum.
@@ -96,9 +96,9 @@ status = "assumption"
 id = "tephra.suzuki_lambda"
 value = 1.0
 unit = "dimensionless"
-valid_min = 1.0
-valid_max = 1.0
-role = "convention"
+valid_min = 0.1
+valid_max = 10
+role = "input"
 status = "assumption"
 
 # Equal-height midpoint bins; numerical approximation to a continuous column.
@@ -106,8 +106,8 @@ status = "assumption"
 id = "tephra.release_bins"
 value = 12
 unit = "dimensionless"
-valid_min = 12
-valid_max = 12
+valid_min = 2
+valid_max = 192
 role = "convention"
 status = "assumption"
 
@@ -116,69 +116,9 @@ status = "assumption"
 id = "tephra.diffusivity"
 value = 1000.0
 unit = "m**2/s"
-valid_min = 1000.0
-valid_max = 1000.0
-role = "convention"
-status = "assumption"
-
-# 20 micrometre representative fine ash; used only where Stokes Reynolds number is <= 1.
-[[parameter]]
-id = "tephra.fine_diameter"
-value = 2e-05
-unit = "m"
-valid_min = 2e-05
-valid_max = 2e-05
-role = "convention"
-status = "assumption"
-
-# Illustrative fine mass fraction; no supplied measured grain-size distribution.
-[[parameter]]
-id = "tephra.fine_fraction"
-value = 0.3
-unit = "dimensionless"
-valid_min = 0.3
-valid_max = 0.3
-role = "convention"
-status = "assumption"
-
-# Illustrative medium mass fraction; no supplied measured grain-size distribution.
-[[parameter]]
-id = "tephra.medium_fraction"
-value = 0.4
-unit = "dimensionless"
-valid_min = 0.4
-valid_max = 0.4
-role = "convention"
-status = "assumption"
-
-# Illustrative coarse mass fraction; fractions sum to one without fitting.
-[[parameter]]
-id = "tephra.coarse_fraction"
-value = 0.3
-unit = "dimensionless"
-valid_min = 0.3
-valid_max = 0.3
-role = "convention"
-status = "assumption"
-
-# Labelled constant-terminal-speed law for medium ash, outside the Stokes calculation.
-[[parameter]]
-id = "tephra.medium_settling"
-value = 0.5
-unit = "m/s"
-valid_min = 0.5
-valid_max = 0.5
-role = "convention"
-status = "assumption"
-
-# Labelled constant-terminal-speed law for coarse ash; shape and drag variation unresolved.
-[[parameter]]
-id = "tephra.coarse_settling"
-value = 5.0
-unit = "m/s"
-valid_min = 5.0
-valid_max = 5.0
-role = "convention"
+valid_min = 10
+valid_max = 10000
+role = "input"
 status = "assumption"
 
 # Wide analytic quadrature domain: six standard deviations around every packet centre.
@@ -186,8 +126,8 @@ status = "assumption"
 id = "tephra.budget_sigma"
 value = 6.0
 unit = "dimensionless"
-valid_min = 6.0
-valid_max = 6.0
+valid_min = 4
+valid_max = 10
 role = "convention"
 status = "assumption"
 
@@ -196,8 +136,8 @@ status = "assumption"
 id = "tephra.budget_points"
 value = 241
 unit = "dimensionless"
-valid_min = 241
-valid_max = 241
+valid_min = 41
+valid_max = 1001
 role = "convention"
 status = "assumption"
 
@@ -228,5 +168,105 @@ value = 1
 unit = "dimensionless"
 valid_min = 1
 valid_max = 1
+role = "convention"
+status = "assumption"
+
+# Selected before holdout runs: 64 to 128 grains changed final mean land load by 6.6665e-5 relative.
+[[parameter]]
+id = "tephra.grain_count"
+value = 64
+unit = "dimensionless"
+valid_min = 2
+valid_max = 4096
+role = "convention"
+status = "assumption"
+
+# Task-specified lower phi bound (16 mm); the spectrum is truncated.
+[[parameter]]
+id = "tephra.grain_phi_min"
+value = -4.0
+unit = "dimensionless"
+valid_min = -4.0
+valid_max = -4.0
+role = "convention"
+status = "assumption"
+
+# Task-specified upper phi bound (15.625 micrometres).
+[[parameter]]
+id = "tephra.grain_phi_max"
+value = 6.0
+unit = "dimensionless"
+valid_min = 6.0
+valid_max = 6.0
+role = "convention"
+status = "assumption"
+
+# Round trial median, not a measured eruption-wide distribution. Cole section 3/Fig 6 reports unit-dependent grains and aggregation peaks at 1 phi, not this normal law.
+[[parameter]]
+id = "tephra.grain_median_phi"
+value = 1.0
+unit = "dimensionless"
+valid_min = -3.0
+valid_max = 5.0
+role = "input"
+status = "assumption"
+
+# Round trial standard deviation in phi; Cole section 3 supplies no eruption-wide normal spread. Controls distal mass fraction.
+[[parameter]]
+id = "tephra.grain_spread_phi"
+value = 2.0
+unit = "dimensionless"
+valid_min = 0.5
+valid_max = 4.0
+role = "input"
+status = "assumption"
+
+# Task-specified Schiller-Naumann drag correction; cited from memory, Schiller and Naumann 1933, VDI 77 pp. 318-320, not read offline.
+[[parameter]]
+id = "tephra.drag_coefficient"
+value = 0.15
+unit = "dimensionless"
+valid_min = 0.15
+valid_max = 0.15
+role = "convention"
+status = "assumption"
+
+# Task-specified Schiller-Naumann Reynolds exponent; cited from memory as above.
+[[parameter]]
+id = "tephra.drag_exponent"
+value = 0.687
+unit = "dimensionless"
+valid_min = 0.687
+valid_max = 0.687
+role = "convention"
+status = "assumption"
+
+# Task-specified transition to constant sphere drag; rounded branches have a small jump.
+[[parameter]]
+id = "tephra.drag_transition_re"
+value = 1000.0
+unit = "dimensionless"
+valid_min = 1000.0
+valid_max = 1000.0
+role = "convention"
+status = "assumption"
+
+# Task-specified high-Re sphere drag; cited from memory as above.
+[[parameter]]
+id = "tephra.newton_drag"
+value = 0.44
+unit = "dimensionless"
+valid_min = 0.44
+valid_max = 0.44
+role = "convention"
+status = "assumption"
+
+# Absolute root tolerance in Reynolds number; negligible compared with drag-law uncertainty.
+[[parameter]]
+id = "tephra.settling_tolerance"
+value = 1e-12
+unit = "dimensionless"
+valid_min = 1e-14
+valid_max = 1e-08
 role = "convention"
 status = "assumption"
