@@ -180,3 +180,31 @@ unitary gate — documented in `06-circuits-and-hardware.md`.
 `03-events-and-order-effects.md` "Eruption collapse" walk-through
 (`x=0, y=0, z=-1, P(danger)=1`, idempotent to `max|diff|=0.0`).
 
+## D5: Stress map (2026-11-03, stage 3, status: accepted)
+**Context:** Per-slot dephasing strength `lam` needs a function of the
+agent's `stress` need. The engine's existing GUI (`engine/gui.py`
+~1748-1753, 1897) already has its own decoherence-meter formula,
+`(stress-0.4)/0.5`, which is a display-only overclaim Tech C must fix in
+Stage 5; it must not silently diverge from whatever this model actually
+uses.
+**Decision:** `lam = clamp((stress-0.2)/0.7, 0, 1)`. The engine's agent
+starts at `stress=0.15` (so `lam=0`, full coherence at game start) and
+each sign adds roughly `0.08` to stress (`engine/agent.py`), so this
+mapping reaches near-full dephasing only after several signs have
+accumulated — matching the intended "stress builds up, then clouds
+judgment" arc.
+**Alternatives considered:** the team stub's `(stress-0.4)/0.5` — rejected:
+reusing the team's existing meter formula might look consistent, but it
+was never derived from the engine's actual stress dynamics, and Stage 5
+must change the GUI meter to call this same function rather than keep two
+divergent formulas.
+**Consequences:** `mind/decoherence.py`'s `decoherence_strength(stress)`
+implements this mapping. Stage 5's integration PR must point
+`engine/gui.py`'s decoherence meter at this same function (see
+`08-integration-notes.md`).
+**Evidence:**
+```
+$ python -c "from mind.decoherence import decoherence_strength as d; print(d(0.15), d(0.85), d(1.0))"
+0.0 0.9285714285714285 1.0
+```
+

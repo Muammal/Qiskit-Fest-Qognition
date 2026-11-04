@@ -4,12 +4,10 @@ Operates on the belief qubit alone, as a 2x2 density matrix: |0> = safe,
 |1> = danger. Rotation angles and collapse events will move to
 mind/config.py in Stage 4, which consolidates every constant; they live
 here for now since Stage 2 has no config.py dependency yet.
-
-Per-slot phase damping (stress as decoherence, Section 4.5) is added to
-run_events in Stage 3 - lam is accepted here only so Stage 3 does not have
-to change this function's signature.
 """
 import numpy as np
+
+from mind.decoherence import apply_phase_damping
 
 # event -> (rotation axis, angle). No angle is +-pi/2 (Section 4.4 "angle
 # rule"): that would reset the belief to 50/50 under full decoherence.
@@ -66,11 +64,9 @@ def apply_event(rho, event):
 
 
 def run_events(rho, events, lam):
-    """Apply events in order, oldest first. lam must be 0 until Stage 3."""
-    if lam:
-        raise NotImplementedError(
-            "per-slot phase damping is added to run_events in Stage 3"
-        )
+    """Apply events in order, oldest first. Phase-damp after every slot,
+    including when the event is "none" (Section 4.5)."""
     for event in events:
         rho = apply_event(rho, event)
+        rho = apply_phase_damping(rho, lam)
     return rho
