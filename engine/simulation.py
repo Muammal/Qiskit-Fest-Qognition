@@ -11,6 +11,11 @@ from engine.agent import SurvivalAgent
 from engine.events import EventGenerator, VOLCANIC
 from engine.volcano import VolcanoModel
 
+try:
+    from mind.quantum_mind import classical_mixture_decide
+except ImportError:
+    classical_mixture_decide = None
+
 DEFAULT_STEPS = 36  # assumption: 72 hours, two hours per step
 
 
@@ -45,7 +50,14 @@ class SimulationEngine:
             self.volcano = VolcanoModel(seed, self.world, weather=self.event_gen.weather)
             self.event_gen.prepare(self.volcano)
 
-        self.decide_fn = decide_fn or (contracts.quantum_decide if self.mind_type == 'quantum' else contracts.classical_decide)
+        if decide_fn:
+            self.decide_fn = decide_fn
+        elif self.mind_type == 'quantum':
+            self.decide_fn = contracts.quantum_decide
+        elif self.mind_type == 'classical_mixture' and classical_mixture_decide is not None:
+            self.decide_fn = classical_mixture_decide
+        else:
+            self.decide_fn = contracts.classical_decide
         self.steps = []
         self.previous_action, self.previous_moved = 'rest', False
         self.random_state = random.Random(seed).getstate()
@@ -106,6 +118,7 @@ class SimulationEngine:
                 break
         record = dict(t=t, state=state, event=event, action=decision['action'],
                       probs=decision['probs'], reason=decision['reason'],
+                      quantum=decision.get('quantum'),
                       pos_after=list(agent.pos), phase=self.volcano.phases[t])
         self.steps.append(record)
         return record

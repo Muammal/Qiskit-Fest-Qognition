@@ -250,3 +250,40 @@ the reflex overrides it.
 and `test_repo_compatibility[test_urgent_thirst_beats_warning_in_both_stubs]`
 passed.
 
+## D9: Integration edits (2026-11-03, stage 5, status: accepted)
+**Context:** Wiring `mind/` into the actual game requires touching
+`contracts.py` and `engine/` - files outside Tech A's normal ownership.
+The plan offers one PR on `tech-a/integration` for Tech C to review, vs
+editing directly.
+**Decision:** One PR on branch `tech-a/integration` (created from
+`tech-a/quantum-mind`), listed edit-by-edit with diffs and test evidence
+in `08-integration-notes.md`. **Not merged by Tech A.** Brodin approved
+proceeding into this stage (and its branch/PR/no-self-merge shape, as
+described to him beforehand) in this session, 2026-11-03.
+**Alternatives considered:** editing `pre-main`/`main` directly — rejected
+per the team's ownership rule (any contract or JSON change needs the whole
+team) and the plan's explicit "Do not merge it yourself."
+**Consequences:** Four files touched, minimally: `contracts.py` (delegate
+`quantum_decide`), `engine/simulation.py` (log `quantum` diagnostics, add
+a `classical_mixture` mind type), `engine/gui.py` (fix two hardware
+overclaims, point the decoherence meter at `decoherence_strength`),
+`engine/batch_runner.py` (add the quantum-vs-mixture comparison, keep the
+existing quantum-vs-classical-stub comparison unchanged for `main.py`).
+`main.py` and `README.md` are proposal-only; neither is edited, since
+`main.py` isn't in Tech A's ownership even under the Stage 5 exception.
+**Evidence:** `08-integration-notes.md`; full diff below.
+```
+$ git diff --stat  (tech-a/integration working tree, pre-commit)
+ contracts.py           | 21 ++++++++++++++++++--
+ engine/batch_runner.py | 54 ++++++++++++++++++++++++++++++++++++++++++++++----
+ engine/gui.py          | 16 +++++++++------
+ engine/simulation.py   | 15 +++++++++++++-
+ 4 files changed, 93 insertions(+), 13 deletions(-)
+
+$ SDL_VIDEODRIVER=dummy python -m pytest -q test_contracts_and_engine.py mind/tests
+62 passed in 1.45s
+
+$ SDL_VIDEODRIVER=dummy python main.py --batch
+(unchanged output vs pre-PR; confirms main.py needed no edits)
+```
+
