@@ -118,10 +118,44 @@ study to a volcano-evacuation scenario is an assumption stated openly.
 alternative dataset was identified, and it would trade one open assumption
 (transfer across domains) for another (what data, what fit procedure)
 without plan guidance.
-**Consequences:** `mind/config.py`'s `ETA = -0.7854`. Stage 1's
-Tversky–Shafir test (κ_max = 0.5588, κ = −0.4389, P(0.5) = 0.36) is the
-evidence this constant reproduces the calibration source exactly; the
-"Questions a judge might ask" section of `02-deliberation-unitary.md` must
-state the cross-domain transfer assumption.
-**Evidence:** Brodin's decision, recorded 2026-11-03.
+**Consequences:** `mind/config.py`'s `ETA` constant stores the unrounded
+exact-solve value `-0.7853897988344999` (solving
+`p_protect_closed_form(0.5, 1, 0.69, 0.59, eta) = 0.36` exactly), so that
+Stage 1's Tversky–Shafir test can check `P(0.5) = 0.36` to `1e-9`, not just
+to the 4-decimal rounding `-0.7854` that `TECH_A_BUILD_PLAN.md` Appendix A
+prints for human readability. `02-deliberation-unitary.md`'s "Questions a
+judge might ask" states the cross-domain transfer assumption.
+**Evidence:**
+```
+$ python3 -c "
+import math
+qS, qD, Ptarget = 0.69, 0.59, 0.36
+kmax = math.sqrt((1-qS)*(1-qD)/(qS*qD))
+kappa = (Ptarget - 0.5*(qS+qD)) / math.sqrt(qS*qD)
+print(kappa/kmax)"
+-0.7853897988344999
+```
+
+## D-QR: QR completion with det +1 (2026-11-03, stage 1, status: accepted)
+**Context:** `u = U|safe,carry>` and `w = U|danger,carry>` are fixed by
+Section 4.3's formulas, but that only pins down 2 of `U`'s 4 columns. The
+remaining 2 columns, and the overall orientation (`det = +1` vs `-1`), are
+unconstrained by the physics and need a concrete, reproducible procedure.
+**Decision:** QR-decompose `[u, w, e2, e3]` (numpy `linalg.qr`, where
+`e2, e3` are the standard basis vectors at indices 2, 3). Flip the sign of
+`Q`'s first two columns if they come back negated relative to `u, w` (numpy
+`qr` can flip a column's sign to make its leading `R` entry positive).
+Then, if `det(Q) = -1`, negate column 3 only (never columns 0 or 1, which
+must stay `+u, +w`).
+**Alternatives considered:** Gram-Schmidt by hand on `e2, e3` — equivalent
+to what `numpy.linalg.qr` already does; no reason to hand-roll it.
+**Consequences:** `build_U` always returns an `SO(4)` matrix (`det = +1`),
+which is what makes the $\le 2$ CZ-gate hardware compilation in
+`06-circuits-and-hardware.md` possible (Vatan & Williams 2004). Columns 2,
+3 of `U` have no physical meaning on their own — the decision qubit never
+starts in `|protect>`, so those columns are never read from in-game; they
+only matter for `det(U)` and for the gate-level circuit in Stage 6.
+**Evidence:** `mind/tests/test_model.py::test_U_validity_random_sweep` (500
+random `(q_S, q_D, eta)` triples, `max|U^T U - I| < 1e-10`,
+`det(U) == 1` to `1e-9`) and `test_gate_circuit_matches_closed_form`.
 
