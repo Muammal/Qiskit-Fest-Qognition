@@ -1,0 +1,16 @@
+{
+  "agent-end-to-end": {
+    "failed": [],
+    "hash": "9d47529c04de1a9ec0ce08aecc8a464b08a8279b48ed2c18c840a2808930231e",
+    "verdict": "PASS"
+  },
+  "agent-evacuation-route": {
+    "hash": "0a7f4a1d95c32e8bf093a572e02ce509fb64399581a8471d61faac11b19403bc",
+    "value": 3.558160464984465,
+    "verdict": "NO_TARGET"
+  },
+  "agent-walking": {
+    "hash": "f00cb0430312c64ccee36ecddd4a2cae0845aebd13e0a156e26ec9f46473d8be",
+    "verdict": "PASS"
+  }
+}
