@@ -281,3 +281,25 @@ ever imports or calls them.
 transpiled gate counts and the 4-SE fake-backend check);
 `06-circuits-and-hardware.md`.
 
+## D8: Library cross-check (2026-11-03, stage 7, status: accepted)
+**Context:** `qcog` and `quantum-mind` are the two cross-check candidates
+Appendix/Section 5 name, both flagged as October 2026 alpha packages.
+**Decision:** Took the plan's own recommended default directly (optional,
+time-boxed, no new dependency) without a separate stop-and-ask: the
+plan's own Section 5 table already states the alternative ("make it a
+dependency") as something to avoid, with no real second design path for
+Brodin to weigh. `mind/experiments/validate.py`'s `library_cross_check()`
+only *imports* `qcog`/`quantum_mind` in the current venv (no network
+calls, no `pip install`) and records whatever happens.
+**Alternatives considered:** making either package a hard dependency -
+rejected per the plan; a full 45-minute exploratory session - skipped,
+since neither package is installed or installable without adding an
+unreviewed dependency outside `requirements.txt` (not Tech A's call to
+add silently).
+**Consequences:** `07-validation-report.md` Section 4 records the real,
+negative result (`ModuleNotFoundError` for both) rather than a
+fabricated comparison. If Brodin wants the full 45-minute exploration,
+it can be done as a follow-up without touching the validated model.
+**Evidence:** `docs/tech-a/07-validation-report.md` Section 4.
+
+
