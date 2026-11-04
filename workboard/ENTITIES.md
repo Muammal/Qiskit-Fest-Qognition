@@ -56,10 +56,10 @@ Evidence never carries over. A pass on St Vincent says nothing about a generated
 | `flow` | Hot flows from an eruption | Built, needs an eruption | | |
 | `mudflow` | Rain on ash | Built, needs ash | | |
 | `storm` | Wind from a cyclone | Built | Stage 2 | Stage 2 |
-| `person` | A body and a mind, at a start point | | | Built for one. Groups in Stage 4 |
-| `shelter` | A place to evacuate to | | | Built as an assembly point. Protection in Stage 4 |
-| `resource` | Food, water, wood | | | Stage 4 |
-| `group` | Many people, who can differ | | | Stage 4 |
+| `person` | A body and a mind, at a start point | | | Built |
+| `shelter` | A place to evacuate to, which also prevents storm injury | | | Built. Doesn't yet protect from ash or flows |
+| `resource` | Food or water at a place | | | Built. Wood isn't yet |
+| `group` | Many people with one mind, spread around a point | | | Built. People don't yet see or help each other |
 
 Hunger, thirst and energy belong to the body of each `person`, and their settings live in `domains/agent/params.toml`.
 
@@ -70,7 +70,7 @@ Hunger, thirst and energy belong to the body of each `person`, and their setting
 | **1. Interfaces and replay** | St Vincent runs from a scenario file | Its results match the hard-coded scenario exactly |
 | **2. Generated eruptions and storms** | An eruption or storm sampled from real catalogues | Generated sizes, lead times and storm winds match the catalogues statistically, with targets set first |
 | **3. Generated weather and land** | Weather from real records at any held island; generated islands | Weather windows match their source. Generated islands pass the terrain checks |
-| **4. People, shelters, resources** | Many different people on one map; a storm-only scenario runs | Runtime no longer assumes an eruption. Each person sees only their own state |
+| **4. People, shelters, resources** (built, first version) | Many different people on one map; a storm-only scenario runs | Done: the runtime no longer assumes an eruption, and each person sees only their own state. Not yet: people interacting, or shelters protecting from ash and flows |
 | **5. In-game builder** | Pick and adjust entities on a screen | Saving and reloading gives an identical file, and the game runs it |
 
 ## Rules

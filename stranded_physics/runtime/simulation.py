@@ -7,7 +7,7 @@ import numpy as np
 
 import contracts
 from stranded_physics.core.api import InterfaceError, ScenarioPack, XY
-from stranded_physics.domains.agent.physiology import advance, cause_of_death, needs, pandolf_watts
+from stranded_physics.domains.agent.physiology import advance, cause_of_death, needs, pandolf_watts, setting
 from stranded_physics.domains.agent.walking import TravelField, travel_field, walk
 from stranded_physics.runtime.body import AgentBody, to_state
 from stranded_physics.runtime.perception import perceive
@@ -15,9 +15,21 @@ from stranded_physics.runtime.perception import perceive
 STEP_MINUTES = 120
 SUBSTEP_MINUTES = 5  # Hazard contact is checked at this resolution along a walk.
 DRINK_REACH_M = 400.  # assumption: close enough to a stream to drink from it.
+FOOD_REACH_M = 400.  # assumption: close enough to gather food.
+SHELTER_REACH_M = 400.  # assumption: close enough to count as sheltered.
+GALE_M_S = 17.2  # Beaufort force 8, from memory: strong enough for a person to notice and act on.
+HURRICANE_M_S = 32.7  # Beaufort force 12, from memory. assumption: an unsheltered person is injured at this wind.
 STORM_RAIN_MM_H = 5.  # assumption: T0 threshold; a `convention` value in the frozen event mapping.
 PHASE_NAMES = {0: "unrest", 1: "escalating", 2: "erupting", 3: "fading"}
 TILE_CODES = {"water": 0, "plains": 1, "forest": 2, "mountain": 3, "shelter": 4}
+
+
+def _mind(mind_type: str):
+    """The team's minds. The control lives with the quantum mind, and is imported only when asked for."""
+    if mind_type == "classical_mixture":
+        from mind.quantum_mind import classical_mixture_decide
+        return classical_mixture_decide
+    return contracts.quantum_decide if mind_type == "quantum" else contracts.classical_decide
 
 
 class PackWorld:
@@ -31,7 +43,7 @@ class PackWorld:
         self.zones = [[self._zone(row, col) for col in range(grid.nx)] for row in range(grid.ny)]
         self.elevation = [[pack.sample("terrain.elevation", grid.centre(row, col)) for col in range(grid.nx)] for row in range(grid.ny)]
         self.spawn_pos = self.to_tile(pack.sites["spawn"][0])
-        self.vent = tuple(self.to_tile(pack.sites["vent"][0]))
+        self.vent = tuple(self.to_tile(pack.sites["vent"][0])) if pack.sites.get("vent") else None
         self.assembly_points = [tuple(self.to_tile(p)) for p in pack.sites["assembly"]]
         self.freshwater_tiles = [tuple(self.to_tile(p)) for p in pack.sites["water"]]
         self.clean_springs = self.freshwater_tiles[1:]
@@ -78,15 +90,15 @@ class PackWorld:
 class PackSimulation:
     """Same surface as SimulationEngine: step(), run(), timeline(), world, agent, steps."""
 
-    def __init__(self, pack: ScenarioPack, mind_type: str = "quantum", noise_source: str = "stub", decide_fn=None, allow_out_of_domain: bool = False) -> None:
+    def __init__(self, pack: ScenarioPack, mind_type: str = "quantum", noise_source: str = "stub", decide_fn=None, allow_out_of_domain: bool = False, person: int = 0) -> None:
         breaches = [k for k, v in pack.verdicts.items() if v == "OUT_OF_DOMAIN"]
         if breaches and not allow_out_of_domain:
             raise InterfaceError(f"pack is outside its models' valid range: {breaches}")
         self.pack, self.mind_type, self.noise_source = pack, mind_type.lower(), noise_source
         self.seed = pack.seed
-        self.decide_fn = decide_fn or (contracts.quantum_decide if self.mind_type == "quantum" else contracts.classical_decide)
+        self.decide_fn = decide_fn or _mind(self.mind_type)
         self.world = PackWorld(pack)
-        self.agent = AgentBody(tuple(pack.sites["spawn"][0]), list(self.world.spawn_pos), pack.t0_local_hour)
+        self.agent = AgentBody(tuple(pack.sites["spawn"][person]), self.world.to_tile(pack.sites["spawn"][person]), pack.t0_local_hour)
         self.recent_events = ["none", "none"]
         self._fields: dict[XY, TravelField] = {}
         self._walked = (0., 0., 0.)  # Seconds, metres and metres climbed in the current step.
@@ -99,6 +111,8 @@ class PackSimulation:
         previous = perceive(self.pack, self.agent.xy_m, max(0., t_s - self.pack.time.dt_s))
         if now.explosion_heard or now.flow_visible:
             return "eruption"
+        if now.wind_m_s >= GALE_M_S:
+            return "storm"
         if now.ash_kg_m2 > previous.ash_kg_m2:
             return "ash_fall"
         if now.felt_tremor:
@@ -129,6 +143,8 @@ class PackSimulation:
             return self._nearest_site(sites["assembly"])
         if action == "drink":
             return self._nearest_site(sites["water"])
+        if action == "forage" and sites.get("food"):
+            return self._nearest_site(sites["food"])
         return None
 
     def _advance(self, action: str, t_s: float) -> None:
@@ -149,7 +165,7 @@ class PackSimulation:
                     rise = self.pack.sample("terrain.elevation", end) - self.pack.sample("terrain.elevation", start)
                     seconds, metres, climbed = seconds + SUBSTEP_MINUTES * 60., metres + math.dist(start, end), climbed + max(0., rise)
                     self.agent.xy_m = end
-            if self.pack.sample("pdc.arrival", self.agent.xy_m) <= clock and self.pack.sample("pdc.active", self.agent.xy_m, clock):
+            if self.pack.has("pdc.arrival") and self.pack.sample("pdc.arrival", self.agent.xy_m) <= clock and self.pack.sample("pdc.active", self.agent.xy_m, clock):
                 self.agent.alive, self.agent.cause = False, "pyroclastic_flow"
                 break
             if self.pack.has("lahar.depth") and self.pack.sample("lahar.depth", self.agent.xy_m, clock) > 0:
@@ -169,7 +185,10 @@ class PackSimulation:
         grade = 100. * climbed / metres if metres else 0.
         water = self._walk_goal("drink")
         body.balance = advance(body.balance, STEP_MINUTES / 60., seconds / 3600., pandolf_watts(speed, grade) if seconds else 0.,
-                               drank=bool(action == "drink" and water and math.dist(water, body.xy_m) < DRINK_REACH_M), rested=action == "rest")
+                               drank=bool(action == "drink" and water and math.dist(water, body.xy_m) < DRINK_REACH_M), rested=action == "rest",
+                               ate_kcal=setting("meal_energy", "kcal") if self._within("food", FOOD_REACH_M) and action == "forage" else 0.)
+        if self.pack.has("storm.max_wind") and self.pack.series("storm.max_wind")[len(self.steps)] >= HURRICANE_M_S and not self._within("assembly", SHELTER_REACH_M):
+            body.injured = True
         current = needs(body.balance)
         body.thirst, body.hunger, body.energy = current["thirst"], current["hunger"], current["energy"]
         if event in ("tremor", "gas_plume", "eruption", "ash_fall"):
@@ -190,7 +209,7 @@ class PackSimulation:
         t_s = t * self.pack.time.dt_s
         event = self._event(t_s)
         self.recent_events = (self.recent_events + [event])[-3:]
-        if event in ("tremor", "gas_plume", "eruption", "ash_fall"):
+        if event in ("tremor", "gas_plume", "eruption", "ash_fall") or (event == "storm" and self.pack.has("storm.max_wind")):
             self.warned = True
         state = to_state(self.agent, self.recent_events)
         contracts.validate_state(state)
@@ -200,7 +219,7 @@ class PackSimulation:
         self._needs(decision["action"], event)
         record = {"t": t, "state": state, "event": event, "action": decision["action"], "probs": decision["probs"],
                   "reason": decision["reason"], "pos_after": list(self.agent.tile),
-                  "phase": PHASE_NAMES[int(self.pack.series("eruption.phase")[t])]}
+                  "phase": PHASE_NAMES[int(self.pack.series("eruption.phase")[t])] if self.pack.has("eruption.phase") else "none"}
         self.steps.append(record)
         return record
 
@@ -210,7 +229,13 @@ class PackSimulation:
             pass
         return self.timeline()
 
+    def _within(self, site: str, reach_m: float) -> bool:
+        return any(math.dist(point, self.agent.xy_m) < reach_m for point in self.pack.sites.get(site, ()))
+
     def _volcano_export(self) -> dict:
+        if not self.pack.has("eruption.phase"):
+            return {"vent": None, "erupts": False, "onset_step": None, "first_pdc_step": None, "phases": ["none"] * self.pack.time.n,
+                    "world_events": [r["event"] for r in self.steps], "hazard_by_step": []}
         phase = self.pack.series("eruption.phase")
         erupting = np.flatnonzero(phase == 2)
         arrival = self.pack.frame("pdc.arrival")

@@ -58,7 +58,7 @@ def start_body(thirst: float, hunger: float, energy: float) -> Body:
     return Body((1. - thirst) * LETHAL_DEFICIT_L, (1. - hunger) * setting("felt_hunger_span", "kcal"), (1. - energy) * setting("fatigue_span", "kcal"))
 
 
-def advance(body: Body, hours: float, walking_hours: float = 0., walking_watts: float = 0., drank: bool = False, rested: bool = False) -> Body:
+def advance(body: Body, hours: float, walking_hours: float = 0., walking_watts: float = 0., drank: bool = False, rested: bool = False, ate_kcal: float = 0.) -> Body:
     """One stretch of time. Returns a new Body."""
     extra_kcal = max(0., walking_watts - REST_WATTS) * walking_hours * SECONDS_PER_HOUR / JOULES_PER_KCAL
     water = body.water_deficit_l + REST_WATER_L_PER_HOUR * hours + sweat_l_per_hour(walking_watts) * walking_hours
@@ -67,7 +67,7 @@ def advance(body: Body, hours: float, walking_hours: float = 0., walking_watts: 
     fatigue = body.fatigue_kcal + extra_kcal
     if rested:
         fatigue = max(0., fatigue - setting("rest_recovery", "kcal"))
-    return replace(body, water_deficit_l=water, food_deficit_kcal=body.food_deficit_kcal + REST_KCAL_PER_HOUR * hours + extra_kcal, fatigue_kcal=fatigue)
+    return replace(body, water_deficit_l=water, food_deficit_kcal=max(0., body.food_deficit_kcal + REST_KCAL_PER_HOUR * hours + extra_kcal - ate_kcal), fatigue_kcal=fatigue)
 
 
 def needs(body: Body) -> dict[str, float]:

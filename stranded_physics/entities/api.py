@@ -12,9 +12,11 @@ from stranded_physics.core.api import InterfaceError
 SOURCES = ("replay", "catalogue", "dials")
 PLACES = ("real", "fictional", "generated")
 REQUIRED_KEYS = {"id", "title", "place", "start_utc", "hours", "step_hours", "local_utc_offset", "entity"}
-ENTITY_KEYS = {"kind", "source", "event", "name"}
+ENTITY_KEYS = {"kind", "source", "event", "name", "mind", "what"}
+MINDS = ("quantum", "classical_mixture", "classical")
+RESOURCES = ("water", "food")
 CATEGORY_OF = {"terrain": "terrain", "weather": "atmos", "eruption": "eruption", "ash": "tephra", "flow": "pdc", "mudflow": "lahar",
-               "storm": "storm", "person": "agent", "shelter": "agent"}
+               "storm": "storm", "person": "agent", "group": "agent", "shelter": "agent", "resource": "agent"}
 
 
 @dataclass(frozen=True)
@@ -35,6 +37,8 @@ class EntitySpec:
     event: str | None = None
     name: str = ""
     settings: Mapping[str, float] = field(default_factory=dict)
+    mind: str = "quantum"  # For people and groups.
+    what: str = ""  # For resources.
 
 
 @dataclass(frozen=True)
@@ -66,7 +70,13 @@ def _entity(entry: dict, where: str) -> EntitySpec:
     if entry["source"] not in SOURCES:
         raise InterfaceError(f"{where}: {entry['kind']} has source {entry['source']!r}. Sources: {SOURCES}")
     settings = {key: value for key, value in entry.items() if key not in ENTITY_KEYS}
-    return EntitySpec(entry["kind"], entry["source"], entry.get("event"), entry.get("name", ""), settings)
+    mind = entry.get("mind", "quantum")
+    if mind not in MINDS:
+        raise InterfaceError(f"{where}: no mind {mind!r}. Minds: {MINDS}")
+    what = entry.get("what", "")
+    if entry["kind"] == "resource" and what not in RESOURCES:
+        raise InterfaceError(f"{where}: a resource needs what = one of {RESOURCES}, not {what!r}")
+    return EntitySpec(entry["kind"], entry["source"], entry.get("event"), entry.get("name", ""), settings, mind, what)
 
 
 def parse_scenario(table: dict, where: str = "scenario") -> ScenarioFile:
@@ -105,5 +115,9 @@ def dump_scenario(scenario: ScenarioFile) -> str:
             lines.append(f"event = {_value(entity.event)}")
         if entity.name:
             lines.append(f"name = {_value(entity.name)}")
+        if entity.kind in ("person", "group"):
+            lines.append(f"mind = {_value(entity.mind)}")
+        if entity.what:
+            lines.append(f"what = {_value(entity.what)}")
         lines += [f"{key} = {_value(value)}" for key, value in entity.settings.items()]
     return "\n".join(lines) + "\n"

@@ -80,13 +80,6 @@ def test_a_person_needs_a_shelter():
         checked(TERRAIN, WEATHER, ERUPTION, PERSON)
 
 
-def test_groups_and_storm_only_play_are_refused_until_stage_4():
-    with pytest.raises(InterfaceError, match="Stage 4"):
-        checked(TERRAIN, WEATHER, ERUPTION, PERSON, PERSON, SHELTER)
-    with pytest.raises(InterfaceError, match="Stage 4"):
-        checked(TERRAIN, WEATHER, PERSON, SHELTER)
-
-
 @pytest.mark.parametrize("changes, message", [({"place": "mars"}, "place"), ({"hours": 7}, "multiple"), ({"start_utc": "2021-04-08T00:00:00"}, "timezone"), ({"extra": 1}, "extra")])
 def test_a_badly_formed_file_is_refused(changes, message):
     with pytest.raises(InterfaceError, match=message):

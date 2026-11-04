@@ -1,4 +1,4 @@
-# A second real scenario from the same parts: only the storm is new. Nobody can play it until Stage 4 of workboard/ENTITIES.md.
+# A second real scenario from the same parts: only the storm is new. Someone in Chateaubelair, with Barrouallie as shelter.
 id = "beryl_2024"
 title = "Hurricane Beryl near St Vincent, July 2024"
 place = "real"
@@ -23,3 +23,17 @@ source = "replay"
 event = "beryl_2024"
 site_lon = -61.227
 site_lat = 13.158
+
+[[entity]]
+kind = "person"
+source = "dials"
+name = "Chateaubelair"
+start_lon = -61.243
+start_lat = 13.283
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "Barrouallie"
+lon = -61.267
+lat = 13.233

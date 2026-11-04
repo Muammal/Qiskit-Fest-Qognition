@@ -149,3 +149,12 @@ valid_min = 1.0
 valid_max = 16.0
 role = "convention"
 status = "assumption"
+
+[[parameter]]
+id = "agent.meal_energy"  # Food gathered and eaten in one two-hour step near a food source. No source held.
+value = 600.0
+unit = "kcal"
+valid_min = 100.0
+valid_max = 2000.0
+role = "input"
+status = "assumption"

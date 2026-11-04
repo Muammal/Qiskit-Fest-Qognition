@@ -91,9 +91,12 @@ KINDS: dict[str, Kind] = {kind.name: kind for kind in (
     Kind("mudflow", ("replay",), (), (), ("terrain", "weather", "ash"), _mudflow),
     Kind("storm", ("replay",), lon_lat_dials("site_", "the place whose wind is reported"), STORM_EVENTS, (), _storm),
     Kind("person", ("dials",), lon_lat_dials("start_", "where this person starts"), (), ("terrain",), _no_model),
+    Kind("group", ("dials",), (*lon_lat_dials("start_", "the middle of this group"), Dial("count", "person", 1, 500, "How many people"),
+                               Dial("radius_km", "km", 0., 20., "How far they spread from the middle")), (), ("terrain",), _no_model),
     Kind("shelter", ("dials",), lon_lat_dials("", "this shelter"), (), ("terrain",), _no_model),
+    Kind("resource", ("dials",), lon_lat_dials("", "this resource"), (), ("terrain",), _no_model),
 )}
-BUILD_ORDER = ("terrain", "weather", "eruption", "ash", "flow", "mudflow", "storm", "person", "shelter")
+BUILD_ORDER = ("terrain", "weather", "eruption", "ash", "flow", "mudflow", "storm", "person", "group", "shelter", "resource")
 
 
 def check_entity(entity: EntitySpec) -> None:
