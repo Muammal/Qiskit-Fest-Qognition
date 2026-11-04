@@ -16,9 +16,9 @@ from stranded_physics.packs.builder import dependency_order
 from stranded_physics.st_vincent import BARBADOS_XY, TIME, VENT_XY
 
 
-def build():
+def build(grain_count=None):
     store = FieldStore()
-    ash = Tephra(ST_VINCENT_GRID, TIME, VENT_XY)
+    ash = Tephra(ST_VINCENT_GRID, TIME, VENT_XY, **({} if grain_count is None else {"grain_count": grain_count}))
     residual = None
     for domain in dependency_order((ash, Eruption(TIME), Atmos(TIME))):
         fields = ScopedFields(store, domain.id, domain.inputs, domain.outputs)
@@ -32,11 +32,11 @@ def build():
 
 
 def main(argv):
-    if len(argv) != 1 or argv[0] not in ("barbados_first_ash_h", "island_cover", "mass_balance"):
+    if len(argv) != 1 or argv[0] not in ("barbados_first_ash_h", "island_cover", "mass_balance", "grain_convergence"):
         return 2
     try:
         land = None
-        if argv[0] == "island_cover":
+        if argv[0] in ("island_cover", "grain_convergence"):
             path = default_files()["dem"][0]
             if not path.exists():
                 print(f"Missing terrain file: {path}", file=sys.stderr)
@@ -47,14 +47,23 @@ def main(argv):
         store, ash, residual = build()
         if argv[0] == "mass_balance":
             value = abs(residual)
+        elif argv[0] == "grain_convergence":
+            baseline = float(store.get("tephra.deposit_load", "kg/m**2")[-1][land].mean())
+            refined, _, _ = build(2 * int(SETTINGS["grain_count"]))
+            doubled = float(refined.get("tephra.deposit_load", "kg/m**2")[-1][land].mean())
+            if baseline == 0 and doubled != 0:
+                raise InterfaceError("relative grain change is undefined for zero baseline load")
+            value = abs(doubled - baseline) / baseline if baseline else 0.
         elif argv[0] == "island_cover":
             final = store.get("tephra.deposit_load", "kg/m**2")[-1]
             value = float(np.mean(final[land] >= SETTINGS["island_threshold"]))
         else:
-            value = next((k * TIME.dt_s / 3600 for k in range(TIME.n)
-                          if ash.load_at(BARBADOS_XY, k * TIME.dt_s) >= SETTINGS["barbados_threshold"]), None)
-            if value is None:
-                return 0
+            loads = [ash.load_at(BARBADOS_XY, k * TIME.dt_s) for k in range(TIME.n)]
+            value = next((k * TIME.dt_s / 3600 for k, load in enumerate(loads)
+                          if load >= SETTINGS["barbados_threshold"]), None)
+            print(json.dumps({"value": 999.0 if value is None else value, "reached": value is not None,
+                              "max_load_kg_m2": max(loads)}))
+            return 0
         print(json.dumps({"value": value}))
     except (InterfaceError, OSError) as error:
         print(str(error), file=sys.stderr)

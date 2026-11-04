@@ -5,10 +5,14 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
+from scipy.optimize import brentq
 
 from stranded_physics.core.api import InterfaceError
 from stranded_physics.core.fields import spec
 from stranded_physics.core.records import load_parameters
+
+MILLIMETRES_TO_METRES = 1e-3
+FULL_TURN = 360.
 
 HERE = Path(__file__).resolve().parent
 PARAMETERS = load_parameters(HERE / "params.toml")
@@ -26,18 +30,53 @@ def stokes_settling_m_s(diameter_m, rho_particle, rho_air, viscosity):
     return speed
 
 
+def settling_speed_m_s(diameter_m, rho_particle, rho_air, viscosity):
+    """Sphere terminal speed with task-specified Schiller-Naumann drag."""
+    if (not np.isfinite([diameter_m, rho_particle, rho_air, viscosity]).all()
+            or diameter_m <= 0 or rho_air <= 0 or rho_particle <= rho_air or viscosity <= 0):
+        raise InterfaceError("settling requires positive diameter, viscosity and density contrast")
+    target = 4 * diameter_m ** 3 * rho_air * (rho_particle - rho_air) * SETTINGS["gravity"] / (3 * viscosity ** 2)
+
+    def drag_balance(re):
+        if re <= SETTINGS["drag_transition_re"]:
+            return 24 * re * (1 + SETTINGS["drag_coefficient"] * re ** SETTINGS["drag_exponent"])
+        return SETTINGS["newton_drag"] * re ** 2
+
+    transition = SETTINGS["drag_transition_re"]
+    # The rounded two-branch law has a small upward jump at Re=1000.
+    if drag_balance(transition) < target < SETTINGS["newton_drag"] * transition ** 2:
+        reynolds = transition
+    else:
+        upper = max(transition, np.sqrt(target / SETTINGS["newton_drag"])) * 2
+        reynolds = brentq(lambda re: drag_balance(re) - target, 0., upper,
+                          xtol=SETTINGS["settling_tolerance"])
+    return reynolds * viscosity / (rho_air * diameter_m)
+
+
+def grain_classes(count):
+    """Truncated normal mass density in phi, on equally spaced phi nodes."""
+    if isinstance(count, bool) or int(count) != count or count < 2:
+        raise InterfaceError("grain count must be an integer of at least two")
+    phi = np.linspace(SETTINGS["grain_phi_min"], SETTINGS["grain_phi_max"], int(count))
+    log_weights = -.5 * ((phi - SETTINGS["grain_median_phi"]) / SETTINGS["grain_spread_phi"]) ** 2
+    fractions = np.exp(log_weights - log_weights.max())
+    fractions[[0, -1]] *= .5
+    return MILLIMETRES_TO_METRES * 2. ** (-phi), fractions / fractions.sum()
+
+
 def gaussian_load_kg_m2(mass_kg, dx_m, dy_m, release_m, wind_speed, bearing_deg, settling, diffusivity):
     if (not np.isfinite([mass_kg, release_m, wind_speed, bearing_deg, settling, diffusivity]).all()
             or mass_kg < 0 or release_m <= 0 or wind_speed < 0 or settling <= 0 or diffusivity <= 0):
         raise InterfaceError("Gaussian fallout needs finite nonnegative mass/wind and positive release, settling and diffusion")
-    x, y = np.broadcast_arrays(np.asarray(dx_m, dtype=float), np.asarray(dy_m, dtype=float))
+    x, y = np.asarray(dx_m, dtype=float), np.asarray(dy_m, dtype=float)
     if not (np.isfinite(x).all() and np.isfinite(y).all()):
         raise InterfaceError("Gaussian coordinates must be finite")
     fall = release_m / settling
     bearing = np.deg2rad(bearing_deg)
     cx, cy = wind_speed * fall * np.sin(bearing), wind_speed * fall * np.cos(bearing)
     variance = 2 * diffusivity * fall
-    return mass_kg / (2 * np.pi * variance) * np.exp(-((x - cx) ** 2 + (y - cy) ** 2) / (2 * variance))
+    return (mass_kg / (2 * np.pi * variance) * np.exp(-(x - cx) ** 2 / (2 * variance))
+            * np.exp(-(y - cy) ** 2 / (2 * variance)))
 
 
 def suzuki_weights(heights_m, column_m, a, lam):
@@ -65,7 +104,7 @@ def wind_at_height(height_m, speed_10m, bearing_10m, speed_500, bearing_500, spe
     east = np.interp(height_m, levels, speeds * np.sin(angles))
     north = np.interp(height_m, levels, speeds * np.cos(angles))
     speed = float(np.hypot(east, north))
-    bearing = float(np.rad2deg(np.arctan2(east, north)) % 360) if speed else 0.
+    bearing = float(np.rad2deg(np.arctan2(east, north)) % FULL_TURN) if speed else 0.
     return speed, bearing
 
 
@@ -96,9 +135,12 @@ def integrated_packet_mass(packet):
     offset = (np.arange(n) + .5) * spacing - SETTINGS["budget_sigma"] * sigma
     along = packet.wind_speed * packet.height_m / packet.settling
     angle = np.deg2rad(packet.bearing_deg)
-    x = along * np.sin(angle) + offset[None, :]
-    y = along * np.cos(angle) + offset[:, None]
-    return float(packet.load(x, y).sum() * spacing ** 2)
+    cx, cy = along * np.sin(angle), along * np.cos(angle)
+    peak = float(packet.load(cx, cy))
+    if not peak:
+        return 0.
+    return float(packet.load(cx + offset, cy).sum() * packet.load(cx, cy + offset).sum()
+                 * spacing ** 2 / peak)
 
 
 class Tephra:
@@ -110,8 +152,10 @@ class Tephra:
     outputs = (spec("tephra.deposit_load"),)
     parameters = PARAMETERS
 
-    def __init__(self, grid, time, vent):
+    def __init__(self, grid, time, vent, grain_count=int(SETTINGS["grain_count"])):
         self.grid, self.time, self.vent = grid, time, vent
+        grain_classes(grain_count)
+        self.grain_count = int(grain_count)
         self._packets = None
 
     def _read(self, fields):
@@ -140,11 +184,9 @@ class Tephra:
         if reasons:
             raise InterfaceError("; ".join(reasons))
         rate, height, *winds = self._read(fields)
-        fractions = np.array([SETTINGS[name + "_fraction"] for name in ("fine", "medium", "coarse")])
-        if (fractions < 0).any() or not np.isclose(fractions.sum(), 1.):
-            raise InterfaceError("grain mass fractions must be nonnegative and sum to one")
-        settling = [stokes_settling_m_s(SETTINGS["fine_diameter"], SETTINGS["particle_density"], SETTINGS["air_density"], SETTINGS["air_viscosity"]),
-                    SETTINGS["medium_settling"], SETTINGS["coarse_settling"]]
+        diameters, fractions = grain_classes(self.grain_count)
+        settling = [settling_speed_m_s(d, SETTINGS["particle_density"], SETTINGS["air_density"],
+                                       SETTINGS["air_viscosity"]) for d in diameters]
         bins = int(SETTINGS["release_bins"])
         packets = []
         released = 0.

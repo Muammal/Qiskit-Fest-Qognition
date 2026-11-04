@@ -21,7 +21,8 @@ def test_arbitrary_axis_event_and_phase_boundaries():
     np.testing.assert_array_equal(result["eruption.explosion"], [0, 1, 0, 0])
     np.testing.assert_array_equal(result["eruption.phase"], [1, 2, 2, 2])
     assert result["eruption.column_height"][0] == 0
-    assert (result["eruption.column_height"][1:] > 0).all()
+    assert result["eruption.column_height"][1] == 0
+    assert (result["eruption.column_height"][2:] > 0).all()
     assert not result["eruption.gas"][1:].any()
 
 
@@ -56,3 +57,35 @@ def test_physical_scalings_and_invalid_inputs():
         mastin_mass_rate_kg_s(-1.)
     with pytest.raises(InterfaceError):
         mtt_height_m(1., 0.)
+
+
+@pytest.mark.parametrize("step", [37., 300., 7200., 12713.])
+def test_interval_mass_is_independent_of_frame_alignment(step):
+    start = datetime(2021, 4, 8, tzinfo=timezone.utc)
+    n = int(np.ceil(96 * 3600 / step)) + 1
+    axis = TimeAxis(start, step, n)
+    result = run(axis, 1)
+    end = start.timestamp() + (n - 1) * step
+    expected = sum(mastin_mass_rate_kg_s(h) * max(0., min(t + duration, end) - max(t, start.timestamp()))
+                   for t, h, duration in read_events())
+    assert result["eruption.mass_rate"][0] == 0
+    assert result["eruption.mass_rate"].sum() * step == pytest.approx(expected, rel=1e-12)
+    moments = start.timestamp() + np.arange(n) * step
+    for k in range(1, n):
+        heights = [h for t, h, duration in read_events()
+                   if min(t + duration, moments[k]) > max(t, moments[k-1])]
+        assert result["eruption.column_height"][k] == max(heights, default=0.)
+
+
+def test_short_and_overlapping_events_add_mass(monkeypatch):
+    import stranded_physics.domains.eruption.model as model
+    start = datetime(2021, 4, 9, tzinfo=timezone.utc)
+    epoch = start.timestamp()
+    monkeypatch.setattr(model, "read_events", lambda: [(epoch + 100, 8000., 1800.),
+                                                     (epoch + 200, 12000., 1800.)])
+    result = run(TimeAxis(start, 7200., 2), 1)
+    assert result["eruption.explosion"][1] == 1
+    assert result["eruption.mass_rate"][1] > 0
+    assert result["eruption.column_height"][1] == 12000
+    assert result["eruption.mass_rate"].sum() * 7200 == pytest.approx(
+        1800 * (mastin_mass_rate_kg_s(8000) + mastin_mass_rate_kg_s(12000)))

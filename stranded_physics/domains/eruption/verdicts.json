@@ -1,11 +1,18 @@
 {
   "eruption-model": {
-    "hash": "19acfa2c6f9ad0885f38cfd1d5c1834639d36a12cd81c2f285fbe7ebda57a2d0",
+    "hash": "ff4d2c16e2ae2728c5aa41408c37b08f8141778efb47e330d011921f663939ab",
     "verdict": "PASS"
   },
   "eruption-plume-scaling": {
-    "hash": "cbc87cfbbffc6c76a774e70649b5f55de8a6f5e54894fefb3a478b341d5417d7",
+    "hash": "47b37e5e2dddde8233600685654e9ebd67c1757f085c4d9a2c7da799a0db576e",
     "value": 0.2409999999999999,
     "verdict": "PASS"
+  },
+  "eruption-total-mass": {
+    "axis_end_utc": "2021-04-12T00:00Z",
+    "cole_whole_eruption_kg": 88750000000.0,
+    "hash": "e41cc9e887bdc656d8795441a25da718580568207831c7babd3c10a21978ab4c",
+    "model_kg": 309689788821.8786,
+    "verdict": "NO_TARGET"
   }
 }

@@ -17,6 +17,11 @@ HERE = Path(__file__).resolve().parent
 RAW = HERE.parents[2] / "artifacts/physics/raw/atmos"
 PARAMETERS = load_parameters(HERE / "params.toml")
 SETTINGS = {p.id.split(".", 1)[1]: float(p.value.magnitude) for p in PARAMETERS}
+SECONDS_PER_HOUR = 3600.
+KMH_PER_MS = 3.6
+FROM_TO_ROTATION = 180.
+FULL_TURN = 360.
+
 COLUMNS = {
     "wind_speed": ("surface", "wind_speed_10m"),
     "wind_bearing": ("surface", "wind_direction_10m"),
@@ -35,7 +40,7 @@ def default_files():
             for role, name in (("upper", "upper_wind_st_vincent"), ("surface", "weather_st_vincent"))}
 
 
-@lru_cache(maxsize=4)
+@lru_cache(maxsize=int(SETTINGS["cache_files"]))
 def _read(path: Path, modified: int):
     data = json.loads(path.read_text(encoding="utf-8"))
     hourly = data["hourly"]
@@ -65,7 +70,7 @@ class Atmos:
         if (self.time.n < 1 or not np.isfinite(self.time.dt_s) or self.time.dt_s <= 0
                 or self.time.t0_utc.utcoffset() is None):
             return ["weather replay needs a positive time axis with timezone-aware UTC instants"]
-        hour = SETTINGS["seconds_per_hour"]
+        hour = SECONDS_PER_HOUR
         if self.time.dt_s % hour or any((m.minute or m.second or m.microsecond) for m in self._moments()):
             return ["weather replay needs exact hourly instants and whole-hour steps"]
         for role in {source for source, _ in COLUMNS.values()}:
@@ -110,13 +115,13 @@ class Atmos:
             hourly, index = _read(path, path.stat().st_mtime_ns)
             values = []
             for k, moment in enumerate(moments):
-                hours = 1 if k == 0 or name != "rain_rate" else int(self.time.dt_s / SETTINGS["seconds_per_hour"])
-                values.append(np.mean([hourly[column][index[(moment - timedelta(seconds=j * SETTINGS["seconds_per_hour"])).strftime("%Y-%m-%dT%H:%M")]]
+                hours = 1 if k == 0 or name != "rain_rate" else int(self.time.dt_s / SECONDS_PER_HOUR)
+                values.append(np.mean([hourly[column][index[(moment - timedelta(seconds=j * SECONDS_PER_HOUR)).strftime("%Y-%m-%dT%H:%M")]]
                                        for j in range(hours)]))
             data = np.asarray(values)
             if name.startswith("wind_speed"):
-                data = data / SETTINGS["kmh_per_ms"]
+                data = data / KMH_PER_MS
             elif name.startswith("wind_bearing"):
-                data = (data + SETTINGS["from_to_rotation"]) % SETTINGS["full_turn"]
+                data = (data + FROM_TO_ROTATION) % FULL_TURN
             fields.put("atmos." + name, data, spec("atmos." + name).unit, time=self.time)
         return {}

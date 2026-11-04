@@ -105,3 +105,28 @@ def test_release_height_quadrature_converges():
         errors.append(abs(np.dot(heights, suzuki_weights(heights, 1., 4., 1.)) - expected))
     assert errors[2] < errors[1] < errors[0]
     assert errors[2] < 2e-4
+
+
+
+def test_continuous_grains_and_terminal_force_balance():
+    from stranded_physics.domains.tephra.model import SETTINGS, grain_classes, settling_speed_m_s
+
+    diameters, fractions = grain_classes(129)
+    assert diameters[0] == pytest.approx(.016)
+    assert diameters[-1] == pytest.approx(.001 / 64)
+    assert (fractions > 0).all()
+    assert fractions.sum() == pytest.approx(1.)
+    np.testing.assert_allclose(np.diff(np.log2(diameters)), -10 / 128)
+    for diameter in np.geomspace(1e-6, .016, 50):
+        speed = settling_speed_m_s(diameter, 2500., 1.2, 1.8e-5)
+        re = 1.2 * speed * diameter / 1.8e-5
+        cd = 24 / re * (1 + .15 * re ** .687) if re <= 1000 else .44
+        drag = .5 * 1.2 * cd * np.pi * diameter ** 2 / 4 * speed ** 2
+        weight = (2500 - 1.2) * SETTINGS["gravity"] * np.pi * diameter ** 3 / 6
+        assert drag == pytest.approx(weight, rel=1e-7)
+    small = settling_speed_m_s(1e-6, 2500., 1.2, 1.8e-5)
+    assert small == pytest.approx(stokes_settling_m_s(1e-6, 2500., 1.2, 1.8e-5), rel=.001)
+    with pytest.raises(InterfaceError):
+        settling_speed_m_s(-1., 2500., 1.2, 1.8e-5)
+    with pytest.raises(InterfaceError):
+        grain_classes(1)
