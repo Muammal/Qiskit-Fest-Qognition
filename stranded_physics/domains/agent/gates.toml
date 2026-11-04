@@ -1,1 +1,29 @@
 # One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+
+[[gate]]
+id = "agent-walking"
+title = "Tobler speeds and best routes match exact answers on test terrain"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/agent/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/agent/*.py", "stranded_physics/domains/agent/params.toml", "stranded_physics/domains/agent/tests/*.py"]
+required = true
+
+[[gate]]
+id = "agent-end-to-end"
+title = "Real St Vincent pack builds, and both minds play it without seeing the future"
+kind = "verification"
+command = "python -m stranded_physics.validation.st_vincent_end_to_end"
+inputs = ["stranded_physics/st_vincent.py", "stranded_physics/runtime/*.py", "stranded_physics/packs/*.py", "stranded_physics/validation/st_vincent_end_to_end.py"]
+required = false
+
+[[gate]]
+id = "agent-evacuation-route"
+title = "Walking time from Chateaubelair to Barrouallie (reported, no target)"
+kind = "validation"
+command = "python -m stranded_physics.validation.st_vincent_end_to_end route_hours"
+inputs = ["stranded_physics/domains/agent/*.py", "stranded_physics/domains/agent/params.toml", "stranded_physics/st_vincent.py"]
+required = false
+expect = "NO_TARGET"
+role = "prediction"
+split = "reference"
+source = "No published route timings are held for 2021, so there is nothing to score this against."
