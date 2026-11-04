@@ -1,0 +1,26 @@
+name: physics gates
+
+on:
+  push:
+    branches: ["physics/**"]
+  pull_request:
+    paths: ["stranded_physics/**", "workboard/**", "requirements-physics.txt"]
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install numpy pytest -r requirements-physics.txt
+      - name: Interface tests
+        run: python -m pytest stranded_physics/core -q
+      - name: Required gates hold, with fresh input hashes
+        run: python -m stranded_physics.gates required
+      - name: Catalog and claims are up to date
+        run: |
+          python -m stranded_physics.catalog
+          python -m stranded_physics.gates claims
+          git diff --exit-code workboard/CATALOG.md workboard/CLAIMS.md

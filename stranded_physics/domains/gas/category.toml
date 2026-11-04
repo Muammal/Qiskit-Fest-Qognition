@@ -1,0 +1,9 @@
+id = "gas"
+title = "Volcanic gas"
+status = "model"
+owner = ""
+first_model = "Gaussian plume"
+owns = "surface SO2 and its exposure"
+must_not_own = "source flux, which comes from eruption"
+outputs = []
+wanted = ["Ground SO2 readings", "Satellite SO2 mass by day"]

@@ -1,0 +1,9 @@
+id = "seismic"
+title = "Earthquakes"
+status = "data_only"
+owner = ""
+first_model = ""
+owns = "earthquake catalogues near volcanoes, felt reports"
+must_not_own = "a wave solver, for now"
+outputs = []
+wanted = ["Local seismic network catalogue (UWI SRC); global catalogues miss small local swarms"]

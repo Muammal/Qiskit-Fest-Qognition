@@ -1,0 +1,9 @@
+id = "agent"
+title = "Human body and movement"
+status = "model"
+owner = ""
+first_model = "Tobler walking, ISO 7933 heat strain, load carriage"
+owns = "hydration, heat strain, energy, walking speed, inhalation, percepts"
+must_not_own = "choosing actions, which belongs to the minds"
+outputs = []
+wanted = ["Evacuation route timings", "ISO 7933 reference cases", "Sleep deprivation evidence, to replace the inherited exhaustion rule"]

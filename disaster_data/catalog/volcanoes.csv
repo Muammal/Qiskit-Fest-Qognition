@@ -1,0 +1,1215 @@
+volcano_number,name,country,subregion,latitude,longitude,elevation_m,primary_type,last_eruption_year,island_class,island_area_km2
+210010,West Eifel Volcanic Field,Germany,Central European Volcanic Province,50.17,6.85,600,Volcanic field,-8300,continental,79752883.58340874
+210020,Chaine des Puys,France,Western European Volcanic Province,45.786,2.981,1464,Lava dome(s),-4040,continental,79752883.58340874
+210030,Olot Volcanic Field,Spain,Western European Volcanic Province,42.17,2.53,893,Volcanic field,,continental,79752883.58340874
+210040,Calatrava Volcanic Field,Spain,Western European Volcanic Province,38.87,-4.02,1117,Volcanic field,-3600,continental,79752883.58340874
+211004,Colli Albani,Italy,Italian Peninsula Volcanic Provinces,41.7569,12.7251,949,Caldera,,continental,79752883.58340874
+211010,Campi Flegrei,Italy,Italian Peninsula Volcanic Provinces,40.827,14.139,458,Caldera,1538,continental,79752883.58340874
+211020,Vesuvius,Italy,Italian Peninsula Volcanic Provinces,40.821,14.426,1281,Stratovolcano,1944,continental,79752883.58340874
+211031,Palinuro,Italy,Aeolian Volcanic Arc,39.48,14.83,-70,Compound,-8040,small_island,
+211030,Ischia,Italy,Italian Peninsula Volcanic Provinces,40.73,13.897,789,Complex,1302,small_island,49.80867299793817
+211041,Panarea,Italy,Aeolian Volcanic Arc,38.638,15.064,399,Stratovolcano,,small_island,35.335932112116694
+211042,Lipari,Italy,Aeolian Volcanic Arc,38.49,14.933,590,Stratovolcano(es),1230,small_island,35.335932112116694
+211040,Stromboli,Italy,Aeolian Volcanic Arc,38.789,15.213,924,Stratovolcano,2026,small_island,12.22795774952074
+211050,Vulcano,Italy,Aeolian Volcanic Arc,38.404,14.962,500,Stratovolcano(es),1890,small_island,21.035091746172057
+211060,Etna,Italy,Sicily Volcanic Province,37.748,14.999,3357,Stratovolcano(es),2026,large_island,25615.34357422644
+211071,Pantelleria,Italy,Sicily Volcanic Province,36.77,12.02,836,Shield,1891,small_island,82.9943515455751
+211070,Campi Flegrei del Mar di Sicilia,Italy,Sicily Volcanic Province,37.1,12.7,-8,Volcanic field,1867,small_island,
+212020,Methana,Greece,Hellenic Volcanic Arc,37.6186,23.3331,380,Lava dome(s),-258,continental,79752883.58340874
+212030,Milos,Greece,Hellenic Volcanic Arc,36.699,24.439,751,Stratovolcano(es),140,small_island,161.82327928083845
+212040,Santorini,Greece,Hellenic Volcanic Arc,36.404,25.396,367,Shield(s),1950,small_island,80.0616071051669
+212050,Nisyros,Greece,Hellenic Volcanic Arc,36.5888,27.1553,698,Stratovolcano,1888,small_island,32.36020194527095
+213000,Kula,Turkiye,Western Anatolian Volcanic Province,38.58,28.52,750,Volcanic field,,continental,79752883.58340874
+213002,Hasandag-Keciboyduran Volcanic Complex,Turkiye,Western Anatolian Volcanic Province,38.13,34.17,3253,Stratovolcano,,continental,79752883.58340874
+213011,Karaca Dag,Turkiye,Northern Arabia Volcanic Province,37.67,39.83,1957,Shield,,continental,79752883.58340874
+213010,Erciyes Volcanic Complex,Turkiye,Western Anatolian Volcanic Province,38.531,35.447,3864,Stratovolcano,-6880,continental,79752883.58340874
+213020,Nemrut Dagi,Turkiye,Central Anatolian Volcanic Province,38.654,42.229,2948,Stratovolcano,1650,continental,79752883.58340874
+213030,Tenduruk Dagi,Turkiye,Central Anatolian Volcanic Province,39.356,43.874,3514,Shield,1855,continental,79752883.58340874
+213040,Ararat,Turkiye,Central Anatolian Volcanic Province,39.7,44.3,5165,Stratovolcano,1840,continental,79752883.58340874
+214010,Elbrus,Russia,Caucasus Volcanic Province,43.351,42.442,5642,Stratovolcano,50,continental,79752883.58340874
+214020,Kazbek,Georgia,Caucasus Volcanic Province,42.697,44.5184,5004,Stratovolcano,-750,continental,79752883.58340874
+214050,Samsari Volcanic Center,Georgia,Caucasus Volcanic Province,41.542,43.7,3290,Volcanic field,,continental,79752883.58340874
+214060,Aragats,Armenia,Caucasus Volcanic Province,40.53,44.2,4095,Stratovolcano,,continental,79752883.58340874
+214070,Ghegham Volcanic Ridge,Armenia,Caucasus Volcanic Province,40.283,45,3597,Volcanic field,-1900,continental,79752883.58340874
+214080,Vaiyots-Sar,Armenia,Caucasus Volcanic Province,39.797,45.497,2575,Pyroclastic cone(s),-2000,continental,79752883.58340874
+214090,Porak,Armenia-Azerbaijan,Caucasus Volcanic Province,40.028,45.74,3029,Volcanic field,-778,continental,79752883.58340874
+214100,Tskhouk-Karckar,Armenia-Azerbaijan,Caucasus Volcanic Province,39.742,45.992,3139,Pyroclastic cone(s),-3000,continental,79752883.58340874
+221010,"Tair, Jebel at",Yemen,Red Sea Rift Volcanic Province,15.55,41.83,244,Stratovolcano,2008,small_island,
+221021,Zukur,Yemen,Red Sea Rift Volcanic Province,14.02,42.75,624,Shield,,small_island,115.17276991301931
+221022,Hanish,Yemen,Red Sea Rift Volcanic Province,13.72,42.73,422,Shield,,small_island,66.77630810908342
+221020,Zubair Group,Yemen,Red Sea Rift Volcanic Province,15.05,42.18,191,Shield,2013,small_island,11.531909820924174
+221041,Dallol,Ethiopia,Afar Rift Volcanic Province,14.242,40.3,-48,Explosion crater(s),2011,continental,79752883.58340874
+221040,Alid,Eritrea,Afar Rift Volcanic Province,14.88,39.92,904,Stratovolcano,,continental,79752883.58340874
+221050,Gada Ale,Ethiopia,Afar Rift Volcanic Province,13.975,40.408,287,Stratovolcano,,continental,79752883.58340874
+221060,Alu-Dalafilla,Ethiopia,Afar Rift Volcanic Province,13.793,40.553,578,Fissure vent(s),2008,continental,79752883.58340874
+221071,Bora Ale,Ethiopia,Afar Rift Volcanic Province,13.725,40.6,668,Stratovolcano,,continental,79752883.58340874
+221080,Erta Ale,Ethiopia,Afar Rift Volcanic Province,13.601,40.666,585,Shield,2025,continental,79752883.58340874
+221091,Hayli Gubbi,Ethiopia,Afar Rift Volcanic Province,13.5111,40.7161,493,Shield,2025,continental,79752883.58340874
+221090,Ale Bagu,Ethiopia,Afar Rift Volcanic Province,13.512,40.631,988,Stratovolcano,,continental,79752883.58340874
+221101,Nabro,Eritrea,Afar Rift Volcanic Province,13.37,41.7,2218,Stratovolcano,2012,continental,79752883.58340874
+221102,Mallahle,Ethiopia-Eritrea,Afar Rift Volcanic Province,13.27,41.65,1875,Stratovolcano,,continental,79752883.58340874
+221103,Sork Ale,Ethiopia-Eritrea,Afar Rift Volcanic Province,13.18,41.725,1611,Stratovolcano,,continental,79752883.58340874
+221104,Asavyo,Ethiopia,Afar Rift Volcanic Province,13.098,41.599,1338,Shield,,continental,79752883.58340874
+221105,Mat Ala,Ethiopia,Afar Rift Volcanic Province,13.106,41.161,493,Shield,,continental,79752883.58340874
+221106,Tat Ali,Ethiopia,Afar Rift Volcanic Province,13.284,41.063,655,Shield,,continental,79752883.58340874
+221107,Borawli,Ethiopia,Afar Rift Volcanic Province,13.304,40.987,784,Stratovolcano,,continental,79752883.58340874
+221100,Dubbi,Eritrea,Afar Rift Volcanic Province,13.579,41.809,1625,Stratovolcano,1861,continental,79752883.58340874
+221111,Ma Alalta,Ethiopia,Afar Rift Volcanic Province,13.013,40.185,1745,Stratovolcano,,continental,79752883.58340874
+221112,Alayta,Ethiopia,Afar Rift Volcanic Province,12.888,40.573,1496,Shield,1915,continental,79752883.58340874
+221113,Dabbahu,Ethiopia,Afar Rift Volcanic Province,12.595,40.48,1401,Stratovolcano,2005,continental,79752883.58340874
+221114,Dabbayra,Ethiopia,Afar Rift Volcanic Province,12.38,40.07,1302,Shield,,continental,79752883.58340874
+221115,Manda Hararo,Ethiopia,Afar Rift Volcanic Province,12.17,40.82,600,Shield(s),2009,continental,79752883.58340874
+221116,Groppo,Ethiopia,Afar Rift Volcanic Province,11.816,40.242,852,Volcanic field,,continental,79752883.58340874
+221110,Afdera,Ethiopia,Afar Rift Volcanic Province,13.088,40.853,1250,Stratovolcano,,continental,79752883.58340874
+221127,Manda Gargori,Ethiopia,Afar Rift Volcanic Province,11.75,41.48,700,Fissure vent(s),,continental,79752883.58340874
+221122,Manda-Inakir,Ethiopia-Djibouti,Afar Rift Volcanic Province,12.38,42.2,600,Fissure vent(s),1928,continental,79752883.58340874
+221123,Mousa Alli,Ethiopia-Eritrea-Djibouti,Afar Rift Volcanic Province,12.469,42.404,1993,Stratovolcano,,continental,79752883.58340874
+221124,Gufa,Eritrea-Djibouti,Afar Rift Volcanic Province,12.55,42.53,600,Volcanic field,,continental,79752883.58340874
+221125,Assab Volcanic Field,Eritrea,Afar Rift Volcanic Province,12.95,42.43,987,Volcanic field,,continental,79752883.58340874
+221126,Ardoukoba,Djibouti,Afar Rift Volcanic Province,11.58,42.47,298,Fissure vent(s),1978,continental,79752883.58340874
+221120,Kurub,Ethiopia,Afar Rift Volcanic Province,11.88,41.208,625,Shield,,continental,79752883.58340874
+221141,Dama Ali,Ethiopia,Main Ethiopian Rift Volcanic Province,11.28,41.63,1068,Shield,1631,continental,79752883.58340874
+221151,Yangudi,Ethiopia,Main Ethiopian Rift Volcanic Province,10.58,41.042,1383,Complex,,continental,79752883.58340874
+221150,Gabillema,Ethiopia,Main Ethiopian Rift Volcanic Province,11.08,41.27,1459,Stratovolcano,,continental,79752883.58340874
+221160,Ayelu,Ethiopia,Main Ethiopian Rift Volcanic Province,10.082,40.702,2145,Stratovolcano,,continental,79752883.58340874
+221171,Hertali,Ethiopia,Main Ethiopian Rift Volcanic Province,9.78,40.33,900,Fissure vent,,continental,79752883.58340874
+221172,Liado Hayk,Ethiopia,Main Ethiopian Rift Volcanic Province,9.57,40.28,878,Volcanic field,,continental,79752883.58340874
+221170,Adwa,Ethiopia,Main Ethiopian Rift Volcanic Province,10.063,40.831,1670,Stratovolcano,,continental,79752883.58340874
+221180,Dofen,Ethiopia,Main Ethiopian Rift Volcanic Province,9.35,40.13,1151,Shield,,continental,79752883.58340874
+221191,Beru,Ethiopia,Main Ethiopian Rift Volcanic Province,8.95,39.75,1100,Volcanic field,,continental,79752883.58340874
+221190,Fentale,Ethiopia,Main Ethiopian Rift Volcanic Province,8.985,39.906,2007,Stratovolcano,1789,continental,79752883.58340874
+221200,Kone,Ethiopia,Main Ethiopian Rift Volcanic Province,8.8105,39.6946,1380,Caldera(s),1820,continental,79752883.58340874
+221210,Boset,Ethiopia,Main Ethiopian Rift Volcanic Province,8.558,39.475,2447,Stratovolcano(es),,continental,79752883.58340874
+221220,Bishoftu Volcanic Field,Ethiopia,Main Ethiopian Rift Volcanic Province,8.78,38.98,1850,Volcanic field,,continental,79752883.58340874
+221222,Melkassa,Ethiopia,Main Ethiopian Rift Volcanic Province,8.43,39.35,1765,Volcanic field,,continental,79752883.58340874
+221230,Gedemsa,Ethiopia,Main Ethiopian Rift Volcanic Province,8.363,39.172,1909,Caldera,,continental,79752883.58340874
+221250,Bora-Bericha-Tullu Moye,Ethiopia,Main Ethiopian Rift Volcanic Province,8.2114,39.0812,2345,Pyroclastic cone,1900,continental,79752883.58340874
+221252,East Ziway,Ethiopia,Main Ethiopian Rift Volcanic Province,7.874,38.902,1889,Fissure vent(s),,continental,79752883.58340874
+221260,Butajiri-Silti Field,Ethiopia,Main Ethiopian Rift Volcanic Province,8.05,38.35,2281,Volcanic field,,continental,79752883.58340874
+221270,Aluto,Ethiopia,Main Ethiopian Rift Volcanic Province,7.77,38.78,2335,Stratovolcano,1550,continental,79752883.58340874
+221280,Shala,Ethiopia,Main Ethiopian Rift Volcanic Province,7.4569,38.5571,2075,Caldera,,continental,79752883.58340874
+221290,Corbetti,Ethiopia,Main Ethiopian Rift Volcanic Province,7.193,38.39,2289,Caldera,-396,continental,79752883.58340874
+221291,Bilate River Field,Ethiopia,Main Ethiopian Rift Volcanic Province,7.07,38.1,1700,Volcanic field,,continental,79752883.58340874
+221320,Korath Range,Ethiopia,Kenyan Rift Volcanic Province,5.117,35.892,912,Tuff cone(s),,continental,79752883.58340874
+222001,Lake Turkana North Island,Kenya,Kenyan Rift Volcanic Province,4.0631,36.0458,490,Tuff cone(s),,continental,79752883.58340874
+222010,Lake Turkana Central Island,Kenya,Kenyan Rift Volcanic Province,3.496,36.0365,518,Tuff cone(s),,continental,79752883.58340874
+222021,Marsabit,Kenya,Kenyan Rift Volcanic Province,2.32,37.97,1707,Shield,,continental,79752883.58340874
+222020,Lake Turkana South Island,Kenya,Kenyan Rift Volcanic Province,2.6364,36.5958,800,Stratovolcano,1888,continental,79752883.58340874
+222030,"Barrier, The",Kenya,Kenyan Rift Volcanic Province,2.32,36.57,1032,Shield,1921,continental,79752883.58340874
+222040,Namarunu,Kenya,Kenyan Rift Volcanic Province,1.98,36.43,817,Shield,-6550,continental,79752883.58340874
+222050,Segererua Plateau,Kenya,Kenyan Rift Volcanic Province,1.57,37.9,699,Pyroclastic cone(s),,continental,79752883.58340874
+222051,Emuruangogolak,Kenya,Kenyan Rift Volcanic Province,1.5,36.33,1285,Shield,1910,continental,79752883.58340874
+222052,Silali,Kenya,Kenyan Rift Volcanic Province,1.15,36.23,1528,Shield,-5050,continental,79752883.58340874
+222053,Paka,Kenya,Kenyan Rift Volcanic Province,0.92,36.18,1697,Shield,-7550,continental,79752883.58340874
+222054,Korosi,Kenya,Kenyan Rift Volcanic Province,0.77,36.12,1446,Shield,,continental,79752883.58340874
+222055,Ol Kokwe,Kenya,Kenyan Rift Volcanic Province,0.62,36.075,1130,Shield,,continental,79752883.58340874
+222056,Nyambeni Hills,Kenya,Kenyan Rift Volcanic Province,0.23,37.87,750,Shield,,continental,79752883.58340874
+222060,Menengai,Kenya,Kenyan Rift Volcanic Province,-0.2,36.07,2278,Shield,-6050,continental,79752883.58340874
+222071,Elmenteita Badlands,Kenya,Kenyan Rift Volcanic Province,-0.546,36.249,2126,Pyroclastic cone(s),,continental,79752883.58340874
+222070,Homa Mountain,Kenya,Kenyan Rift Volcanic Province,-0.38,34.5,1751,Complex,,continental,79752883.58340874
+222080,"Eburru, Ol Doinyo",Kenya,Kenyan Rift Volcanic Province,-0.65,36.22,2856,Complex,,continental,79752883.58340874
+222090,Olkaria,Kenya,Kenyan Rift Volcanic Province,-0.904,36.292,2434,Pyroclastic cone(s),1770,continental,79752883.58340874
+222100,Longonot,Kenya,Kenyan Rift Volcanic Province,-0.914,36.446,2776,Stratovolcano,1863,continental,79752883.58340874
+222110,Suswa,Kenya,Kenyan Rift Volcanic Province,-1.151,36.357,2356,Shield,,continental,79752883.58340874
+222120,"Lengai, Ol Doinyo",Tanzania,Kenyan Rift Volcanic Province,-2.764,35.914,2962,Stratovolcano,2026,continental,79752883.58340874
+222130,Chyulu Hills,Kenya,Kenyan Rift Volcanic Province,-2.68,37.88,2188,Volcanic field,1855,continental,79752883.58340874
+222164,Ngozi,Tanzania,Rukwa Rift Volcanic Province,-9.0036,33.552,2614,Caldera,1450,continental,79752883.58340874
+222166,Rungwe,Tanzania,Rukwa Rift Volcanic Province,-9.135,33.668,2953,Stratovolcano,1250,continental,79752883.58340874
+222160,Meru,Tanzania,Kenyan Rift Volcanic Province,-3.244,36.75,4550,Stratovolcano,1910,continental,79752883.58340874
+222170,Kyejo,Tanzania,Rukwa Rift Volcanic Province,-9.229,33.792,2176,Stratovolcano,1800,continental,79752883.58340874
+223001,Fort Portal Volcanic Field,Uganda,Albertine Rift Volcanic Province,0.7,30.25,1615,Volcanic field,-2120,continental,79752883.58340874
+223002,Ndali-Kasenda Volcanic Field,Uganda,Albertine Rift Volcanic Province,0.4583,30.275,1300,Volcanic field,,continental,79752883.58340874
+223020,Nyamulagira,DR Congo,Albertine Rift Volcanic Province,-1.408,29.2,3058,Shield,2026,continental,79752883.58340874
+223030,Nyiragongo,DR Congo,Albertine Rift Volcanic Province,-1.52,29.25,3470,Stratovolcano,2026,continental,79752883.58340874
+223040,Karisimbi,DR Congo-Rwanda,Albertine Rift Volcanic Province,-1.506,29.45,4490,Stratovolcano,-8050,continental,79752883.58340874
+224004,"Basile, Pico",Equatorial Guinea,Western Africa Volcanic Province,3.588,8.762,2999,Shield,1923,small_island,1994.4213589002877
+224011,Tombel Graben,Cameroon,Western Africa Volcanic Province,4.758,9.717,500,Volcanic field,,continental,79752883.58340874
+224010,Cameroon,Cameroon,Western Africa Volcanic Province,4.203,9.17,4095,Stratovolcano,2000,continental,79752883.58340874
+224030,Oku Volcanic Field,Cameroon,Western Africa Volcanic Province,6.25,10.5,3011,Volcanic field,,continental,79752883.58340874
+225001,Todra Volcanic Field,Niger,West Central Sahara Volcanic Province,17.68,8.5,1780,Volcanic field,,continental,79752883.58340874
+225004,Tahalra Volcanic Field,Algeria,West Central Sahara Volcanic Province,22.67,5,1467,Volcanic field,,continental,79752883.58340874
+225005,Atakor Volcanic Field,Algeria,West Central Sahara Volcanic Province,23.33,5.83,2918,Volcanic field,,continental,79752883.58340874
+225006,Manzaz Volcanic Field,Algeria,West Central Sahara Volcanic Province,23.92,5.83,1672,Volcanic field,,continental,79752883.58340874
+225009,"Toh, Tarso",Chad,East Central Sahara Volcanic Province,21.33,16.33,2000,Volcanic field,,continental,79752883.58340874
+225010,"Tousside, Tarso",Chad,East Central Sahara Volcanic Province,21.0408,16.473,3299,Stratovolcano,,continental,79752883.58340874
+225021,"Koussi, Emi",Chad,East Central Sahara Volcanic Province,19.8,18.53,3415,Shield(pyroclastic),,continental,79752883.58340874
+225020,"Voon, Tarso",Chad,East Central Sahara Volcanic Province,20.92,17.28,3100,Stratovolcano,,continental,79752883.58340874
+225030,"Marra, Jebel",Sudan,Southeast Sahara Volcanic Province,12.95,24.27,3042,Volcanic field,-2000,continental,79752883.58340874
+225040,Kutum Volcanic Field,Sudan,Southeast Sahara Volcanic Province,14.57,25.85,1779,Volcanic field,,continental,79752883.58340874
+225050,Meidob Volcanic Field,Sudan,Southeast Sahara Volcanic Province,15.32,26.47,2000,Volcanic field,-2950,continental,79752883.58340874
+225060,Bayuda Volcanic Field,Sudan,Southeast Sahara Volcanic Province,18.33,32.75,670,Volcanic field,850,continental,79752883.58340874
+231001,"Ash Shaam, Harrat",Syria-Jordan-Saudi Arabia,Northern Arabia Volcanic Province,32.333,37.583,1100,Volcanic field,-2670,continental,79752883.58340874
+231040,"Lunayyir, Harrat",Saudi Arabia,Western Arabia Volcanic Province,25.17,37.75,1370,Volcanic field,1000,continental,79752883.58340874
+231050,"Ithnayn, Harrat",Saudi Arabia,Western Arabia Volcanic Province,26.58,40.2,1625,Volcanic field,,continental,79752883.58340874
+231060,"Khaybar, Harrat",Saudi Arabia,Western Arabia Volcanic Province,25.5,40,2093,Volcanic field,650,continental,79752883.58340874
+231071,"Kishb, Harrat",Saudi Arabia,Western Arabia Volcanic Province,22.8,41.38,1475,Volcanic field,,continental,79752883.58340874
+231072,"Birk, Harrat al",Saudi Arabia,Southwest Arabia Volcanic Province,18.37,41.63,587,Volcanic field,,continental,79752883.58340874
+231070,"Rahat, Harrat",Saudi Arabia,Western Arabia Volcanic Province,23.08,39.78,1744,Volcanic field,1256,continental,79752883.58340874
+231080,"Yar, Jabal",Saudi Arabia,Southwest Arabia Volcanic Province,17.05,42.83,305,Volcanic field,1810,continental,79752883.58340874
+231090,"Arhab, Harra of",Yemen,Southwest Arabia Volcanic Province,15.6025,44.0978,3100,Volcanic field,500,continental,79752883.58340874
+231110,"Haylan, Jabal",Yemen,Southwest Arabia Volcanic Province,15.4,45.1,1550,Volcanic field,-1200,continental,79752883.58340874
+231120,"Dhamar, Harras of",Yemen,Southwest Arabia Volcanic Province,14.57,44.67,3500,Volcanic field,,continental,79752883.58340874
+231160,"Sawad, Harra Es-",Yemen,Southwest Arabia Volcanic Province,13.58,46.12,1737,Volcanic field,1253,continental,79752883.58340874
+231170,Balhaf-Bir Ali Volcanic Field,Yemen,Southwest Arabia Volcanic Province,14.067,48.3,604,Volcanic field,,continental,79752883.58340874
+231180,Bir Borhut,Yemen,Southwest Arabia Volcanic Province,15.515,50.935,464,Volcanic field,,continental,79752883.58340874
+232010,Damavand,Iran,Caucasus Volcanic Province,35.951,52.109,5670,Stratovolcano,-5350,continental,79752883.58340874
+233001,"Grille, La",Union of the Comoros,Madagascar-Comoros Volcanic Province,-11.4861,43.35,1064,Shield,,small_island,1028.712312013708
+233005,Mayotte,France,Madagascar-Comoros Volcanic Province,-12.83,45.17,660,Shield,-2050,small_island,383.2471662956794
+233010,Karthala,Union of the Comoros,Madagascar-Comoros Volcanic Province,-11.7658,43.3639,2350,Shield,2007,small_island,1028.712312013708
+233020,"Fournaise, Piton de la",France,Reunion Hotspot Volcano Group,-21.244,55.708,2632,Shield,2026,large_island,2589.510600156172
+234000,Boomerang Seamount,France,Amsterdam-St. Paul Hotspot Volcano Group,-37.7216,77.8221,-650,Caldera,1995,small_island,53.16103788899057
+234001,Amsterdam Island,France,Amsterdam-St. Paul Hotspot Volcano Group,-37.83,77.52,881,Stratovolcano,,small_island,53.16103788899057
+234002,St. Paul,France,Amsterdam-St. Paul Hotspot Volcano Group,-38.72,77.53,268,Stratovolcano,1793,small_island,9.727216054442225
+234011,McDonald Islands,Australia,Kerguelen Hotspot Volcano Group,-53.0394,72.595,263,Complex,2005,small_island,
+234010,Heard,Australia,Kerguelen Hotspot Volcano Group,-53.106,73.513,2745,Stratovolcano,2026,small_island,393.21863003750155
+234020,Kerguelen Islands,France,Kerguelen Hotspot Volcano Group,-49.58,69.5,1840,Stratovolcano(es),,large_island,6565.750515583585
+234030,"Est, Ile de l'",France,Crozet Hotspot Volcano Group,-46.43,52.2,1090,Stratovolcano,,small_island,140.21701659424946
+234040,"Possession, Ile de la",France,Crozet Hotspot Volcano Group,-46.42,51.75,934,Stratovolcano,,small_island,140.21701659424946
+234050,"Cochons, Ile aux",France,Crozet Hotspot Volcano Group,-46.1,50.23,775,Stratovolcano,,small_island,64.54414940098413
+234060,Prince Edward Island,South Africa,Marion Hotspot Volcano Group,-46.63,37.95,672,Shield,,small_island,43.73872061797529
+234070,Marion Island,South Africa,Marion Hotspot Volcano Group,-46.9,37.75,1230,Shield(s),2004,small_island,275.29525444225106
+241021,Tuhua/Mayor Island,New Zealand,Taupo Volcanic Arc,-37.28,176.25,355,Shield,-5055,small_island,
+241020,Auckland Volcanic Field,New Zealand,Western North Island Volcanic Province,-36.89,174.81,260,Volcanic field,1446,large_island,113884.63022308127
+241030,Taranaki,New Zealand,Western North Island Volcanic Province,-39.3,174.07,2518,Stratovolcano,1800,large_island,113884.63022308127
+241040,Whakaari/White Island,New Zealand,Taupo Volcanic Arc,-37.52,177.18,294,Stratovolcano(es),2026,small_island,
+241050,Okataina,New Zealand,Taupo Volcanic Arc,-38.1569,176.5069,1111,Lava dome(s),1981,large_island,113884.63022308127
+241070,Taupo,New Zealand,Taupo Volcanic Arc,-38.7811,175.893,760,Caldera,260,large_island,113884.63022308127
+241080,Tongariro,New Zealand,Taupo Volcanic Arc,-39.157,175.632,1978,Stratovolcano(es),2012,large_island,113884.63022308127
+241101,Clark,New Zealand,Southern Kermadec Volcanic Arc,-36.446,177.839,-860,Stratovolcano,,small_island,
+241102,Tangaroa,New Zealand,Southern Kermadec Volcanic Arc,-36.321,178.028,-600,Stratovolcano,,small_island,
+241100,Ruapehu,New Zealand,Taupo Volcanic Arc,-39.28,175.57,2797,Stratovolcano,2007,large_island,113884.63022308127
+241110,Rumble V,New Zealand,Southern Kermadec Volcanic Arc,-36.142,178.196,-400,Stratovolcano,,small_island,
+241120,Rumble IV,New Zealand,Southern Kermadec Volcanic Arc,-36.13,178.05,-500,Stratovolcano,,small_island,
+241130,Rumble III,New Zealand,Southern Kermadec Volcanic Arc,-35.745,178.478,-220,Stratovolcano,2008,small_island,
+241131,Rumble II West,New Zealand,Southern Kermadec Volcanic Arc,-35.353,178.527,-1200,Stratovolcano,,small_island,
+241140,Healy,New Zealand,Southern Kermadec Volcanic Arc,-35.004,178.973,-980,Stratovolcano,1360,small_island,
+241150,Brothers,New Zealand,Southern Kermadec Volcanic Arc,-34.875,179.0667,-1350,Caldera,,small_island,
+242001,Wright,New Zealand,Middle Kermadec Volcanic Arc,-31.85,-179.18,-900,Stratovolcano(es),,small_island,
+242010,Curtis Island,New Zealand,Middle Kermadec Volcanic Arc,-30.543,-178.556,47,Stratovolcano,,small_island,
+242021,Macauley,New Zealand,Middle Kermadec Volcanic Arc,-30.21,-178.475,238,Caldera,-4360,small_island,
+242022,Giggenbach,New Zealand,Middle Kermadec Volcanic Arc,-30.036,-178.712,-65,Stratovolcano,,small_island,
+242030,Raoul Island,New Zealand,Northern Kermadec Volcanic Arc,-29.27,-177.92,516,Stratovolcano,2006,small_island,39.23423655245249
+242050,Monowai,New Zealand,Northern Kermadec Volcanic Arc,-25.887,-177.188,-132,Stratovolcano,2014,small_island,
+243001,Kermadec Arc at 24.8°S,Tonga,Northern Kermadec Volcanic Arc,-24.8,-177.02,-385,Stratovolcano,,small_island,
+243011,Tofua Arc at 21.1°S,Tonga,Tofua Volcanic Arc,-21.15,-175.75,-65,Stratovolcano,,small_island,
+243010,Tofua Arc at 21.3°S,Tonga,Tofua Volcanic Arc,-21.338,-175.65,-68,Stratovolcano,1932,small_island,
+243030,Tofua Arc at 20.9°S,Tonga,Tofua Volcanic Arc,-20.852,-175.55,-296,Stratovolcano,2017,small_island,
+243040,Hunga Tonga-Hunga Ha'apai,Tonga,Tofua Volcanic Arc,-20.5532,-175.3841,114,Caldera,2022,small_island,
+243050,Fonuafo'ou,Tonga,Tofua Volcanic Arc,-20.32,-175.42,-17,Stratovolcano,1936,small_island,
+243061,Kao,Tonga,Tofua Volcanic Arc,-19.668,-175.016,1009,Stratovolcano,1847,small_island,6.56164013222631
+243060,Tofua,Tonga,Tofua Volcanic Arc,-19.75,-175.07,515,Caldera,2026,small_island,41.953492690177185
+243070,Lateiki,Tonga,Tofua Volcanic Arc,-19.18,-174.87,43,Stratovolcano,2019,small_island,
+243080,Home Reef,Tonga,Tofua Volcanic Arc,-18.992,-174.775,-10,Stratovolcano,2026,small_island,11.887558468687804
+243091,Tofua Arc at 18.3°S,Tonga,Tofua Volcanic Arc,-18.325,-174.365,-40,Stratovolcano,2019,small_island,
+243090,Late,Tonga,Tofua Volcanic Arc,-18.806,-174.65,540,Stratovolcano,1854,small_island,11.887558468687804
+243101,Tafahi,Tonga,Tofua Volcanic Arc,-15.854,-173.747,546,Stratovolcano,,small_island,0.22811961464844238
+243102,Curacoa,Tonga,Tofua Volcanic Arc,-15.62,-173.67,-33,Complex,1979,small_island,0.22811961464844238
+243100,Fonualei,Tonga,Tofua Volcanic Arc,-18.023,-174.317,188,Stratovolcano,1957,small_island,
+243110,Niuafo'ou,Tonga,Northeast Lau Basin Volcano Group,-15.6,-175.63,260,Shield,1946,small_island,41.2650394555893
+243120,Tafu-Maka,Tonga,Northeast Lau Basin Volcano Group,-15.37,-174.23,-1400,Fissure vent,2008,small_island,
+243130,West Mata,Tonga,Northeast Lau Basin Volcano Group,-15.1,-173.75,-1174,Fissure vent(s),2009,small_island,
+244000,Vailuluu,United States,Samoan Hotspot Volcano Group,-14.215,-169.058,-592,Shield,2003,small_island,
+244001,Tau,United States,Samoan Hotspot Volcano Group,-14.23,-169.454,931,Shield,,small_island,40.04688747246248
+244010,Ofu-Olosega,United States,Samoan Hotspot Volcano Group,-14.175,-169.618,639,Shield(s),1866,small_island,6.089822346063744
+244020,Tutuila,United States,Samoan Hotspot Volcano Group,-14.2903,-170.7019,653,Tuff cone(s),440,small_island,131.9347125423284
+244030,Upolu,Samoa,Samoan Hotspot Volcano Group,-13.935,-171.72,1100,Shield,,small_island,1139.1422001317917
+244040,Savaii,Samoa,Samoan Hotspot Volcano Group,-13.612,-172.525,1858,Shield,1911,small_island,1651.6541673185004
+245010,Taveuni,Fiji,Fiji Volcanic Arc,-16.8412,-179.9644,1241,Shield,1550,small_island,325.1813220358001
+245030,Nabukelevu,Fiji,Fiji Volcanic Arc,-19.1181,177.9815,791,Lava dome(s),1660,small_island,491.30033608361623
+250010,St. Andrew Strait,Papua New Guinea,Bismarck Sea Volcanic Province,-2.38,147.35,270,Complex,1957,small_island,30.720401038234833
+250030,Titan Ridge,Papua New Guinea,Bismarck Sea Volcanic Province,-3.03,147.78,-1300,Fissure vent,1972,small_island,
+251001,Blup Blup,Papua New Guinea,Bismarck Volcanic Arc,-3.507,144.605,402,Stratovolcano,,small_island,4.792857696129583
+251002,Kadovar,Papua New Guinea,Bismarck Volcanic Arc,-3.608,144.588,365,Stratovolcano,2023,small_island,4.792857696129583
+251010,Bam,Papua New Guinea,Bismarck Volcanic Arc,-3.613,144.818,685,Stratovolcano,1960,small_island,4.792857696129583
+251020,Manam,Papua New Guinea,Bismarck Volcanic Arc,-4.08,145.037,1807,Stratovolcano,2026,small_island,70.00492716769938
+251030,Karkar,Papua New Guinea,Bismarck Volcanic Arc,-4.647,145.976,1839,Stratovolcano,1979,small_island,371.3189903606654
+251041,Hankow Reef,Papua New Guinea,Bismarck Volcanic Arc,-4.883,146.717,-5,Stratovolcano,,small_island,
+251050,Long Island,Papua New Guinea,Bismarck Volcanic Arc,-5.3144,147.105,1263,Complex,1993,small_island,495.0838409404695
+251060,Umboi,Papua New Guinea,Bismarck Volcanic Arc,-5.592,147.892,1335,Complex,,small_island,796.3033630778648
+251070,Ritter Island,Papua New Guinea,Bismarck Volcanic Arc,-5.519,148.115,75,Stratovolcano,2007,small_island,55.4724138685695
+251080,Sakar,Papua New Guinea,Bismarck Volcanic Arc,-5.4098,148.0836,947,Stratovolcano,,small_island,55.4724138685695
+252010,Langila,Papua New Guinea,Bismarck Volcanic Arc,-5.525,148.42,1330,Complex,2026,large_island,35987.99335271372
+252040,Dakataua,Papua New Guinea,Bismarck Volcanic Arc,-5.0455,150.0996,408,Caldera,1895,large_island,35987.99335271372
+252050,Bola,Papua New Guinea,Bismarck Volcanic Arc,-5.141,150.038,1116,Stratovolcano,,large_island,35987.99335271372
+252060,Garua Harbour,Papua New Guinea,Bismarck Volcanic Arc,-5.3,150.07,565,Volcanic field,,large_island,35987.99335271372
+252071,Lolo,Papua New Guinea,Bismarck Volcanic Arc,-5.466,150.509,796,Stratovolcano,,large_island,35987.99335271372
+252070,Krummel-Garbuna-Welcker,Papua New Guinea,Bismarck Volcanic Arc,-5.416,150.027,564,Stratovolcano(es),2008,large_island,35987.99335271372
+252080,Witori,Papua New Guinea,Bismarck Volcanic Arc,-5.5745,150.5161,724,Caldera,2012,large_island,35987.99335271372
+252090,Sulu Range,Papua New Guinea,Bismarck Volcanic Arc,-5.5,150.942,610,Stratovolcano(es),,large_island,35987.99335271372
+252100,Hargy,Papua New Guinea,Bismarck Volcanic Arc,-5.33,151.1,1148,Stratovolcano,950,large_island,35987.99335271372
+252110,Bamus,Papua New Guinea,Bismarck Volcanic Arc,-5.2,151.23,2248,Stratovolcano,1886,large_island,35987.99335271372
+252120,Ulawun,Papua New Guinea,Bismarck Volcanic Arc,-5.05,151.33,2334,Stratovolcano,2025,large_island,35987.99335271372
+252130,Lolobau,Papua New Guinea,Bismarck Volcanic Arc,-4.9156,151.1617,878,Caldera,1912,small_island,62.7252718940778
+252140,Rabaul,Papua New Guinea,Bismarck Volcanic Arc,-4.2459,152.1937,688,Caldera,2014,large_island,35987.99335271372
+252150,Tavui,Papua New Guinea,Bismarck Volcanic Arc,-4.1089,152.2134,200,Caldera,-4946,large_island,35987.99335271372
+253011,Hydrographers Range,Papua New Guinea,Trobriand Volcanic Province,-9,148.37,1915,Stratovolcano,,large_island,785453.3499252028
+253010,Lamington,Papua New Guinea,Trobriand Volcanic Province,-8.95,148.15,1680,Stratovolcano,1956,large_island,785453.3499252028
+253021,Managlase Plateau,Papua New Guinea,Trobriand Volcanic Province,-9.08,148.33,1342,Volcanic field,,large_island,785453.3499252028
+253030,Victory,Papua New Guinea,Trobriand Volcanic Province,-9.2003,149.072,1832,Stratovolcano,1935,large_island,785453.3499252028
+253041,Goodenough,Papua New Guinea,Trobriand Volcanic Province,-9.358,150.246,220,Volcanic field,,small_island,664.5553007389271
+253040,Sessagara Hills,Papua New Guinea,Trobriand Volcanic Province,-9.5542,149.1278,493,Volcanic field,1944,large_island,785453.3499252028
+253050,Iamalele,Papua New Guinea,Trobriand Volcanic Province,-9.5056,150.5239,194,Lava dome(s),,small_island,1271.4060438158326
+253060,Dawson Strait Group,Papua New Guinea,Trobriand Volcanic Province,-9.62,150.88,500,Volcanic field,1350,small_island,1271.4060438158326
+255011,Billy Mitchell,Papua New Guinea,Bougainville Volcanic Arc,-6.0898,155.2254,1544,Caldera,1580,large_island,8750.333680764616
+255010,Balbi,Papua New Guinea,Bougainville Volcanic Arc,-5.9156,155.0008,2715,Stratovolcano,,large_island,8750.333680764616
+255021,Takuan Group,Papua New Guinea,Bougainville Volcanic Arc,-6.442,155.608,2210,Compound,,large_island,8750.333680764616
+255020,Bagana,Papua New Guinea,Bougainville Volcanic Arc,-6.137,155.196,1855,Lava cone,2026,large_island,8750.333680764616
+255030,Loloru,Papua New Guinea,Bougainville Volcanic Arc,-6.52,155.62,1887,Compound,-1050,large_island,8750.333680764616
+255052,Kana Keoki,Solomon Islands,Solomon Volcanic Province,-8.75,157.03,-700,Stratovolcano,,small_island,375.6915677849034
+255053,Coleman Seamount,Solomon Islands,Solomon Volcanic Province,-8.841,157.16,-717,Stratovolcano,,small_island,375.6915677849034
+255050,Simbo,Solomon Islands,Solomon Volcanic Province,-8.292,156.52,335,Stratovolcano(es),1910,small_island,168.87228223421525
+255061,New Georgia at 8.9°S,Solomon Islands,Solomon Volcanic Province,-8.92,158.03,-240,Stratovolcano,,small_island,539.0306320761805
+255060,Kavachi,Solomon Islands,Solomon Volcanic Province,-8.991,157.979,-20,Stratovolcano,2014,small_island,539.0306320761805
+255070,Savo,Solomon Islands,Solomon Volcanic Province,-9.1324,159.8119,455,Stratovolcano,1847,small_island,24.62059935101102
+256010,Tinakula,Solomon Islands,Vanuatu Volcanic Arc,-10.386,165.804,796,Stratovolcano,2024,small_island,10.041071407633867
+257001,Motlav,Vanuatu,Vanuatu Volcanic Arc,-13.67,167.67,411,Stratovolcano,,small_island,38.68841546401522
+257010,Suretamatai,Vanuatu,Vanuatu Volcanic Arc,-13.8,167.47,921,Complex,1966,small_island,306.2101904472174
+257020,Gaua,Vanuatu,Vanuatu Volcanic Arc,-14.281,167.514,729,Stratovolcano,2022,small_island,335.7657616835061
+257030,Ambae,Vanuatu,Vanuatu Volcanic Arc,-15.389,167.835,1496,Shield,2026,small_island,448.0296562282587
+257040,Ambrym,Vanuatu,Vanuatu Volcanic Arc,-16.25,168.12,1334,Shield(pyroclastic),2024,small_island,693.587803867175
+257050,Lopevi,Vanuatu,Vanuatu Volcanic Arc,-16.507,168.346,1413,Stratovolcano,2007,small_island,27.60531092227147
+257060,East Epi,Vanuatu,Vanuatu Volcanic Arc,-16.6797,168.3893,833,Stratovolcano(es),2023,small_island,461.87288605704424
+257070,Kuwae,Vanuatu,Vanuatu Volcanic Arc,-16.8304,168.5227,-2,Caldera,1974,small_island,461.87288605704424
+257081,Nguna-Emau,Vanuatu,Vanuatu Volcanic Arc,-17.4522,168.353,589,Stratovolcano(es),,small_island,25.223209942780073
+257090,Traitor's Head,Vanuatu,Vanuatu Volcanic Arc,-18.754,169.238,817,Stratovolcano,1881,small_island,892.8410593737806
+257100,Yasur,Vanuatu,Vanuatu Volcanic Arc,-19.532,169.447,361,Stratovolcano,2026,small_island,580.9761760125488
+258001,Gemini-Oscostar,Vanuatu,Vanuatu Volcanic Arc,-20.957,170.13,-33,Stratovolcano,1996,small_island,
+258010,Matthew Island,France - claimed by Vanuatu,Vanuatu Volcanic Arc,-22.33,171.32,177,Stratovolcano,1956,small_island,0.131269781543135
+258020,Hunter Island,France - claimed by Vanuatu,Vanuatu Volcanic Arc,-22.4,172.05,297,Stratovolcano,1903,small_island,0.1558016810742519
+259010,Newer Volcanics Province,Australia,Southeastern Australia Volcanic Province,-37.77,142.5,1011,Volcanic field,-2900,continental,7613489.021537037
+259804,McBride Volcanic Province,Australia,Northeastern Australia Volcanic Province,-18.367,144.567,1020,Volcanic field,-5050,continental,7613489.021537037
+260010,Barren Island,India,Andaman Volcanic Province,12.278,93.858,354,Stratovolcano,2026,small_island,2.7173710007389498
+261030,Peuet Sague,Indonesia,Sunda Volcanic Arc,4.903,96.289,2785,Complex,2000,large_island,429883.41445049364
+261050,"Telong, Bur ni",Indonesia,Sunda Volcanic Arc,4.769,96.821,2617,Stratovolcano,1937,large_island,429883.41445049364
+261070,Singkut,Indonesia,Sunda Volcanic Arc,3.2379,98.5127,2181,Caldera(s),1881,large_island,429883.41445049364
+261080,Sinabung,Indonesia,Sunda Volcanic Arc,3.17,98.392,2460,Stratovolcano,2021,large_island,429883.41445049364
+261121,Malintang,Indonesia,Sunda Volcanic Arc,0.4756,99.6628,1988,Stratovolcano,,large_island,429883.41445049364
+261120,Sorikmarapi,Indonesia,Sunda Volcanic Arc,0.6834,99.5409,2145,Stratovolcano,1986,large_island,429883.41445049364
+261130,Talakmau,Indonesia,Sunda Volcanic Arc,0.0787,99.984,2911,Complex,,large_island,429883.41445049364
+261140,Marapi,Indonesia,Sunda Volcanic Arc,-0.38,100.474,2885,Complex,2026,large_island,429883.41445049364
+261150,Tandikat-Singgalang,Indonesia,Sunda Volcanic Arc,-0.4311,100.3192,2879,Stratovolcano(es),1924,large_island,429883.41445049364
+261160,Talang,Indonesia,Sunda Volcanic Arc,-0.979,100.681,2575,Stratovolcano,2007,large_island,429883.41445049364
+261170,Kerinci,Indonesia,Sunda Volcanic Arc,-1.697,101.264,3800,Stratovolcano,2024,large_island,429883.41445049364
+261180,Sumbing,Indonesia,Sunda Volcanic Arc,-2.414,101.728,2507,Stratovolcano,1921,large_island,429883.41445049364
+261220,Kaba,Indonesia,Sunda Volcanic Arc,-3.5156,102.6261,1962,Stratovolcano,2000,large_island,429883.41445049364
+261231,Patah,Indonesia,Sunda Volcanic Arc,-4.257,103.306,2836,Stratovolcano?,,large_island,429883.41445049364
+261230,Dempo,Indonesia,Sunda Volcanic Arc,-4.016,103.121,3142,Stratovolcano(es),2025,large_island,429883.41445049364
+261251,Ranau,Indonesia,Sunda Volcanic Arc,-4.871,103.925,1854,Caldera,,large_island,429883.41445049364
+261270,Suoh,Indonesia,Sunda Volcanic Arc,-5.25,104.27,1000,Caldera(s),2024,large_island,429883.41445049364
+262000,Krakatau,Indonesia,Sunda Volcanic Arc,-6.1009,105.4233,285,Caldera,2024,small_island,11.055193894774094
+263010,Pulosari,Indonesia,Sunda Volcanic Arc,-6.343,105.978,1324,Stratovolcano,,large_island,126717.62290167317
+263020,Karang,Indonesia,Sunda Volcanic Arc,-6.268,106.05,1768,Stratovolcano,,large_island,126717.62290167317
+263040,Perbakti-Gagak,Indonesia,Sunda Volcanic Arc,-6.75,106.675,1726,Stratovolcano(es),1939,large_island,126717.62290167317
+263050,Salak,Indonesia,Sunda Volcanic Arc,-6.716,106.733,2218,Stratovolcano,1938,large_island,126717.62290167317
+263060,Gede-Pangrango,Indonesia,Sunda Volcanic Arc,-6.786,106.983,3026,Stratovolcano(es),1957,large_island,126717.62290167317
+263070,Patuha,Indonesia,Sunda Volcanic Arc,-7.162,107.4,2422,Stratovolcano,,large_island,126717.62290167317
+263090,Tangkuban Parahu,Indonesia,Sunda Volcanic Arc,-6.77,107.6,2084,Stratovolcano,2019,large_island,126717.62290167317
+263100,Papandayan,Indonesia,Sunda Volcanic Arc,-7.3175,107.7306,2643,Stratovolcano(es),2002,large_island,126717.62290167317
+263131,Tampomas,Indonesia,Sunda Volcanic Arc,-6.7639,107.9612,1690,Stratovolcano,,large_island,126717.62290167317
+263130,Guntur,Indonesia,Sunda Volcanic Arc,-7.143,107.841,2251,Complex,1847,large_island,126717.62290167317
+263140,Galunggung,Indonesia,Sunda Volcanic Arc,-7.25,108.058,2168,Stratovolcano,1984,large_island,126717.62290167317
+263150,Talagabodas,Indonesia,Sunda Volcanic Arc,-7.208,108.07,2201,Stratovolcano,,large_island,126717.62290167317
+263170,Ciremai,Indonesia,Sunda Volcanic Arc,-6.895,108.408,3039,Stratovolcano,1951,large_island,126717.62290167317
+263180,Slamet,Indonesia,Sunda Volcanic Arc,-7.242,109.208,3428,Stratovolcano,2014,large_island,126717.62290167317
+263200,Dieng Volcanic Complex,Indonesia,Sunda Volcanic Arc,-7.2,109.879,2565,Complex,2025,large_island,126717.62290167317
+263210,Sundoro,Indonesia,Sunda Volcanic Arc,-7.3014,109.997,3149,Stratovolcano,1971,large_island,126717.62290167317
+263220,Sumbing,Indonesia,Sunda Volcanic Arc,-7.3819,110.0747,3370,Stratovolcano,1730,large_island,126717.62290167317
+263240,Merbabu,Indonesia,Sunda Volcanic Arc,-7.454,110.44,3118,Stratovolcano,1797,large_island,126717.62290167317
+263250,Merapi,Indonesia,Sunda Volcanic Arc,-7.54,110.446,2910,Stratovolcano,2026,large_island,126717.62290167317
+263260,Lawu,Indonesia,Sunda Volcanic Arc,-7.625,111.192,3265,Stratovolcano,,large_island,126717.62290167317
+263281,Kawi-Butak,Indonesia,Sunda Volcanic Arc,-7.92,112.45,2651,Stratovolcano(es),,large_island,126717.62290167317
+263280,Kelud,Indonesia,Sunda Volcanic Arc,-7.935,112.314,1730,Stratovolcano,2014,large_island,126717.62290167317
+263291,Penanggungan,Indonesia,Sunda Volcanic Arc,-7.616,112.62,1631,Stratovolcano,,large_island,126717.62290167317
+263290,Arjuno-Welirang,Indonesia,Sunda Volcanic Arc,-7.733,112.575,3343,Stratovolcano,1952,large_island,126717.62290167317
+263300,Semeru,Indonesia,Sunda Volcanic Arc,-8.108,112.922,3657,Stratovolcano,2026,large_island,126717.62290167317
+263310,Tengger Caldera,Indonesia,Sunda Volcanic Arc,-7.942,112.95,2329,Stratovolcano(es),2023,large_island,126717.62290167317
+263320,Lamongan,Indonesia,Sunda Volcanic Arc,-7.981,113.341,1641,Stratovolcano,1898,large_island,126717.62290167317
+263330,Iyang-Argapura,Indonesia,Sunda Volcanic Arc,-7.97,113.57,3088,Complex,,large_island,126717.62290167317
+263340,Raung,Indonesia,Sunda Volcanic Arc,-8.119,114.056,3260,Stratovolcano,2025,large_island,126717.62290167317
+263351,Baluran,Indonesia,Sunda Volcanic Arc,-7.85,114.37,1247,Stratovolcano,,large_island,126717.62290167317
+263350,Ijen,Indonesia,Sunda Volcanic Arc,-8.058,114.242,2769,Stratovolcano(es),1999,large_island,126717.62290167317
+264001,Buyan-Bratan,Indonesia,Sunda Volcanic Arc,-8.283,115.133,2244,Caldera,,large_island,5449.508110208283
+264010,Batur,Indonesia,Sunda Volcanic Arc,-8.2403,115.3775,1711,Caldera,2000,large_island,5449.508110208283
+264020,Agung,Indonesia,Sunda Volcanic Arc,-8.343,115.508,2997,Stratovolcano,2022,large_island,5449.508110208283
+264030,Rinjani,Indonesia,Sunda Volcanic Arc,-8.42,116.47,3726,Stratovolcano,2016,large_island,4683.907550273928
+264040,Tambora,Indonesia,Sunda Volcanic Arc,-8.25,118,2850,Stratovolcano,1967,large_island,14546.820730947224
+264050,Sangeang Api,Indonesia,Sunda Volcanic Arc,-8.2,119.07,1912,Complex,2022,small_island,137.8679543308409
+264060,"Sano, Wai",Indonesia,Sunda Volcanic Arc,-8.7345,120.0074,1319,Caldera,,large_island,14371.01247903624
+264071,Ranakah,Indonesia,Sunda Volcanic Arc,-8.637,120.5302,2288,Lava dome(s),1991,large_island,14371.01247903624
+264080,Inierie,Indonesia,Sunda Volcanic Arc,-8.875,120.95,2245,Stratovolcano,-8050,large_island,14371.01247903624
+264090,Inielika,Indonesia,Sunda Volcanic Arc,-8.73,120.98,1559,Complex,2001,large_island,14371.01247903624
+264100,Ebulobo,Indonesia,Sunda Volcanic Arc,-8.817,121.191,2096,Stratovolcano,1969,large_island,14371.01247903624
+264110,Iya,Indonesia,Sunda Volcanic Arc,-8.891,121.641,618,Stratovolcano,1969,large_island,14371.01247903624
+264140,Kelimutu,Indonesia,Sunda Volcanic Arc,-8.77,121.82,1639,Complex,1968,large_island,14371.01247903624
+264150,Paluweh,Indonesia,Sunda Volcanic Arc,-8.32,121.708,875,Stratovolcano,2013,small_island,39.757658898114684
+264160,Egon,Indonesia,Sunda Volcanic Arc,-8.676,122.455,1661,Stratovolcano,2008,large_island,14371.01247903624
+264180,Lewotobi,Indonesia,Sunda Volcanic Arc,-8.542,122.775,1703,Stratovolcano(es),2026,large_island,14371.01247903624
+264220,Iliboleng,Indonesia,Sunda Volcanic Arc,-8.342,123.258,1659,Stratovolcano,1993,small_island,527.8803804078855
+264230,Lewotolok,Indonesia,Sunda Volcanic Arc,-8.274,123.508,1431,Stratovolcano,2026,small_island,1304.1552828985057
+264240,Ililabalekan,Indonesia,Sunda Volcanic Arc,-8.55,123.38,1018,Stratovolcano,,small_island,1304.1552828985057
+264250,Iliwerung,Indonesia,Sunda Volcanic Arc,-8.532,123.573,583,Complex,2021,small_island,1304.1552828985057
+264260,"Tara, Batu",Indonesia,Sunda Volcanic Arc,-7.791,123.585,633,Stratovolcano,2015,small_island,
+264270,Sirung,Indonesia,Sunda Volcanic Arc,-8.4972,124.1306,1347,Complex,2021,small_island,741.0227640755867
+265040,Wurlali,Indonesia,Inner Banda Volcanic Arc,-7.125,128.675,868,Stratovolcano,1892,small_island,189.4994011826996
+265050,Teon,Indonesia,Inner Banda Volcanic Arc,-6.976,129.144,728,Stratovolcano,1904,small_island,12.329661109959726
+265060,Nila,Indonesia,Inner Banda Volcanic Arc,-6.73,129.5,781,Stratovolcano,1968,small_island,22.965145194416262
+265070,Serua,Indonesia,Inner Banda Volcanic Arc,-6.312,130.017,608,Stratovolcano,1921,small_island,4.784673606192923
+265080,Manuk,Indonesia,Inner Banda Volcanic Arc,-5.543,130.303,257,Stratovolcano,,small_island,
+265090,Banda Api,Indonesia,Inner Banda Volcanic Arc,-4.523,129.881,596,Caldera,1988,small_island,26.21951281059613
+266010,Colo,Indonesia,Sangihe Volcanic Arc,-0.162,121.601,404,Stratovolcano,1983,small_island,58.63988298142016
+266020,Ambang,Indonesia,Sangihe Volcanic Arc,0.75,124.42,1795,Complex,2005,large_island,170804.4591171588
+266030,Soputan,Indonesia,Sangihe Volcanic Arc,1.112,124.737,1785,Stratovolcano,2020,large_island,170804.4591171588
+266100,Lokon-Empung,Indonesia,Sangihe Volcanic Arc,1.3644,124.7992,1580,Stratovolcano(es),2015,large_island,170804.4591171588
+266110,Mahawu,Indonesia,Sangihe Volcanic Arc,1.352,124.865,1299,Stratovolcano,1977,large_island,170804.4591171588
+266120,Klabat,Indonesia,Sangihe Volcanic Arc,1.454,125.031,1968,Stratovolcano,,large_island,170804.4591171588
+266130,Tangkoko-Duasudara,Indonesia,Sangihe Volcanic Arc,1.518,125.185,1334,Stratovolcano,1880,large_island,170804.4591171588
+267010,Ruang,Indonesia,Sangihe Volcanic Arc,2.3058,125.3671,703,Stratovolcano,2024,small_island,61.88635332582962
+267020,Karangetang,Indonesia,Sangihe Volcanic Arc,2.781,125.407,1797,Stratovolcano,2023,small_island,116.23609253523732
+267030,Banua Wuhu,Indonesia,Sangihe Volcanic Arc,3.1463,125.4422,-5,Complex,1919,small_island,
+267040,Awu,Indonesia,Sangihe Volcanic Arc,3.689,125.447,1318,Stratovolcano,2004,small_island,415.4921114461142
+268001,Tarakan,Indonesia,Halmahera Volcanic Arc,1.832,127.825,317,Pyroclastic cone(s),,large_island,18295.499051562667
+268010,Dukono,Indonesia,Halmahera Volcanic Arc,1.6992,127.8783,1273,Complex,2026,large_island,18295.499051562667
+268020,Tobaru,Indonesia,Halmahera Volcanic Arc,1.63,127.67,1035,Stratovolcano,,large_island,18295.499051562667
+268030,Ibu,Indonesia,Halmahera Volcanic Arc,1.4941,127.6324,1357,Stratovolcano,2026,large_island,18295.499051562667
+268040,Gamkonora,Indonesia,Halmahera Volcanic Arc,1.38,127.53,1635,Stratovolcano,2007,large_island,18295.499051562667
+268051,Jailolo,Indonesia,Halmahera Volcanic Arc,1.08,127.439,993,Stratovolcano,,large_island,18295.499051562667
+268052,Hiri,Indonesia,Halmahera Volcanic Arc,0.8971,127.317,687,Stratovolcano,,small_island,92.01055387397638
+268050,Todoko-Ranu,Indonesia,Halmahera Volcanic Arc,1.2389,127.4556,979,Caldera(s),,large_island,18295.499051562667
+268061,Kie Matubu,Indonesia,Halmahera Volcanic Arc,0.6623,127.4029,1713,Stratovolcano,1210,small_island,105.9342842174913
+268062,Mare,Indonesia,Halmahera Volcanic Arc,0.57,127.4,308,Stratovolcano,,small_island,105.9342842174913
+268063,Moti,Indonesia,Halmahera Volcanic Arc,0.454,127.411,927,Stratovolcano,,small_island,79.25275328971028
+268060,Gamalama,Indonesia,Halmahera Volcanic Arc,0.81,127.3322,1714,Stratovolcano(es),2018,small_island,92.01055387397638
+268070,Kie Besi,Indonesia,Halmahera Volcanic Arc,0.32,127.4,1357,Stratovolcano,1988,small_island,79.25275328971028
+271011,Melebingoy,Philippines,Mindanao Volcanic Province,6.113,124.892,1824,Stratovolcano,1641,large_island,94557.03116493038
+271020,Matutum,Philippines,Mindanao Volcanic Province,6.3604,125.0765,2262,Stratovolcano,1290,large_island,94557.03116493038
+271031,Leonard Range,Philippines,Eastern Philippine Volcanic Arc,7.382,126.047,1080,Stratovolcano,80,large_island,94557.03116493038
+271040,Makaturing,Philippines,Mindanao Volcanic Province,7.644,124.317,1818,Stratovolcano,1882,large_island,94557.03116493038
+271060,Ragang,Philippines,Mindanao Volcanic Province,7.691,124.507,2790,Stratovolcano,1916,large_island,94557.03116493038
+271070,Musuan,Philippines,Mindanao Volcanic Province,7.8765,125.0697,610,Lava dome,,large_island,94557.03116493038
+271080,Camiguin,Philippines,Mindanao Volcanic Province,9.203,124.673,1552,Stratovolcano(es),1953,small_island,242.33187858585072
+272020,Kanlaon,Philippines,Negros-Sulu Volcanic Arc,10.4096,123.13,2422,Stratovolcano,2026,large_island,12943.297354853023
+272050,Cabalían,Philippines,Eastern Philippine Volcanic Arc,10.285,125.218,912,Stratovolcano,1820,large_island,7027.467282812728
+272080,Biliran,Philippines,Eastern Philippine Volcanic Arc,11.523,124.535,1301,Compound,1939,small_island,465.6514061472035
+273010,Bulusan,Philippines,Eastern Philippine Volcanic Arc,12.769,124.056,1535,Stratovolcano(es),2025,large_island,105880.89729202019
+273030,Mayon,Philippines,Eastern Philippine Volcanic Arc,13.257,123.685,2462,Stratovolcano,2026,large_island,105880.89729202019
+273041,Iriga,Philippines,Eastern Philippine Volcanic Arc,13.458,123.451,1138,Stratovolcano,,large_island,105880.89729202019
+273042,Isarog,Philippines,Eastern Philippine Volcanic Arc,13.658,123.38,1966,Stratovolcano,-3500,large_island,105880.89729202019
+273050,Banahaw,Philippines,Luzon Volcanic Arc,14.07,121.48,2158,Complex,,large_island,105880.89729202019
+273060,San Pablo Volcanic Field,Philippines,Luzon Volcanic Arc,14.12,121.3,1090,Volcanic field,1350,large_island,105880.89729202019
+273070,Taal,Philippines,Luzon Volcanic Arc,14.0106,120.9975,311,Caldera,2026,large_island,105880.89729202019
+273083,Pinatubo,Philippines,Luzon Volcanic Arc,15.13,120.35,1486,Stratovolcano,2021,large_island,105880.89729202019
+273090,Cagua,Philippines,Luzon Volcanic Arc,18.222,122.123,1133,Stratovolcano,1860,large_island,105880.89729202019
+274010,Camiguin de Babuyanes,Philippines,Luzon Volcanic Arc,18.83,121.86,712,Stratovolcano,1857,small_island,157.59333188029754
+274020,Didicas,Philippines,Luzon Volcanic Arc,19.077,122.202,228,Compound,1978,small_island,157.59333188029754
+274030,Babuyan Claro,Philippines,Luzon Volcanic Arc,19.524,121.95,1064,Stratovolcano(es),1924,small_island,61.88553862527962
+274060,Iraya,Philippines,Luzon Volcanic Arc,20.469,122.01,1009,Stratovolcano,1454,small_island,71.51867849155433
+275001,Hainan Volcanic Field,China,Southeast Asia Volcanic Province,19.905,110.229,196,Volcanic field,1933,large_island,33943.402896125204
+275020,Ly Son Group,Vietnam,Southeast Asia Volcanic Province,15.38,109.12,157,Volcanic field,,small_island,8.372048126213592
+275060,"Cendres, Ile des",Vietnam,Southeast Asia Volcanic Province,10.158,109.014,-20,Volcanic field,1923,small_island,
+275080,Popa,Burma (Myanmar),Southeast Asia Volcanic Province,20.92,95.25,1518,Stratovolcano,-6050,continental,79752883.58340874
+275110,Tengchong,China,Southeast Asia Volcanic Province,25.23,98.5,2865,Volcanic field,-5750,continental,79752883.58340874
+281031,Kueishantao,Taiwan,Ryukyu Volcanic Arc,24.841,121.953,361,Stratovolcano,1853,small_island,3.6925518590516315
+281032,Tatun Volcanic Group,Taiwan,Ryukyu Volcanic Arc,25.178,121.553,1120,Lava dome(s),648,large_island,35940.42678649775
+282010,Submarine Volcano NNE of Iriomotejima,Japan,Ryukyu Volcanic Arc,24.57,123.93,-200,Stratovolcano,1924,small_island,272.37431151656915
+282021,Yokoatejima,Japan,Ryukyu Volcanic Arc,28.7994,128.9958,495,Stratovolcano(es),1835,small_island,
+282022,Akusekijima,Japan,Ryukyu Volcanic Arc,29.465,129.594,555,Stratovolcano(es),,small_island,6.259465260795533
+282020,Io-Torishima,Japan,Ryukyu Volcanic Arc,27.881,128.223,212,Complex,1968,small_island,1.8601637815209304
+282030,Suwanosejima,Japan,Ryukyu Volcanic Arc,29.638,129.714,796,Stratovolcano(es),2026,small_island,16.344814912539867
+282043,Kuchinoshima,Japan,Ryukyu Volcanic Arc,29.968,129.926,628,Stratovolcano(es),1190,small_island,13.830367910429086
+282040,Nakanoshima,Japan,Ryukyu Volcanic Arc,29.859,129.857,979,Stratovolcano(es),1914,small_island,36.820865144779596
+282050,Kuchinoerabujima,Japan,Ryukyu Volcanic Arc,30.443,130.217,657,Stratovolcano(es),2020,small_island,38.72703986403253
+282060,Kikai,Japan,Ryukyu Volcanic Arc,30.793,130.305,704,Caldera,2025,small_island,12.814103697388433
+282070,Ata,Japan,Ryukyu Volcanic Arc,31.18,130.5283,924,Caldera(s),885,large_island,36972.41564685259
+282081,Yonemaru-Sumiyoshiike,Japan,Ryukyu Volcanic Arc,31.771,130.592,40,Maar(s),-6200,large_island,36972.41564685259
+282080,Aira,Japan,Ryukyu Volcanic Arc,31.5772,130.6589,1117,Caldera,2026,large_island,36972.41564685259
+282091,Fukue,Japan,Nankai Volcanic Arc,32.657,128.849,315,Volcanic field,-400,small_island,367.6749197971297
+282090,Kirishimayama,Japan,Ryukyu Volcanic Arc,31.934,130.862,1700,Shield,2025,large_island,36972.41564685259
+282100,Unzendake,Japan,Nankai Volcanic Arc,32.761,130.299,1483,Complex,1996,large_island,36972.41564685259
+282110,Asosan,Japan,Nankai Volcanic Arc,32.8849,131.085,1592,Caldera,2021,large_island,36972.41564685259
+282120,Kujusan,Japan,Nankai Volcanic Arc,33.086,131.249,1791,Stratovolcano(es),1996,large_island,36972.41564685259
+282130,Yufu-Tsurumi,Japan,Nankai Volcanic Arc,33.282,131.39,,Lava dome(s),867,large_island,36972.41564685259
+283001,Abu,Japan,Nankai Volcanic Arc,34.4833,131.5167,641,Volcanic field,-6850,large_island,229073.9443140697
+283002,Sanbesan,Japan,Nankai Volcanic Arc,35.141,132.622,1126,Stratovolcano,650,large_island,229073.9443140697
+283010,Izu-Tobu,Japan,Izu Volcanic Arc,34.903,139.095,580,Pyroclastic cone(s),1989,large_island,229073.9443140697
+283020,Hakoneyama,Japan,Izu Volcanic Arc,35.233,139.021,1438,Complex,2015,large_island,229073.9443140697
+283031,Yokodake,Japan,Northeast Japan Volcanic Arc,36.0875,138.32,2480,Stratovolcano(es),1200,large_island,229073.9443140697
+283030,Fujisan,Japan,Izu Volcanic Arc,35.361,138.728,3776,Stratovolcano,1708,large_island,229073.9443140697
+283040,Ontakesan,Japan,Nankai Volcanic Arc,35.8931,137.4806,3067,Complex,2014,large_island,229073.9443140697
+283050,Hakusan,Japan,Nankai Volcanic Arc,36.155,136.771,2702,Stratovolcano,1659,large_island,229073.9443140697
+283060,Norikuradake,Japan,Nankai Volcanic Arc,36.106,137.554,3026,Stratovolcano(es),-50,large_island,229073.9443140697
+283070,Yakedake,Japan,Nankai Volcanic Arc,36.227,137.587,2455,Stratovolcano(es),1995,large_island,229073.9443140697
+283080,Midagahara,Japan,Nankai Volcanic Arc,36.571,137.59,2621,Stratovolcano,1839,large_island,229073.9443140697
+283090,Niigata-Yakeyama,Japan,Northeast Japan Volcanic Arc,36.921,138.036,2400,Lava dome,1998,large_island,229073.9443140697
+283100,Myokosan,Japan,Northeast Japan Volcanic Arc,36.891,138.114,2454,Stratovolcano,-750,large_island,229073.9443140697
+283110,Asamayama,Japan,Northeast Japan Volcanic Arc,36.406,138.523,2568,Complex,2019,large_island,229073.9443140697
+283121,Shiga,Japan,Northeast Japan Volcanic Arc,36.688,138.519,2041,Shield(s),,large_island,229073.9443140697
+283122,Harunasan,Japan,Northeast Japan Volcanic Arc,36.4775,138.8508,1449,Stratovolcano,550,large_island,229073.9443140697
+283120,Kusatsu-Shiranesan,Japan,Northeast Japan Volcanic Arc,36.618,138.528,2165,Stratovolcano(es),2018,large_island,229073.9443140697
+283131,Hiuchigatake,Japan,Northeast Japan Volcanic Arc,36.955,139.285,2356,Stratovolcano,1544,large_island,229073.9443140697
+283130,Akagisan,Japan,Northeast Japan Volcanic Arc,36.56,139.193,1828,Stratovolcano,,large_island,229073.9443140697
+283141,Nantaisan,Japan,Northeast Japan Volcanic Arc,36.765,139.4906,2486,Stratovolcano,-9540,large_island,229073.9443140697
+283142,Omanago Group,Japan,Northeast Japan Volcanic Arc,36.8067,139.4756,2341,Lava dome(s),-3050,large_island,229073.9443140697
+283143,Takaharayama,Japan,Northeast Japan Volcanic Arc,36.9,139.777,1795,Stratovolcano,-4570,large_island,229073.9443140697
+283140,Nikko-Shiranesan,Japan,Northeast Japan Volcanic Arc,36.799,139.376,2578,Shield,1952,large_island,229073.9443140697
+283151,Numazawa,Japan,Northeast Japan Volcanic Arc,37.444,139.566,835,Shield,-3400,large_island,229073.9443140697
+283150,Nasudake,Japan,Northeast Japan Volcanic Arc,37.1247,139.9631,1915,Stratovolcano(es),1963,large_island,229073.9443140697
+283160,Bandaisan,Japan,Northeast Japan Volcanic Arc,37.601,140.072,1816,Stratovolcano,1888,large_island,229073.9443140697
+283170,Adatarayama,Japan,Northeast Japan Volcanic Arc,37.647,140.281,1728,Stratovolcano(es),1996,large_island,229073.9443140697
+283180,Azumayama,Japan,Northeast Japan Volcanic Arc,37.735,140.244,1949,Stratovolcano(es),1977,large_island,229073.9443140697
+283191,Hijiori,Japan,Northeast Japan Volcanic Arc,38.5992,140.1617,552,Caldera,,large_island,229073.9443140697
+283190,Zaozan [Zaosan],Japan,Northeast Japan Volcanic Arc,38.1439,140.4397,1841,Complex,1940,large_island,229073.9443140697
+283200,Naruko,Japan,Northeast Japan Volcanic Arc,38.729,140.734,470,Caldera,837,large_island,229073.9443140697
+283210,Kurikomayama,Japan,Northeast Japan Volcanic Arc,38.961,140.788,,Stratovolcano,1950,large_island,229073.9443140697
+283220,Chokaisan,Japan,Northeast Japan Volcanic Arc,39.0994,140.0489,2236,Stratovolcano(es),1974,large_island,229073.9443140697
+283230,Akita-Komagatake,Japan,Northeast Japan Volcanic Arc,39.761,140.799,1637,Stratovolcano(es),1971,large_island,229073.9443140697
+283240,Iwatesan,Japan,Northeast Japan Volcanic Arc,39.853,141.001,2038,Complex,1919,large_island,229073.9443140697
+283250,Hachimantai,Japan,Northeast Japan Volcanic Arc,39.958,140.854,1613,Stratovolcano,-5350,large_island,229073.9443140697
+283262,Megata,Japan,Northeast Japan Volcanic Arc,39.95,139.725,160,Maar(s),-2050,large_island,229073.9443140697
+283260,Akita-Yakeyama,Japan,Northeast Japan Volcanic Arc,39.964,140.757,1366,Stratovolcano,1997,large_island,229073.9443140697
+283271,Towada,Japan,Northeast Japan Volcanic Arc,40.51,140.88,1011,Caldera,915,large_island,229073.9443140697
+283270,Iwakisan,Japan,Northeast Japan Volcanic Arc,40.656,140.303,1624,Stratovolcano,1863,large_island,229073.9443140697
+283280,Hakkodasan,Japan,Northeast Japan Volcanic Arc,40.659,140.877,1584,Stratovolcano(es),1550,large_island,229073.9443140697
+283290,Osorezan,Japan,Northeast Japan Volcanic Arc,41.279,141.12,878,Stratovolcano,1787,large_island,229073.9443140697
+284011,Toshima,Japan,Izu Volcanic Arc,34.52,139.279,508,Stratovolcano,-4550,small_island,2.853665181379648
+284010,Izu-Oshima,Japan,Izu Volcanic Arc,34.724,139.394,758,Stratovolcano,1990,small_island,101.41435735393614
+284020,Niijima,Japan,Izu Volcanic Arc,34.397,139.27,432,Lava dome(s),886,small_island,26.93134534715778
+284030,Kozushima,Japan,Izu Volcanic Arc,34.219,139.153,572,Lava dome(s),838,small_island,17.42060266967792
+284041,Mikurajima,Japan,Izu Volcanic Arc,33.874,139.602,851,Stratovolcano,-4100,small_island,17.15199668102494
+284042,Kurose Hole,Japan,Izu Volcanic Arc,33.4,139.68,-114,Caldera,,small_island,84.55259810755967
+284040,Miyakejima,Japan,Izu Volcanic Arc,34.094,139.526,775,Stratovolcano,2010,small_island,50.15697280115826
+284050,Hachijojima,Japan,Izu Volcanic Arc,33.137,139.766,854,Stratovolcano(es),1606,small_island,84.55259810755967
+284061,Kita-Bayonnaise,Japan,Izu Volcanic Arc,32.1,139.85,-360,Caldera,,small_island,
+284060,Aogashima,Japan,Izu Volcanic Arc,32.458,139.759,423,Stratovolcano,1785,small_island,1.684422910611485
+284070,Myojinsho,Japan,Izu Volcanic Arc,31.888,139.918,11,Caldera,1970,small_island,
+284080,Sumisujima,Japan,Izu Volcanic Arc,31.44,140.051,136,Caldera,1916,small_island,0.021587000282948708
+284091,Sofugan,Japan,Izu Volcanic Arc,29.794,140.342,99,Stratovolcano,,small_island,
+284093,Suiyo Seamount,Japan,Ogasawara Volcanic Arc,28.575,140.633,-991,Stratovolcano,,small_island,
+284094,Mokuyo Seamount,Japan,Ogasawara Volcanic Arc,28.327,140.572,-933,Stratovolcano,,small_island,
+284095,Doyo Seamount,Japan,Ogasawara Volcanic Arc,27.68,140.8,-590,Stratovolcano,,small_island,
+284096,Nishinoshima,Japan,Ogasawara Volcanic Arc,27.2439,140.8797,160,Caldera,2023,small_island,1.1573839260889929
+284097,Kaikata Seamount,Japan,Ogasawara Volcanic Arc,26.667,140.929,-165,Stratovolcano,,small_island,
+284090,Izu-Torishima,Japan,Izu Volcanic Arc,30.484,140.303,394,Stratovolcano,2002,small_island,3.2860381679917614
+284100,Kaitoku Seamount,Japan,Ogasawara Volcanic Arc,26.1267,141.1017,-95,Stratovolcano,2023,small_island,
+284110,Funka Asane,Japan,Ogasawara Volcanic Arc,25.455,141.2386,-20,Stratovolcano,2022,small_island,7.959817782374723
+284121,Kita-Fukutokutai,Japan,Ogasawara Volcanic Arc,24.417,141.417,-73,Stratovolcano,1954,small_island,2.191684066746545
+284120,Ioto,Japan,Ogasawara Volcanic Arc,24.7503,141.2892,172,Caldera,2025,small_island,26.273913223960534
+284131,Minami-Hiyoshi,Japan,Mariana Volcanic Arc,23.5,141.935,-107,Stratovolcano,1975,small_island,
+284132,Nikko,Japan,Mariana Volcanic Arc,23.078,142.326,-392,Stratovolcano,,small_island,
+284133,Fukujin,United States,Mariana Volcanic Arc,21.93,143.47,-217,Stratovolcano,1974,small_island,
+284134,Kasuga 1,United States,Mariana Volcanic Arc,21.765,143.71,-598,Stratovolcano,1959,small_island,
+284135,Kasuga 2,United States,Mariana Volcanic Arc,21.6,143.637,-274,Stratovolcano,,small_island,
+284136,NW Eifuku,United States,Mariana Volcanic Arc,21.485,144.043,-1535,Stratovolcano,,small_island,
+284137,Daikoku,United States,Mariana Volcanic Arc,21.324,144.194,-323,Stratovolcano,,small_island,
+284130,Fukutoku-Oka-no-Ba,Japan,Ogasawara Volcanic Arc,24.285,141.481,-29,Pyroclastic cone,2021,small_island,2.191684066746545
+284141,Ahyi,United States,Mariana Volcanic Arc,20.437,145.03,-55,Stratovolcano,2026,small_island,9.386366030064687
+284142,Supply Reef,United States,Mariana Volcanic Arc,20.13,145.1,-8,Stratovolcano,,small_island,11.646433716251778
+284143,Maug Islands,United States,Mariana Volcanic Arc,20.02,145.22,227,Stratovolcano,,small_island,11.646433716251778
+284140,Farallon de Pajaros,United States,Mariana Volcanic Arc,20.546,144.893,337,Stratovolcano,1953,small_island,9.386366030064687
+284150,Asuncion,United States,Mariana Volcanic Arc,19.671,145.406,857,Stratovolcano,1906,small_island,9.7074883804635
+284160,Agrigan,United States,Mariana Volcanic Arc,18.77,145.67,965,Stratovolcano,1917,small_island,62.80808375314174
+284170,Pagan,United States,Mariana Volcanic Arc,18.13,145.8,570,Stratovolcano(es),2021,small_island,90.45343465462767
+284180,Alamagan,United States,Mariana Volcanic Arc,17.6,145.83,744,Stratovolcano,870,small_island,13.99136728247505
+284191,Zealandia Bank,United States,Mariana Volcanic Arc,16.88,145.85,0,Stratovolcano,,small_island,5.1387682759821525
+284192,Sarigan,United States,Mariana Volcanic Arc,16.6991,145.7803,494,Stratovolcano,,small_island,5.1387682759821525
+284190,Guguan,United States,Mariana Volcanic Arc,17.3137,145.84,232,Stratovolcano,1883,small_island,4.413711633046596
+284201,East Diamante,United States,Mariana Volcanic Arc,15.93,145.67,-127,Stratovolcano,,small_island,
+284202,Ruby,United States,Mariana Volcanic Arc,15.605,145.572,-174,Stratovolcano,2023,small_island,
+284200,Anatahan,United States,Mariana Volcanic Arc,16.35,145.67,790,Stratovolcano,2008,small_island,33.131007313126126
+284211,NW Rota-1,United States,Mariana Volcanic Arc,14.601,144.775,-455,Stratovolcano,2010,small_island,
+284210,Esmeralda Bank,United States,Mariana Volcanic Arc,14.958,145.249,-74,Stratovolcano,,small_island,
+284220,Forecast Seamount,United States,Mariana Volcanic Arc,13.4,143.92,-1456,Stratovolcano,,small_island,
+284230,Seamount X,United States,Mariana Volcanic Arc,13.25,144.02,-1230,Stratovolcano,,small_island,
+285011,Esan,Japan,Northeast Japan Volcanic Arc,41.805,141.166,617,Lava dome(s),1874,large_island,78174.10638391472
+285010,Oshima-Oshima,Japan,Northeast Japan Volcanic Arc,41.51,139.367,732,Stratovolcano,1790,small_island,8.929306677046112
+285020,Hokkaido-Komagatake,Japan,Northeast Japan Volcanic Arc,42.063,140.677,1131,Stratovolcano,2000,large_island,78174.10638391472
+285031,Niseko,Japan,Northeast Japan Volcanic Arc,42.875,140.659,1308,Stratovolcano(es),-4900,large_island,78174.10638391472
+285032,Yoteizan,Japan,Northeast Japan Volcanic Arc,42.8267,140.8114,1898,Stratovolcano,-1050,large_island,78174.10638391472
+285034,Kuttara,Japan,Northeast Japan Volcanic Arc,42.491,141.16,549,Stratovolcano(es),1820,large_island,78174.10638391472
+285030,Toya,Japan,Northeast Japan Volcanic Arc,42.544,140.839,733,Stratovolcano,2001,large_island,78174.10638391472
+285041,Rishirizan,Japan,Kuril Volcanic Arc,45.179,141.242,1721,Stratovolcano,-5830,small_island,176.83945548763418
+285040,Shikotsu,Japan,Northeast Japan Volcanic Arc,42.688,141.38,1320,Caldera,1981,large_island,78174.10638391472
+285050,Tokachidake,Japan,Kuril Volcanic Arc,43.418,142.686,2077,Stratovolcano(es),2004,large_island,78174.10638391472
+285061,Maruyama,Japan,Kuril Volcanic Arc,43.418,143.031,1692,Stratovolcano(es),1898,large_island,78174.10638391472
+285060,Taisetsuzan,Japan,Kuril Volcanic Arc,43.664,142.854,2291,Stratovolcano(es),1739,large_island,78174.10638391472
+285070,Akan,Japan,Kuril Volcanic Arc,43.3864,144.0086,1499,Caldera,2026,large_island,78174.10638391472
+285081,Mashu,Japan,Kuril Volcanic Arc,43.572,144.561,857,Caldera,1080,large_island,78174.10638391472
+285082,Rausudake,Japan,Kuril Volcanic Arc,44.076,145.122,1660,Stratovolcano,1800,large_island,78174.10638391472
+285080,Kussharo,Japan,Kuril Volcanic Arc,43.615,144.427,574,Caldera,1320,large_island,78174.10638391472
+285090,Shiretoko-Iozan,Japan,Kuril Volcanic Arc,44.133,145.161,1562,Stratovolcano,1936,large_island,78174.10638391472
+290010,Tomariyama [Golovnin],Japan - administered by Russia,Kuril Volcanic Arc,43.844,145.504,535,Caldera,1848,small_island,1562.9576321386392
+290021,Ruruidake [Smirnov],Japan - administered by Russia,Kuril Volcanic Arc,44.4536,146.14,1481,Stratovolcano,,small_island,1562.9576321386392
+290020,Raususan [Mendeleev],Japan - administered by Russia,Kuril Volcanic Arc,43.979,145.733,882,Stratovolcano,1880,small_island,1562.9576321386392
+290030,Chachadake [Tiatia],Japan - administered by Russia,Kuril Volcanic Arc,44.3536,146.2531,1772,Stratovolcano,1981,small_island,1562.9576321386392
+290040,Berutarubesan [Berutarube],Japan - administered by Russia,Kuril Volcanic Arc,44.462,146.932,1221,Stratovolcano,,large_island,3026.7927650862666
+290050,Etorofu-Atosanupuri [Atosanupuri],Japan - administered by Russia,Kuril Volcanic Arc,44.8078,147.1306,1209,Stratovolcano,1932,large_island,3026.7927650862666
+290060,Hitokappu Volcano Group [Bogatyr Ridge],Japan - administered by Russia,Kuril Volcanic Arc,44.857,147.403,1610,Stratovolcano,,large_island,3026.7927650862666
+290070,Etorofu-Yakeyama [Grozny Group],Japan - administered by Russia,Kuril Volcanic Arc,45.0114,147.8722,1147,Complex,2013,large_island,3026.7927650862666
+290080,Sashiusudake [Baransky],Japan - administered by Russia,Kuril Volcanic Arc,45.1036,148.0142,1128,Stratovolcano,1951,large_island,3026.7927650862666
+290100,Moyorodake [Medvezhia],Japan - administered by Russia,Kuril Volcanic Arc,45.389,148.838,1124,Stratovolcano,1999,large_island,3026.7927650862666
+290111,Ivao Group,Russia,Kuril Volcanic Arc,45.7593,149.6762,1426,Pyroclastic cone(s),,small_island,1463.566036103972
+290120,Kolokol Group,Russia,Kuril Volcanic Arc,46.042,150.083,1328,Stratovolcano,1973,small_island,1463.566036103972
+290130,Kuril Arc at 46.3°N,Russia,Kuril Volcanic Arc,46.2944,150.8526,-100,,,small_island,12.607308280820693
+290150,Chirpoi,Russia,Kuril Volcanic Arc,46.532,150.871,742,Caldera,2016,small_island,12.607308280820693
+290161,Milna,Russia,Kuril Volcanic Arc,46.815,151.786,1504,Stratovolcano,1914,small_island,373.16332041735325
+290180,Zavaritzki Caldera,Russia,Kuril Volcanic Arc,46.9178,151.9518,612,Caldera,1957,small_island,373.16332041735325
+290191,Uratman,Russia,Kuril Volcanic Arc,47.12,152.25,678,Stratovolcano,,small_island,373.16332041735325
+290190,Prevo Peak,Russia,Kuril Volcanic Arc,47.0139,152.1167,1360,Stratovolcano,1825,small_island,373.16332041735325
+290200,Ketoi,Russia,Kuril Volcanic Arc,47.35,152.475,1172,Stratovolcano,1960,small_island,73.6810552570019
+290211,Srednii,Russia,Kuril Volcanic Arc,47.5861,152.893,36,Stratovolcano,,small_island,71.49332188731474
+290210,Ushishur,Russia,Kuril Volcanic Arc,47.5125,152.8139,357,Caldera,1884,small_island,71.49332188731474
+290220,Rasshua,Russia,Kuril Volcanic Arc,47.77,153.02,956,Stratovolcano,1957,small_island,71.49332188731474
+290240,Sarychev Peak,Russia,Kuril Volcanic Arc,48.092,153.2,1496,Stratovolcano,2021,small_island,66.93206517557081
+290250,Raikoke,Russia,Kuril Volcanic Arc,48.292,153.25,551,Stratovolcano,2019,small_island,66.93206517557081
+290260,Chirinkotan,Russia,Kuril Volcanic Arc,48.98,153.48,724,Stratovolcano,2022,small_island,
+290270,Ekarma,Russia,Kuril Volcanic Arc,48.958,153.93,1170,Stratovolcano,2010,small_island,35.378629473752554
+290290,Sinarka,Russia,Kuril Volcanic Arc,48.873,154.182,911,Stratovolcano,1878,small_island,125.51734230222235
+290300,Kharimkotan,Russia,Kuril Volcanic Arc,49.12,154.508,1145,Stratovolcano,1933,small_island,77.05210848963321
+290310,Tao-Rusyr Caldera,Russia,Kuril Volcanic Arc,49.34,154.725,1272,Stratovolcano,1952,small_island,445.1185019996371
+290320,Nemo Peak,Russia,Kuril Volcanic Arc,49.5641,154.8126,994,Caldera,1938,small_island,445.1185019996371
+290331,Shirinki,Russia,Kuril Volcanic Arc,50.1973,154.9781,693,Stratovolcano,,small_island,
+290340,Fuss Peak,Russia,Kuril Volcanic Arc,50.267,155.246,1742,Stratovolcano,1854,large_island,2076.8803286942007
+290350,Karpinsky Group,Russia,Kuril Volcanic Arc,50.1419,155.3847,1326,Complex,,large_island,2076.8803286942007
+290360,Chikurachki,Russia,Kuril Volcanic Arc,50.324,155.461,1781,Stratovolcano(es),2023,large_island,2076.8803286942007
+290370,Vernadsky Ridge,Russia,Kuril Volcanic Arc,50.5819,155.9867,1183,Pyroclastic cone(s),,large_island,2076.8803286942007
+290380,Ebeko,Russia,Kuril Volcanic Arc,50.686,156.014,1103,Stratovolcano,2024,large_island,2076.8803286942007
+290390,Alaid,Russia,Kuril Volcanic Arc,50.861,155.565,2285,Stratovolcano,2022,small_island,167.20781669270556
+300010,Kambalny,Russia,Kuril Volcanic Arc,51.306,156.875,2116,Stratovolcano,2017,continental,79752883.58340874
+300021,Yavinsky,Russia,Kuril Volcanic Arc,51.533,156.629,646,Stratovolcano,-4050,continental,79752883.58340874
+300022,Diky Greben,Russia,Kuril Volcanic Arc,51.452,156.978,1040,Lava dome(s),350,continental,79752883.58340874
+300023,Kurile Lake,Russia,Kuril Volcanic Arc,51.45,157.12,81,Caldera,-6440,continental,79752883.58340874
+300020,Koshelev,Russia,Kuril Volcanic Arc,51.356,156.753,1822,Stratovolcano,1690,continental,79752883.58340874
+300030,Iliinsky,Russia,Kuril Volcanic Arc,51.498,157.203,1555,Stratovolcano,1901,continental,79752883.58340874
+300040,Zheltovsky,Russia,Kuril Volcanic Arc,51.577,157.328,1926,Stratovolcano,1923,continental,79752883.58340874
+300052,Olkoviy-Ozernoy Volcanic Field,Russia,Kuril Volcanic Arc,52.02,157.53,681,Volcanic field,,continental,79752883.58340874
+300053,Khodutka,Russia,Kuril Volcanic Arc,52.062,157.711,2039,Stratovolcano(es),-300,continental,79752883.58340874
+300058,Asacha,Russia,Kuril Volcanic Arc,52.355,157.827,1910,Complex,,continental,79752883.58340874
+300059,Visokiy,Russia,Kuril Volcanic Arc,52.435,157.9332,1227,Stratovolcano,,continental,79752883.58340874
+300050,Ksudach,Russia,Kuril Volcanic Arc,51.8042,157.5292,1007,Stratovolcano,1907,continental,79752883.58340874
+300060,Mutnovsky,Russia,Kuril Volcanic Arc,52.449,158.196,2288,Complex,2000,continental,79752883.58340874
+300070,Gorely,Russia,Kuril Volcanic Arc,52.5549,158.0358,1799,Caldera,2010,continental,79752883.58340874
+300082,Tolmachev Dol,Russia,Kuril Volcanic Arc,52.63,157.58,1021,Pyroclastic cone(s),300,continental,79752883.58340874
+300083,Vilyuchinsky,Russia,Kuril Volcanic Arc,52.7,158.28,2173,Stratovolcano,-8050,continental,79752883.58340874
+300084,Barkhatnaya Sopka,Russia,Kuril Volcanic Arc,52.802,158.24,874,Volcanic field,-3550,continental,79752883.58340874
+300080,Opala,Russia,Kuril Volcanic Arc,52.543,157.339,2439,Caldera,1776,continental,79752883.58340874
+300090,Koryaksky,Russia,Eastern Kamchatka Volcanic Arc,53.321,158.712,3430,Stratovolcano,2009,continental,79752883.58340874
+300100,Avachinsky,Russia,Eastern Kamchatka Volcanic Arc,53.256,158.836,2717,Stratovolcano,2001,continental,79752883.58340874
+300110,Dzenzursky,Russia,Eastern Kamchatka Volcanic Arc,53.637,158.922,2285,Compound,,continental,79752883.58340874
+300121,Veer,Russia,Eastern Kamchatka Volcanic Arc,53.7525,158.4478,520,Pyroclastic cone(s),390,continental,79752883.58340874
+300122,Kostakan,Russia,Eastern Kamchatka Volcanic Arc,53.833,158.052,1150,Pyroclastic cone(s),1350,continental,79752883.58340874
+300123,Bakening,Russia,Eastern Kamchatka Volcanic Arc,53.905,158.07,2278,Stratovolcano,-550,continental,79752883.58340874
+300124,Zavaritsky,Russia,Eastern Kamchatka Volcanic Arc,53.9065,158.3851,1547,Pyroclastic cone(s),-800,continental,79752883.58340874
+300125,Akademia Nauk,Russia,Eastern Kamchatka Volcanic Arc,53.98,159.45,1180,Stratovolcano(es),1996,continental,79752883.58340874
+300120,Zhupanovsky,Russia,Eastern Kamchatka Volcanic Arc,53.589,159.15,2899,Compound,2016,continental,79752883.58340874
+300130,Karymsky,Russia,Eastern Kamchatka Volcanic Arc,54.049,159.443,1513,Stratovolcano,2025,continental,79752883.58340874
+300140,Maly Semyachik,Russia,Eastern Kamchatka Volcanic Arc,54.135,159.674,1527,Caldera,1952,continental,79752883.58340874
+300150,Bolshoi Semiachik,Russia,Eastern Kamchatka Volcanic Arc,54.32,160.02,1720,Stratovolcano(es),-4450,continental,79752883.58340874
+300160,Taunshits,Russia,Eastern Kamchatka Volcanic Arc,54.528,159.804,2301,Stratovolcano,-550,continental,79752883.58340874
+300170,Uzon,Russia,Eastern Kamchatka Volcanic Arc,54.4885,159.9741,1617,Caldera(s),200,continental,79752883.58340874
+300180,Kikhpinych,Russia,Eastern Kamchatka Volcanic Arc,54.489,160.251,1515,Stratovolcano(es),1550,continental,79752883.58340874
+300190,Krasheninnikov,Russia,Eastern Kamchatka Volcanic Arc,54.596,160.27,1816,Caldera,2026,continental,79752883.58340874
+300200,Kronotsky,Russia,Eastern Kamchatka Volcanic Arc,54.753,160.533,3482,Stratovolcano,-3350,continental,79752883.58340874
+300210,Gamchen,Russia,Eastern Kamchatka Volcanic Arc,54.974,160.703,2539,Complex,-188,continental,79752883.58340874
+300221,Vysoky,Russia,Eastern Kamchatka Volcanic Arc,55.064,160.765,2129,Stratovolcano,-550,continental,79752883.58340874
+300220,Komarov,Russia,Eastern Kamchatka Volcanic Arc,55.033,160.725,2065,Stratovolcano,950,continental,79752883.58340874
+300230,Kizimen,Russia,Eastern Kamchatka Volcanic Arc,55.131,160.32,2334,Stratovolcano,2013,continental,79752883.58340874
+300241,Udina,Russia,Eastern Kamchatka Volcanic Arc,55.758,160.527,2886,Stratovolcano(es),,continental,79752883.58340874
+300242,Zimina,Russia,Eastern Kamchatka Volcanic Arc,55.862,160.603,3057,Stratovolcano(es),,continental,79752883.58340874
+300240,Tolbachik,Russia,Eastern Kamchatka Volcanic Arc,55.832,160.326,3611,Shield,2013,continental,79752883.58340874
+300251,Kamen,Russia,Eastern Kamchatka Volcanic Arc,56.02,160.593,4585,Stratovolcano,,continental,79752883.58340874
+300250,Bezymianny,Russia,Eastern Kamchatka Volcanic Arc,55.972,160.595,2882,Stratovolcano,2025,continental,79752883.58340874
+300261,Ushkovsky,Russia,Eastern Kamchatka Volcanic Arc,56.113,160.509,3943,Compound,1890,continental,79752883.58340874
+300260,Klyuchevskoy,Russia,Eastern Kamchatka Volcanic Arc,56.056,160.642,4754,Stratovolcano,2025,continental,79752883.58340874
+300271,Piip,Russia,Aleutian Ridge Volcanic Arc,55.42,167.33,-300,Stratovolcano,-5050,small_island,
+300272,Khangar,Russia,Central Kamchatka Volcanic Arc,54.761,157.407,1967,Stratovolcano,1500,continental,79752883.58340874
+300273,Cherpuk Group,Russia,Central Kamchatka Volcanic Arc,55.55,157.47,1868,Pyroclastic cone(s),-4550,continental,79752883.58340874
+300270,Sheveluch,Russia,Eastern Kamchatka Volcanic Arc,56.653,161.36,3283,Stratovolcano,2026,continental,79752883.58340874
+300280,Ichinsky,Russia,Central Kamchatka Volcanic Arc,55.678,157.718,3596,Stratovolcano,1740,continental,79752883.58340874
+300360,Bolshoi-Kekuknaysky,Russia,Central Kamchatka Volcanic Arc,56.483,157.917,1401,Shield(s),-5310,continental,79752883.58340874
+300450,Alney-Chashakondzha,Russia,Central Kamchatka Volcanic Arc,56.656,159.647,2570,Stratovolcano,1600,continental,79752883.58340874
+300511,Shisheika,Russia,Central Kamchatka Volcanic Arc,57.153,161.09,355,Lava dome,-2240,continental,79752883.58340874
+300512,Terpuk,Russia,Central Kamchatka Volcanic Arc,57.2,159.83,765,Shield,-800,continental,79752883.58340874
+300520,Sedanka Lava Field,Russia,Central Kamchatka Volcanic Arc,57.317,160.067,1399,Volcanic field,-7050,continental,79752883.58340874
+300550,Gorny Institute,Russia,Central Kamchatka Volcanic Arc,57.33,160.2,2125,Stratovolcano,1250,continental,79752883.58340874
+300551,Kinenin,Russia,Central Kamchatka Volcanic Arc,57.35,160.97,583,Maar,850,continental,79752883.58340874
+300552,Bliznetsy,Russia,Central Kamchatka Volcanic Arc,57.35,161.37,265,Lava cone,-1060,continental,79752883.58340874
+300560,Titila,Russia,Central Kamchatka Volcanic Arc,57.406,160.108,1523,Shield(s),-550,continental,79752883.58340874
+300590,Elovsky,Russia,Central Kamchatka Volcanic Arc,57.55,160.53,1381,Shield(s),-7550,continental,79752883.58340874
+300650,Nylgimelkin,Russia,Central Kamchatka Volcanic Arc,57.97,160.65,1764,Shield(s),-3550,continental,79752883.58340874
+300671,Spokoiny,Russia,Central Kamchatka Volcanic Arc,58.13,160.82,2171,Stratovolcano,-3450,continental,79752883.58340874
+300680,Ostry,Russia,Central Kamchatka Volcanic Arc,58.18,160.82,2552,Stratovolcano,-2050,continental,79752883.58340874
+300700,Severny,Russia,Central Kamchatka Volcanic Arc,58.28,160.87,1936,Shield,-1550,continental,79752883.58340874
+302030,Udokan Plateau,Russia,Baikal Rift Volcanic Province,56.28,117.77,2180,Volcanic field,-220,continental,79752883.58340874
+302060,Jombolok,Russia,Baikal Rift Volcanic Province,52.713,99.021,2047,Volcanic field,737,continental,79752883.58340874
+303010,Taryatu-Chulutu,Mongolia,Baikal Rift Volcanic Province,48.133,99.95,2326,Volcanic field,-2980,continental,79752883.58340874
+304030,Ashikule Volcanic Field,China,Northern Tibetan Plateau Volcanic Province,35.742,81.646,5090,Volcanic field,1951,continental,79752883.58340874
+305010,Honggeertu,China,Central East Asia Volcanic Province,41.59,113.111,1605,Volcanic field,,continental,79752883.58340874
+305011,Arxan-Chaihe,China,Central East Asia Volcanic Province,47.45,120.8,1677,Volcanic field,0,continental,79752883.58340874
+305020,Keluo Group,China,Central East Asia Volcanic Province,49.37,125.92,670,Volcanic field,,continental,79752883.58340874
+305030,Wudalianchi,China,Central East Asia Volcanic Province,48.722,126.15,597,Volcanic field,1776,continental,79752883.58340874
+305040,Jingpohu,China,Central East Asia Volcanic Province,44.08,128.83,1000,Volcanic field,-520,continental,79752883.58340874
+305050,Longgang Group,China,Central East Asia Volcanic Province,42.33,126.5,1000,Volcanic field,350,continental,79752883.58340874
+305060,Changbaishan,China-North Korea,Central East Asia Volcanic Province,41.98,128.08,2744,Stratovolcano,1903,continental,79752883.58340874
+306030,Ulleungdo,South Korea,Central East Asia Volcanic Province,37.5,130.87,984,Stratovolcano,-2990,small_island,73.05771459981382
+306040,Halla,South Korea,Central East Asia Volcanic Province,33.361,126.53,1919,Shield,1007,small_island,1868.6344717607165
+311010,Buldir,United States,Aleutian Ridge Volcanic Arc,52.35,175.911,656,Stratovolcano,,small_island,19.202016833469404
+311020,Kiska,United States,Aleutian Ridge Volcanic Arc,52.103,177.602,1220,Stratovolcano,1990,small_island,267.88886657935694
+311030,Segula,United States,Aleutian Ridge Volcanic Arc,52.015,178.136,1160,Stratovolcano,,small_island,29.971396079820057
+311040,Davidof,United States,Aleutian Ridge Volcanic Arc,51.97,178.33,328,Stratovolcano,,small_island,75.37295524253817
+311050,Little Sitkin,United States,Aleutian Ridge Volcanic Arc,51.95,178.543,1174,Stratovolcano,1830,small_island,75.37295524253817
+311060,Semisopochnoi,United States,Aleutian Ridge Volcanic Arc,51.93,179.58,1221,Stratovolcano,2023,small_island,221.6599256371778
+311070,Gareloi,United States,Aleutian Ridge Volcanic Arc,51.79,-178.794,1573,Stratovolcano,1989,small_island,56.90310005506675
+311080,Tanaga,United States,Aleutian Ridge Volcanic Arc,51.885,-178.146,1806,Stratovolcano(es),1914,small_island,547.1665823002493
+311090,Takawangha,United States,Aleutian Ridge Volcanic Arc,51.873,-178.006,1449,Stratovolcano,1550,small_island,547.1665823002493
+311100,Bobrof,United States,Aleutian Ridge Volcanic Arc,51.91,-177.438,738,Stratovolcano,,small_island,8.037610687034153
+311110,Kanaga,United States,Aleutian Ridge Volcanic Arc,51.923,-177.168,1307,Stratovolcano,2023,small_island,367.81235297210156
+311111,Moffett,United States,Aleutian Ridge Volcanic Arc,51.944,-176.747,1196,Stratovolcano,-1600,small_island,720.963422428067
+311120,Great Sitkin,United States,Aleutian Ridge Volcanic Arc,52.076,-176.13,1740,Stratovolcano,2026,small_island,155.15113988663964
+311130,Kasatochi,United States,Aleutian Ridge Volcanic Arc,52.177,-175.508,314,Stratovolcano,2008,small_island,4.8383032484124255
+311140,Koniuji,United States,Aleutian Ridge Volcanic Arc,52.22,-175.13,273,Stratovolcano,-1150,small_island,1027.2558017705564
+311160,Atka Volcanic Complex,United States,Aleutian Ridge Volcanic Arc,52.331,-174.139,1518,Stratovolcano(es),2025,small_island,1027.2558017705564
+311180,Seguam,United States,Aleutian Ridge Volcanic Arc,52.315,-172.51,1054,Stratovolcano(es),1993,small_island,206.41930133796288
+311190,Amukta,United States,Aleutian Ridge Volcanic Arc,52.5,-171.252,1066,Stratovolcano,1996,small_island,42.815171740470014
+311200,Chagulak,United States,Aleutian Ridge Volcanic Arc,52.5716,-171.1383,1028,Stratovolcano,,small_island,7.504597013763833
+311210,Yunaska,United States,Aleutian Ridge Volcanic Arc,52.6394,-170.6317,550,Shield,1937,small_island,178.38228873011846
+311220,Herbert,United States,Aleutian Ridge Volcanic Arc,52.742,-170.111,1280,Stratovolcano,,small_island,50.06561399772865
+311230,Carlisle,United States,Aleutian Ridge Volcanic Arc,52.894,-170.054,1620,Stratovolcano,1828,small_island,41.06965624134914
+311240,Cleveland,United States,Aleutian Ridge Volcanic Arc,52.825,-169.944,1730,Stratovolcano,2020,small_island,162.36016995908304
+311241,Tana,United States,Aleutian Ridge Volcanic Arc,52.83,-169.77,1170,Stratovolcano(es),,small_island,162.36016995908304
+311250,Uliaga,United States,Aleutian Ridge Volcanic Arc,53.065,-169.77,888,Stratovolcano,,small_island,41.560536819732306
+311260,Kagamil,United States,Aleutian Ridge Volcanic Arc,52.974,-169.72,893,Stratovolcano,1929,small_island,41.560536819732306
+311270,Vsevidof,United States,Aleutian Ridge Volcanic Arc,53.1264,-168.6875,2160,Stratovolcano,1878,small_island,1763.4811065003298
+311280,Recheschnoi,United States,Aleutian Ridge Volcanic Arc,53.157,-168.539,1984,Stratovolcano,,small_island,1763.4811065003298
+311290,Okmok,United States,Aleutian Ridge Volcanic Arc,53.43,-168.13,1073,Shield,2008,small_island,1763.4811065003298
+311300,Bogoslof,United States,Aleutian Ridge Volcanic Arc,53.93,-168.03,150,Stratovolcano,2017,small_island,0.4957925193186008
+311310,Makushin,United States,Aleutian Ridge Volcanic Arc,53.891,-166.923,1800,Stratovolcano,1995,large_island,2680.7403181787704
+311320,Akutan,United States,Aleutian Ridge Volcanic Arc,54.134,-165.986,1303,Stratovolcano,1992,small_island,347.14657005418314
+311340,Westdahl,United States,Aleutian Ridge Volcanic Arc,54.516,-164.65,1563,Stratovolcano?,1992,large_island,4073.232577079208
+311350,Fisher,United States,Aleutian Ridge Volcanic Arc,54.65,-164.43,1112,Stratovolcano,1830,large_island,4073.232577079208
+311360,Shishaldin,United States,Aleutian Ridge Volcanic Arc,54.756,-163.97,2857,Stratovolcano,2023,large_island,4073.232577079208
+311380,Roundtop,United States,Aleutian Ridge Volcanic Arc,54.8,-163.589,1871,Stratovolcano,-7600,large_island,4073.232577079208
+311390,Amak,United States,Aleutian Ridge Volcanic Arc,55.4184,-163.1472,547,Stratovolcano,1796,small_island,13.404481288790777
+312010,Frosty,United States,Aleutian Ridge Volcanic Arc,55.067,-162.835,1728,Stratovolcano(es),,continental,37684975.17336956
+312011,Dutton,United States,Aleutian Ridge Volcanic Arc,55.183,-162.276,1465,Stratovolcano,,continental,37684975.17336956
+312020,Emmons Lake Volcanic Center,United States,Aleutian Ridge Volcanic Arc,55.3519,-162.0445,1534,Caldera,,continental,37684975.17336956
+312030,Pavlof,United States,Aleutian Ridge Volcanic Arc,55.417,-161.894,2493,Stratovolcano,2022,continental,37684975.17336956
+312040,Pavlof Sister,United States,Aleutian Ridge Volcanic Arc,55.457,-161.854,2142,Stratovolcano,,continental,37684975.17336956
+312050,Dana,United States,Aleutian Ridge Volcanic Arc,55.641,-161.214,1354,Stratovolcano,-1890,continental,37684975.17336956
+312060,Kupreanof,United States,Aleutian Ridge Volcanic Arc,56.011,-159.797,1895,Stratovolcano,,continental,37684975.17336956
+312070,Veniaminof,United States,Aleutian Ridge Volcanic Arc,56.17,-159.38,2507,Stratovolcano,2021,continental,37684975.17336956
+312080,Black Peak,United States,Alaska Peninsula Volcanic Arc,56.552,-158.785,1032,Stratovolcano,-1900,continental,37684975.17336956
+312090,Aniakchak,United States,Alaska Peninsula Volcanic Arc,56.88,-158.17,1341,Caldera,1931,continental,37684975.17336956
+312100,Yantarni,United States,Alaska Peninsula Volcanic Arc,57.019,-157.185,1345,Stratovolcano,-800,continental,37684975.17336956
+312110,Chiginagak,United States,Alaska Peninsula Volcanic Arc,57.135,-156.99,2221,Stratovolcano,1998,continental,37684975.17336956
+312120,Kialagvik,United States,Alaska Peninsula Volcanic Arc,57.203,-156.745,1677,Stratovolcano,,continental,37684975.17336956
+312130,Ugashik-Peulik,United States,Alaska Peninsula Volcanic Arc,57.751,-156.368,1474,Stratovolcano,1814,continental,37684975.17336956
+312131,Ukinrek Maars,United States,Alaska Peninsula Volcanic Arc,57.8344,-156.5203,91,Maar(s),1977,continental,37684975.17336956
+312132,Alaska Peninsula Arc at 155.4°W,United States,Alaska Peninsula Volcanic Arc,57.87,-155.411,402,Lava dome,,continental,37684975.17336956
+312140,Martin,United States,Alaska Peninsula Volcanic Arc,58.172,-155.361,1863,Stratovolcano,1953,continental,37684975.17336956
+312150,Mageik,United States,Alaska Peninsula Volcanic Arc,58.195,-155.253,2165,Stratovolcano,-500,continental,37684975.17336956
+312160,Trident,United States,Alaska Peninsula Volcanic Arc,58.236,-155.1,1864,Stratovolcano,1974,continental,37684975.17336956
+312170,Katmai,United States,Alaska Peninsula Volcanic Arc,58.279,-154.9533,2047,Stratovolcano,1912,continental,37684975.17336956
+312180,Novarupta,United States,Alaska Peninsula Volcanic Arc,58.2655,-155.1588,841,Caldera,1912,continental,37684975.17336956
+312190,Griggs,United States,Alaska Peninsula Volcanic Arc,58.354,-155.092,2317,Stratovolcano,-1790,continental,37684975.17336956
+312200,Snowy Mountain,United States,Alaska Peninsula Volcanic Arc,58.336,-154.682,2162,Stratovolcano(es),1710,continental,37684975.17336956
+312210,Denison,United States,Alaska Peninsula Volcanic Arc,58.418,-154.449,2287,Stratovolcano,,continental,37684975.17336956
+312220,Steller,United States,Alaska Peninsula Volcanic Arc,58.4298,-154.3895,2279,Stratovolcano,,continental,37684975.17336956
+312230,Kukak,United States,Alaska Peninsula Volcanic Arc,58.453,-154.355,2043,Stratovolcano,,continental,37684975.17336956
+312250,Kaguyak,United States,Alaska Peninsula Volcanic Arc,58.6113,-154.0245,901,Lava dome(s),-3850,continental,37684975.17336956
+312260,Fourpeaked,United States,Alaska Peninsula Volcanic Arc,58.77,-153.672,2105,Stratovolcano,2006,continental,37684975.17336956
+312270,Douglas,United States,Alaska Peninsula Volcanic Arc,58.855,-153.542,2140,Stratovolcano,,continental,37684975.17336956
+313010,Augustine,United States,Alaska Peninsula Volcanic Arc,59.3626,-153.435,1218,Lava dome(s),2006,small_island,75.31718520679001
+313020,Iliamna,United States,Alaska Peninsula Volcanic Arc,60.032,-153.09,3053,Stratovolcano,1876,continental,37684975.17336956
+313030,Redoubt,United States,Alaska Peninsula Volcanic Arc,60.485,-152.742,3108,Stratovolcano,2009,continental,37684975.17336956
+313040,Spurr,United States,Alaska Peninsula Volcanic Arc,61.299,-152.251,3374,Stratovolcano,1992,continental,37684975.17336956
+313050,Hayes,United States,Alaska Peninsula Volcanic Arc,61.64,-152.411,3034,Stratovolcano,1200,continental,37684975.17336956
+314010,St. Paul Island,United States,Northern Alaska-Bering Sea Volcanic Province,57.167,-170.213,203,Shield,-1280,small_island,114.35324743413064
+314030,Ingakslugwat Hills,United States,Northern Alaska-Bering Sea Volcanic Province,61.43,-164.47,190,Volcanic field,,continental,37684975.17336956
+314040,St. Michael,United States,Northern Alaska-Bering Sea Volcanic Province,63.45,-162.12,715,Volcanic field,,continental,37684975.17336956
+314060,Imuruk Lake,United States,Northern Alaska-Bering Sea Volcanic Province,65.517,-163.45,610,Volcanic field,300,continental,37684975.17336956
+315001,Buzzard Creek,United States,Alaska Peninsula Volcanic Arc,64.0616,-148.4327,830,Tuff ring(s),-1050,continental,37684975.17336956
+315020,Wrangell,United States,Wrangell Volcanic Arc,62.006,-144.017,4278,Shield,1912,continental,37684975.17336956
+315030,Churchill,United States,Wrangell Volcanic Arc,61.38,-141.75,5005,Stratovolcano,847,continental,37684975.17336956
+315040,Edgecumbe,United States,Queen Charlotte Volcano Group,57.05,-135.75,970,Volcanic field,-2080,small_island,465.10681137867067
+315050,Duncan Canal,United States,Queen Charlotte Volcano Group,56.5,-133.1,15,Volcanic field,,large_island,2729.855038634166
+315060,Tlevak Strait-Suemez Island,United States,Queen Charlotte Volcano Group,55.25,-133.3,50,Volcanic field,,small_island,145.71381944800387
+315070,Behm Canal-Rudyerd Bay,United States,Northern Cordilleran Volcanic Province,55.35,-131,500,Volcanic field,,large_island,2821.1218638734176
+320010,Fort Selkirk,Canada,Northern Cordilleran Volcanic Province,62.93,-137.38,1239,Volcanic field,,continental,37684975.17336956
+320020,Alligator Lake,Canada,Northern Cordilleran Volcanic Province,60.42,-135.42,2217,Volcanic field,,continental,37684975.17336956
+320030,Atlin Volcanic Field,Canada,Northern Cordilleran Volcanic Province,59.708,-133.358,1880,Pyroclastic cone(s),,continental,37684975.17336956
+320031,Tuya Volcanic Field,Canada,Northern Cordilleran Volcanic Province,59.37,-130.58,2123,Volcanic field,,continental,37684975.17336956
+320040,Heart Peaks,Canada,Northern Cordilleran Volcanic Province,58.6,-131.97,2012,Shield,,continental,37684975.17336956
+320050,Level Mountain,Canada,Northern Cordilleran Volcanic Province,58.42,-131.35,2164,Shield,,continental,37684975.17336956
+320060,Edziza,Canada,Northern Cordilleran Volcanic Province,57.72,-130.63,2786,Stratovolcano,950,continental,37684975.17336956
+320070,Spectrum Range,Canada,Northern Cordilleran Volcanic Province,57.43,-130.68,2430,Shield,,continental,37684975.17336956
+320080,Hoodoo Mountain,Canada,Northern Cordilleran Volcanic Province,56.78,-131.28,1850,Pyroclastic cone(s),-7050,continental,37684975.17336956
+320090,Iskut-Unuk River Cones,Canada,Northern Cordilleran Volcanic Province,56.567,-130.75,1880,Pyroclastic cone(s),1800,continental,37684975.17336956
+320100,Tseax River Cone,Canada,Northern Cordilleran Volcanic Province,55.1109,-128.8991,612,Pyroclastic cone,1690,continental,37684975.17336956
+320110,Crow Lagoon,Canada,Northern Cordilleran Volcanic Province,54.7,-130.23,335,Pyroclastic cone,,continental,37684975.17336956
+320120,Milbanke Sound Group,Canada,Queen Charlotte Volcano Group,52.498,-128.723,233,Pyroclastic cone(s),,small_island,261.35182242302784
+320140,Nazko,Canada,Interior Western Canada Volcanic Province,52.928,-123.732,1238,Pyroclastic cone(s),-5220,continental,37684975.17336956
+320150,Wells Gray-Clearwater,Canada,Interior Western Canada Volcanic Province,52.0306,-120.1125,950,Volcanic field,1550,continental,37684975.17336956
+320160,Silverthrone,Canada,Garibaldi Volcanic Arc,51.5179,-126.1133,2860,Caldera,,continental,37684975.17336956
+320170,Bridge River Cones,Canada,Garibaldi Volcanic Arc,50.8,-123.4,2500,Volcanic field,,continental,37684975.17336956
+320180,Meager,Canada,Garibaldi Volcanic Arc,50.63,-123.5,2680,Complex,-410,continental,37684975.17336956
+320190,Garibaldi Lake,Canada,Garibaldi Volcanic Arc,49.933,-123,2316,Volcanic field,,continental,37684975.17336956
+320200,Garibaldi,Canada,Garibaldi Volcanic Arc,49.85,-123,2678,Stratovolcano,-8060,continental,37684975.17336956
+320811,Cayley Volcanic Field,Canada,Garibaldi Volcanic Arc,50.12,-123.28,2375,Volcanic field,,continental,37684975.17336956
+321010,Baker,United States,Garibaldi Volcanic Arc,48.777,-121.813,3285,Stratovolcano(es),1880,continental,37684975.17336956
+321020,Glacier Peak,United States,Garibaldi Volcanic Arc,48.112,-121.113,3213,Stratovolcano,1700,continental,37684975.17336956
+321030,Rainier,United States,High Cascades Volcanic Arc,46.853,-121.76,4392,Stratovolcano,1450,continental,37684975.17336956
+321040,Adams,United States,High Cascades Volcanic Arc,46.206,-121.49,3742,Stratovolcano,950,continental,37684975.17336956
+321050,St. Helens,United States,High Cascades Volcanic Arc,46.2,-122.18,2549,Stratovolcano,2008,continental,37684975.17336956
+321060,West Crater,United States,High Cascades Volcanic Arc,45.88,-122.08,1329,Volcanic field,-5750,continental,37684975.17336956
+321070,Indian Heaven,United States,High Cascades Volcanic Arc,45.93,-121.82,1806,Volcanic field,-6250,continental,37684975.17336956
+322010,Hood,United States,High Cascades Volcanic Arc,45.374,-121.695,3426,Stratovolcano,1866,continental,37684975.17336956
+322020,Jefferson,United States,High Cascades Volcanic Arc,44.674,-121.8,3199,Stratovolcano,950,continental,37684975.17336956
+322030,Blue Lake Crater,United States,High Cascades Volcanic Arc,44.4125,-121.7686,1136,Maar,680,continental,37684975.17336956
+322040,Sand Mountain Field,United States,High Cascades Volcanic Arc,44.38,-121.93,1664,Volcanic field,-950,continental,37684975.17336956
+322060,Belknap,United States,High Cascades Volcanic Arc,44.285,-121.8423,2094,Shield(s),475,continental,37684975.17336956
+322070,Three Sisters,United States,High Cascades Volcanic Arc,44.133,-121.767,3159,Complex,439,continental,37684975.17336956
+322090,Bachelor,United States,High Cascades Volcanic Arc,43.979,-121.688,2763,Stratovolcano,-5800,continental,37684975.17336956
+322100,Davis Lake,United States,High Cascades Volcanic Arc,43.57,-121.82,2163,Volcanic field,-2790,continental,37684975.17336956
+322110,Newberry,United States,High Cascades Volcanic Arc,43.722,-121.229,2434,Shield,690,continental,37684975.17336956
+322120,Devils Garden,United States,High Lava Plains Volcanic Province,43.512,-120.861,1698,Volcanic field,,continental,37684975.17336956
+322150,Cinnamon Butte,United States,High Cascades Volcanic Arc,43.2411,-122.1111,1958,Pyroclastic cone(s),,continental,37684975.17336956
+322160,Crater Lake,United States,High Cascades Volcanic Arc,42.942,-122.107,2487,Caldera,-2850,continental,37684975.17336956
+322170,Diamond Craters,United States,High Lava Plains Volcanic Province,43.1,-118.75,1435,Volcanic field,-5610,continental,37684975.17336956
+322190,Jordan Craters,United States,High Lava Plains Volcanic Province,43.147,-117.46,1473,Volcanic field,-1250,continental,37684975.17336956
+323010,Shasta,United States,High Cascades Volcanic Arc,41.409,-122.193,4317,Stratovolcano,1250,continental,37684975.17336956
+323020,Medicine Lake,United States,High Cascades Volcanic Arc,41.611,-121.554,2412,Shield,1060,continental,37684975.17336956
+323080,Lassen Volcanic Center,United States,High Cascades Volcanic Arc,40.492,-121.508,3187,Stratovolcano,1917,continental,37684975.17336956
+323100,Clear Lake Volcanic Field,United States,California Coast Ranges Volcano Group,38.97,-122.77,1439,Volcanic field,,continental,37684975.17336956
+323110,Mono Lake Volcanic Field,United States,Basin and Range Volcanic Province,38,-119.03,2121,Volcanic field,1790,continental,37684975.17336956
+323120,Mono-Inyo Craters,United States,Basin and Range Volcanic Province,37.804,-119.029,2796,Lava dome(s),1380,continental,37684975.17336956
+323150,Mammoth Mountain,United States,Basin and Range Volcanic Province,37.631,-119.032,3369,Lava dome(s),1260,continental,37684975.17336956
+323160,Ubehebe Craters,United States,Basin and Range Volcanic Province,37.02,-117.45,752,Maar(s),-150,continental,37684975.17336956
+323200,Salton Buttes,United States,Gulf of California Rift Volcanic Province,33.197,-115.616,-40,Lava dome(s),210,continental,37684975.17336956
+324010,Black Butte Crater Lava Field,United States,Yellowstone-Snake River Hotspot Volcano Group,43.185,-114.3542,1478,Shield,-8180,continental,37684975.17336956
+324020,Craters of the Moon,United States,Yellowstone-Snake River Hotspot Volcano Group,43.371,-113.493,2005,Volcanic field,-130,continental,37684975.17336956
+324030,Wapi Lava Field,United States,Yellowstone-Snake River Hotspot Volcano Group,42.8859,-113.2166,1597,Shield,-300,continental,37684975.17336956
+324040,Hell's Half Acre,United States,Yellowstone-Snake River Hotspot Volcano Group,43.492,-112.4503,1632,Shield,-3250,continental,37684975.17336956
+326010,Soda Lakes,United States,Basin and Range Volcanic Province,39.525,-118.8778,1251,Maar(s),,continental,37684975.17336956
+327040,Markagunt Plateau,United States,Basin and Range Volcanic Province,37.58,-112.67,2840,Volcanic field,1050,continental,37684975.17336956
+327050,Black Rock Desert,United States,Basin and Range Volcanic Province,38.97,-112.5,1800,Volcanic field,1290,continental,37684975.17336956
+328010,Dotsero,United States,Basin and Range Volcanic Province,39.6613,-107.0355,2230,Maar,-2200,continental,37684975.17336956
+329010,Uinkaret Field,United States,Basin and Range Volcanic Province,36.38,-113.13,1555,Volcanic field,1100,continental,37684975.17336956
+329020,San Francisco Volcanic Field,United States,Basin and Range Volcanic Province,35.347,-111.678,3850,Volcanic field,1075,continental,37684975.17336956
+327110,Carrizozo,United States,Basin and Range Volcanic Province,33.78,-105.93,1731,Pyroclastic cone(s),-3250,continental,37684975.17336956
+327120,Zuni-Bandera,United States,Basin and Range Volcanic Province,34.8,-108,2550,Volcanic field,-1170,continental,37684975.17336956
+327812,Red Hill-Quemado,United States,Basin and Range Volcanic Province,34.25,-108.83,2300,Volcanic field,-9450,continental,37684975.17336956
+331010,Endeavour Segment,Canada,Northeast Pacific Rifts Volcanic Province,47.95,-129.1,-2050,Fissure vent(s),-3490,small_island,
+331011,Cobb Segment,Canada,Northeast Pacific Rifts Volcanic Province,46.88,-129.33,-2100,Fissure vent(s),-1180,small_island,
+331020,CoAxial Segment,Undersea Features,Northeast Pacific Rifts Volcanic Province,46.52,-129.58,-2400,Fissure vent(s),1993,small_island,
+331021,Axial Seamount,Undersea Features,Northeast Pacific Rifts Volcanic Province,45.95,-130,-1410,Fissure vent(s),2015,small_island,
+331030,Cleft Segment,Undersea Features,Northeast Pacific Rifts Volcanic Province,44.83,-130.3,-2140,Fissure vent(s),1986,small_island,
+331031,North Gorda Ridge Segment,United States,Northeast Pacific Rifts Volcanic Province,42.67,-126.78,-3000,Fissure vent(s),1996,small_island,
+331040,Escanaba Segment,United States,Northeast Pacific Rifts Volcanic Province,40.98,-127.5,-1700,Fissure vent(s),-2260,small_island,
+332000,Kamaehuakanaloa,United States,Hawaiian-Emperor Hotspot Volcano Group,18.92,-155.27,-975,Shield,1996,small_island,
+332010,Kilauea,United States,Hawaiian-Emperor Hotspot Volcano Group,19.421,-155.287,1222,Shield,2026,large_island,10554.67473847899
+332020,Mauna Loa,United States,Hawaiian-Emperor Hotspot Volcano Group,19.475,-155.608,4170,Shield,2022,large_island,10554.67473847899
+332030,Mauna Kea,United States,Hawaiian-Emperor Hotspot Volcano Group,19.82,-155.47,4205,Shield,-2460,large_island,10554.67473847899
+332040,Hualalai,United States,Hawaiian-Emperor Hotspot Volcano Group,19.692,-155.87,2523,Shield,1801,large_island,10554.67473847899
+332060,Haleakala,United States,Hawaiian-Emperor Hotspot Volcano Group,20.7099,-156.2537,3053,Shield,1750,small_island,1928.5882844290886
+333010,Teahitia,France,Society Islands Hotspot Volcano Group,-17.564,-148.821,-1743,Compound,1985,small_island,
+333020,Rocard,France,Society Islands Hotspot Volcano Group,-17.662,-148.586,-2515,Cone,1972,small_island,
+333030,Moua Pihaa,France,Society Islands Hotspot Volcano Group,-18.325,-148.525,-312,Stratovolcano,1970,small_island,
+333040,Mehetia,France,Society Islands Hotspot Volcano Group,-17.874,-148.068,389,Stratovolcano,,small_island,
+333050,Adams Seamount,United Kingdom,Pitcairn Hotspot Volcano Group,-25.37,-129.27,-39,Lava dome,-50,small_island,
+333060,Macdonald,France,Austral-Cook Hotspot Volcano Group,-28.98,-140.25,-39,Shield,1989,small_island,
+334020,Northern EPR at 17°N,Mexico,Northern East Pacific Rise Volcanic Province,16.55,-105.32,-2700,Fissure vent(s),-50,small_island,
+334021,Northern EPR at 16°N,Mexico,Northern East Pacific Rise Volcanic Province,15.83,-105.43,-2300,Fissure vent(s),-50,small_island,
+334040,Northern EPR at 10.7°N,Undersea Features,Northern East Pacific Rise Volcanic Province,10.73,-103.58,-2900,Fissure vent(s),2003,small_island,
+334050,Northern EPR at 9.8°N,Undersea Features,Northern East Pacific Rise Volcanic Province,9.83,-104.3,-2500,Fissure vent(s),2025,small_island,
+334070,Galapagos Rift at 86°W,Ecuador,Galapagos Rift Volcanic Province,0.792,-86.15,-2430,Fissure vent(s),1996,small_island,
+334100,Southern EPR at 8°S,Undersea Features,Southern East Pacific Rise Volcanic Province,-8.27,-107.95,-2800,Fissure vent(s),1969,small_island,
+334120,Southern EPR at 17.5°S (Segment K),Undersea Features,Southern East Pacific Rise Volcanic Province,-17.436,-113.206,-2566,Fissure vent(s),1990,small_island,
+334130,Southern EPR at 18.2°S (Segment J),Undersea Features,Southern East Pacific Rise Volcanic Province,-18.175,-113.35,-2650,Fissure vent(s),1890,small_island,
+334140,Southern EPR at 18.5°S (Segment I),Undersea Features,Southern East Pacific Rise Volcanic Province,-18.53,-113.42,-2600,Fissure vent(s),1915,small_island,
+335020,Hollister Ridge,Undersea Features,Pacific-Antarctic Ridge Volcanic Province,-53.998,-139.845,-1000,Fissure vent,,small_island,
+335030,Udintsev Transform,Undersea Features,Pacific-Antarctic Ridge Volcanic Province,-56.153,-143.373,-5700,Fissure vent,,small_island,
+341001,Pinacate,Mexico,Basin and Range Volcanic Province,31.85,-113.5,1183,Volcanic field,,continental,37684975.17336956
+341003,"San Luis, Isla",Mexico,Gulf of California Rift Volcanic Province,29.9728,-114.4082,183,Tuff cone,-1141,small_island,5.137518908486541
+341004,Jaraguay Volcanic Field,Mexico,Gulf of California Rift Volcanic Province,29.33,-114.5,960,Volcanic field,,continental,37684975.17336956
+341007,San Borja Volcanic Field,Mexico,Gulf of California Rift Volcanic Province,28.5,-113.75,1360,Volcanic field,,continental,37684975.17336956
+341011,"Tortuga, Isla",Mexico,Gulf of California Rift Volcanic Province,27.438,-111.881,224,Shield,,small_island,9.789911628335927
+341012,Comondu-La Purisima,Mexico,Gulf of California Rift Volcanic Province,26,-111.92,780,Volcanic field,,continental,37684975.17336956
+341021,Socorro,Mexico,Mathematicians Ridge Volcanic Province,18.78,-110.95,1050,Shield,1994,small_island,168.96104315835598
+341022,Durango Volcanic Field,Mexico,Basin and Range Volcanic Province,24.15,-104.45,2075,Volcanic field,,continental,37684975.17336956
+341024,Sanganguey,Mexico,Trans-Mexican Volcanic Arc,21.45,-104.73,2340,Stratovolcano,,continental,37684975.17336956
+341020,Barcena,Mexico,Mathematicians Ridge Volcanic Province,19.3,-110.82,332,Pyroclastic cone(s),1953,small_island,16.95221168483801
+341031,Mascota Volcanic Field,Mexico,Trans-Mexican Volcanic Arc,20.567,-104.817,2525,Volcanic field,,continental,37684975.17336956
+341030,Ceboruco,Mexico,Trans-Mexican Volcanic Arc,21.125,-104.508,2280,Stratovolcano,1875,continental,37684975.17336956
+341040,Colima,Mexico,Trans-Mexican Volcanic Arc,19.514,-103.62,3850,Stratovolcano(es),2019,continental,37684975.17336956
+341061,Zitacuaro-Valle de Bravo,Mexico,Trans-Mexican Volcanic Arc,19.4,-100.25,3500,Volcanic field,-3050,continental,37684975.17336956
+341062,Jocotitlan,Mexico,Trans-Mexican Volcanic Arc,19.7383,-99.7579,3911,Stratovolcano,1270,continental,37684975.17336956
+341060,Michoacan-Guanajuato,Mexico,Trans-Mexican Volcanic Arc,19.85,-101.75,3860,Volcanic field,1952,continental,37684975.17336956
+341070,"Toluca, Nevado de",Mexico,Trans-Mexican Volcanic Arc,19.108,-99.758,4680,Stratovolcano,-1350,continental,37684975.17336956
+341082,Iztaccihuatl,Mexico,Trans-Mexican Volcanic Arc,19.179,-98.642,5230,Stratovolcano,,continental,37684975.17336956
+341080,Chichinautzin,Mexico,Trans-Mexican Volcanic Arc,19.139,-99.16,3938,Volcanic field,399,continental,37684975.17336956
+341091,"Malinche, La",Mexico,Trans-Mexican Volcanic Arc,19.231,-98.032,4461,Stratovolcano,-1170,continental,37684975.17336956
+341092,Serdan-Oriental Volcanic Field,Mexico,Trans-Mexican Volcanic Arc,19.27,-97.47,3485,Volcanic field,-3920,continental,37684975.17336956
+341093,"Humeros, Los",Mexico,Trans-Mexican Volcanic Arc,19.68,-97.45,3150,Caldera(s),-4470,continental,37684975.17336956
+341095,Naolinco Volcanic Field,Mexico,Trans-Mexican Volcanic Arc,19.635,-96.91,2000,Volcanic field,1145,continental,37684975.17336956
+341090,Popocatepetl,Mexico,Trans-Mexican Volcanic Arc,19.023,-98.622,5393,Stratovolcano(es),2026,continental,37684975.17336956
+341100,"Orizaba, Pico de",Mexico,Trans-Mexican Volcanic Arc,19.03,-97.27,5564,Stratovolcano,1846,continental,37684975.17336956
+341110,San Martin,Mexico,Trans-Mexican Volcanic Arc,18.5615,-95.1989,1660,Volcanic field,1796,continental,37684975.17336956
+341120,"Chichon, El",Mexico,Chiapanecan Volcanic Arc,17.3602,-93.2297,1150,Lava dome(s),1982,continental,37684975.17336956
+341130,Tacana,Mexico-Guatemala,Central America Volcanic Arc,15.132,-92.109,4064,Stratovolcano,1986,continental,37684975.17336956
+342020,Tajumulco,Guatemala,Central America Volcanic Arc,15.043,-91.903,4203,Stratovolcano,,continental,37684975.17336956
+342030,Santa Maria,Guatemala,Central America Volcanic Arc,14.757,-91.552,3745,Stratovolcano,2026,continental,37684975.17336956
+342040,Almolonga,Guatemala,Central America Volcanic Arc,14.797,-91.519,3173,Stratovolcano,1818,continental,37684975.17336956
+342060,Atitlan,Guatemala,Central America Volcanic Arc,14.583,-91.186,3535,Stratovolcano(es),1853,continental,37684975.17336956
+342070,Toliman,Guatemala,Central America Volcanic Arc,14.612,-91.189,3158,Stratovolcano(es),,continental,37684975.17336956
+342080,Acatenango,Guatemala,Central America Volcanic Arc,14.501,-90.876,3976,Stratovolcano(es),1972,continental,37684975.17336956
+342090,Fuego,Guatemala,Central America Volcanic Arc,14.4748,-90.8806,3799,Stratovolcano(es),2026,continental,37684975.17336956
+342100,Agua,Guatemala,Central America Volcanic Arc,14.465,-90.743,3760,Stratovolcano,,continental,37684975.17336956
+342111,Cuilapa-Barbarena,Guatemala,Central America Volcanic Arc,14.33,-90.4,1454,Volcanic field,,continental,37684975.17336956
+342110,Pacaya,Guatemala,Central America Volcanic Arc,14.382,-90.601,2569,Complex,2021,continental,37684975.17336956
+342121,Jumaytepeque,Guatemala,Central America Volcanic Arc,14.34,-90.271,1802,Stratovolcano,,continental,37684975.17336956
+342120,Tecuamburro,Guatemala,Central America Volcanic Arc,14.156,-90.407,1845,Stratovolcano,-960,continental,37684975.17336956
+342130,Moyuta,Guatemala,Central America Volcanic Arc,14.03,-90.1,1662,Stratovolcano,,continental,37684975.17336956
+342140,Flores,Guatemala,Central America Volcanic Arc,14.308,-89.992,1600,Volcanic field,,continental,37684975.17336956
+342141,Tahual,Guatemala,Central America Volcanic Arc,14.43,-89.9,1716,Stratovolcano,,continental,37684975.17336956
+342150,"Santiago, Cerro",Guatemala,Central America Volcanic Arc,14.33,-89.87,1192,Volcanic field,,continental,37684975.17336956
+342160,Suchitan,Guatemala,Central America Volcanic Arc,14.4,-89.78,2042,Stratovolcano(es),,continental,37684975.17336956
+342170,Chingo,Guatemala-El Salvador,Central America Volcanic Arc,14.12,-89.73,1775,Stratovolcano,,continental,37684975.17336956
+342180,Ixtepeque,Guatemala,Central America Volcanic Arc,14.42,-89.68,1292,Lava dome(s),,continental,37684975.17336956
+343002,"Singuil, Cerro",El Salvador,Central America Volcanic Arc,14.054,-89.631,926,Volcanic field,,continental,37684975.17336956
+343010,Apaneca Range,El Salvador,Central America Volcanic Arc,13.872,-89.742,2028,Stratovolcano(es),,continental,37684975.17336956
+343020,Santa Ana,El Salvador,Central America Volcanic Arc,13.853,-89.63,2381,Stratovolcano,2005,continental,37684975.17336956
+343030,Izalco,El Salvador,Central America Volcanic Arc,13.813,-89.633,1950,Stratovolcano,1966,continental,37684975.17336956
+343041,Coatepeque Caldera,El Salvador,Central America Volcanic Arc,13.87,-89.55,746,Caldera,,continental,37684975.17336956
+343051,"Cinotepeque, Cerro",El Salvador,Central America Volcanic Arc,14.02,-89.25,665,Volcanic field,,continental,37684975.17336956
+343050,San Salvador,El Salvador,Central America Volcanic Arc,13.734,-89.294,1893,Stratovolcano,1917,continental,37684975.17336956
+343060,Ilopango,El Salvador,Central America Volcanic Arc,13.672,-89.053,450,Caldera,1880,continental,37684975.17336956
+343072,Taburete,El Salvador,Central America Volcanic Arc,13.435,-88.532,1172,Stratovolcano,,continental,37684975.17336956
+343070,San Vicente,El Salvador,Central America Volcanic Arc,13.5969,-88.8375,2149,Stratovolcano,,continental,37684975.17336956
+343081,Usulutan,El Salvador,Central America Volcanic Arc,13.419,-88.471,1449,Stratovolcano,,continental,37684975.17336956
+343082,"Tigre, El",El Salvador,Central America Volcanic Arc,13.47,-88.43,1640,Stratovolcano,,continental,37684975.17336956
+343080,Tecapa,El Salvador,Central America Volcanic Arc,13.494,-88.502,1593,Stratovolcano,,continental,37684975.17336956
+343090,Chinameca,El Salvador,Central America Volcanic Arc,13.478,-88.33,1300,Stratovolcano,,continental,37684975.17336956
+343101,"Aramuaca, Laguna",El Salvador,Central America Volcanic Arc,13.428,-88.105,181,Maar,,continental,37684975.17336956
+343100,San Miguel,El Salvador,Central America Volcanic Arc,13.434,-88.269,2130,Stratovolcano,2023,continental,37684975.17336956
+343130,"Tigre, Isla del",Honduras,Central America Volcanic Arc,13.274,-87.639,774,Stratovolcano,,small_island,23.893695548703686
+343140,"Zacate Grande, Isla",Honduras,Central America Volcanic Arc,13.33,-87.63,640,Stratovolcano,,small_island,48.83220335607092
+343150,"Yojoa, Lago",Honduras,Central America Volcanic Arc,14.964,-87.983,1060,Volcanic field,-7638,continental,37684975.17336956
+344010,Cosiguina,Nicaragua,Central America Volcanic Arc,12.98,-87.57,872,Stratovolcano,1859,continental,37684975.17336956
+344020,San Cristobal,Nicaragua,Central America Volcanic Arc,12.702,-87.004,1745,Stratovolcano,2024,continental,37684975.17336956
+344040,Telica,Nicaragua,Central America Volcanic Arc,12.606,-86.84,1036,Stratovolcano(es),2025,continental,37684975.17336956
+344070,"Negro, Cerro",Nicaragua,Central America Volcanic Arc,12.506,-86.702,728,Pyroclastic cone(s),1999,continental,37684975.17336956
+344080,Las Pilas-El Hoyo Complex,Nicaragua,Central America Volcanic Arc,12.4922,-86.6786,1088,Complex,1954,continental,37684975.17336956
+344091,Apoyeque,Nicaragua,Central America Volcanic Arc,12.242,-86.342,518,Caldera,-50,continental,37684975.17336956
+344092,Nejapa-Miraflores,Nicaragua,Central America Volcanic Arc,12.12,-86.32,360,Fissure vent(s),1060,continental,37684975.17336956
+344090,Momotombo,Nicaragua,Central America Volcanic Arc,12.423,-86.539,1270,Stratovolcano,2016,continental,37684975.17336956
+344101,Granada,Nicaragua,Central America Volcanic Arc,11.9,-85.979,250,Fissure vent(s),,continental,37684975.17336956
+344100,Masaya,Nicaragua,Central America Volcanic Arc,11.9844,-86.1688,594,Caldera,2026,continental,37684975.17336956
+344111,Zapatera,Nicaragua,Central America Volcanic Arc,11.73,-85.82,629,Shield,,continental,37684975.17336956
+344110,Mombacho,Nicaragua,Central America Volcanic Arc,11.826,-85.968,1344,Stratovolcano,,continental,37684975.17336956
+344120,Concepcion,Nicaragua,Central America Volcanic Arc,11.538,-85.622,1700,Stratovolcano,2024,continental,37684975.17336956
+345010,Orosi,Costa Rica,Central America Volcanic Arc,10.98,-85.473,1659,Stratovolcano(es),,continental,37684975.17336956
+345020,Rincon de la Vieja,Costa Rica,Central America Volcanic Arc,10.8314,-85.3364,1729,Complex,2024,continental,37684975.17336956
+345031,Tenorio,Costa Rica,Central America Volcanic Arc,10.673,-85.015,1916,Stratovolcano(es),,continental,37684975.17336956
+345033,Arenal,Costa Rica,Central America Volcanic Arc,10.463,-84.703,1670,Stratovolcano,2010,continental,37684975.17336956
+345034,Platanar,Costa Rica,Central America Volcanic Arc,10.3,-84.366,2267,Stratovolcano(es),,continental,37684975.17336956
+345030,Miravalles,Costa Rica,Central America Volcanic Arc,10.748,-85.153,2028,Stratovolcano,1946,continental,37684975.17336956
+345040,Poas,Costa Rica,Central America Volcanic Arc,10.2,-84.233,2697,Stratovolcano,2026,continental,37684975.17336956
+345050,Barva,Costa Rica,Central America Volcanic Arc,10.135,-84.1,2906,Complex,-6050,continental,37684975.17336956
+345060,Irazu,Costa Rica,Central America Volcanic Arc,9.979,-83.852,3436,Stratovolcano,1977,continental,37684975.17336956
+345070,Turrialba,Costa Rica,Central America Volcanic Arc,10.025,-83.767,3340,Stratovolcano,2022,continental,37684975.17336956
+346010,Baru,Panama,Central America Volcanic Arc,8.808,-82.543,3474,Stratovolcano,1550,continental,37684975.17336956
+351011,Romeral,Colombia,Northern Andean Volcanic Arc,5.203,-75.363,3769,Stratovolcano,-5390,continental,37684975.17336956
+351012,"Bravo, Cerro",Colombia,Northern Andean Volcanic Arc,5.091,-75.293,3985,Stratovolcano,1720,continental,37684975.17336956
+351021,Santa Isabel,Colombia,Northern Andean Volcanic Arc,4.818,-75.365,4944,Shield,-850,continental,37684975.17336956
+351020,"Ruiz, Nevado del",Colombia,Northern Andean Volcanic Arc,4.892,-75.324,5279,Stratovolcano,2026,continental,37684975.17336956
+351030,"Tolima, Nevado del",Colombia,Northern Andean Volcanic Arc,4.658,-75.33,5215,Stratovolcano,1943,continental,37684975.17336956
+351040,Machin,Colombia,Northern Andean Volcanic Arc,4.487,-75.389,2749,Stratovolcano,1180,continental,37684975.17336956
+351050,"Huila, Nevado del",Colombia,Northern Andean Volcanic Arc,2.93,-76.03,5364,Stratovolcano,2012,continental,37684975.17336956
+351061,Sotara,Colombia,Northern Andean Volcanic Arc,2.108,-76.592,4400,Stratovolcano,,continental,37684975.17336956
+351060,Purace,Colombia,Northern Andean Volcanic Arc,2.3095,-76.3948,4650,Stratovolcano(es),2026,continental,37684975.17336956
+351070,Dona Juana,Colombia,Northern Andean Volcanic Arc,1.5,-76.936,4137,Stratovolcano,1906,continental,37684975.17336956
+351080,Galeras,Colombia,Northern Andean Volcanic Arc,1.22,-77.37,4276,Complex,2014,continental,37684975.17336956
+351090,Azufral,Colombia,Northern Andean Volcanic Arc,1.08,-77.68,4070,Stratovolcano,-930,continental,37684975.17336956
+351100,Cumbal,Colombia,Northern Andean Volcanic Arc,0.95,-77.87,4764,Stratovolcano,1926,continental,37684975.17336956
+351110,Chiles-Cerro Negro,Colombia-Ecuador,Northern Andean Volcanic Arc,0.817,-77.938,4698,Stratovolcano,1936,continental,37684975.17336956
+352001,Soche,Ecuador,Northern Andean Volcanic Arc,0.552,-77.58,3955,Stratovolcano,-6650,continental,37684975.17336956
+352002,Chachimbiro,Ecuador,Northern Andean Volcanic Arc,0.468,-78.287,4106,Stratovolcano,-3740,continental,37684975.17336956
+352003,Cuicocha,Ecuador,Northern Andean Volcanic Arc,0.308,-78.364,3246,Caldera,650,continental,37684975.17336956
+352004,Imbabura,Ecuador,Northern Andean Volcanic Arc,0.258,-78.183,4609,Compound,-5550,continental,37684975.17336956
+352005,Mojanda,Ecuador,Northern Andean Volcanic Arc,0.13,-78.27,4263,Stratovolcano(es),,continental,37684975.17336956
+352006,Cayambe,Ecuador,Northern Andean Volcanic Arc,0.029,-77.986,5790,Compound,1786,continental,37684975.17336956
+352011,Pululahua,Ecuador,Northern Andean Volcanic Arc,0.0464,-78.49,3360,Caldera,290,continental,37684975.17336956
+352010,Reventador,Ecuador,Northern Andean Volcanic Arc,-0.077,-77.656,3562,Stratovolcano,2026,continental,37684975.17336956
+352021,Atacazo,Ecuador,Northern Andean Volcanic Arc,-0.353,-78.617,4463,Stratovolcano,-320,continental,37684975.17336956
+352022,Chacana,Ecuador,Northern Andean Volcanic Arc,-0.375,-78.25,4643,Caldera,1773,continental,37684975.17336956
+352020,Guagua Pichincha,Ecuador,Northern Andean Volcanic Arc,-0.171,-78.598,4784,Stratovolcano,2002,continental,37684975.17336956
+352031,Aliso,Ecuador,Northern Andean Volcanic Arc,-0.53,-78,4267,Stratovolcano,-2450,continental,37684975.17336956
+352030,Antisana,Ecuador,Northern Andean Volcanic Arc,-0.481,-78.141,5753,Stratovolcano,1802,continental,37684975.17336956
+352041,Iliniza,Ecuador,Northern Andean Volcanic Arc,-0.662,-78.716,5162,Stratovolcano,,continental,37684975.17336956
+352040,Sumaco,Ecuador,Northern Andean Volcanic Arc,-0.538,-77.626,3990,Stratovolcano,1895,continental,37684975.17336956
+352050,Cotopaxi,Ecuador,Northern Andean Volcanic Arc,-0.677,-78.436,5911,Stratovolcano,2023,continental,37684975.17336956
+352060,Quilotoa,Ecuador,Northern Andean Volcanic Arc,-0.8592,-78.9044,3914,Caldera,1280,continental,37684975.17336956
+352071,Chimborazo,Ecuador,Northern Andean Volcanic Arc,-1.469,-78.817,6261,Stratovolcano,550,continental,37684975.17336956
+352081,Licto,Ecuador,Northern Andean Volcanic Arc,-1.786,-78.614,3322,Pyroclastic cone(s),,continental,37684975.17336956
+352080,Tungurahua,Ecuador,Northern Andean Volcanic Arc,-1.467,-78.442,5023,Stratovolcano,2016,continental,37684975.17336956
+352090,Sangay,Ecuador,Northern Andean Volcanic Arc,-2.005,-78.341,5286,Stratovolcano,2026,continental,37684975.17336956
+353011,Ecuador,Ecuador,Galapagos Hotspot Volcano Group,-0.02,-91.546,790,Shield,1150,large_island,4645.91858380307
+353010,Fernandina,Ecuador,Galapagos Hotspot Volcano Group,-0.37,-91.55,1476,Shield,2024,small_island,597.3110814647406
+353020,Wolf,Ecuador,Galapagos Hotspot Volcano Group,0.02,-91.35,1710,Shield,2022,large_island,4645.91858380307
+353030,Darwin,Ecuador,Galapagos Hotspot Volcano Group,-0.18,-91.28,1330,Shield,1813,large_island,4645.91858380307
+353040,Alcedo,Ecuador,Galapagos Hotspot Volcano Group,-0.43,-91.12,1130,Shield,1993,large_island,4645.91858380307
+353050,"Negra, Sierra",Ecuador,Galapagos Hotspot Volcano Group,-0.83,-91.17,1124,Shield,2018,large_island,4645.91858380307
+353060,"Azul, Cerro",Ecuador,Galapagos Hotspot Volcano Group,-0.92,-91.408,1640,Shield,2008,large_island,4645.91858380307
+353070,Pinta,Ecuador,Northern Galapagos Volcanic Province,0.5858,-90.7553,729,Shield,,small_island,50.319460189769394
+353081,Genovesa,Ecuador,Northern Galapagos Volcanic Province,0.32,-89.958,64,Shield,,small_island,11.853616479721698
+353080,Marchena,Ecuador,Northern Galapagos Volcanic Province,0.33,-90.47,343,Shield,1991,small_island,118.61297573133217
+353091,Santa Cruz,Ecuador,Galapagos Hotspot Volcano Group,-0.62,-90.33,864,Shield,,small_island,961.0037145949797
+353090,Santiago,Ecuador,Galapagos Hotspot Volcano Group,-0.22,-90.77,920,Shield,1906,small_island,561.3683762876107
+353120,San Cristobal,Ecuador,Galapagos Hotspot Volcano Group,-0.8292,-89.4292,707,Shield,,small_island,564.4077675377938
+354000,Quimsachata-Oroscocha,Peru,Central Andean Volcanic Arc,-14.131,-71.363,3848,Lava dome,-4450,continental,37684975.17336956
+354001,"Auquihuato, Cerro",Peru,Central Andean Volcanic Arc,-15.0726,-73.1914,5001,Pyroclastic cone,,continental,37684975.17336956
+354003,Coropuna,Peru,Central Andean Volcanic Arc,-15.52,-72.65,6377,Stratovolcano,,continental,37684975.17336956
+354004,Andahua-Orcopampa,Peru,Central Andean Volcanic Arc,-15.42,-72.33,4713,Volcanic field,1490,continental,37684975.17336956
+354005,Huambo,Peru,Central Andean Volcanic Arc,-15.78,-72.08,4554,Volcanic field,-700,continental,37684975.17336956
+354006,Sabancaya,Peru,Central Andean Volcanic Arc,-15.787,-71.857,5960,Stratovolcano(es),2026,continental,37684975.17336956
+354010,"Misti, El",Peru,Central Andean Volcanic Arc,-16.2991,-71.4056,5793,Stratovolcano,1985,continental,37684975.17336956
+354020,Ubinas,Peru,Central Andean Volcanic Arc,-16.345,-70.8972,5608,Stratovolcano,2024,continental,37684975.17336956
+354031,Ticsani,Peru,Central Andean Volcanic Arc,-16.7586,-70.5981,5382,Lava dome(s),1800,continental,37684975.17336956
+354030,Huaynaputina,Peru,Central Andean Volcanic Arc,-16.6144,-70.8542,4679,Stratovolcano,1600,continental,37684975.17336956
+354040,Tutupaca,Peru,Central Andean Volcanic Arc,-17.026,-70.372,5801,Stratovolcano(es),1802,continental,37684975.17336956
+354050,Yucamane,Peru,Central Andean Volcanic Arc,-17.184,-70.196,5495,Stratovolcano(es),-1320,continental,37684975.17336956
+354060,"Casiri, Nevados",Peru,Central Andean Volcanic Arc,-17.4852,-69.7886,5626,Stratovolcano(es),,continental,37684975.17336956
+355011,Taapaca,Chile,Central Andean Volcanic Arc,-18.1,-69.5,5860,Complex,-320,continental,37684975.17336956
+355012,Parinacota,Chile-Bolivia,Central Andean Volcanic Arc,-18.166,-69.142,6336,Stratovolcano,290,continental,37684975.17336956
+355020,Guallatiri,Chile,Central Andean Volcanic Arc,-18.42,-69.092,6071,Stratovolcano,1960,continental,37684975.17336956
+355032,Tata Sabaya,Bolivia,Central Andean Volcanic Arc,-19.13,-68.53,5430,Stratovolcano,,continental,37684975.17336956
+355030,Isluga,Chile,Central Andean Volcanic Arc,-19.15,-68.83,5550,Stratovolcano,1913,continental,37684975.17336956
+355040,Irruputuncu,Chile-Bolivia,Central Andean Volcanic Arc,-20.73,-68.55,5163,Stratovolcano,1995,continental,37684975.17336956
+355050,Olca-Paruma,Chile-Bolivia,Central Andean Volcanic Arc,-20.939,-68.413,5705,Stratovolcano(es),,continental,37684975.17336956
+355091,Sairecabur,Chile-Bolivia,Central Andean Volcanic Arc,-22.719,-67.891,5961,Stratovolcano(es),,continental,37684975.17336956
+355092,Licancabur,Chile-Bolivia,Central Andean Volcanic Arc,-22.83,-67.88,5916,Stratovolcano,,continental,37684975.17336956
+355093,Guayaques,Chile-Bolivia,Central Andean Volcanic Arc,-22.895,-67.566,5598,Lava dome(s),,continental,37684975.17336956
+355094,Purico Complex,Chile,Central Andean Volcanic Arc,-23,-67.75,5703,Shield(pyroclastic),,continental,37684975.17336956
+355095,Colachi,Chile,Central Andean Volcanic Arc,-23.236,-67.645,5631,Stratovolcano,,continental,37684975.17336956
+355096,Acamarachi,Chile,Central Andean Volcanic Arc,-23.292,-67.618,6023,Stratovolcano,,continental,37684975.17336956
+355098,Chiliques,Chile,Central Andean Volcanic Arc,-23.58,-67.7,5778,Stratovolcano,,continental,37684975.17336956
+355090,Putana,Chile,Central Andean Volcanic Arc,-22.557,-67.853,5884,Stratovolcano,1810,continental,37684975.17336956
+355101,Cordon de Puntas Negras,Chile,Central Andean Volcanic Arc,-23.743,-67.534,5852,Stratovolcano(es),,continental,37684975.17336956
+355102,Miniques,Chile,Central Andean Volcanic Arc,-23.82,-67.77,5910,Stratovolcano(es),,continental,37684975.17336956
+355103,"Tujle, Cerro",Chile,Central Andean Volcanic Arc,-23.83,-67.95,3550,Maar,,continental,37684975.17336956
+355104,Caichinque,Chile,Central Andean Volcanic Arc,-23.949,-67.74,4458,Stratovolcano(es),,continental,37684975.17336956
+355105,Tilocalar,Chile,Central Andean Volcanic Arc,-23.97,-68.13,3109,Lava cone(es),,continental,37684975.17336956
+355107,Pular,Chile,Central Andean Volcanic Arc,-24.188,-68.054,6233,Stratovolcano(es),,continental,37684975.17336956
+355108,"Negrillar, La",Chile,Central Andean Volcanic Arc,-24.319,-68.59,4220,Pyroclastic cone(s),,continental,37684975.17336956
+355109,Socompa,Chile-Argentina,Central Andean Volcanic Arc,-24.396,-68.246,6031,Stratovolcano,-5250,continental,37684975.17336956
+355100,Lascar,Chile,Central Andean Volcanic Arc,-23.37,-67.73,5592,Stratovolcano(es),2026,continental,37684975.17336956
+355112,Corrida de Cori Volcanic Field,Chile-Argentina,Central Andean Volcanic Arc,-25.083,-68.367,5451,Stratovolcano,,continental,37684975.17336956
+355110,Llullaillaco,Chile-Argentina,Central Andean Volcanic Arc,-24.72,-68.53,6739,Stratovolcano,1877,continental,37684975.17336956
+355121,Cordon del Azufre,Chile-Argentina,Central Andean Volcanic Arc,-25.336,-68.521,5481,Complex,,continental,37684975.17336956
+355122,"Bayo Gorbea, Cerro",Chile-Argentina,Central Andean Volcanic Arc,-25.414,-68.588,5413,Complex,,continental,37684975.17336956
+355123,"Nevada, Sierra",Chile-Argentina,Central Andean Volcanic Arc,-26.48,-68.58,6173,Complex,,continental,37684975.17336956
+355124,Falso Azufre,Chile-Argentina,Central Andean Volcanic Arc,-26.8,-68.37,5906,Complex,,continental,37684975.17336956
+355125,"Incahuasi, Nevado de",Chile-Argentina,Central Andean Volcanic Arc,-27.033,-68.296,6638,Stratovolcano(es),,continental,37684975.17336956
+355120,Lastarria,Chile-Argentina,Central Andean Volcanic Arc,-25.168,-68.507,5706,Stratovolcano,,continental,37684975.17336956
+355131,"Solo, El",Chile-Argentina,Central Andean Volcanic Arc,-27.105,-68.713,6205,Stratovolcano,,continental,37684975.17336956
+355130,"Ojos del Salado, Nevados",Chile-Argentina,Central Andean Volcanic Arc,-27.109,-68.541,6879,Stratovolcano,750,continental,37684975.17336956
+355160,Aracar,Argentina,Central Andean Volcanic Arc,-24.29,-67.783,6095,Stratovolcano,,continental,37684975.17336956
+355161,Central Andean Arc at 25.1°S,Argentina,Central Andean Volcanic Arc,-25.078,-68.266,4652,Pyroclastic cone,,continental,37684975.17336956
+355190,"Condor, El",Argentina,Central Andean Volcanic Arc,-26.632,-68.361,6373,Stratovolcano,,continental,37684975.17336956
+355200,Peinado,Argentina,Central Andean Volcanic Arc,-26.623,-68.116,5741,Stratovolcano,,continental,37684975.17336956
+355210,"Blanco, Cerro",Argentina,Central Andean Volcanic Arc,-26.7657,-67.746,4670,Caldera,-2300,continental,37684975.17336956
+355220,Tipas,Argentina,Central Andean Volcanic Arc,-27.196,-68.561,6658,Complex,,continental,37684975.17336956
+356011,Rapa Nui,Chile,Salas y Gómez Ridge Volcano Group,-27.114,-109.356,501,Shield(s),,small_island,175.17466888036634
+357010,Tupungatito,Chile-Argentina,Southern Andean Volcanic Arc,-33.425,-69.797,5660,Stratovolcano,1987,continental,37684975.17336956
+357021,Maipo,Chile-Argentina,Southern Andean Volcanic Arc,-34.164,-69.832,5323,Caldera,1912,continental,37684975.17336956
+357022,Palomo,Chile,Southern Andean Volcanic Arc,-34.608,-70.295,4860,Stratovolcano,,continental,37684975.17336956
+357023,"Atuel, Caldera del",Argentina,Southern Andean Volcanic Arc,-34.592,-69.921,5189,Caldera,,continental,37684975.17336956
+357024,Risco Plateado,Argentina,Southern Andean Volcanic Arc,-34.917,-69.981,4999,Stratovolcano,,continental,37684975.17336956
+357020,San Jose,Chile-Argentina,Southern Andean Volcanic Arc,-33.789,-69.895,6070,Stratovolcano(es),1960,continental,37684975.17336956
+357030,Tinguiririca,Chile,Southern Andean Volcanic Arc,-34.814,-70.352,4280,Stratovolcano,1917,continental,37684975.17336956
+357041,Infiernillo,Argentina,Southern Andean Volcanic Arc,-35.123,-69.9,3007,Volcanic field,-6890,continental,37684975.17336956
+357042,Calabozos,Chile,Southern Andean Volcanic Arc,-35.558,-70.496,3508,Caldera,,continental,37684975.17336956
+357040,Planchon-Peteroa,Chile,Southern Andean Volcanic Arc,-35.223,-70.568,3977,Stratovolcano(es),2025,continental,37684975.17336956
+357050,Descabezado Grande,Chile,Southern Andean Volcanic Arc,-35.58,-70.75,3953,Stratovolcano(es),1933,continental,37684975.17336956
+357061,"Maule, Laguna del",Chile,Southern Andean Volcanic Arc,-36.058,-70.492,2162,Caldera,-50,continental,37684975.17336956
+357062,San Pedro-Pellado,Chile,Southern Andean Volcanic Arc,-35.989,-70.849,3621,Stratovolcano(es),,continental,37684975.17336956
+357063,"Longavi, Nevado de",Chile,Southern Andean Volcanic Arc,-36.1959,-71.1641,3175,Stratovolcano,-4890,continental,37684975.17336956
+357064,"Blancas, Lomas",Chile,Southern Andean Volcanic Arc,-36.286,-71.009,2268,Stratovolcano,,continental,37684975.17336956
+357065,"Resago, Volcan",Chile,Southern Andean Volcanic Arc,-36.4606,-70.9033,1890,Pyroclastic cone,,continental,37684975.17336956
+357066,Payun Matru,Argentina,Southern Andean Volcanic Arc,-36.422,-69.241,3715,Volcanic field,-5050,continental,37684975.17336956
+357060,"Azul, Cerro",Chile,Southern Andean Volcanic Arc,-35.653,-70.761,3788,Stratovolcano,1967,continental,37684975.17336956
+357072,Tromen Volcanic Plateau,Argentina,Southern Andean Volcanic Arc,-37.144,-70.033,4114,Stratovolcano(es),1822,continental,37684975.17336956
+357070,"Chillan, Nevados de",Chile,Southern Andean Volcanic Arc,-36.868,-71.378,3180,Stratovolcano,2022,continental,37684975.17336956
+357080,Antuco,Chile,Southern Andean Volcanic Arc,-37.406,-71.349,2979,Stratovolcano,1869,continental,37684975.17336956
+357091,Callaqui,Chile,Southern Andean Volcanic Arc,-37.9276,-71.4464,3099,Stratovolcano,1980,continental,37684975.17336956
+357093,Tolhuaca,Chile,Southern Andean Volcanic Arc,-38.31,-71.645,2739,Stratovolcano,-4000,continental,37684975.17336956
+357090,Copahue,Chile-Argentina,Southern Andean Volcanic Arc,-37.856,-71.183,2953,Stratovolcano,2024,continental,37684975.17336956
+357102,"Blanca, Laguna",Argentina,Southern Andean Volcanic Arc,-39.02,-70.37,1700,Volcanic field,,continental,37684975.17336956
+357100,Lonquimay,Chile,Southern Andean Volcanic Arc,-38.379,-71.586,2832,Stratovolcano,1990,continental,37684975.17336956
+357111,Sollipulli,Chile,Southern Andean Volcanic Arc,-38.97,-71.52,2282,Caldera,1240,continental,37684975.17336956
+357112,Caburgua-Huelemolle,Chile,Southern Andean Volcanic Arc,-39.25,-71.75,1652,Volcanic field,-5050,continental,37684975.17336956
+357110,Llaima,Chile,Southern Andean Volcanic Arc,-38.692,-71.729,3125,Stratovolcano,2009,continental,37684975.17336956
+357121,Quetrupillan,Chile,Southern Andean Volcanic Arc,-39.496,-71.722,2360,Stratovolcano,255,continental,37684975.17336956
+357122,Lanin,Chile-Argentina,Southern Andean Volcanic Arc,-39.637,-71.502,3776,Stratovolcano,560,continental,37684975.17336956
+357123,Huanquihue Group,Argentina,Southern Andean Volcanic Arc,-39.887,-71.58,2189,Stratovolcano(es),1750,continental,37684975.17336956
+357120,Villarrica,Chile,Southern Andean Volcanic Arc,-39.42,-71.93,2847,Stratovolcano,2025,continental,37684975.17336956
+357130,Mocho-Choshuenco,Chile,Southern Andean Volcanic Arc,-39.927,-72.027,2422,Stratovolcano(es),1937,continental,37684975.17336956
+357140,Carran-Los Venados,Chile,Southern Andean Volcanic Arc,-40.35,-72.07,1114,Pyroclastic cone(s),1979,continental,37684975.17336956
+357153,Antillanca Volcanic Complex,Chile,Southern Andean Volcanic Arc,-40.783,-72.15,1979,Stratovolcano(es),-230,continental,37684975.17336956
+357150,Puyehue-Cordon Caulle,Chile,Southern Andean Volcanic Arc,-40.59,-72.117,2236,Stratovolcano,2012,continental,37684975.17336956
+357160,Puntiagudo-Cordon Cenizos,Chile,Southern Andean Volcanic Arc,-40.969,-72.264,2493,Stratovolcano,1850,continental,37684975.17336956
+358011,Tronador,Chile-Argentina,Southern Andean Volcanic Arc,-41.157,-71.885,3478,Stratovolcano,,continental,37684975.17336956
+358012,Cayutue-La Vigueria,Chile,Southern Andean Volcanic Arc,-41.3,-72.27,506,Volcanic field,-190,continental,37684975.17336956
+358010,Osorno,Chile,Southern Andean Volcanic Arc,-41.105,-72.496,2659,Stratovolcano,1869,continental,37684975.17336956
+358022,Yate,Chile,Southern Andean Volcanic Arc,-41.755,-72.396,2187,Stratovolcano,1090,continental,37684975.17336956
+358023,Hornopiren,Chile,Southern Andean Volcanic Arc,-41.874,-72.431,1572,Stratovolcano,340,continental,37684975.17336956
+358024,Apagado,Chile,Southern Andean Volcanic Arc,-41.88,-72.58,1210,Pyroclastic cone,-590,continental,37684975.17336956
+358025,Crater Basalt Volcanic Field,Argentina,Southern Andean Volcanic Arc,-42.018,-70.194,1344,Volcanic field,,continental,37684975.17336956
+358020,Calbuco,Chile,Southern Andean Volcanic Arc,-41.33,-72.618,1974,Stratovolcano,2015,continental,37684975.17336956
+358030,Huequi,Chile,Southern Andean Volcanic Arc,-42.377,-72.578,1318,Lava dome(s),1920,continental,37684975.17336956
+358041,Chaiten,Chile,Southern Andean Volcanic Arc,-42.8349,-72.6514,1122,Caldera,2011,continental,37684975.17336956
+358040,Michinmahuida,Chile,Southern Andean Volcanic Arc,-42.799,-72.445,2452,Stratovolcano,1835,continental,37684975.17336956
+358049,Yanteles,Chile,Southern Andean Volcanic Arc,-43.469,-72.782,1790,Stratovolcano(es),-6650,continental,37684975.17336956
+358052,Melimoyu,Chile,Southern Andean Volcanic Arc,-44.08,-72.88,2400,Stratovolcano,200,continental,37684975.17336956
+358053,Puyuhuapi,Chile,Southern Andean Volcanic Arc,-44.3,-72.53,524,Pyroclastic cone(s),,continental,37684975.17336956
+358054,Mentolat,Chile,Southern Andean Volcanic Arc,-44.6931,-73.0767,1603,Stratovolcano,1710,large_island,2000.5195368039915
+358055,Cay,Chile,Southern Andean Volcanic Arc,-45.059,-72.984,2090,Stratovolcano,,continental,37684975.17336956
+358056,Maca,Chile,Southern Andean Volcanic Arc,-45.1,-73.17,2960,Stratovolcano,1560,continental,37684975.17336956
+358057,"Hudson, Cerro",Chile,Southern Andean Volcanic Arc,-45.9,-72.97,1905,Stratovolcano,2011,continental,37684975.17336956
+358050,Corcovado,Chile,Southern Andean Volcanic Arc,-43.189,-72.794,1826,Stratovolcano,-4920,continental,37684975.17336956
+358062,Aguilera,Chile,Austral Andean Volcanic Arc,-50.33,-73.75,2546,Stratovolcano,-1253,continental,37684975.17336956
+358063,Reclus,Chile,Austral Andean Volcanic Arc,-50.9395,-73.5802,1403,Pyroclastic cone,1908,continental,37684975.17336956
+358060,Lautaro,Chile,Austral Andean Volcanic Arc,-49.019,-73.504,3542,Stratovolcano,1979,continental,37684975.17336956
+358070,"Burney, Monte",Chile,Austral Andean Volcanic Arc,-52.33,-73.4,1758,Stratovolcano,1910,continental,37684975.17336956
+358080,Pali-Aike Volcanic Field,Chile-Argentina,Austral Andean Volcanic Arc,-52.082,-69.698,282,Volcanic field,-5550,continental,37684975.17336956
+358090,Fueguino,Chile,Austral Andean Volcanic Arc,-54.97,-70.262,157,Lava dome(s),1820,small_island,607.6736841641584
+360010,Saba,Netherlands,Lesser Antilles Volcanic Arc,17.63,-63.23,887,Stratovolcano,1640,small_island,7.087330272583122
+360020,"Quill, The",Netherlands,Lesser Antilles Volcanic Arc,17.478,-62.96,601,Stratovolcano,250,small_island,19.097194514428057
+360030,Liamuiga,Saint Kitts and Nevis,Lesser Antilles Volcanic Arc,17.37,-62.8,1156,Stratovolcano,160,small_island,176.10872231266228
+360040,Nevis Peak,Saint Kitts and Nevis,Lesser Antilles Volcanic Arc,17.15,-62.58,985,Stratovolcano,,small_island,88.88620059768824
+360050,Soufriere Hills,United Kingdom,Lesser Antilles Volcanic Arc,16.72,-62.18,915,Stratovolcano,2013,small_island,99.93330473100548
+360060,Soufriere Guadeloupe,France,Lesser Antilles Volcanic Arc,16.044,-61.664,1467,Stratovolcano,1977,small_island,844.5247553110112
+360080,"Diables, Morne aux",Dominica,Lesser Antilles Volcanic Arc,15.612,-61.43,861,Lava dome(s),,small_island,732.8957148391498
+360090,"Diablotins, Morne",Dominica,Lesser Antilles Volcanic Arc,15.503,-61.397,1430,Stratovolcano,,small_island,732.8957148391498
+360101,"Watt, Morne",Dominica,Lesser Antilles Volcanic Arc,15.307,-61.305,1224,Stratovolcano(es),1997,small_island,732.8957148391498
+360100,"Trois Pitons, Morne",Dominica,Lesser Antilles Volcanic Arc,15.37,-61.33,1387,Complex,920,small_island,732.8957148391498
+360110,"Plat Pays, Morne",Dominica,Lesser Antilles Volcanic Arc,15.255,-61.341,940,Stratovolcano,1270,small_island,732.8957148391498
+360120,Pelee,France,Lesser Antilles Volcanic Arc,14.809,-61.166,1372,Stratovolcano,1932,small_island,1101.4421908841837
+360140,Qualibou,Saint Lucia,Lesser Antilles Volcanic Arc,13.83,-61.05,777,Caldera,1766,small_island,607.3807463756667
+360150,Soufriere St. Vincent,Saint Vincent and the Grenadines,Lesser Antilles Volcanic Arc,13.33,-61.18,1220,Stratovolcano,2021,small_island,330.752345526173
+360160,Kick 'em Jenny,Grenada,Lesser Antilles Volcanic Arc,12.3,-61.64,-185,Complex,2017,small_island,3.2294791213329375
+360170,St. Catherine,Grenada,Lesser Antilles Volcanic Arc,12.15,-61.67,840,Stratovolcano,,small_island,314.35650650579106
+370010,Snaefellsjokull,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.8,-23.783,1446,Stratovolcano,200,large_island,101694.55373787158
+370020,Helgrindur,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.866,-23.283,986,Volcanic field,,large_island,101694.55373787158
+370030,Ljosufjoll,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.9,-22.483,1063,Volcanic field,960,large_island,101694.55373787158
+371020,Reykjanes,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.817,-22.717,140,Crater rows,2025,large_island,101694.55373787158
+371030,Krysuvik-Trolladyngja,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.917,-22.067,360,Crater rows,1340,large_island,101694.55373787158
+371040,Brennisteinsfjoll,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.933,-21.783,610,Crater rows,1341,large_island,101694.55373787158
+371051,Hromundartindur,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.083,-21.333,550,Stratovolcano,,large_island,101694.55373787158
+371050,Hengill,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.083,-21.416,803,Crater rows,150,large_island,101694.55373787158
+371060,Grimsnes,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.05,-20.883,200,Volcanic field,-3500,large_island,101694.55373787158
+371070,Prestahnukur,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.583,-20.666,1385,Fissure vent(s),-3350,large_island,101694.55373787158
+371080,Oddnyjarhnjukur-Langjokull,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.85,-19.7,1100,Fissure vent(s),950,large_island,101694.55373787158
+371090,Hofsjokull,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.833,-18.766,1765,Fissure vent(s),,large_island,101694.55373787158
+372010,Vestmannaeyjar,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.416,-20.266,283,Fissure vent(s),1973,small_island,9.499616524641919
+372020,Eyjafjallajokull,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.633,-19.633,1651,Stratovolcano,2010,large_island,101694.55373787158
+372030,Katla,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.633,-19.083,1490,Fissure vent(s),1918,large_island,101694.55373787158
+372040,Tindfjallajokull,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.783,-19.716,1464,Stratovolcano,,large_island,101694.55373787158
+372050,Torfajokull,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.892,-19.122,1280,Stratovolcano,1477,large_island,101694.55373787158
+372070,Hekla,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.983,-19.666,1490,Stratovolcano,2000,large_island,101694.55373787158
+373010,Grimsvotn,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.416,-17.316,1719,Caldera,2011,large_island,101694.55373787158
+373030,Bardarbunga,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.633,-17.516,2000,Stratovolcano,2015,large_island,101694.55373787158
+373040,Tungnafellsjokull,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.75,-17.916,1523,Stratovolcano,,large_island,101694.55373787158
+373050,Kverkfjoll,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.653,-16.647,1930,Stratovolcano,1968,large_island,101694.55373787158
+373060,Askja,Iceland,Iceland Neovolcanic Rift Volcanic Province,65.033,-16.783,1080,Stratovolcano,1961,large_island,101694.55373787158
+373070,Fremrinamar,Iceland,Iceland Neovolcanic Rift Volcanic Province,65.416,-16.666,970,Stratovolcano,-1200,large_island,101694.55373787158
+373080,Krafla,Iceland,Iceland Neovolcanic Rift Volcanic Province,65.715,-16.728,800,Caldera,1984,large_island,101694.55373787158
+373090,Theistareykir,Iceland,Iceland Neovolcanic Rift Volcanic Province,65.883,-16.967,563,Shield,-900,large_island,101694.55373787158
+373100,Tjornes Fracture Zone,Iceland,Arctic Ridge Volcanic Province,66.309,-17.118,-75,Fissure vent,1868,small_island,
+374010,Oraefajokull,Iceland,Iceland Neovolcanic Rift Volcanic Province,64,-16.65,2010,Stratovolcano,1728,large_island,101694.55373787158
+374020,Esjufjoll,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.25,-16.583,1620,Stratovolcano,,large_island,101694.55373787158
+374801,Snaefell,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.798,-15.56,1833,Stratovolcano,,large_island,101694.55373787158
+375010,Kolbeinsey Ridge,Iceland,Arctic Ridge Volcanic Province,66.67,-18.5,5,Fissure vent,1755,small_island,3.879074293926035
+376010,Jan Mayen,Norway,Arctic Ridge Volcanic Province,71.082,-8.155,2197,Stratovolcano,1985,small_island,455.239279517961
+377020,East Gakkel Ridge at 85°E,Undersea Features,Arctic Ridge Volcanic Province,85.608,85.25,-3800,Fissure vent,1999,small_island,
+381040,Pico Fracture Zone,Undersea Features,Azores-Terceira Rift Volcanic Province,38.75,-38.08,-4200,Fissure vent,1865,small_island,
+382001,Flores,Portugal,Azores-Terceira Rift Volcanic Province,39.462,-31.216,914,Stratovolcano(es),-950,small_island,188.5788346943501
+382010,Fayal,Portugal,Azores-Terceira Rift Volcanic Province,38.576,-28.713,1041,Stratovolcano,1958,small_island,177.66025252869466
+382020,Pico,Portugal,Azores-Terceira Rift Volcanic Province,38.47,-28.4,2351,Stratovolcano,1720,small_island,468.7718154634716
+382030,Sao Jorge,Portugal,Azores-Terceira Rift Volcanic Province,38.65,-28.08,1053,Fissure vent,1902,small_island,258.37996865635625
+382040,Graciosa,Portugal,Azores-Terceira Rift Volcanic Province,39.02,-27.97,402,Stratovolcano,-1950,small_island,81.50936968383387
+382050,Terceira,Portugal,Azores-Terceira Rift Volcanic Province,38.73,-27.32,1023,Stratovolcano(es),2000,small_island,453.64379558021466
+382070,Don Joao de Castro Bank,Portugal,Azores-Terceira Rift Volcanic Province,38.23,-26.63,-13,Shield,1720,small_island,
+382081,Picos Fissural Volcanic System,Portugal,Azores-Terceira Rift Volcanic Province,37.78,-25.67,350,Fissure vent,1652,small_island,822.2046082803166
+382080,Sete Cidades,Portugal,Azores-Terceira Rift Volcanic Province,37.865,-25.785,842,Stratovolcano,1880,small_island,822.2046082803166
+382090,Agua de Pau,Portugal,Azores-Terceira Rift Volcanic Province,37.77,-25.47,947,Stratovolcano,1564,small_island,822.2046082803166
+382100,Furnas,Portugal,Azores-Terceira Rift Volcanic Province,37.77,-25.32,805,Stratovolcano,1630,small_island,822.2046082803166
+382110,Monaco Bank,Portugal,Azores-Terceira Rift Volcanic Province,37.6,-25.88,-197,Fissure vent,1911,small_island,822.2046082803166
+382120,Madeira,Portugal,Madeira Hotspot Volcano Group,32.73,-16.97,1862,Shield,-4500,small_island,753.3918081697589
+383010,La Palma,Spain,Canary Volcanic Province,28.57,-17.83,2426,Stratovolcano(es),2021,small_island,708.8545129718123
+383020,Hierro,Spain,Canary Volcanic Province,27.73,-18.03,1500,Shield,2012,small_island,301.5508039416763
+383030,Tenerife,Spain,Canary Volcanic Province,28.271,-16.641,3715,Stratovolcano,1909,large_island,2006.8874761697648
+383040,Gran Canaria,Spain,Canary Volcanic Province,28,-15.58,1950,Fissure vent(s),40,small_island,1560.814247979359
+383050,Fuerteventura,Spain,Canary Volcanic Province,28.358,-14.02,529,Fissure vent(s),,small_island,1640.5768078562623
+383060,Lanzarote,Spain,Canary Volcanic Province,29.03,-13.63,670,Fissure vent(s),1824,small_island,829.6321207691361
+384010,Fogo,Cabo Verde,Cape Verde Hotspot Volcano Group,14.95,-24.35,2829,Stratovolcano,2015,small_island,461.8903944639308
+384020,Brava,Cabo Verde,Cape Verde Hotspot Volcano Group,14.8514,-24.7041,956,Stratovolcano,,small_island,59.99766821790364
+385030,Romanche Fracture Zone,Undersea Features,Central Mid-Atlantic Rift Volcanic Province,-0.433,-19.596,-1528,Fissure vent,,small_island,
+385050,Ascension,United Kingdom,Central Mid-Atlantic Rift Volcanic Province,-7.9458,-14.3667,822,Stratovolcano,1508,small_island,89.28503481947554
+386011,Nightingale Island,United Kingdom,Southern Atlantic Volcano Group,-37.42,-12.48,365,Stratovolcano,2004,small_island,
+386010,Tristan da Cunha,United Kingdom,Southern Atlantic Volcano Group,-37.092,-12.28,2060,Shield,1962,small_island,79.46464833355013
+386020,Bouvet,Norway,Southern Atlantic Volcano Group,-54.408,3.351,741,Shield,-50,small_island,54.96767531633868
+390011,Young Island,Antarctica,Balleny Hotspot Volcano Group,-66.42,162.47,1340,Stratovolcano,,continental,172.191601257899
+390012,Sturge Island,Antarctica,Balleny Hotspot Volcano Group,-67.4,164.83,1167,Stratovolcano,,continental,256.64696404243136
+390013,"Pleiades, The",Antarctica,McMurdo Volcanic Province,-72.67,165.5,3040,Stratovolcano,-1050,continental,12059456.440452345
+390015,Melbourne,Antarctica,McMurdo Volcanic Province,-74.35,164.7,2732,Stratovolcano,1892,continental,12059456.440452345
+390016,McMurdo Province at 76.8°S,Antarctica,McMurdo Volcanic Province,-76.83,163,-500,Caldera,,continental,12059456.440452345
+390010,Buckle Island,Antarctica,Balleny Hotspot Volcano Group,-66.78,163.25,1239,Stratovolcano,1899,continental,123.13413433003437
+390017,Morning,Antarctica,McMurdo Volcanic Province,-78.5,163.53,2723,Shield,,continental,12059456.440452345
+390021,Royal Society Range,Antarctica,McMurdo Volcanic Province,-78.25,163.33,3000,Pyroclastic cone(s),,continental,12059456.440452345
+390022,Berlin,Antarctica,Western Antarctica Volcanic Province,-76.05,-136,3478,Shield(s),-8350,continental,12059456.440452345
+390023,Andrus,Antarctica,Western Antarctica Volcanic Province,-75.8,-132.33,2978,Shield(s),,continental,12059456.440452345
+390027,Takahe,Antarctica,Western Antarctica Volcanic Province,-76.28,-112.08,3460,Shield,-5550,continental,12059456.440452345
+390028,Hudson Mountains,Antarctica,Western Antarctica Volcanic Province,-74.33,-99.42,749,Stratovolcano(es),-207,continental,12059456.440452345
+390020,Erebus,Antarctica,McMurdo Volcanic Province,-77.53,167.17,3794,Stratovolcano,2026,continental,2456.3542595336603
+390031,Penguin Island,Antarctica,South Shetlands Volcanic Arc,-62.1,-57.93,180,Stratovolcano,1905,continental,1127.1711526376596
+390030,Deception Island,Antarctica,South Shetlands Volcanic Arc,-62.9567,-60.6367,602,Caldera,1970,continental,76.2605325309288
+390041,Paulet,Antarctica,Antarctic Peninsula Volcanic Province,-63.579,-55.78,353,Pyroclastic cone,,continental,331.8043089545104
+390040,Bridgeman Island,Antarctica,South Shetlands Volcanic Arc,-62.063,-56.713,240,Stratovolcano,,small_island,
+390070,Southern Thule,United Kingdom,South Sandwich Volcanic Arc,-59.442,-27.225,1075,Stratovolcano(es),1975,small_island,21.076961436632555
+390081,Montagu Island,United Kingdom,South Sandwich Volcanic Arc,-58.445,-26.374,1370,Shield,2007,small_island,107.66284840925212
+390080,Bristol Island,United Kingdom,South Sandwich Volcanic Arc,-59.017,-26.533,1100,Stratovolcano,2016,small_island,44.105350932701135
+390090,Saunders,United Kingdom,South Sandwich Volcanic Arc,-57.8,-26.483,843,Stratovolcano,2026,small_island,38.3589088635488
+390100,Candlemas Island,United Kingdom,South Sandwich Volcanic Arc,-57.08,-26.67,550,Stratovolcano,1911,small_island,10.172064338937297
+390110,Hodson,United Kingdom,South Sandwich Volcanic Arc,-56.712,-27.176,835,Stratovolcano,,small_island,28.281281714177755
+390120,Leskov Island,United Kingdom,South Sandwich Volcanic Arc,-56.656,-28.14,190,Stratovolcano,,small_island,4.990445674108207
+390130,Zavodovski,United Kingdom,South Sandwich Volcanic Arc,-56.3,-27.57,551,Stratovolcano,2016,small_island,15.414351417073505
+390140,Protector Seamounts,United Kingdom,South Sandwich Volcanic Arc,-55.912,-28.167,-55,Volcanic field,1962,small_island,
+390847,Melville,Antarctica,South Shetlands Volcanic Arc,-62.02,-57.67,549,Stratovolcano,,continental,1127.1711526376596
+390829,Mount Haddington Volcanic Field,Antarctica,Antarctic Peninsula Volcanic Province,-64.15,-57.75,1544,Shield,,continental,2189.3100519167506
+331032,Jackson Segment,United States,Northeast Pacific Rifts Volcanic Province,42.15,-127.05,-3100,Fissure vent(s),,small_island,
+284193,South Sarigan Seamount,United States,Mariana Volcanic Arc,16.58,145.78,-184,Stratovolcano,2010,small_island,5.1387682759821525
+385052,Walvis Ridge at 33°S,Undersea Features,Southern Atlantic Volcano Group,-32.958,-5.22,-1200,Cone,2002,small_island,
+242005,Havre Seamount,New Zealand,Middle Kermadec Volcanic Arc,-31.08,-179.033,-897,Stratovolcano,2012,small_island,
+290072,Odamoisan [Tebenkov],Japan - administered by Russia,Kuril Volcanic Arc,45.0286,147.9169,1208,Stratovolcano,,large_island,3026.7927650862666
+243140,Niuatahi,Tonga,Northeast Lau Basin Volcano Group,-15.3675,-174.0028,-1270,Caldera,,small_island,
+285083,Tenchozan,Japan,Kuril Volcanic Arc,44.044,145.086,1046,Crater rows,,large_island,78174.10638391472
+283069,Akandanayama,Japan,Nankai Volcanic Arc,36.2,137.573,2109,Stratovolcano,,large_island,229073.9443140697
+243111,Dugong,Tonga,Northeast Lau Basin Volcano Group,-15.431,-175.725,-1170,Shield,,small_island,41.2650394555893
+243112,Lobster,Tonga,Northeast Lau Basin Volcano Group,-15.333,-176.283,-1500,Shield,,small_island,
+358064,Meullin,Chile,Southern Andean Volcanic Arc,-45.22,-73.05,1080,Volcanic field,,continental,37684975.17336956
+331005,West Valley Segment,Canada,Northeast Pacific Rifts Volcanic Province,48.78,-128.64,-2550,Fissure vent,,small_island,
+331060,East Blanco Depression,Undersea Features,Northeast Pacific Rifts Volcanic Province,44.267,-129.879,-3000,Fissure vent,,small_island,
+211080,Marsili,Italy,Aeolian Volcanic Arc,39.284,14.399,-779,Complex,-1050,small_island,
+284305,Mariana Back-Arc Segment at 15.5°N,United States,Mariana Volcanic Arc,15.406,144.506,-4100,Fissure vent,2015,small_island,
+373082,Heidarspordar,Iceland,Iceland Neovolcanic Rift Volcanic Province,65.583,-16.817,490,Fissure vent,-300,large_island,101694.55373787158
+371022,Eldey,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.733,-23,70,Fissure vent,1926,small_island,
+373012,Thordarhyrna,Iceland,Iceland Neovolcanic Rift Volcanic Province,64.267,-17.617,1650,Stratovolcano,1904,large_island,101694.55373787158
+221294,Northern Lake Abaya Volcanic Field,Ethiopia,Main Ethiopian Rift Volcanic Province,6.76,37.97,1594,Volcanic field,,continental,79752883.58340874
+221330,Mega Volcanic Field,Ethiopia,Kenyan Rift Volcanic Province,3.971,38.213,1500,Volcanic field,,continental,79752883.58340874
+312055,Stepovak Bay Group,United States,Aleutian Ridge Volcanic Arc,55.917,-160.017,1633,Volcanic field,,continental,37684975.17336956
+244021,Malumalu,United States,Samoan Hotspot Volcano Group,-14.601,-169.787,-145,Stratovolcano,,small_island,
+371032,Fagradalsfjall,Iceland,Iceland Neovolcanic Rift Volcanic Province,63.895,-22.258,250,Fissure vent,2023,large_island,101694.55373787158
+212042,Kolumbo,Greece,Hellenic Volcanic Arc,36.524,25.483,-18,Complex,1650,small_island,80.0616071051669
+233040,Fani Maore,France,Madagascar-Comoros Volcanic Province,-12.9121,45.7075,-2500,Cone,2019,small_island,
+303015,Khoid Naiman Nuur,Mongolia,Baikal Rift Volcanic Province,46.6459,101.7982,2532,Pyroclastic cone,,continental,79752883.58340874
+223045,Mugogo,DR Congo,Albertine Rift Volcanic Province,-1.3687,29.48,2338,Cone,1957,continental,79752883.58340874

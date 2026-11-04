@@ -1,0 +1,9 @@
+id = "storm"
+title = "Tropical storms and cyclones"
+status = "model"
+owner = ""
+first_model = "Holland 1980 wind profile"
+owns = "cyclone tracks and rates, storm wind and rain as forcing"
+must_not_own = "everyday weather, lahar triggers"
+outputs = []
+wanted = ["Local storm rainfall records", "EM-DAT storm losses (needs registration)"]
