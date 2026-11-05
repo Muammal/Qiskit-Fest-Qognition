@@ -169,6 +169,8 @@ def main():
     parser.add_argument("--terminal", action="store_true", help="Run interactive terminal ASCII survival run")
     parser.add_argument("--batch", action="store_true", help="Compare Quantum vs Classical Mixture vs Classical Rational")
     parser.add_argument("--curate", action="store_true", help="Curate signature runs into demo-pack/")
+    parser.add_argument("--export-data", action="store_true", help="Export evacuation survival rates, critical seeds & policy interventions to exports/")
+    parser.add_argument("--export-video", action="store_true", help="Export full simulation run MP4 video to exports/videos/")
     parser.add_argument("--test", action="store_true", help="Execute integration test suite")
     parser.add_argument("--seed", type=int, default=101, help="Event hazard or terrain seed")
     parser.add_argument("--mind", type=str, default="quantum",
@@ -178,6 +180,8 @@ def main():
     parser.add_argument("--noise", type=str, default="stub", help="Noise source profile")
     parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano", "titanic", "pompeii", "waterloo"], help="Choose scenario directly")
     parser.add_argument("--speed", type=float, default=0.2, help="Seconds delay per step during live demo")
+    parser.add_argument("--video-speed", type=float, default=1.0, help="Playback speed multiplier (e.g. 0.25 for Slow-Mo, 2.0 for Fast-Forward) when exporting video")
+    parser.add_argument("--output", type=str, default=None, help="Optional output file or directory path for exports")
 
     args = parser.parse_args()
 
@@ -185,6 +189,26 @@ def main():
         import pytest
         print("[Tech C] Running integration test suite...")
         sys.exit(pytest.main(["-v", "test_contracts_and_engine.py"]))
+    elif args.export_data:
+        from engine.exporter import export_evacuation_datasets
+        out_dir = args.output or "exports"
+        info = export_evacuation_datasets(output_dir=out_dir, num_seeds=12)
+        print(f"\n{BOLD}{GREEN}=== Exported Evacuation Survival & Policy Datasets ==={RESET}")
+        for k, v in info.items():
+            print(f"  {k}: {CYAN}{v}{RESET}")
+    elif args.export_video:
+        from engine.exporter import export_simulation_video
+        scen = args.scenario or "volcano"
+        info = export_simulation_video(
+            scenario=scen,
+            seed=args.seed,
+            mind=args.mind,
+            output_path=args.output,
+            speed_multiplier=args.video_speed,
+        )
+        print(f"\n{BOLD}{GREEN}=== Exported Full Simulation Video ==={RESET}")
+        for k, v in info.items():
+            print(f"  {k}: {CYAN}{v}{RESET}")
     elif args.batch:
         summary = run_batch_comparison(num_seeds=20, max_steps=DEFAULT_STEPS)
         print(f"\n{BOLD}=== Synthetic Heuristic-Stub Results ({summary['num_seeds']} Seeds) ==={RESET}")

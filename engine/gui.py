@@ -648,9 +648,12 @@ class IslandVisualizerApp:
         self.builder_factory = builder_factory  # Handed in by main.py, so this package never depends on the physics engine.
         self.notice = ""
         self.step_speed = 0.4
+        self.speed_choices = [0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
         self.speed_multiplier = 1.0
         self.auto_step_timer = 0.0
+        self.bob_phase = 0.0
         self.is_paused = False
+        self.video_recorder = None
 
         # Build Interactive Buttons
         self._build_event_choice_buttons()
@@ -662,20 +665,16 @@ class IslandVisualizerApp:
         self.show_history_overlay = False
         self.show_debrief_modal = False
 
-        # Initialize Simulation Engine
-        self._init_simulation()
-
         # Visual Systems
         self.preview_mini_map = self._generate_mini_map(self.seed, size=300)
         self.weather = WeatherSystem((MAP_SIZE, MAP_SIZE))
-        self.char_screen_x = self.world.spawn_pos[0] * TILE_SIZE + TILE_SIZE / 2
-        self.char_screen_y = self.world.spawn_pos[1] * TILE_SIZE + TILE_SIZE / 2
-        self.char_target_x = self.char_screen_x
-        self.char_target_y = self.char_screen_y
         self.char_bob = 0.0
         self.bubble_text = ""
         self.bubble_timer = 0.0
         self.selected_tile: Optional[Tuple[int, int]] = None
+
+        # Initialize Simulation Engine (sets initial character position accurately per scenario)
+        self._init_simulation()
 
     def toggle_fullscreen(self):
         """Native hardware fullscreen toggle mapping to native resolution."""
@@ -900,14 +899,15 @@ class IslandVisualizerApp:
 
     def _build_sim_buttons(self):
         # Map view top navigation bar buttons
-        self.btn_nav_home = UIButton((14, 10, 95, 32), "Menu", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="menu")
-        self.btn_nav_pause = UIButton((115, 10, 90, 32), "Pause", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_YELLOW, icon="pause")
-        self.btn_nav_step = UIButton((211, 10, 85, 32), "Step >", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_GREEN, icon="step")
-        self.btn_nav_speed = UIButton((302, 10, 110, 32), "Speed 1.0x", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="speed")
-        self.btn_nav_mind = UIButton((418, 10, 115, 32), "Quantum", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_PURPLE, icon="quantum")
-        self.btn_nav_evac = UIButton((539, 10, 105, 32), "Evac (E)", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_ORANGE, icon="shield")
-        self.btn_nav_log = UIButton((650, 10, 115, 32), "Action Log", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="log")
-        self.btn_nav_fs = UIButton((771, 10, 115, 32), "Fullscreen", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="fullscreen")
+        self.btn_nav_home = UIButton((10, 10, 82, 32), "Menu", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="menu")
+        self.btn_nav_pause = UIButton((97, 10, 82, 32), "Pause", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_YELLOW, icon="pause")
+        self.btn_nav_step = UIButton((184, 10, 78, 32), "Step >", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_GREEN, icon="step")
+        self.btn_nav_speed = UIButton((267, 10, 114, 32), "Speed 1.0x", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="speed")
+        self.btn_nav_mind = UIButton((386, 10, 104, 32), "Quantum", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_PURPLE, icon="quantum")
+        self.btn_nav_evac = UIButton((495, 10, 94, 32), "Evac (E)", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_ORANGE, icon="shield")
+        self.btn_nav_log = UIButton((594, 10, 98, 32), "Action Log", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="log")
+        self.btn_nav_rec = UIButton((697, 10, 94, 32), "Rec Video", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_RED, icon="play")
+        self.btn_nav_fs = UIButton((796, 10, 94, 32), "Fullscreen", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="fullscreen")
 
         # Debrief modal buttons
         mx = WINDOW_WIDTH // 2
@@ -966,8 +966,12 @@ class IslandVisualizerApp:
         self.is_paused = False
         self.bubble_text = ""
         self.bubble_timer = 0.0
-        self.char_screen_x = (self.agent.pos[0] + 0.5) * TILE_SIZE
-        self.char_screen_y = (self.agent.pos[1] + 0.5) * TILE_SIZE
+        view = self.ship_view or self.city_view
+        if view is not None:
+            self.char_screen_x, self.char_screen_y = view.focus_xy(self.engine)
+        else:
+            self.char_screen_x = (self.agent.pos[0] + 0.5) * TILE_SIZE
+            self.char_screen_y = (self.agent.pos[1] + 0.5) * TILE_SIZE
         self.char_target_x = self.char_screen_x
         self.char_target_y = self.char_screen_y
         if hasattr(self, "weather"):
@@ -1160,6 +1164,14 @@ class IslandVisualizerApp:
                 self.is_paused = not self.is_paused
             elif event.key in (pygame.K_RIGHT, pygame.K_n) and self.app_state == "sim":
                 self.step_forward()
+            elif event.key in (pygame.K_MINUS, pygame.K_KP_MINUS, pygame.K_LEFTBRACKET) and self.app_state == "sim":
+                self._shift_speed(-1)
+            elif event.key in (pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS, pygame.K_RIGHTBRACKET) and self.app_state == "sim":
+                self._shift_speed(1)
+            elif event.key == pygame.K_v and self.app_state == "sim":
+                self._toggle_video_recording()
+            elif event.key == pygame.K_k and self.app_state == "sim":
+                self._export_current_data()
             elif event.key == pygame.K_q and self.app_state in ("sim", "home"):
                 self._toggle_mind()
             elif event.key == pygame.K_e:
@@ -1185,18 +1197,58 @@ class IslandVisualizerApp:
                 self._handle_sim_click(v_mouse)
         return True
 
+    def _shift_speed(self, delta: int):
+        """Shifts speed_multiplier down into Slow-Mo (0.1x..0.5x) or up into Fast-Forward (2.0x..8.0x)."""
+        speeds = self.speed_choices
+        curr_idx = speeds.index(self.speed_multiplier) if self.speed_multiplier in speeds else 3
+        new_idx = max(0, min(len(speeds) - 1, curr_idx + delta))
+        self.speed_multiplier = speeds[new_idx]
+        self.bubble_text = f"Time Speed: {self.speed_multiplier:g}x ({'SLOW-MO' if self.speed_multiplier < 1.0 else ('FAST-FWD' if self.speed_multiplier > 1.0 else 'NORMAL')})"
+        self.bubble_timer = 1.8
+
+    def _toggle_video_recording(self):
+        """Starts or stops live MP4 video recording of the simulation canvas."""
+        from engine.exporter import LiveVideoRecorder
+        if self.video_recorder is not None and self.video_recorder.active:
+            saved = self.video_recorder.stop()
+            self.video_recorder = None
+            self.bubble_text = f"Saved video: {os.path.basename(saved)}"
+            self.bubble_timer = 3.0
+        else:
+            out_file = os.path.join(
+                "exports", "videos",
+                f"{self.scenario}_seed{self.seed}_{self.mind_type}_{int(time.time())}.mp4"
+            )
+            self.video_recorder = LiveVideoRecorder(out_file, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, fps=FPS)
+            self.video_recorder.start()
+            self.bubble_text = f"Recording MP4: {os.path.basename(out_file)}"
+            self.bubble_timer = 2.5
+
+    def _export_current_data(self):
+        """Exports the current simulation timeline and evacuation survival dataset."""
+        from engine.exporter import export_evacuation_datasets
+        os.makedirs("exports", exist_ok=True)
+        if hasattr(self.engine, "timeline"):
+            tl_path = os.path.join("exports", f"timeline_{self.scenario}_seed{self.seed}_{self.mind_type}.json")
+            with open(tl_path, "w", encoding="utf-8") as f:
+                json.dump(self.engine.timeline(), f, indent=2)
+        export_evacuation_datasets(output_dir="exports", num_seeds=5)
+        self.bubble_text = "Exported survival & policy data to exports/"
+        self.bubble_timer = 3.0
+
     def run(self):
         running = True
         while running:
             dt = self.clock.tick(FPS) / 1000.0
+            sim_dt = dt * self.speed_multiplier
 
-            # Auto-stepping during unpaused simulation
-            self.cutscene.update(dt)
+            # Auto-stepping during unpaused simulation (scaled by Slow-Mo / Fast-Forward multiplier)
+            self.cutscene.update(sim_dt)
             if self.scenario in CROWD_SCENARIOS:
                 self._pompeii_poll_step()
             if self.app_state == "sim" and not self.is_paused and not self.show_debrief_modal and not self.show_history_overlay \
                     and not self.cutscene.active:
-                self.auto_step_timer += dt * self.speed_multiplier
+                self.auto_step_timer += sim_dt
                 if self.auto_step_timer >= self.step_speed:
                     self.auto_step_timer = 0.0
                     self.step_forward()
@@ -1212,21 +1264,27 @@ class IslandVisualizerApp:
                 if self.handle_event(event, v_mouse) is False:
                     running = False
 
-            # Character Smooth Interpolation (Lerp)
-            self.char_screen_x += (self.char_target_x - self.char_screen_x) * 12.0 * dt
-            self.char_screen_y += (self.char_target_y - self.char_screen_y) * 12.0 * dt
-            self.char_bob = math.sin(time.time() * 8.0) * 2.0
+            # Character Smooth Interpolation (Lerp scaled by sim_dt for Slow-Mo & Fast-Forward)
+            lerp_alpha = min(1.0, 12.0 * sim_dt)
+            self.char_screen_x += (self.char_target_x - self.char_screen_x) * lerp_alpha
+            self.char_screen_y += (self.char_target_y - self.char_screen_y) * lerp_alpha
+            self.bob_phase += 8.0 * sim_dt
+            self.char_bob = math.sin(self.bob_phase) * 2.0
 
             if self.bubble_timer > 0:
                 self.bubble_timer = max(0.0, self.bubble_timer - dt)
 
             ash_level = getattr(self.world, "ash", 0.0)
-            self.weather.update(self.current_event, dt, ash_level=ash_level)
+            self.weather.update(self.current_event, sim_dt, ash_level=ash_level)
 
             # Render Scene
             self.draw(v_mouse)
+            if self.video_recorder is not None and self.video_recorder.active:
+                self.video_recorder.capture_surface(self.canvas)
             self.present()
 
+        if self.video_recorder is not None and self.video_recorder.active:
+            self.video_recorder.stop()
         pygame.quit()
 
     def _toggle_mind(self):
@@ -1288,7 +1346,7 @@ class IslandVisualizerApp:
             nav_btns = [
                 self.btn_nav_home, self.btn_nav_pause, self.btn_nav_step,
                 self.btn_nav_speed, self.btn_nav_mind, self.btn_nav_evac,
-                self.btn_nav_log, self.btn_nav_fs
+                self.btn_nav_log, self.btn_nav_rec, self.btn_nav_fs
             ]
             for btn in nav_btns:
                 hovered = btn.check_hover(pos) or hovered
@@ -1479,10 +1537,6 @@ class IslandVisualizerApp:
 
         if self.btn_launch.check_hover(pos):
             self._init_simulation()
-            self.char_screen_x = self.world.spawn_pos[0] * TILE_SIZE + TILE_SIZE / 2
-            self.char_screen_y = self.world.spawn_pos[1] * TILE_SIZE + TILE_SIZE / 2
-            self.char_target_x = self.char_screen_x
-            self.char_target_y = self.char_screen_y
             self.app_state = "sim"
 
     def _handle_sim_click(self, pos: Tuple[int, int]):
@@ -1514,8 +1568,8 @@ class IslandVisualizerApp:
             self.step_forward()
             self.btn_nav_step.trigger_click()
         elif self.btn_nav_speed.check_hover(pos):
-            speeds = [0.5, 1.0, 2.0, 4.0]
-            curr_idx = speeds.index(self.speed_multiplier) if self.speed_multiplier in speeds else 1
+            speeds = self.speed_choices
+            curr_idx = speeds.index(self.speed_multiplier) if self.speed_multiplier in speeds else 3
             self.speed_multiplier = speeds[(curr_idx + 1) % len(speeds)]
             self.btn_nav_speed.trigger_click()
         elif self.btn_nav_mind.check_hover(pos):
@@ -1527,6 +1581,9 @@ class IslandVisualizerApp:
         elif self.btn_nav_log.check_hover(pos):
             self.show_history_overlay = True
             self.btn_nav_log.trigger_click()
+        elif self.btn_nav_rec.check_hover(pos):
+            self._toggle_video_recording()
+            self.btn_nav_rec.trigger_click()
         elif self.btn_nav_fs.check_hover(pos):
             self.toggle_fullscreen()
             self.btn_nav_fs.trigger_click()
@@ -2031,7 +2088,20 @@ class IslandVisualizerApp:
         self.btn_nav_pause.text = "Play" if self.is_paused else "Pause"
         self.btn_nav_pause.icon = "play" if self.is_paused else "pause"
 
-        self.btn_nav_speed.text = f"Speed {self.speed_multiplier}x"
+        if self.speed_multiplier < 1.0:
+            self.btn_nav_speed.text = f"Slow {self.speed_multiplier:g}x"
+            self.btn_nav_speed.active_color = COLOR_CYAN
+        elif self.speed_multiplier > 1.0:
+            self.btn_nav_speed.text = f"Fast {self.speed_multiplier:g}x"
+            self.btn_nav_speed.active_color = COLOR_ORANGE
+        else:
+            self.btn_nav_speed.text = "Speed 1.0x"
+            self.btn_nav_speed.active_color = COLOR_GREEN
+
+        rec_active = self.video_recorder is not None and self.video_recorder.active
+        self.btn_nav_rec.text = "Stop Rec" if rec_active else "Rec Video"
+        self.btn_nav_rec.is_active = rec_active
+
         if self.mind_type == "quantum":
             self.btn_nav_mind.text = "Quantum"
             self.btn_nav_mind.icon = "quantum"
@@ -2048,7 +2118,7 @@ class IslandVisualizerApp:
         self.btn_nav_fs.text = "Window" if self.is_fullscreen else "Fullscreen"
         self.btn_nav_fs.icon = "windowed" if self.is_fullscreen else "fullscreen"
 
-        for btn in (self.btn_nav_home, self.btn_nav_pause, self.btn_nav_step, self.btn_nav_speed, self.btn_nav_mind, self.btn_nav_evac, self.btn_nav_log, self.btn_nav_fs):
+        for btn in (self.btn_nav_home, self.btn_nav_pause, self.btn_nav_step, self.btn_nav_speed, self.btn_nav_mind, self.btn_nav_evac, self.btn_nav_log, self.btn_nav_rec, self.btn_nav_fs):
             btn.check_hover(mouse_pos)
             btn.draw(self.canvas)
 
@@ -2546,8 +2616,8 @@ class IslandVisualizerApp:
         controls_lbl = self.font_sub.render("SIMULATION SHORTCUTS & INTERACTION CONTROLS", True, COLOR_TEXT_MAIN)
         self.canvas.blit(controls_lbl, (panel_x + 16, curr_y + 12))
 
-        c_line1 = "[SPACE] Play / Pause   |   [RIGHT] Advance Step   |   [F11] Fullscreen Toggle"
-        c_line2 = "[Q] Switch Mind Model  |   [E] Evacuation Map     |   [TAB] Action History Log"
+        c_line1 = "[SPACE] Play/Pause  |  [-/+] Slow-Mo / Fast-Fwd  |  [RIGHT] Step  |  [F11] Fullscreen"
+        c_line2 = "[Q] Switch Mind     |  [V] Rec MP4 Video         |  [K] Export Data |  [TAB] Log"
         self.canvas.blit(self.font_body.render(c_line1, True, COLOR_TEXT_MAIN), (panel_x + 16, curr_y + 44))
         self.canvas.blit(self.font_body.render(c_line2, True, COLOR_TEXT_MUTED), (panel_x + 16, curr_y + 72))
 
