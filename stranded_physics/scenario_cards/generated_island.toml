@@ -1,0 +1,47 @@
+# An island that doesn't exist: land, weather and eruption all sampled from real catalogues. Each seed gives a different one, and nothing here can be compared with reality.
+id = "generated_island"
+title = "A generated island with a sampled eruption"
+place = "generated"
+start_utc = "2023-06-01T00:00:00+00:00"
+hours = 96
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "catalogue"
+
+[[entity]]
+kind = "weather"
+source = "catalogue"
+what = "montserrat"
+
+[[entity]]
+kind = "eruption"
+source = "catalogue"
+vent_lon = -61.1814
+vent_lat = 13.2997
+
+[[entity]]
+kind = "ash"
+source = "replay"
+
+[[entity]]
+kind = "flow"
+source = "replay"
+delay_hours = 6.0
+
+[[entity]]
+kind = "person"
+source = "dials"
+name = "A villager"
+mind = "quantum"
+start_lon = -61.2276
+start_lat = 13.3000
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "The far coast"
+lon = -61.2464
+lat = 13.2459

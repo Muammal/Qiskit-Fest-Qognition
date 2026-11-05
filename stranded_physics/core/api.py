@@ -191,3 +191,4 @@ class Percept:
     ash_kg_m2: float
     rain_mm_h: float
     flow_visible: bool
+    wind_m_s: float = 0.  # Added by change note 002. Storm wind where a storm is in the scenario.

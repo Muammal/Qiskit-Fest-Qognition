@@ -1,6 +1,43 @@
 {
+  "eruption-generator": {
+    "hash": "7a0699d429f3be6300015d4dda3ca9fc7e2fff12dc4b169383a7a0e321916ff8",
+    "verdict": "PASS"
+  },
+  "eruption-lead-time-sampling": {
+    "catalogue_count": 22,
+    "hash": "cd98e9190ed55502a19eee57a41e538f0b891e577933473155e81f5b3d1dd230",
+    "sample_count": 100000,
+    "value": 0.0014590909090909099,
+    "verdict": "PASS"
+  },
+  "eruption-model": {
+    "hash": "9f93d8b259358f1243df75a7d46894915fa1d3be58a8ac188df202ac26fd37fe",
+    "verdict": "PASS"
+  },
+  "eruption-plume-scaling": {
+    "hash": "8931f3f5848966359666e39c8b30011573da9047aec26b787212b906bc669cc7",
+    "value": 0.2409999999999999,
+    "verdict": "PASS"
+  },
+  "eruption-size-4-mass": {
+    "hash": "598a438e0e46dda7ffb663d44e74e546cb08a6116d095c4c5a3d67a1ba30b14f",
+    "value": 11.525685001453235,
+    "verdict": "PASS"
+  },
+  "eruption-size-holdout": {
+    "hash": "649adcdc71e6d31490da3833b30001e11fa43c4015e93321ad059a86b347d997",
+    "value": 0.22524526418786694,
+    "verdict": "FAIL"
+  },
+  "eruption-total-mass": {
+    "axis_end_utc": "2021-04-12T00:00Z",
+    "cole_whole_eruption_kg": 88750000000.0,
+    "hash": "28423d56b2492a53e157b13e221732fa4fe6a774d5571b7c1834b0147a7f0db6",
+    "model_kg": 309689788821.8786,
+    "verdict": "NO_TARGET"
+  },
   "eruption.records_and_units": {
-    "hash": "f26bc182e5a12ea8f5beb755769a0976f3e05500406ca27b46033e2415e7252c",
+    "hash": "8305e9f3228dfc92bf6befbea87bfeadc526a7c43ab816c4b334604307fc16ae",
     "verdict": "PASS"
   }
 }

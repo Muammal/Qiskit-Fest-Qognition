@@ -1,6 +1,20 @@
 {
+  "lava-dome-radius": {
+    "hash": "df39738a64aa225cfd2a17b39abf56f4eb773a35427cc5a3b037b246a65509e4",
+    "value": 335.30413655590183,
+    "verdict": "NO_TARGET"
+  },
+  "lava-dome-volume": {
+    "hash": "eac55df67c82810a985231e7c2d39f89e0c7df92b8e62080817444101c18a43b",
+    "value": 20.0,
+    "verdict": "PASS"
+  },
+  "lava-model": {
+    "hash": "898058779ed2bfb1413f06919267c4ddefd5ecc5f1a4733ea401e9840b96fdba",
+    "verdict": "PASS"
+  },
   "lava.records_and_units": {
-    "hash": "aa2295567150d465ea52662feccb5e1ac2edcf3c3ee84aa0d692e68a6b5607b7",
+    "hash": "1a977327dd00475a7481a9e239d2842f056ed30e5ba7ff4a1f451ee5e284ec1f",
     "verdict": "PASS"
   }
 }

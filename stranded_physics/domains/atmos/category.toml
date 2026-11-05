@@ -5,5 +5,5 @@ owner = ""
 first_model = "reanalysis forcing replayed per event"
 owns = "wind column by pressure level, rain, temperature, humidity"
 must_not_own = "ash, storms as events"
-outputs = []
+outputs = ["atmos.rain_rate", "atmos.wind_speed", "atmos.wind_bearing", "atmos.air_temperature", "atmos.wind_speed_500hpa", "atmos.wind_bearing_500hpa", "atmos.wind_speed_200hpa", "atmos.wind_bearing_200hpa"]
 wanted = ["ERA5 pressure levels before 2021 (needs a free CDS account)", "Local rain gauges around La Soufriere"]

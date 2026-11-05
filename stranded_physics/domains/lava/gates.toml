@@ -7,3 +7,38 @@ kind = "verification"
 command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/lava'); load_datasets(p/'datasets.toml', 'lava'); load_parameters(p/'params.toml')\""
 inputs = ["stranded_physics/domains/lava/datasets.toml", "stranded_physics/domains/lava/params.toml"]
 required = true
+
+[[gate]]
+id = "lava-model"
+title = "Dome rules hold: Huppert spreading, cap, destruction, time rule"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/lava/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/lava/*.py", "stranded_physics/domains/lava/params.toml", "stranded_physics/domains/lava/tests/*.py"]
+required = false
+
+[[gate]]
+id = "lava-dome-volume"
+title = "Dome volume when the explosions began (million cubic metres)"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.lava.measure dome_volume_mm3"
+inputs = ["stranded_physics/domains/lava/*.py", "stranded_physics/domains/lava/params.toml"]
+required = false
+target = 20.0
+tolerance = 2.0
+role = "anchor"
+split = "reference"
+source = "Cole et al., accepted manuscript of Geological Society Special Publication 539: 'we assume the 2021 lava dome had a volume of ~ 20 x 106m3 prior to the explosions'. The extrusion rate is derived from this, so this checks arithmetic, not prediction"
+
+[[gate]]
+id = "lava-dome-radius"
+title = "Dome radius when the explosions began (reported, no target)"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.lava.measure dome_radius_m"
+inputs = ["stranded_physics/domains/lava/*.py", "stranded_physics/domains/lava/params.toml"]
+required = false
+expect = "NO_TARGET"
+role = "input"
+split = "reference"
+source = "No reliable radius was in the sources held. The real dome was an elongated coulee, which a round model can't represent"

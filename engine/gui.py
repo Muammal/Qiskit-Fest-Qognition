@@ -145,10 +145,10 @@ ACTION_COLORS = {
 }
 
 ISLAND_PRESETS = [
-    {"label": "Archipelago (Seed 101)", "seed": 101, "tag": "Balanced | High Survival", "color": COLOR_GREEN},
-    {"label": "Arid Crag (Seed 105)", "seed": 105, "tag": "Arid Interior | Thirst Peril", "color": COLOR_ORANGE},
-    {"label": "Interference Lab (Seed 202)", "seed": 202, "tag": "Order Effect Divergence", "color": COLOR_PURPLE},
-    {"label": "Heroic Haven (Seed 777)", "seed": 777, "tag": "Timber Rich | Freshwater", "color": COLOR_CYAN}
+    {"label": "Island Seed 101", "seed": 101, "tag": "All minds survive", "color": COLOR_GREEN},
+    {"label": "Island Seed 105", "seed": 105, "tag": "All minds survive", "color": COLOR_ORANGE},
+    {"label": "Island Seed 202", "seed": 202, "tag": "All minds survive", "color": COLOR_PURPLE},
+    {"label": "Island Seed 777", "seed": 777, "tag": "All minds die", "color": COLOR_CYAN}
 ]
 
 TITANIC_PRESETS = [
@@ -185,10 +185,10 @@ WATERLOO_SETTINGS = (  # first option is the default; A is the user's chosen map
 CROWD_SCENARIOS = ("pompeii", "waterloo")
 
 VOLCANO_PRESETS = [
-    {"label": "Event Seed 101", "seed": 101, "tag": "Standard Unrest | Timed Pulse", "color": COLOR_CYAN},
-    {"label": "Event Seed 105", "seed": 105, "tag": "Rapid Escalation | Fast Lava", "color": COLOR_ORANGE},
-    {"label": "Event Seed 202", "seed": 202, "tag": "Order Effect Divergence", "color": COLOR_PURPLE},
-    {"label": "Event Seed 777", "seed": 777, "tag": "Severe PDC Surge | Eruption", "color": COLOR_RED}
+    {"label": "Event Seed 101", "seed": 101, "tag": "Erupts at +20 h | First flow +30 h", "color": COLOR_CYAN},
+    {"label": "Event Seed 105", "seed": 105, "tag": "No eruption | Unrest fades", "color": COLOR_ORANGE},
+    {"label": "Event Seed 202", "seed": 202, "tag": "No eruption | Unrest fades", "color": COLOR_PURPLE},
+    {"label": "Event Seed 777", "seed": 777, "tag": "Erupts at +36 h | First flow +46 h", "color": COLOR_RED}
 ]
 
 
@@ -597,7 +597,7 @@ class WeatherSystem:
 # -----------------------------------------------------------------------------
 class IslandVisualizerApp:
     def __init__(self, seed: int = 101, mind_type: str = "quantum", noise_source: str = "stub",
-                 start_screen: str = "event_choice", scenario: str = "volcano"):
+                 start_screen: str = "event_choice", scenario: str = "volcano", builder_factory=None):
         pygame.init()
         pygame.font.init()
         pygame.display.set_caption("Quantum Cognition Simulation")
@@ -642,6 +642,11 @@ class IslandVisualizerApp:
         self.waterloo_settings = {key: options[0] for key, _, options in WATERLOO_SETTINGS}
         self._worker, self._worker_result = None, None
         self.city_view, self.split_panels, self.show_split_panels = None, None, True
+        self.custom_game = None  # A scenario file being played. None means one of the built-in scenarios.
+        self.before_custom_game = (seed, self.mind_type)  # Put back on leaving it.
+        self.builder = None
+        self.builder_factory = builder_factory  # Handed in by main.py, so this package never depends on the physics engine.
+        self.notice = ""
         self.step_speed = 0.4
         self.speed_multiplier = 1.0
         self.auto_step_timer = 0.0
@@ -762,11 +767,18 @@ class IslandVisualizerApp:
             "POMPEII EVACUATION  >>", self.font_title,
             bg_color=(140, 66, 40), active_color=COLOR_RED, icon="volcano"
         )
-        self.card5_rect = pygame.Rect(26, 752, 1548, 84)
+        # The bottom row is shared: the Waterloo banner on the left, the scenario builder on the right.
+        self.card5_rect = pygame.Rect(26, 752, 1010, 84)
         self.btn_choice_waterloo = UIButton(
-            (1196 + 35, 770, btn_w, 48),
+            (self.card5_rect.right - btn_w - 24, 770, btn_w, 48),
             "WATERLOO CHLORINE LEAK  >>", self.font_sub,
             bg_color=(70, 120, 60), active_color=COLOR_GREEN, icon="launch"
+        )
+        self.card_build_rect = pygame.Rect(self.card5_rect.right + 16, 752, WINDOW_WIDTH - 26 - self.card5_rect.right - 16, 84)
+        self.btn_choice_build = UIButton(
+            (self.card_build_rect.centerx - 230, 770, 460, 48),
+            "BUILD YOUR OWN SCENARIO  >>", self.font_title,
+            bg_color=(146, 58, 196), active_color=COLOR_PURPLE, icon="menu"
         )
 
     def _presets(self):
@@ -833,7 +845,7 @@ class IslandVisualizerApp:
         )
         self.btn_mind_classical = UIButton(
             (col2_x + 555, top_y + 36, card_w, 80), "Classical Rational Mind", self.font_title,
-            subtext="Deterministic utility argmax derived from published ATUS summary tables",
+            subtext="Deterministic utility from hand-set urgency weights",
             subfont=self.font_small, active_color=COLOR_BLUE, icon="classical"
         )
 
@@ -862,7 +874,7 @@ class IslandVisualizerApp:
 
         # 4. Step Number Buttons
         self.step_buttons: List[UIButton] = []
-        step_choices = [12, 24, 36, 48]
+        step_choices = [6, 12, 24, 36]  # The engine stops at 36 steps.
         st_y = top_y + 395
         btn_w = 250
         for i, steps in enumerate(step_choices):
@@ -907,15 +919,19 @@ class IslandVisualizerApp:
 
     def _init_simulation(self):
         self._finish_worker()
-        engine_class = {"titanic": TitanicSimulation, "pompeii": PompeiiSimulation, "waterloo": WaterlooSimulation}.get(self.scenario, SimulationEngine)
-        extra = self._scenario_settings()[1] if self.scenario in CROWD_SCENARIOS else {}
-        self.engine = engine_class(
-            seed=self.seed,
-            mind_type=self.mind_type,
-            noise_source=self.noise_source,
-            scenario=self.scenario,
-            **extra
-        )
+        if self.custom_game is not None:
+            self.engine = self.custom_game.simulation(self.mind_type)
+            self.max_steps = self.engine.pack.time.n
+        else:
+            engine_class = {"titanic": TitanicSimulation, "pompeii": PompeiiSimulation, "waterloo": WaterlooSimulation}.get(self.scenario, SimulationEngine)
+            extra = self._scenario_settings()[1] if self.scenario in CROWD_SCENARIOS else {}
+            self.engine = engine_class(
+                seed=self.seed,
+                mind_type=self.mind_type,
+                noise_source=self.noise_source,
+                scenario=self.scenario,
+                **extra
+            )
         self.world = self.engine.world
         self.agent = self.engine.agent
         self.event_gen = self.engine.event_gen
@@ -1098,6 +1114,9 @@ class IslandVisualizerApp:
                 self.window_w, self.window_h = max(800, event.w), max(450, event.h)
                 self.screen = pygame.display.set_mode((self.window_w, self.window_h), pygame.RESIZABLE)
 
+        elif self.app_state == "builder" and event.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN, pygame.MOUSEWHEEL) and getattr(event, "key", None) != pygame.K_F11:
+            self.builder.handle_event(event, v_mouse)
+
         elif event.type == pygame.MOUSEWHEEL and self.show_history_overlay:
             self.history_scroll = max(0, min(max(0, len(self.history) - 7), self.history_scroll - event.y))
 
@@ -1115,6 +1134,16 @@ class IslandVisualizerApp:
                     self._handle_event_choice_click(self.btn_choice_pompeii.rect.center)
                 elif event.key in (pygame.K_5, pygame.K_KP5):
                     self._handle_event_choice_click(self.btn_choice_waterloo.rect.center)
+                elif event.key == pygame.K_b:
+                    self._handle_event_choice_click(self.btn_choice_build.rect.center)
+            elif self.app_state == "home" and event.key == pygame.K_RETURN:
+                self._handle_home_click(self.btn_launch.rect.center)
+            elif self.app_state == "sim" and event.key == pygame.K_r:
+                self._init_simulation()
+            elif self.app_state == "sim" and event.key == pygame.K_h:
+                self.app_state = self._menu_state()
+            elif self.app_state == "sim" and event.key == pygame.K_p and self.custom_game is not None:
+                self._next_person()
             elif event.key == pygame.K_f and self.app_state == "sim" and self.scenario in ("titanic", "pompeii", "waterloo"):
                 self._follow({"pompeii": next_role_citizen, "waterloo": next_role_patron}.get(self.scenario, next_role_person)(self.engine))
             elif event.key == pygame.K_c and self.app_state == "sim" and self.scenario in ("titanic", "pompeii", "waterloo"):
@@ -1127,7 +1156,7 @@ class IslandVisualizerApp:
                 self.is_paused = not self.is_paused
             elif event.key in (pygame.K_RIGHT, pygame.K_n) and self.app_state == "sim":
                 self.step_forward()
-            elif event.key == pygame.K_q and self.app_state == "sim":
+            elif event.key == pygame.K_q and self.app_state in ("sim", "home"):
                 self._toggle_mind()
             elif event.key == pygame.K_e:
                 self.show_evacuation_map = not self.show_evacuation_map
@@ -1139,7 +1168,7 @@ class IslandVisualizerApp:
                 elif self.show_debrief_modal:
                     self.show_debrief_modal = False
                 elif self.app_state == "sim":
-                    self.app_state = "home"
+                    self.app_state = self._menu_state()
                 elif self.app_state == "home":
                     self.app_state = "event_choice"
 
@@ -1229,6 +1258,8 @@ class IslandVisualizerApp:
                 return True
             if self.btn_choice_waterloo.check_hover(pos) or self.card5_rect.collidepoint(pos):
                 return True
+            if self.btn_choice_build.check_hover(pos):
+                return True
             return self.btn_choice_island.check_hover(pos) or self.btn_choice_volcano.check_hover(pos) or c1_h or c2_h
 
         elif self.app_state == "home":
@@ -1260,6 +1291,9 @@ class IslandVisualizerApp:
                 hovered = btn.check_hover(pos) or hovered
             return hovered
 
+        elif self.app_state == "builder":
+            return self.builder.hover(pos)
+
         return False
 
     def present(self):
@@ -1288,12 +1322,65 @@ class IslandVisualizerApp:
         elif self.app_state == "sim":
             self._handle_sim_click(pos)
 
+    def _menu_state(self) -> str:
+        """Where the menu buttons lead: a scenario file came from the builder, so they go back there."""
+        return "builder" if self.custom_game is not None else "home"
+
+    def _leave_custom_game(self):
+        if self.custom_game is not None:
+            self.custom_game, self.max_steps = None, DEFAULT_STEPS
+            self.seed, self.mind_type = self.before_custom_game
+            self._show_mind_on_button()
+
+    def _open_builder(self):
+        if self.builder_factory is None:
+            self.notice = "The builder isn't available here. Start the game with: python main.py --gui"
+            return
+        try:
+            if self.builder is None:
+                self.builder = self.builder_factory(self)
+        except ImportError as error:
+            self.notice = f"The builder needs requirements-physics.txt installed: {error}"
+            return
+        except Exception as error:  # The original scenarios must stay playable whatever is wrong with the builder's files.
+            self.notice = f"The builder couldn't start: {error}"
+            return
+        self.notice = ""
+        self.app_state = "builder"
+
+    def _follow_person(self):
+        """Starts the person the game is following, with the mind the scenario gave them."""
+        self.mind_type = self.custom_game.person.mind
+        self._show_mind_on_button()
+        self._init_simulation()
+
+    def _show_mind_on_button(self):
+        names = {"quantum": ("Quantum", COLOR_PURPLE), "classical_mixture": ("Mixture", COLOR_CYAN), "classical": ("Classical", COLOR_BLUE)}
+        self.btn_nav_mind.text, self.btn_nav_mind.active_color = names[self.mind_type]
+
+    def start_custom_game(self, game):
+        """Plays a scenario the builder has built."""
+        if self.custom_game is None:
+            self.before_custom_game = (self.seed, self.mind_type)
+        self.custom_game, self.scenario, self.seed = game, "volcano", game.pack.seed
+        self._follow_person()
+        self.app_state = "sim"
+
+    def _next_person(self):
+        self.custom_game.next_person()
+        self._follow_person()
+
     def _handle_event_choice_click(self, pos: Tuple[int, int]):
+        if self.btn_choice_build.check_hover(pos):
+            self._open_builder()
+            return
         c1_hit = self.btn_choice_island.check_hover(pos) or (hasattr(self, 'card1_rect') and self.card1_rect.collidepoint(pos))
         c2_hit = self.btn_choice_volcano.check_hover(pos) or (hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(pos))
         c3_hit = self.btn_choice_titanic.check_hover(pos) or self.card3_rect.collidepoint(pos)
         c4_hit = self.btn_choice_pompeii.check_hover(pos) or self.card4_rect.collidepoint(pos)
         c5_hit = self.btn_choice_waterloo.check_hover(pos) or self.card5_rect.collidepoint(pos)
+        if c1_hit or c2_hit or c3_hit or c4_hit or c5_hit:
+            self._leave_custom_game()
         self.max_steps = self._horizon_for("titanic" if c3_hit else "pompeii" if c4_hit else "waterloo" if c5_hit else "other")
         if c5_hit:
             self.scenario = "waterloo"
@@ -1370,7 +1457,7 @@ class IslandVisualizerApp:
             self.preview_mini_map = self._generate_mini_map(self.seed, size=300)
             return
 
-        step_choices = [12, 24, 36, 48]
+        step_choices = [6, 12, 24, 36]  # The engine stops at 36 steps.
         for i, btn in enumerate(self.step_buttons):
             if btn.check_hover(pos):
                 if self.scenario in CROWD_SCENARIOS:
@@ -1400,7 +1487,7 @@ class IslandVisualizerApp:
             elif self.btn_modal_scenario.check_hover(pos):
                 self.app_state = "event_choice"
             elif self.btn_modal_home.check_hover(pos) or self.btn_modal_close.check_hover(pos):
-                self.app_state = "home"
+                self.app_state = self._menu_state()
             return
 
         if self.show_history_overlay:
@@ -1409,7 +1496,7 @@ class IslandVisualizerApp:
             return
 
         if self.btn_nav_home.check_hover(pos):
-            self.app_state = "home"
+            self.app_state = self._menu_state()
         elif self.btn_nav_pause.check_hover(pos):
             self.is_paused = not self.is_paused
             self.btn_nav_pause.trigger_click()
@@ -1458,6 +1545,10 @@ class IslandVisualizerApp:
         elif self.app_state == "sim":
             self.draw_sim_screen(mouse_pos)
             self.cutscene.draw(self.canvas)
+        elif self.app_state == "builder":
+            self.builder.draw(mouse_pos)
+            if self.app_state == "sim":  # The build finished this frame.
+                self.draw_sim_screen(mouse_pos)
 
     # -------------------------------------------------------------------------
     # Render Event Choice Screen (State 0) - Tactical Research Dossier Style
@@ -1537,11 +1628,11 @@ class IslandVisualizerApp:
         # Corner Sector Badge
         self.draw_badge(c2_x + 28, c_y + 24, "SECTOR 02: CALDERA", COLOR_ORANGE)
         self.canvas.blit(self.font_title.render("VOLCANO ERUPTION EVACUATION", True, COLOR_TEXT_MAIN), (c2_x + 28, c_y + 56))
-        self.canvas.blit(self.font_small.render("Calibrated Topography  •  Seismic Unrest  •  Emergency Routing", True, COLOR_TEXT_MUTED), (c2_x + 28, c_y + 82))
+        self.canvas.blit(self.font_small.render("Fictional Island Terrain  •  Seismic Unrest  •  Emergency Routing", True, COLOR_TEXT_MUTED), (c2_x + 28, c_y + 82))
         pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (c2_x + 24, c_y + 108), (c2_x + card_w - 24, c_y + 108), 1)
 
         desc2 = (
-            "A calibrated stratovolcano enters rapid precursory unrest. The agent must interpret tremor and "
+            "A fictional stratovolcano enters rapid precursory unrest. The agent must interpret tremor and "
             "gas warnings, navigate around expanding lava flows and toxic ash deposition, and execute "
             "shortest-path routes to designated coastal assembly zones."
         )
@@ -1552,7 +1643,7 @@ class IslandVisualizerApp:
         self.canvas.blit(self.font_sub.render("TECHNICAL SPECIFICATIONS", True, COLOR_GOLD), (c2_x + 28, f_y2))
         f_y2 += 28
         specs2 = [
-            ("Grid Matrix", "40 × 40 cells (basalt topography)", COLOR_CYAN),
+            ("Grid Matrix", "40 × 40 cells (fictional, assumed rates)", COLOR_CYAN),
             ("Corridors", "Caldera, valleys, coastal assembly", COLOR_ORANGE),
             ("Hazards", "Lava, ash, lethal PDCs & lahars", COLOR_RED),
             ("Cognitive Model", "Stress-induced decoherence", COLOR_PURPLE)
@@ -1571,18 +1662,19 @@ class IslandVisualizerApp:
         self._draw_titanic_card(c3_x, c_y, card_w, card_h, mouse_pos)
         self._draw_pompeii_card(c4_x, c_y, card_w, card_h, mouse_pos)
         self._draw_waterloo_banner(mouse_pos)
+        self._draw_build_card(mouse_pos)
 
         # -------------------------------------------------------------
         # Footer Technical Shortcut Bar
         # -------------------------------------------------------------
-        footer_w, footer_h = 760, 34
+        footer_w, footer_h = 900, 34
         footer_x = (WINDOW_WIDTH - footer_w) // 2
         footer_y = WINDOW_HEIGHT - 54
         foot_rect = pygame.Rect(footer_x, footer_y, footer_w, footer_h)
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, foot_rect, border_radius=4)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, foot_rect, 1, border_radius=4)
 
-        tip_str = "[ 1 ] Island    [ 2 ] Volcano    [ 3 ] Titanic    [ 4 ] Pompeii    [ 5 ] Waterloo    [ F11 ] Fullscreen"
+        tip_str = "[ 1 ] Island   [ 2 ] Volcano   [ 3 ] Titanic   [ 4 ] Pompeii   [ 5 ] Waterloo   [ B ] Build   [ F11 ] Fullscreen"
         hint_surf = self.font_mono.render(tip_str, True, COLOR_TEXT_HINT)
         self.canvas.blit(hint_surf, (footer_x + (footer_w - hint_surf.get_width()) // 2, footer_y + (footer_h - hint_surf.get_height()) // 2))
 
@@ -1592,10 +1684,19 @@ class IslandVisualizerApp:
         self.draw_card(rect.x, rect.y, rect.width, rect.height, border_color=COLOR_GREEN if hover else COLOR_CARD_BORDER, border_width=1)
         self.draw_badge(rect.x + 24, rect.y + 12, "LOCAL: WATERLOO, ONTARIO", COLOR_GREEN)
         self.canvas.blit(self.font_title.render("MOSES SPRINGER CHLORINE LEAK", True, COLOR_TEXT_MAIN), (rect.x + 290, rect.y + 12))
-        self.canvas.blit(self.font_small.render("A hypothetical evacuation at a real site. Most details of the 30 July 2012 leak are unknown, so the leak and head-count are labelled settings.",
-                                                True, COLOR_TEXT_MUTED), (rect.x + 24, rect.y + 52))
+        text_width = self.btn_choice_waterloo.rect.x - rect.x - 48
+        render_wrapped_text(self.canvas, "A hypothetical evacuation at a real site. Most details of the 30 July 2012 leak are unknown, so the leak and head-count are labelled settings.",
+                            self.font_small, COLOR_TEXT_MUTED, rect.x + 24, rect.y + 42, text_width, line_spacing=2, max_lines=2)
         self.btn_choice_waterloo.check_hover(mouse_pos)
         self.btn_choice_waterloo.draw(self.canvas)
+
+    def _draw_build_card(self, mouse_pos: Tuple[int, int]):
+        rect = self.card_build_rect
+        hover = self.btn_choice_build.check_hover(mouse_pos)
+        self.draw_card(rect.x, rect.y, rect.width, rect.height, border_color=COLOR_PURPLE if hover else COLOR_CARD_BORDER, border_width=1)
+        self.btn_choice_build.draw(self.canvas)
+        if self.notice:
+            render_wrapped_text(self.canvas, self.notice, self.font_small, COLOR_RED, rect.x + 16, rect.bottom - 18, rect.width - 32, line_spacing=2, max_lines=1)
 
     def _draw_pompeii_card(self, x: int, y: int, w: int, h: int, mouse_pos: Tuple[int, int]):
         hover = self.card4_rect.collidepoint(mouse_pos) or self.btn_choice_pompeii.check_hover(mouse_pos)
@@ -1810,7 +1911,7 @@ class IslandVisualizerApp:
         st_lbl = self.font_title.render(st_text, True, COLOR_TEXT_MAIN)
         self.canvas.blit(st_lbl, (col2_x + 24, col2_y + 365))
 
-        step_choices = [12, 24, 36, 48]
+        step_choices = [6, 12, 24, 36]  # The engine stops at 36 steps.
         for i, st_btn in enumerate(self.step_buttons):
             st_btn.is_active = self.scenario not in CROWD_SCENARIOS and (self.max_steps == step_choices[i])
             st_btn.check_hover(mouse_pos)
@@ -1830,9 +1931,9 @@ class IslandVisualizerApp:
 
         bullet_lines = [
             "  * Quantum Mind: Belief states represented as 2-qubit amplitudes with non-commuting projection angles.",
-            "  * Order Effect: Experiencing [Storm -> Find Food] yields distinct actions compared to [Find Food -> Storm].",
+            "  * Order Effect: From the same state, [Tremor -> Gas] and [Gas -> Tremor] shift P(protect) by .33, against .04 in the control.",
             "  * Stress Model: Physiological stress maps to a simulated dephasing channel (stress model); no hardware decoherence is driven live.",
-            "  * Survival Metric: Dehydration triggers lethal failure at 24h, Starvation at 72h. Maintain shelter to reduce exposure."
+            "  * Survival: Without water, death comes at about 58 h. All rates are assumed. Maintain shelter to reduce exposure."
         ]
         if self.scenario == "pompeii":
             bullet_lines = [
@@ -1851,7 +1952,7 @@ class IslandVisualizerApp:
         for i, bl in enumerate(bullet_lines):
             self.canvas.blit(self.font_body.render(bl, True, COLOR_TEXT_MUTED), (hints_box.x + 18, hints_box.y + 40 + i * 26))
 
-        tip_str = "Press [ENTER] to Launch  |  [F11] Fullscreen  |  [Q] Toggle Mind Model  |  Decoherence Modeling Active"
+        tip_str = "Press [ENTER] to Launch  |  [F11] Fullscreen  |  [Q] Toggle Mind Model"
         self.canvas.blit(self.font_sub.render(tip_str, True, COLOR_TEXT_HINT), (WINDOW_WIDTH // 2 - 320, WINDOW_HEIGHT - 28))
 
     # -------------------------------------------------------------------------
@@ -1875,6 +1976,8 @@ class IslandVisualizerApp:
 
         # 4. Top Navigation Bar (Integrated Over Map)
         self.draw_map_navigation_bar(mouse_pos)
+        if self.custom_game is not None:
+            self.draw_custom_game_label()
 
         # 5. Tile Inspector Tooltip (Hover)
         self.draw_tile_tooltip(mouse_pos)
@@ -1889,6 +1992,15 @@ class IslandVisualizerApp:
         # 8. End-of-Event Debrief Screen Modal
         if self.show_debrief_modal:
             self.draw_debrief_modal(mouse_pos)
+
+    def draw_custom_game_label(self):
+        game = self.custom_game
+        label = f"{game.title}  |  Following {game.person.name} ({game.index + 1} of {len(game.people)})  |  [P] next person"
+        shown = self.font_small.render(label, True, COLOR_TEXT_MAIN)
+        box = pygame.Rect(14, 56, min(shown.get_width() + 20, MAP_SIZE - 28), 24)
+        pygame.draw.rect(self.canvas, (248, 234, 198), box, border_radius=6)
+        pygame.draw.rect(self.canvas, (106, 64, 28), box, 2, border_radius=6)
+        self.canvas.blit(shown, (box.x + 10, box.y + 4), (0, 0, box.width - 20, shown.get_height()))
 
     def _focus_is_on_shown_map(self):
         """The followed person's avatar only belongs on the map they are actually on."""
@@ -2015,18 +2127,19 @@ class IslandVisualizerApp:
 
         # Volcano Caldera & Hazards (if volcano scenario)
         if self.scenario == "volcano":
-            vx, vy = self.world.vent
-            vrx = int(vx * TILE_SIZE + TILE_SIZE / 2)
-            vry = int(vy * TILE_SIZE + TILE_SIZE / 2)
-            pygame.draw.circle(self.canvas, (82, 54, 42), (vrx, vry), 17)
-            pygame.draw.circle(self.canvas, (218, 62, 32), (vrx, vry), 11)
-            pygame.draw.circle(self.canvas, (255, 196, 48), (vrx, vry), 6)
+            if self.world.vent:  # A scenario file may hold no eruption.
+                vx, vy = self.world.vent
+                vrx = int(vx * TILE_SIZE + TILE_SIZE / 2)
+                vry = int(vy * TILE_SIZE + TILE_SIZE / 2)
+                pygame.draw.circle(self.canvas, (82, 54, 42), (vrx, vry), 17)
+                pygame.draw.circle(self.canvas, (218, 62, 32), (vrx, vry), 11)
+                pygame.draw.circle(self.canvas, (255, 196, 48), (vrx, vry), 6)
 
             # Evacuation Map Overlay
             if self.show_evacuation_map:
                 overlay = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
                 colors = ((62, 168, 32, 28), (228, 152, 24, 42), (218, 52, 38, 62))
-                for y, row in enumerate(self.world.zones):
+                for y, row in enumerate(self.world.zones if self.world.vent else ()):  # Danger zones are measured from the vent.
                     for x, zone in enumerate(row):
                         if self.world.get_tile(x, y):
                             rx = int(round(x * TILE_SIZE))
@@ -2083,7 +2196,7 @@ class IslandVisualizerApp:
         scale_box = pygame.Rect(14, MAP_SIZE - 34, 156, 24)
         pygame.draw.rect(self.canvas, (248, 234, 198), scale_box, border_radius=6)
         pygame.draw.rect(self.canvas, (106, 64, 28), scale_box, 2, border_radius=6)
-        self.canvas.blit(self.font_small.render("SCALE: 1 TILE = 250m", True, COLOR_TEXT_MAIN), (scale_box.x + 10, scale_box.y + 4))
+        self.canvas.blit(self.font_small.render(f"SCALE: 1 TILE = {getattr(self.world, 'scale_m_per_tile', 250):.0f}m", True, COLOR_TEXT_MAIN), (scale_box.x + 10, scale_box.y + 4))
 
         comp_box = pygame.Rect(MAP_SIZE - 72, 60, 60, 24)
         pygame.draw.rect(self.canvas, (248, 234, 198), comp_box, border_radius=6)
@@ -2446,12 +2559,12 @@ class IslandVisualizerApp:
         if self.scenario == "waterloo":
             return self._draw_waterloo_debrief(mouse_pos, mx, my, mw, mh, border_col)
 
-        m_title = "MISSION COMPLETE: 72h SURVIVAL MASTERED" if survived else f"MISSION OVER: SURVIVOR PERISHED ({str(self.agent.cause_of_death).upper()})"
+        m_title = f"MISSION COMPLETE: {self.max_steps * 2}h SURVIVAL MASTERED" if survived else f"MISSION OVER: SURVIVOR PERISHED ({str(self.agent.cause_of_death).upper()})"
         m_color = COLOR_GOLD if survived else COLOR_RED
         t_surf = self.font_hero.render(m_title, True, m_color)
         self.canvas.blit(t_surf, (mx + (mw - t_surf.get_width()) // 2, my + 28))
 
-        scen_str = "Volcano Evacuation" if self.scenario == "volcano" else "Island Wilderness"
+        scen_str = self.custom_game.title if self.custom_game is not None else "Volcano Evacuation" if self.scenario == "volcano" else "Island Wilderness"
         dur_str = f"Endured {self.step_idx}/{self.max_steps} Steps ({self.step_idx * 2} Game Hours in {scen_str})"
         d_surf = self.font_sub.render(dur_str, True, COLOR_TEXT_MUTED)
         self.canvas.blit(d_surf, (mx + (mw - d_surf.get_width()) // 2, my + 74))
@@ -2461,11 +2574,11 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, box_rect, 1, border_radius=4)
 
         if self.mind_type == "quantum":
-            engine_name, engine_col = "2-Qubit Quantum Deliberation (Validated Unitary Model)", COLOR_PURPLE
+            engine_name, engine_col = "2-Qubit Quantum Deliberation (Checked Against Qiskit)", COLOR_PURPLE
         elif self.mind_type == "classical_mixture":
             engine_name, engine_col = "Classical Mixture Control (λ=1, Zero Coherence)", COLOR_CYAN
         else:
-            engine_name, engine_col = "Classical ATUS Rational Utility (Argmax)", COLOR_BLUE
+            engine_name, engine_col = "Classical Rule-Based Utility (Argmax)", COLOR_BLUE
 
         lines = [
             ("Decision Engine:", engine_name, engine_col),
@@ -2731,7 +2844,7 @@ class IslandVisualizerApp:
 
 
 def launch_gui(seed: int = 101, mind: str = "quantum", noise: str = "stub", start_screen: str = "event_choice",
-               scenario: str = "volcano"):
+               scenario: str = "volcano", builder_factory=None):
     """Launches the complete Pygame Quantum Cognition Simulation starting at the Event Choice Screen."""
-    app = IslandVisualizerApp(seed=seed, mind_type=mind, noise_source=noise, start_screen=start_screen, scenario=scenario)
+    app = IslandVisualizerApp(seed=seed, mind_type=mind, noise_source=noise, start_screen=start_screen, scenario=scenario, builder_factory=builder_factory)
     app.run()

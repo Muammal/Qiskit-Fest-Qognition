@@ -1,6 +1,16 @@
 {
+  "lahar-model": {
+    "hash": "f690754713e8f4c617e954736960f1ac45306fca8a7d78c7d0b48c7cf23b8c9c",
+    "verdict": "PASS"
+  },
+  "lahar-trigger-timing": {
+    "hash": "d0f59c719cfd8525bef26633f9b719cc86685aaa90e1440524c107ac9f5f25c5",
+    "lahar_frames": 0,
+    "max_rain_mm_h": 0.7,
+    "verdict": "NO_TARGET"
+  },
   "lahar.records_and_units": {
-    "hash": "c6b6eb549e94efdee900cb5f3905c5d5939c645a8d8c1303fdce80b05dd78d54",
+    "hash": "5210ac552b8b26c091a4e7e4b857676be9ec7e185795a0cac06343be977f2cfe",
     "verdict": "PASS"
   }
 }

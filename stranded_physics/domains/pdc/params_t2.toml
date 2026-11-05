@@ -1,0 +1,85 @@
+# pdc T2 settings, fixed before the solver existed. Do not tune these against the gates.
+# The real-world targets were already known from T1, so T2's checks are blind to the result, but not to the target.
+
+[[parameter]]
+id = "pdc_t2.pulse_volume"  # One flow pulse: about 17 million m3 of deposits outside the crater, over at least six massive units.
+value = 2830000.0
+unit = "m**3"
+valid_min = 100000.0
+valid_max = 50000000.0
+role = "input"
+status = "derived"
+source = "Cole et al., accepted manuscript of Geological Society Special Publication 539 (raw/st_vincent_cole_accepted.pdf): '~ 17 x 10^6 m3 for the volume of the PDC deposits in the valleys outside the crater'; 'A series of at least six massive PDC units'. Deposit volume is used as flow volume, which is an assumption."
+
+[[parameter]]
+id = "pdc_t2.release_inner_radius"  # A collapsing column lands around the crater, about 800 m from its centre.
+value = 800.0
+unit = "m"
+valid_min = 100.0
+valid_max = 3000.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "pdc_t2.release_outer_radius"  # Round figure. Release is even all around the crater, so any direction in the result comes from the terrain.
+value = 1300.0
+unit = "m"
+valid_min = 200.0
+valid_max = 5000.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "pdc_t2.coulomb_friction"  # Voellmy mu. Middle of the 0.1 to 0.2 often used for dense flows. From memory; check in T-104.
+value = 0.15
+unit = "dimensionless"
+valid_min = 0.02
+valid_max = 0.5
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "pdc_t2.turbulent_friction"  # Voellmy xi. Middle of the 200 to 1000 often used. From memory; check in T-104.
+value = 500.0
+unit = "m/s**2"
+valid_min = 50.0
+valid_max = 5000.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "pdc_t2.arrival_depth"  # A cell counts as reached once a flow is this deep. Below it, numerical smearing dominates.
+value = 0.1
+unit = "m"
+valid_min = 0.001
+valid_max = 2.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "pdc_t2.duration"  # Long enough for a pulse to stop. Published flows lasted minutes.
+value = 1800.0
+unit = "s"
+valid_min = 60.0
+valid_max = 14400.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "pdc_t2.cfl"  # Time-step safety factor. Numerical only.
+value = 0.4
+unit = "dimensionless"
+valid_min = 0.05
+valid_max = 0.9
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "pdc_t2.first_collapse_after_axis_start"  # 21:30 UTC on 10 April, counted from 00:00 UTC on 8 April. Same input as T1.
+value = 69.5
+unit = "hour"
+valid_min = 0.0
+valid_max = 200.0
+role = "input"
+status = "literature"
+source = "Cole et al., accepted manuscript of Geological Society Special Publication 539 (raw/st_vincent_cole_accepted.pdf): 'onset of the first significant PDC activity was associated with U3 activity from 21:30 UTC on 10th April'"

@@ -1,20 +1,258 @@
-# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+# Physical assumptions and measurement conventions; no calibration to local winds.
 
+# Round uncalibrated shape choice. Holland 1980 cyclostrophic form cited from memory: doi:10.1175/1520-0493(1980)108<1212:AAMOTW>2.0.CO;2, radial wind profile; original not read offline.
 [[parameter]]
 id = "storm.holland_b"
-value = 1.35
+value = 1.5
 unit = "dimensionless"
-valid_min = 0.9
-valid_max = 2.5
+valid_min = 0.5
+valid_max = 3.0
 role = "input"
-status = "literature"
-source = "Holland (1980) Monthly Weather Review 108:1212-1218 Table 1"
+status = "assumption"
 
+# Task-specified spherical Earth approximation; regional ellipsoidal corrections neglected.
 [[parameter]]
-id = "storm.rain_threshold"
-value = 5.0
-unit = "mm/hour"
-valid_min = 1.0
-valid_max = 50.0
+id = "storm.earth_radius"
+value = 6371000.0
+unit = "m"
+valid_min = 6350000.0
+valid_max = 6400000.0
+role = "input"
+status = "assumption"
+
+# Task-provided Kingstown measurement site; no independent station geolocation supplied.
+[[parameter]]
+id = "storm.kingstown_lon"
+value = -61.227
+unit = "degree"
+valid_min = -61.3
+valid_max = -61.1
+role = "input"
+status = "assumption"
+
+# Task-provided Kingstown measurement site.
+[[parameter]]
+id = "storm.kingstown_lat"
+value = 13.158
+unit = "degree"
+valid_min = 13.0
+valid_max = 13.3
+role = "input"
+status = "assumption"
+
+# Task-specified 2024-06-30 00:00 UTC hourly measurement start.
+[[parameter]]
+id = "storm.peak_axis_epoch"
+value = 1719705600.0
+unit = "s"
+valid_min = 1719705600.0
+valid_max = 1719705600.0
 role = "convention"
 status = "assumption"
+
+# Task-specified 72 hourly samples; last sample is start +71 hours.
+[[parameter]]
+id = "storm.peak_axis_frames"
+value = 72
+unit = "dimensionless"
+valid_min = 1
+valid_max = 168
+role = "convention"
+status = "assumption"
+
+# Deterministic storm replay; reproducibility seed does not change it.
+[[parameter]]
+id = "storm.validation_seed"
+value = 1
+unit = "dimensionless"
+valid_min = 1
+valid_max = 1
+role = "convention"
+status = "assumption"
+
+# Catalog observation window in disaster_data/calibration.json cyclone_rate_per_year_st_vincent.method and disaster_data/REPORT.md; includes zero-count years.
+[[parameter]]
+id = "storm.catalog_first_year"
+value = 1980
+unit = "dimensionless"
+valid_min = 1980
+valid_max = 1980
+role = "convention"
+status = "assumption"
+
+# Last complete archive year per disaster_data/calibration.json; do not infer coverage from years with events.
+[[parameter]]
+id = "storm.catalog_last_year"
+value = 2025
+unit = "dimensionless"
+valid_min = 2025
+valid_max = 2025
+role = "convention"
+status = "assumption"
+
+# Catalog selection radius in disaster_data/calibration.json and REPORT.md; storm centres, not impact footprints.
+[[parameter]]
+id = "storm.catalog_radius_km"
+value = 200.0
+unit = "km"
+valid_min = 200.0
+valid_max = 200.0
+role = "convention"
+status = "assumption"
+
+# Training-only season cutoff; later seasons are excluded before inspecting wind or distance.
+[[parameter]]
+id = "storm.wind_before_season"
+value = 2005.0
+unit = "dimensionless"
+valid_min = 1800
+valid_max = 2005
+role = "input"
+status = "literature"
+source = "disaster_data/catalog/cyclones_near_study_islands.csv ; season < 2005, all study islands"
+
+# Wind dial support up to 150 m/s; extrapolating the symmetric Holland model is unvalidated.
+[[parameter]]
+id = "storm.generated_max_wind_m_s"
+value = 50.0
+unit = "m/s"
+valid_min = 0
+valid_max = 150
+role = "input"
+status = "assumption"
+
+# Closest distance dial support; empirical defaults retain all training island-storm rows.
+[[parameter]]
+id = "storm.generated_closest_km"
+value = 100.0
+unit = "km"
+valid_min = 0
+valid_max = 2000
+role = "input"
+status = "assumption"
+
+# Uniform travel bearing referenced to the site, parallel transported to the track; no steering model.
+[[parameter]]
+id = "storm.generated_bearing_deg"
+value = 180.0
+unit = "degree"
+valid_min = 0
+valid_max = 360
+role = "input"
+status = "assumption"
+
+# Uniform uncalibrated translation speed from 1 to 30 m/s; controls wind exposure duration.
+[[parameter]]
+id = "storm.generated_speed_m_s"
+value = 8.0
+unit = "m/s"
+valid_min = 1
+valid_max = 30
+role = "input"
+status = "assumption"
+
+# Uniform uncalibrated radius from 1 to 200 km; strongly controls site wind, not fitted to observations.
+[[parameter]]
+id = "storm.generated_rmax_m"
+value = 30000.0
+unit = "m"
+valid_min = 1000
+valid_max = 200000
+role = "input"
+status = "assumption"
+
+# Scenario-relative closest-pass time; must also fit the supplied axis.
+[[parameter]]
+id = "storm.generated_closest_s"
+value = 0.0
+unit = "s"
+valid_min = 0
+valid_max = 315576000
+role = "input"
+status = "assumption"
+
+# Operational axis support from one microsecond to ten Julian years; long tracks can circle the globe.
+[[parameter]]
+id = "storm.generator_axis_s"
+value = 259200.0
+unit = "s"
+valid_min = 0.000001
+valid_max = 315576000
+role = "input"
+status = "assumption"
+
+# Input geographic coordinate range.
+[[parameter]]
+id = "storm.generated_site_lon"
+value = 0.0
+unit = "degree"
+valid_min = -180
+valid_max = 180
+role = "input"
+status = "literature"
+source = "stranded_physics/core/api.py ; site_lonlat convention"
+
+# Input geographic coordinate range.
+[[parameter]]
+id = "storm.generated_site_lat"
+value = 0.0
+unit = "degree"
+valid_min = -90
+valid_max = 90
+role = "input"
+status = "literature"
+source = "stranded_physics/core/api.py ; site_lonlat convention"
+
+# Task convention: default closest passage in middle half.
+[[parameter]]
+id = "storm.onset_fraction_min"
+value = 0.25
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "literature"
+source = "workboard/ENTITIES.md ; Stage 2 engine task closest_s"
+
+# Task convention: default closest passage in middle half.
+[[parameter]]
+id = "storm.onset_fraction_max"
+value = 0.75
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "literature"
+source = "workboard/ENTITIES.md ; Stage 2 engine task closest_s"
+
+# Hourly fixes anchored on closest_s, extending beyond the axis.
+[[parameter]]
+id = "storm.generator_fix_s"
+value = 3600.0
+unit = "s"
+valid_min = 3600
+valid_max = 3600
+role = "input"
+status = "literature"
+source = "workboard/ENTITIES.md ; Stage 2 engine task track sampling"
+
+# Fixed independent diagnostic seed for reproducible empirical holdout comparisons.
+[[parameter]]
+id = "storm.generator_measure_seed"
+value = 314159.0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 4294967295
+role = "input"
+status = "assumption"
+
+# Task-prescribed wind holdout sample count.
+[[parameter]]
+id = "storm.wind_sample_count"
+value = 100000.0
+unit = "dimensionless"
+valid_min = 100000
+valid_max = 100000
+role = "input"
+status = "literature"
+source = "workboard/ENTITIES.md ; Stage 2 engine task wind_holdout"

@@ -135,7 +135,7 @@ def debrief(app):
     app.text('Run debrief',348,128,font=app.font_hero)
     app.text(f'{app.step_idx*2} hours observed / {app.max_steps*2} hour horizon',348,174,color=MUTED)
     summary=app.engine.timeline()['evacuation']
-    labels=(('First sign','first_sign_step'),('Left danger zone','left_danger_step'),
+    labels=(('First sign','first_sign_step'),('First left danger zone','left_danger_step'),
             ('Reached safety','reached_safe_step'),('Assembly point','reached_assembly_step'),
             ('Eruption onset','onset_step'),('First flow','first_pdc_step'))
     for i,(label,key) in enumerate(labels):

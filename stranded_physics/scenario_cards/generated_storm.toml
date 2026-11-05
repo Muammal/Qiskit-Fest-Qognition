@@ -1,0 +1,39 @@
+# A storm sampled from the catalogue. Peak wind and closest pass come from the seed; its track is a straight line, so this isn't a forecast.
+id = "generated_storm"
+title = "A sampled storm passing St Vincent"
+place = "generated"
+start_utc = "2021-04-08T00:00:00+00:00"
+hours = 96
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "weather"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "storm"
+source = "catalogue"
+site_lon = -61.227
+site_lat = 13.158
+
+[[entity]]
+kind = "person"
+source = "dials"
+name = "Richmond"
+mind = "quantum"
+start_lon = -61.226
+start_lat = 13.317
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "Barrouallie"
+lon = -61.267
+lat = 13.233
