@@ -197,3 +197,15 @@ def test_flows_stay_within_their_reach_limit():
     reached = np.isfinite(pack.frame("pdc.arrival"))
     assert flow.reach_limit_m < 3000.
     assert reached.any() and distance_from(spec.grid, flow.vent)[reached].max() <= flow.reach_limit_m
+
+
+def test_gas_and_lava_build_from_a_scenario_and_someone_can_play_it():
+    from stranded_physics.packs.builder import build_pack
+    from stranded_physics.runtime.group import play_people
+    scenario = load_scenario(CARDS / "st_vincent_2021_full.toml")
+    pack = build_pack(to_spec(scenario, 1), 1)
+    assert pack.has("gas.so2_concentration") and pack.has("lava.footprint") and pack.has("exposure.roof_failure")
+    assert pack.frame("lava.footprint", 0.).sum() > 0
+    assert pack.frame("lava.footprint", 47 * 7200.).sum() == 0  # The explosions destroyed the dome.
+    assert play_people(pack, ["classical"])[0]["steps"]
+    assert {"gas", "lava", "exposure"} <= set(scenario.uses())

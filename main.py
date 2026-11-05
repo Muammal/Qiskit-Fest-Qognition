@@ -87,7 +87,11 @@ def run_live_demo(
     print(f"  Configuration: Engine={engine_mode.upper()} | Scenario={scenario.upper()} | Seed={seed} | Mind={mind.upper()} | Noise={noise}")
     print(f"  Legend: {BLUE}~{RESET} Water  {YELLOW}.{RESET} Plains  {GREEN}^{RESET} Forest  M Mountain  {MAGENTA}S{RESET} Shelter  {BOLD}{RED}@{RESET} Agent\n")
 
-    if engine_mode == "physics":
+    if engine_mode == "legacy_pack":
+        from stranded_physics.packs.legacy import build_legacy_pack
+        from stranded_physics.runtime.simulation import PackSimulation
+        sim = PackSimulation(build_legacy_pack(seed), mind_type=mind, noise_source=noise)
+    elif engine_mode == "physics":
         from stranded_physics.packs.st_vincent_2021 import build
         from stranded_physics.runtime.simulation import PackSimulation
         pack = build(seed)
@@ -158,7 +162,7 @@ def main():
     parser.add_argument("--mind", type=str, default="quantum",
                         choices=["quantum", "classical_mixture", "classical"], help="Mind engine")
     parser.add_argument("--engine", type=str, default="legacy",
-                        choices=["legacy", "physics"], help="Simulation runtime (legacy or T1 St. Vincent physics pack)")
+                        choices=["legacy", "physics", "legacy_pack"], help="Simulation runtime: legacy, the T1 St. Vincent physics pack, or the fictional island through the pack runtime")
     parser.add_argument("--noise", type=str, default="stub", help="Noise source profile")
     parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano"], help="Choose scenario directly")
     parser.add_argument("--speed", type=float, default=0.2, help="Seconds delay per step during live demo")

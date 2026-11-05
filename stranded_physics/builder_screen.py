@@ -20,9 +20,9 @@ from stranded_physics.entities.kinds import ERUPTION_EVENTS, KINDS, NOT_BUILT
 from stranded_physics.runtime.game import build_game, lonlat_to_map, map_to_lonlat, terrain_picture
 
 KIND_TEXT = {"terrain": "The land", "weather": "Wind, rain, temperature", "eruption": "Timeline, column, mass", "ash": "Fallout from an eruption",
-             "flow": "Hot flows from an eruption", "mudflow": "Rain on ash", "storm": "Wind from a cyclone", "person": "A body and a mind",
+             "flow": "Hot flows from an eruption", "mudflow": "Rain on ash", "gas": "SO2 downwind", "lava": "A growing dome", "storm": "Wind from a cyclone", "person": "A body and a mind",
              "group": "Many people, one mind", "shelter": "Somewhere to evacuate to", "resource": "Food, water or wood"}
-KIND_GROUPS = (("WORLD", ("terrain", "weather")), ("HAZARDS", ("eruption", "ash", "flow", "mudflow", "storm")),
+KIND_GROUPS = (("WORLD", ("terrain", "weather")), ("HAZARDS", ("eruption", "ash", "flow", "mudflow", "gas", "lava", "storm")),
                ("PEOPLE AND PLACES", ("person", "group", "shelter", "resource")))
 KIND_COLORS = {"person": COLOR_PURPLE, "group": COLOR_PURPLE, "shelter": COLOR_GREEN, "resource": COLOR_CYAN, "storm": COLOR_BLUE}
 SOURCE_TEXT = {"replay": "Real record", "catalogue": "Sampled from records", "dials": "Set by hand"}

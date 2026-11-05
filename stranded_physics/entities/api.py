@@ -15,8 +15,11 @@ REQUIRED_KEYS = {"id", "title", "place", "start_utc", "hours", "step_hours", "lo
 ENTITY_KEYS = {"kind", "source", "event", "name", "mind", "what"}
 MINDS = ("quantum", "classical_mixture", "classical")
 RESOURCES = ("water", "food", "wood")
-CATEGORY_OF = {"terrain": "terrain", "weather": "atmos", "eruption": "eruption", "ash": "tephra", "flow": "pdc", "mudflow": "lahar",
+CATEGORY_OF = {"terrain": "terrain", "weather": "atmos", "eruption": "eruption", "ash": "tephra", "flow": "pdc", "mudflow": "lahar", "gas": "gas", "lava": "lava",
                "storm": "storm", "person": "agent", "group": "agent", "shelter": "agent", "resource": "agent"}
+
+
+ALSO_USES = {"ash": ("exposure",), "person": ("exposure",), "group": ("exposure",)}  # Ash builds roof failure, and people are exposed to hazards.
 
 
 @dataclass(frozen=True)
@@ -68,9 +71,9 @@ class ScenarioFile:
         """The engine categories this scenario relies on, in order, for the checker."""
         ordered: list[str] = []
         for entity in self.entities:
-            category = CATEGORY_OF[entity.kind]
-            if category not in ordered:
-                ordered.append(category)
+            for category in (CATEGORY_OF[entity.kind], *ALSO_USES.get(entity.kind, ())):
+                if category not in ordered:
+                    ordered.append(category)
         return tuple(ordered)
 
 

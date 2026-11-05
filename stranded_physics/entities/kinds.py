@@ -86,8 +86,19 @@ def _eruption(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
 
 
 def _ash(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+    from stranded_physics.domains.exposure.model import Exposure
     from stranded_physics.domains.tephra.model import Tephra
-    return (Tephra(world.grid, world.time, world.vent),)
+    return (Tephra(world.grid, world.time, world.vent), Exposure(world.grid, world.time))
+
+
+def _gas(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+    from stranded_physics.domains.gas.model import Gas
+    return (Gas(world.grid, world.time, world.vent),)
+
+
+def _lava(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+    from stranded_physics.domains.lava.model import Lava
+    return (Lava(world.grid, world.time, world.vent, None if world.onset_s is None else 0.),)
 
 
 def _flow(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
@@ -146,6 +157,8 @@ KINDS: dict[str, Kind] = {kind.name: kind for kind in (
     Kind("flow", ("replay",), (Dial("delay_hours", "hour", 0., 240., "For a generated eruption: how long after its first explosion the first flow comes", optional=True),),
          FLOW_MODELS, ("terrain", "eruption"), _flow, model_choice=True),
     Kind("mudflow", ("replay",), (), (), ("terrain", "weather", "ash"), _mudflow),
+    Kind("gas", ("replay",), (), (), ("terrain", "weather", "eruption"), _gas),
+    Kind("lava", ("replay",), (), (), ("terrain", "eruption"), _lava),
     Kind("storm", ("replay", "catalogue", "dials"), lon_lat_dials("site_", "the place whose wind is reported"), STORM_EVENTS, (), _storm, STORM_DIALS),
     Kind("person", ("dials",), lon_lat_dials("start_", "where this person starts"), (), ("terrain", "weather"), _no_model),
     Kind("group", ("dials",), (*lon_lat_dials("start_", "the middle of this group"), Dial("count", "person", 1, 500, "How many people", whole=True),
@@ -153,7 +166,7 @@ KINDS: dict[str, Kind] = {kind.name: kind for kind in (
     Kind("shelter", ("dials",), lon_lat_dials("", "this shelter"), (), ("terrain",), _no_model),
     Kind("resource", ("dials",), lon_lat_dials("", "this resource"), (), ("terrain",), _no_model),
 )}
-BUILD_ORDER = ("terrain", "weather", "eruption", "ash", "flow", "mudflow", "storm", "person", "group", "shelter", "resource")
+BUILD_ORDER = ("terrain", "weather", "eruption", "ash", "flow", "mudflow", "gas", "lava", "storm", "person", "group", "shelter", "resource")
 
 
 def check_entity(entity: EntitySpec) -> None:

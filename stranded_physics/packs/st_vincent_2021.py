@@ -10,6 +10,7 @@ from stranded_physics.core.api import GridSpec, InterfaceError, ScenarioSpec, XY
 from stranded_physics.core.fields import FieldStore, ScopedFields
 from stranded_physics.domains.atmos.model import Atmos
 from stranded_physics.domains.eruption.model import Eruption
+from stranded_physics.domains.exposure.model import Exposure
 from stranded_physics.domains.lahar.model import Lahar
 from stranded_physics.domains.pdc.model import Pdc
 from stranded_physics.domains.tephra.model import Tephra
@@ -55,7 +56,7 @@ def sites(spawn: str = "chateaubelair") -> dict[str, list[XY]]:
 
 
 def scenario(spawn: str = "chateaubelair") -> ScenarioSpec:
-    domains = (Terrain(), Atmos(SCENARIO_TIME), Eruption(SCENARIO_TIME), Tephra(GRID, SCENARIO_TIME, VENT_XY),
+    domains = (Terrain(), Atmos(SCENARIO_TIME), Eruption(SCENARIO_TIME), Tephra(GRID, SCENARIO_TIME, VENT_XY), Exposure(GRID, SCENARIO_TIME),
                Pdc(GRID, SCENARIO_TIME, VENT_XY), Lahar(GRID, SCENARIO_TIME, VENT_XY))
     return ScenarioSpec(f"st_vincent_2021_{spawn}", GRID, CONTRACT_GRID, SCENARIO_TIME, LOCAL_HOUR_AT_START, domains, sites(spawn))
 

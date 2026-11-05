@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 
 import numpy as np
 
 import contracts
 from stranded_physics.core.api import InterfaceError, ScenarioPack, XY
 from stranded_physics.domains.agent.physiology import advance, cause_of_death, needs, pandolf_watts, setting
+from stranded_physics.domains.exposure.model import ash_energy_cost_per_hour, flow_death_probability
 from stranded_physics.domains.agent.walking import TravelField, travel_field, walk
 from stranded_physics.runtime.body import AgentBody, to_state
 from stranded_physics.runtime.perception import perceive
@@ -21,6 +23,7 @@ WOOD_REACH_M = 400.  # assumption: close enough to gather wood.
 WOOD_PER_SHELTER = 2  # assumption: carried over from the fictional island.
 MOST_WOOD_CARRIED = 4  # assumption: carried over from the fictional island's food limit.
 INJURY_STEPS = 12  # assumption: a day before an injured person walks normally again. Resting heals twice as fast.
+LUCK_STREAM = 603  # Keeps who survives apart from every other random stream, so a choice of mind changes nothing else.
 GALE_M_S = 17.2  # Beaufort force 8, from memory: strong enough for a person to notice and act on.
 HURRICANE_M_S = 32.7  # Beaufort force 12, from memory. assumption: an unsheltered person is injured at this wind.
 STORM_RAIN_MM_H = 5.  # assumption: T0 threshold; a `convention` value in the frozen event mapping.
@@ -122,6 +125,10 @@ class PackSimulation:
         self.warned = False
         self.built: list[XY] = []  # Shelters this person has built. Only they use them.
         self.injury_steps_left = 0
+        self.luck = np.random.default_rng([pack.seed, person, LUCK_STREAM])
+        self.flow_met_on_step: int | None = None  # A flow is one event in a step, however many substeps it covers.
+        self.roof_failed_share = 0.  # The roof failure share at this person's shelter when last checked.
+        self.roof_lost = False
         self.helped = False  # Someone able-bodied is close enough to help. Set by runtime/group.py. It changes the walking only, and never reaches the mind.
 
     def _event(self, t_s: float) -> str:
@@ -184,8 +191,7 @@ class PackSimulation:
                     rise = self.pack.sample("terrain.elevation", end) - self.pack.sample("terrain.elevation", start)
                     seconds, metres, climbed = seconds + SUBSTEP_MINUTES * 60., metres + math.dist(start, end), climbed + max(0., rise)
                     self.agent.xy_m = end
-            if self.pack.has("pdc.arrival") and self.pack.sample("pdc.arrival", self.agent.xy_m) <= clock and self.pack.sample("pdc.active", self.agent.xy_m, clock):
-                self.agent.alive, self.agent.cause = False, "pyroclastic_flow"
+            if self._killed_by_flow(clock):
                 break
             if self.pack.has("lahar.depth") and self.pack.sample("lahar.depth", self.agent.xy_m, clock) > 0:
                 self.agent.alive, self.agent.cause = False, "lahar"
@@ -208,6 +214,7 @@ class PackSimulation:
                                ate_kcal=setting("meal_energy", "kcal") if self._within("food", FOOD_REACH_M) and action == "forage" else 0.)
         self._use_materials(action)
         self._heal(action)
+        self._expose_to_ash()
         if self.pack.has("storm.max_wind") and self.pack.series("storm.max_wind")[len(self.steps)] >= HURRICANE_M_S and not self._sheltered():
             self._injure()
         current = needs(body.balance)
@@ -222,6 +229,38 @@ class PackSimulation:
         cause = cause_of_death(body.balance)
         if body.alive and cause:
             body.alive, body.cause = False, cause
+
+    def _killed_by_flow(self, clock: float) -> bool:
+        """Not everyone caught by a flow dies, and shelter improves the odds. Survivors are injured. T-603's probabilities aren't fitted to casualty data."""
+        here = self.agent.xy_m
+        if not self.pack.has("pdc.arrival") or self.pack.sample("pdc.arrival", here) > clock or not self.pack.sample("pdc.active", here, clock):
+            return False
+        step = len(self.steps)
+        if self.flow_met_on_step == step:
+            return False
+        self.flow_met_on_step = step
+        if self.luck.random() < flow_death_probability(self._sheltered()):
+            self.agent.alive, self.agent.cause = False, "pyroclastic_flow"
+            return True
+        self._injure()
+        return False
+
+    def _expose_to_ash(self) -> None:
+        """Fresh ash tires a person, less so indoors. As it builds up on a roof, that roof may fail, which injures them and ends its use as shelter."""
+        if not self.pack.has("tephra.deposit_load"):
+            return
+        t_s = len(self.steps) * self.pack.time.dt_s
+        body, load = self.agent, self.pack.sample("tephra.deposit_load", self.agent.xy_m, t_s)
+        tiredness = ash_energy_cost_per_hour(load, self._sheltered()) * STEP_MINUTES / 60. * setting("fatigue_span", "kcal")
+        body.balance = replace(body.balance, fatigue_kcal=body.balance.fatigue_kcal + float(tiredness))
+        if self.pack.has("exposure.roof_failure") and self._sheltered():
+            share = self.pack.sample("exposure.roof_failure", self.agent.xy_m, t_s)
+            if share > self.roof_failed_share:
+                chance = (share - self.roof_failed_share) / (1. - self.roof_failed_share)
+                self.roof_failed_share = share
+                if self.luck.random() < chance:
+                    self.roof_lost = True
+                    self._injure()
 
     def _use_materials(self, action: str) -> None:
         """Wood is gathered by foraging near it. Two pieces build a shelter where the person stands, and one makes a tool."""
@@ -244,7 +283,7 @@ class PackSimulation:
             self.agent.injured = self.injury_steps_left > 0
 
     def _sheltered(self) -> bool:
-        return self._within("assembly", SHELTER_REACH_M) or any(math.dist(point, self.agent.xy_m) < SHELTER_REACH_M for point in self.built)
+        return not self.roof_lost and (self._within("assembly", SHELTER_REACH_M) or any(math.dist(point, self.agent.xy_m) < SHELTER_REACH_M for point in self.built))
 
     def step(self) -> dict | None:
         t = len(self.steps)

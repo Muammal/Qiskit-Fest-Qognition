@@ -4,6 +4,7 @@ from __future__ import annotations
 from stranded_physics.core.api import Percept, ScenarioPack, XY
 
 FLOW_SIGHT_M = 1000.  # assumption: T0 sighting distance for a moving flow front. WS6 replaces this.
+SO2_SMELL_UG_M3 = 2600.  # About 1 ppm, the usual odour threshold for SO2. From memory; check in T-104.
 
 
 def perceive(pack: ScenarioPack, xy_m: XY, t_s: float) -> Percept:
@@ -21,7 +22,7 @@ def perceive(pack: ScenarioPack, xy_m: XY, t_s: float) -> Percept:
     return Percept(
         t_s=t_s,
         felt_tremor=sign("eruption.tremor"),
-        gas_smell=sign("eruption.gas"),
+        gas_smell=sign("eruption.gas") or (pack.has("gas.so2_concentration") and pack.sample("gas.so2_concentration", xy_m, t_s) >= SO2_SMELL_UG_M3),
         explosion_heard=sign("eruption.explosion"),
         ash_kg_m2=pack.sample("tephra.deposit_load", xy_m, t_s) if pack.has("tephra.deposit_load") else 0.,
         rain_mm_h=float(pack.series("atmos.rain_rate")[now]),
