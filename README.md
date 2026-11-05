@@ -1,235 +1,295 @@
-# Quantum Cognition Simulation: Decision-Making & Multi-Scenario Survival
+# Quantum Cognition Simulation: Decision-Making & Multi-Scenario Evacuation Survival
 
-[![Integration Tests](https://img.shields.io/badge/tests-31%20passed-brightgreen.svg)](#daily-integration--testing)
+[![Integration Tests](https://img.shields.io/badge/tests-816%20passed-brightgreen.svg)](#daily-integration--verification-testing)
 [![Qiskit](https://img.shields.io/badge/Qiskit-2.x-6929C4.svg)](https://qiskit.org/)
-[![Status](https://img.shields.io/badge/Multi--Scenario-Integrated-success.svg)](#architecture--team-boundaries)
-[![Resolution](https://img.shields.io/badge/Resolution-1600%C3%97900%20(Fullscreen%20Scaled)-blueviolet.svg)](#fullscreen--interactive-controls)
+[![Status](https://img.shields.io/badge/Tech%20A%20%2B%20B%20%2B%20C%20%2B%20D-Unified-success.svg)](#unified-track-documentation-tech-a--tech-b--tech-c--product-d)
+[![Resolution](https://img.shields.io/badge/Resolution-1600%C3%97900%20(Aspect%20Scaled)-blueviolet.svg)](#fullscreen--interactive-controls)
+[![Physics Gates](https://img.shields.io/badge/Physics%20Gates-22%2F22%20PASS-success.svg)](#daily-integration--verification-testing)
 
-> **"Can quantum probability explain why humans make counterintuitive survival decisions under extreme environmental stress?"**
+> **"Can quantum probability explain why humans make counterintuitive evacuation and survival decisions under extreme environmental stress — and how can we use it to improve real-life evacuation survival rates?"**
 
-**Quantum Cognition Simulation** is an interactive multi-scenario cognitive modeling sandbox built for an advanced quantum hackathon. The system simulates human decision-making under existential pressure by contrasting a **2-qubit quantum cognition circuit** (exhibiting non-commuting order effects, constructive interference, and physiological stress decoherence) against an empirical **classical rational baseline** (derived from American Time Use Survey utility priors).
+> **Start here:** The project notebook, [`notebooks/stranded_quantum_cognition.ipynb`](notebooks/stranded_quantum_cognition.ipynb), documents the theoretical foundations, empirical calibration against 49 disaster datasets, and complete engine verification.
+
+**Quantum Cognition Simulation** is an interactive multi-scenario cognitive modeling, crowd evacuation, and physical hazard platform. The simulator evaluates human decision-making under existential pressure across **five historical and physical evacuation scenarios** plus an **Interactive Scenario Builder**. It models the cognitive mechanisms behind human hesitation and panic by contrasting a **2-qubit quantum cognition architecture**—alongside **6 quantum cognition models adapted from published literature**—against a **zero-coherence classical mixture control ($\lambda=1$)** and a **classical rational utility baseline**.
+
+---
+
+## The Scientific Problem: Why Classical Models Fail in Evacuations
+
+In real disasters—such as volcanic eruptions, maritime sinkings, building fires, and toxic industrial leaks—human evacuees consistently exhibit three systematic departures from classical expected-utility theory:
+
+1. **Normalcy Bias & Disjunction Effect (Tversky & Shafir, 1992)**  
+   When environmental cues are ambiguous ($p_{\text{danger}} \approx 0.5$), people delay protective action at rates lower than *both* conditional scenarios ($P(\text{protect}|\text{safe})$ and $P(\text{protect}|\text{danger})$). In classical probability, the Law of Total Probability mandates:
+   $$P_{\text{classical}}(\text{protect}) = (1-p)q_S + p q_D$$
+   In real life, people wait for confirmation. Quantum cognition models this as **destructive wave interference** ($2c\,\text{Re}(\rho_{01}) > 0$), reducing protective action by **18%** below classical predictions and capturing real-life delays before evacuation begins.
+
+2. **Cue Order Effects (Wang & Busemeyer, 2014 *PNAS*)**  
+   Observing a mild tremor followed by a dark gas plume (`tremor → gas_plume`) yields a significantly higher evacuation rate ($\Delta P = +14\%\text{ to }+33\%$) than experiencing the plume first and then the tremor (`gas_plume → tremor`), even though the total factual evidence is identical. In quantum mechanics, belief operators do not commute:
+   $$[U_{\text{tremor}}, U_{\text{gas}}] \neq 0$$
+
+3. **Stress Dephasing & Alarm Collapse (Broekaert et al., 2020)**  
+   Acute physiological and psychological stress damps off-diagonal quantum coherence ($\lambda \to 1$). Furthermore, clear, unambiguous evacuation alarms trigger **projective measurement collapse** ($\rho_{01} \to 0$), destroying hesitation and aligning the population toward coordinated flight.
+
+---
+
+## Mathematical Architecture: How the Quantum Mind Works
+
+```mermaid
+flowchart TD
+    subgraph PERCEPT["1. Environmental Perception (contracts.py)"]
+        ENV["Perceived Cue e\n(tremor, gas_plume, alarm, etc.)"]
+        STRESS["Physiological Stress\n(0.0 to 1.0)"]
+    end
+
+    subgraph STATE["2. Density Matrix Evolution (mind/belief.py)"]
+        RHO["Belief Qubit State ρ\non H_belief (C^2)"]
+        GATE{"Is Cue Ambiguous\nor Certain Danger?"}
+        ROT["Non-Commuting SU(2) Rotation\nRy(θ_e) Rz(φ_e)"]
+        COLLAPSE["Projective Lüders Collapse\nP_danger = |1><1|"]
+        DEPHASE["Kraus Stress Dephasing\nλ = 1 - exp(-2.5 * stress^2)"]
+    end
+
+    subgraph ACTION["3. Deliberation & Action Selection (mind/model.py)"]
+        UNITARY["SO(4) Deliberation Unitary U(q_S, q_D)\nCoupling Belief & Action Qubits"]
+        PROB["P_q(protect) = Classical Mixture - 2c * Re(ρ_01)"]
+        CONTRACT["Sample Action a in contracts.ACTIONS\n(hide, build_shelter, forage, drink, rest, explore, craft)"]
+    end
+
+    ENV --> GATE
+    GATE -- "Ambiguous (tremor, gas)" --> ROT
+    GATE -- "Certain (eruption, alarm)" --> COLLAPSE
+    ROT --> DEPHASE
+    STRESS --> DEPHASE
+    COLLAPSE --> RHO
+    DEPHASE --> RHO
+    RHO --> UNITARY
+    UNITARY --> PROB
+    PROB --> CONTRACT
+```
+
+### 1. Hilbert Space $\mathcal{H}_{\text{belief}} \otimes \mathcal{H}_{\text{action}}$ ($\mathbb{C}^2 \otimes \mathbb{C}^2$)
+- **Qubit 0 (Belief)**: Basis $\{|0\rangle = |\text{safe}\rangle, |1\rangle = |\text{danger}\rangle\}$. Initialized from the agent's baseline needs: $p_0 = 1 - \text{safety}$.
+- **Qubit 1 (Action Tendency)**: Basis $\{|0\rangle = |\text{carry-on}\rangle, |1\rangle = |\text{protect}\rangle\}$.
+
+### 2. Belief Evolution & Stress Dephasing
+- Ambiguous hazard cues apply unitary rotation $U_e = R_y(\theta_e)R_z(\phi_e)$.
+- Stress drives phase-damping channel $\mathcal{E}_\lambda(\rho)$ with decay rate:
+  $$\lambda = 1 - \exp(-2.5\,\text{stress}^2), \qquad \rho_{01} \mapsto (1-\lambda)\rho_{01}$$
+- Unambiguous alarms apply projective measurement: $\rho \mapsto \Pi_{\text{danger}} \rho \Pi_{\text{danger}} / \text{Tr}(\Pi_{\text{danger}} \rho)$.
+
+### 3. Deliberation Unitary & Interference Formula
+Coupling belief and action via $U(q_S, q_D)$ produces the final probability of taking protective action:
+$$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture } (\lambda=1)} - \underbrace{2\left(\sqrt{(1-q_S)q_D} + \sqrt{q_S(1-q_D)}\right)\text{Re}(\rho_{01})}_{\text{Quantum Interference Term}}$$
+
+---
+
+## Five Evacuation Scenarios + Custom Scenario Builder
+
+| # | Scenario | Scale & Population | Physical Hazard Engine | Key Evacuation & Survival Insight |
+|---|---|---|---|---|
+| **1** | **Island Wilderness (`island`)** | 1 agent, 36 steps (72 h) | 40×40 DEM, Markov storms, hypothermia, dehydration | Grover DTQW quantum walk accelerates finding freshwater/shelter before storm arrival |
+| **2** | **Volcano Evacuation (`volcano`)** | 1–5 agents, 36 steps | Caldera DEM, active PDCs, surges, lahars, downwind ash, Tobler hiking paths | Cue order effect (`Tremor → Gas` vs `Gas → Tremor`) produces $\pm 15.6\%$ swing in evacuation timing |
+| **3** | **RMS Titanic 1912 (`titanic`)** | **2,208 agents** across 10 decks | Progressive compartment flooding & 20 lifeboats (`1,178` seats, Wormstedt schedule) | Unambiguous PA alarm + open boarding on both sides raises quantum survival from **578** (`26.2%`) to **1,027** (`46.5%`, **+449 lives saved**) |
+| **4** | **Pompeii AD 79 (`pompeii`)** | **11,500 citizens** across households | Plinian column, pumice load, roof collapse, pyroclastic surges (`engine/eruption.py`) | Ambiguous cue framing (`Mapping C`) causes **644 deaths** from quantum hesitation vs. **287** under classical mixture |
+| **5** | **Waterloo Chlorine Leak (`waterloo`)** | **100 swimmers & staff** | 2D advection-diffusion chlorine plume (`engine/chlorine.py`), EPA AEGL thresholds | Unambiguous staff alarm eliminates hesitation, cutting disabling AEGL-2 chlorine exposure by **28%** |
+| **6** | **Scenario Builder (`engine/builder.py`)** | Custom multi-person packs | In-engine interactive terrain, hazard, and multi-agent placement editor | Design, test, and replay custom evacuation and crisis scenarios directly in the GUI (`[B]`) |
 
 ---
 
 ## Visual Interface & Simulation Showcase
 
-The application features a modern 1600×900 visualizer with dynamic vector graphics, atmospheric particle systems, aspect-scaled fullscreen scaling, and real-time cognitive telemetry.
+The application features a 1600×900 visualizer with dynamic relief shading, atmospheric particle systems, letterboxed aspect scaling, and live quantum telemetry.
 
 ### 1. Scenario Selection Hub (`Screen 0`)
-The initial screen presented on launch allows players to choose their survival environment: **Island Wilderness** or **Volcano Evacuation**. Features interactive hover glows, metadata pill badges, and direct keyboard navigation (`[1]` / `[2]`).
+Select between **Island Wilderness**, **Volcano Evacuation**, **RMS Titanic**, **Pompeii**, **Waterloo Chlorine Leak**, or the **Interactive Scenario Builder**. Features metadata badges and hotkey access (`[1]`–`[5]`, `[B]`).
 
 ![Scenario Selection Hub](docs/images/01_event_choice_hub.png)
 
 ---
 
-### 2. Scenario Configuration & Seed Hub (`Screen 1`)
-An interactive pre-flight dashboard equipped with real-time procedural minimap generation, seed steppers (±1, ±10, ±100, randomize), cognitive architecture toggles (**2-Qubit Quantum Mind** vs **Classical Rational Mind**), scenario presets, and configurable simulation horizons (12, 24, 36 steps).
+### 2. Scenario Configuration & 3-Mind Selector (`Screen 1`)
+Pre-flight dashboard featuring a live 300×300 topographic minimap, seed steppers (±1, ±10, ±100, random), and the 3-Card Mind Architecture selector (**2-Qubit Quantum Mind** $\to$ **Classical Mixture Control** $\to$ **Classical Rational Mind**).
 
 ![Scenario Configuration & Seed Hub](docs/images/02_home_configuration.png)
 
 ---
 
-### 3. Island Wilderness Survival Simulation (`Screen 2 - Island Mode`)
-Real-time 40×40 procedural island simulation. Features animated survival agent movement (smooth lerp interpolation with idle bobbing), vital physiological telemetry bars (hunger, thirst, warmth, energy, safety, morale), quantum probability breakdown, inventory tracking, and dynamic weather particle effects.
+### 3. RMS Titanic 1912 Evacuation Simulation (`Screen 2 - Titanic Mode`)
+Simulates all 2,208 passengers and crew across 10 vertical decks. Features progressive compartment flood lines, 20 lifeboat davit stations, crowd stairwell bottlenecks, and hypothermia tracking.
 
-![Island Wilderness Survival](docs/images/03_island_survival_sim.png)
-
----
-
-### 4. Volcano Eruption Evacuation Simulation (`Screen 2 - Volcano Mode`)
-Calibrated 40×40 volcanic topography with active central caldera, dynamic seismic tremors, lava meanders, fast pyroclastic density currents (PDCs), toxic ash fallout, dynamic hazard risk zoning (Safe / Caution / Danger), and BFS shortest-path evacuation paths to coastal assembly zones.
-
-![Volcano Eruption Evacuation](docs/images/04_volcano_evacuation_sim.png)
+![RMS Titanic Evacuation](docs/images/06_titanic_evacuation_sim.png)
 
 ---
 
-### 5. Mission Debrief & Comparative Analysis (`Debrief Modal`)
-End-of-event telemetry modal summarizing the agent's survival outcome, cause of death (if fatal), full step-by-step decision trajectory, and quantum vs classical cognitive divergence with instant replay capabilities.
+### 4. Pompeii AD 79 Evacuation Simulation (`Screen 2 - Pompeii Mode`)
+Simulates 11,500 Roman citizens across domestic households. Features dual-map views (City street grid and Regional Bay of Naples view), falling pumice roof collapse hazards, and gate congestion.
+
+![Pompeii Evacuation](docs/images/07_pompeii_evacuation_sim.png)
+
+---
+
+### 5. Waterloo Aquatic Facility Chlorine Leak (`Screen 2 - Waterloo Mode`)
+Simulates 100 visitors and staff escaping a 2D toxic gas plume. Features live chlorine concentration (PPM), odour detection thresholds, staff alarm triggers, and EPA AEGL-1/2/3 exposure reporting.
+
+![Waterloo Chlorine Sim](docs/images/08_waterloo_chlorine_sim.png)
+
+---
+
+### 6. Interactive Scenario Builder (`Screen - Builder Mode`)
+Create custom crisis scenarios. Draw terrain elevation, place water and shelter, configure volcanic or chemical hazard sources, spawn agents with different cognitive minds, and export portable scenario packs.
+
+![Scenario Builder](docs/images/09_scenario_builder.png)
+
+---
+
+### 7. Island Wilderness & Volcano Evacuation Simulations
+Procedural 40×40 topographic island wilderness and volcanic evacuation environments featuring Tobler hiking routes, active pyroclastic flows, and Elixir/Gold physiological telemetry bars.
+
+<p align="center">
+  <img src="docs/images/03_island_survival_sim.png" width="48%" />
+  <img src="docs/images/04_volcano_evacuation_sim.png" width="48%" />
+</p>
+
+---
+
+### 8. Mission Debrief & Comparative Telemetry Modal
+End-of-simulation telemetry modal displaying survivor status, cause of death, physiological logs, and instant single-click buttons for replay or mind-to-mind comparison on the exact same seed.
 
 ![Mission Debrief Modal](docs/images/05_mission_debrief.png)
 
 ---
 
-## Dual Simulation Scenarios
-
-Players can explore two fundamentally distinct environmental and psychological challenges:
-
-### 🏝️ Scenario A: Island Wilderness Survival
-- **Procedural Topography**: Unique 40×40 archipelago generated from a procedural seed with organic coastline harmonics, dense pine forests, freshwater springs, and alpine snowcaps.
-- **Resource Economy**: Full survival loop including wood harvesting, food foraging, shelter construction, and hydration management.
-- **Stochastic Environment**: Dynamic weather transitions (Markov rain, maritime storms, freezing nights) and territorial wildlife encounters (wild boars).
-- **Quantum Mechanics**: Superposition exploration walks across uncharted land and belief interference under cold exposure.
-
-### 🌋 Scenario B: Volcano Eruption Evacuation
-- **Calibrated Geography**: Fixed 40×40 volcanic island featuring a central volcanic crater, radial drainage valleys, and designated coastal assembly points (250m per tile scale).
-- **Hazard Clock**: Seeded hidden unrest, precursory tremors, sulfur gas plumes, explosive eruptions, lava flows, and lethal pyroclastic surges.
-- **Emergency Routing**: Dynamic evacuation zoning with automated BFS pathfinding guiding the agent away from danger zones toward clean water springs and rescue points.
-- **Quantum Mechanics**: Order effects under seismic warnings (e.g. tremor then gas plume vs gas plume then tremor) and rapid threat-induced decoherence.
-
----
-
-## Architecture & Codebase Layout
-
-The project enforces clean separation between the shared physics/world engine, cognitive models, frozen contracts, and frontend visualizers:
+## Codebase Architecture
 
 ```
 QWC/
-├── contracts.py                  # Frozen interfaces, state validation & heuristic stubs
-├── requirements.txt              # Pinned dependency environment (pygame-ce, qiskit, pytest)
-├── main.py                       # Unified entrypoint (GUI, CLI demo, batch benchmark, tests)
-├── test_contracts_and_engine.py  # Comprehensive integration test suite (31 tests)
-├── timeline.json                 # Standardized simulation run output schema
-├── docs/                         # Theory, mathematical models & assets
-│   ├── images/                   # High-resolution screenshots of the UI and simulation
-│   │   ├── 01_event_choice_hub.png
-│   │   ├── 02_home_configuration.png
-│   │   ├── 03_island_survival_sim.png
-│   │   ├── 04_volcano_evacuation_sim.png
-│   │   └── 05_mission_debrief.png
-│   ├── VOLCANO_MODEL.md          # Volcanic hazard assumptions, constants & JSON schema
-│   ├── 01_THEORY_AND_ARCHITECTURAL_FOUNDATIONS.md
-│   └── 03_CODEBASE_IMPLEMENTATION_AND_MODULES.md
-├── engine/                       # World, volcano, agents & simulation engine
-│   ├── world.py                  # Dual-scenario map generator (procedural island & fixed volcano)
-│   ├── volcano.py                # Hazard model (unrest, lava, PDCs, ash fallout)
-│   ├── agent.py                  # Physiological state, needs decay, lethal thresholds & movement
-│   ├── events.py                 # Environmental weather & contextual activity triggers
-│   ├── simulation.py             # Shared simulation loop emitting timeline.json
-│   ├── batch_runner.py           # Multi-seed batch comparison & demo curation
-│   └── gui.py                    # 1600x900 interactive Pygame UI with vector graphics & particles
-└── demo-pack/                    # Curated signature runs for frontend replay
-    ├── run_01_heroic_survival.json
-    ├── run_02_dramatic_death.json
-    ├── run_03_order_effect_quantum.json
-    ├── run_04_order_effect_classical.json
-    └── run_05_stress_decoherence.json
+├── contracts.py                  # Frozen interfaces, Grover DTQW explore_step & classical baseline
+├── data/priors.json              # BLS ATUS baseline time-use priors
+├── main.py                       # Unified executable entrypoint (GUI, CLI, demo, batch, exports)
+├── test_contracts_and_engine.py  # Contract and engine integration test suite
+├── test_titanic.py               # RMS Titanic scenario verification suite
+├── test_pompeii.py               # Pompeii AD 79 scenario verification suite
+├── test_waterloo.py              # Waterloo chlorine leak scenario verification suite
+├── mind/                         # Tech A: 2-Qubit Quantum Cognitive Architecture
+│   ├── model.py                  # Deliberation unitary U(q_S, q_D) & Tversky-Shafir calibration
+│   ├── cognition_models.py       # 6 published quantum cognition models (Busemeyer, QLBN, Lindblad, etc.)
+│   ├── belief.py                 # Density-matrix belief state, Ry*Rz event gates & collapse
+│   ├── decoherence.py            # Stress-driven Kraus dephasing & Lindblad open-system channel
+│   ├── quantum_mind.py           # quantum_decide & classical_mixture_decide implementations
+│   ├── circuits.py               # Gate-level Qiskit circuits with mid-circuit measurement
+│   ├── human_tests/              # Pre-registered empirical human decision benchmark suites
+│   └── tests/                    # Tech A unit & Qiskit verification tests
+├── stranded_physics/             # Tech B: 14-Domain Empirical Physics Framework
+│   ├── scenarios.py              # 9 concrete geophysical solvers (La Soufrière 2021)
+│   ├── core/                     # Pint unit registry, FieldStore, Parameter & verdicts
+│   ├── domains/                  # 14 hazard domains (terrain, pdc, tephra, gas, storm, ship, sea, etc.)
+│   ├── runtime/                  # Causal perception, AgentBody & PackSimulation
+│   ├── catalog.py                # Automated dataset & parameter catalog builder
+│   └── gates.py                  # Physical verification gate runner (22/22 PASS)
+├── engine/                       # Tech C: Multi-Scenario Evacuation Engine & Visualizer
+│   ├── world.py                  # Dual-scenario DEM, priority-flood drainage & Tobler pathfinder
+│   ├── volcano.py                # Ash grid, active PDC/lahar, surge & lava models
+│   ├── titanic.py                # RMS Titanic 2,208-agent simulation loop
+│   ├── flood.py                  # Titanic 10-deck compartment flood model
+│   ├── lifeboats.py              # 20 lifeboats, davit stations & loading schedule
+│   ├── pompeii.py                # Pompeii 11,500-citizen evacuation simulation loop
+│   ├── eruption.py               # Plinian column, pumice fall & pyroclastic flow model
+│   ├── waterloo.py               # Waterloo chlorine gas leak simulation loop
+│   ├── chlorine.py               # 2D advection-diffusion gas dispersion model
+│   ├── builder.py                # In-engine custom scenario creator
+│   ├── exporter.py               # Full MP4 video renderer & evacuation data exporter
+│   └── gui.py                    # 1600x900 interactive Pygame Visualizer & Dashboard
+├── artifacts/physics/raw/        # Tech B: 19 Verified Raw Data Assets (Copernicus DEM, FABDEM, etc.)
+├── exports/                      # Exported survival rates, policy CSVs, and full simulation videos
+└── site/                         # Product D: Client-Side Web Replay & Quantum Inspector (index.html)
 ```
 
 ---
 
-## Frozen Contracts (`contracts.py`)
+## Quickstart & Commands
 
-All cognitive decision engines plug into the strict interface defined in `contracts.py`:
-
-### Primitive Constants
-- **`ACTIONS`**: `["forage", "drink", "build_shelter", "rest", "explore", "craft", "hide"]`
-- **`EVENTS`**: `["storm", "injury", "find_food", "animal", "cold_night", "none", "tremor", "gas_plume", "eruption", "ash_fall"]`
-- **`TILE_TYPES`**: `{0: "water", 1: "plains", 2: "forest", 3: "mountain", 4: "shelter"}`
-
-### Interface Signatures
-```python
-def get_prior(state: dict) -> dict:
-    """Baseline habit distribution derived from physiological needs and ATUS tables."""
-
-def classical_decide(state: dict) -> dict:
-    """Rational classical decision baseline (deterministic prior utility argmax)."""
-
-def quantum_decide(state: dict) -> dict:
-    """2-Qubit quantum cognition decision engine (Qiskit 2.x)."""
-
-def explore_step(pos: list, world: Any, mode: str = "quantum") -> list:
-    """Discrete step generator: quantum walk superposition spread vs classical Brownian walk."""
-```
-
-### Standardized Decision Schema
-Every step output adheres strictly to:
-```json
-{
-  "action": "hide",
-  "probs": {
-    "forage": 0.05,
-    "drink": 0.05,
-    "build_shelter": 0.15,
-    "rest": 0.10,
-    "explore": 0.05,
-    "craft": 0.05,
-    "hide": 0.55
-  },
-  "reason": "Order effect: injury followed by storm induces constructive fear interference -> prioritizing safety"
-}
-```
-
----
-
-## The Quantum Cognition Model
-
-### 1. Non-Commuting Order Effects
-Classical Bayesian models assume events commute:
-$$P(A \cap B) = P(B \cap A)$$
-
-In human cognition under crisis, mental operators do not commute ($[U_A, U_B] \neq 0$). Experiencing an **injury followed by a storm** collapses the agent's belief state into defensive constructive interference favoring `hide` and `build_shelter`. Conversely, experiencing a **storm followed by an injury** channels beliefs toward physical recuperation (`rest`).
-
-### 2. Stress as Environmental Decoherence
-In physics, open quantum systems undergo decoherence ($T_1$ relaxation and $T_2$ dephasing) when coupled to a thermal bath. In this simulation, critical physiological stress (dehydration, hypothermia, acute predator threat):
-- Dampens cognitive interference patterns.
-- Decays off-diagonal density matrix terms, collapsing the pure quantum state into a classical mixed distribution.
-- Mechanistically replicates cognitive "tunnel vision" and survival panic.
-
----
-
-## Quickstart & Launch Commands
-
-### 1. Interactive Graphical Visualizer (Recommended)
-Launch the full desktop application:
+### 1. Launch Interactive Visualizer (Desktop GUI)
 ```bash
 python main.py
 ```
-This boots into the **Event Choice Hub**, where you can pick Island Survival or Volcano Evacuation, tweak seed/mind parameters, and run the real-time simulation.
 
-### 2. Headless & CLI Execution Modes
+### 2. Export Evacuation Datasets & Critical Seeds (CSV / JSON / Markdown)
+Generates comprehensive survival datasets and policy comparison tables into `exports/`:
 ```bash
-# Launch GUI directly with specific parameters
-python main.py --seed 42 --mind quantum --scenario island
-
-# ASCII terminal replay demo
-python main.py --demo --seed 101
-
-# Multi-seed batch divergence benchmark (Quantum vs Classical)
-python main.py --batch
-
-# Regenerate curated demo-pack/ timelines
-python main.py --curate
-
-# Run the automated test suite
-python main.py --test
+python main.py --export-data
 ```
 
----
+### 3. Export Full Simulation MP4 Videos (Normal, Slow-Mo, Fast-Forward)
+Renders complete runs from start to finish (including map, character, telemetry, and final debrief) into `exports/videos/`:
+```bash
+# Standard 1.0x speed video
+python main.py --export-video --scenario volcano --seed 101 --mind quantum
 
-## Fullscreen & Interactive Controls
+# Slow-Mo video (0.5x speed)
+python main.py --export-video --scenario volcano --seed 101 --mind quantum --video-speed 0.5
+
+# Full RMS Titanic sinking and lifeboat evacuation video
+python main.py --export-video --scenario titanic --seed 42 --mind quantum
+```
+
+### 4. Interactive Keyboard & Speed Controls
 
 | Screen | Control | Action |
 |---|---|---|
-| **Any Screen** | `F11` or `[Fullscreen]` Button | **Toggle Fullscreen / Windowed Mode** (with automatic aspect-ratio letterboxing) |
-| **Event Choice Hub** | `[1]` / `[2]` | **Select Island Survival** (`1`) or **Volcano Evacuation** (`2`) |
-| **Event Choice Hub** | Click on Card or Button | **Open Scenario Configuration** |
+| **Any Screen** | `F11` or `[Fullscreen]` | **Toggle Fullscreen / Windowed Mode** (aspect-ratio preserved) |
+| **Event Choice Hub** | `[1]` / `[2]` / `[3]` / `[4]` / `[5]` | **Select Island** (`1`), **Volcano** (`2`), **Titanic** (`3`), **Pompeii** (`4`), or **Waterloo** (`5`) |
+| **Event Choice Hub** | `B` or `[Build Scenario]` | **Launch Interactive Scenario Builder** |
 | **Configuration Hub** | `ENTER` or `SPACE` | **Launch Simulation** |
-| **Configuration Hub** | `ESC` or `< Change Scenario` | **Return to Event Choice Hub** |
+| **Configuration Hub** | `ESC` or `< Change Scenario` | **Return to Scenario Selection Hub** |
 | **Simulation View** | `SPACE` | **Play / Pause** auto-stepping |
-| **Simulation View** | `RIGHT ARROW` or `N` | **Step Forward** single 2-hour turn |
-| **Simulation View** | `Q` or `[Mind Toggle]` Button | **Toggle Mind Live** (Quantum Mind $\leftrightarrow$ Classical Baseline) |
-| **Simulation View** | `1` / `2` / `3` or `[Speed]` Button | **Cycle Speed** (1.0× normal, 2.5× fast, 6.0× instant) |
-| **Simulation View** | `E` | **Toggle Evacuation Map Overlay** (zones, assembly points, BFS paths) |
-| **Simulation View** | `TAB` or `[Log]` Button | **Toggle Chronological Action History Overlay** |
+| **Simulation View** | `RIGHT ARROW` or `N` | **Step Forward** single turn |
+| **Simulation View** | `[-]` / `[[]` or `[+]` / `[]]` | **Shift Time Speed** (Slow-Mo `0.1x`, `0.25x`, `0.5x` $\leftrightarrow$ Fast-Forward `2x`, `4x`, `8x`) |
+| **Simulation View** | `Q` or `[Mind Toggle]` | **Cycle Mind Live** (`Quantum` $\to$ `Classical Mixture` $\to$ `Classical Rational`) |
+| **Simulation View** | `V` or `[Rec Video]` | **Start / Stop Live MP4 Video Recording** to `exports/videos/` |
+| **Simulation View** | `K` | **Export Current Run Timeline & Evacuation Data** to `exports/` |
+| **Simulation View** | `F` | **Follow Next Person / Role** (in crowd scenarios & builder packs) |
+| **Simulation View** | `P` / `M` / `X` | **Toggle Split Panels** (`P`), **Region Map** (`M` in Pompeii), or **Skip Cutscene** (`X`) |
+| **Simulation View** | `E` | **Toggle Evacuation Map Overlay** (zones, assembly shelters, Dijkstra paths) |
+| **Simulation View** | `TAB` or `[Action Log]` | **Toggle Chronological Action History Overlay** |
 | **Simulation View** | `R` | **Reset Current Run** |
-| **Simulation View** | `ESC` or `H` or `[Menu]` Button | **Return to Home Configuration Screen** |
+| **Simulation View** | `ESC` or `H` or `[Menu]` | **Return to Home Configuration Screen** |
 
 ---
 
-## Daily Integration Testing
+## Daily Integration & Verification Testing
 
-The test suite validates contract integrity, terrain generation, physiological decay rates, volcanic hazards, agent movement, and GUI interaction:
+The entire repository is verified using automated test suites, physical gate runners, and Qiskit validation scripts:
 
-```bash
-python -m pytest test_contracts_and_engine.py -v
+```powershell
+# 1. Full unified pytest suite (Tech A + Tech B + Tech C + Titanic + Pompeii + Waterloo)
+$env:SDL_VIDEODRIVER="dummy"; $env:SDL_AUDIODRIVER="dummy"; python -m pytest -q
+# -> 816 passed, 3 skipped in 13m 19s
+
+# 2. Tech B 14-Domain Physical Verification Gates
+python -m stranded_physics.gates required
+# -> 22/22 PASS across all domains
+
+# 3. Automated Physical Parameter & Dataset Catalog Builder
+python -m stranded_physics.catalog
+# -> Generated workboard/CATALOG.md (49 datasets, 20 Pint parameters)
+
+# 4. Tech A Quantum Cognition Validation Suite
+python -m mind.experiments.validate
+# -> Generated docs/tech-a/07-validation-report.md (any_failed=False)
 ```
-All **31 integration tests** pass consistently across platforms.
 
 ---
 
 ## Citations & Theoretical References
 
-1. **Busemeyer, J. R., & Wang, Z. (2014).** *Quantum model of cognition and decision.* Current Directions in Psychological Science.
-2. **Pothos, E. M., & Busemeyer, J. R. (2022).** *Quantum cognition.* Annual Review of Psychology.
-3. **Qiskit Development Team (2025).** *Qiskit: An Open-source Framework for Quantum Computing.*
-4. **Bureau of Labor Statistics (BLS).** *American Time Use Survey (ATUS) Summary Tables.*
+1. **Busemeyer, J. R., & Bruza, P. D. (2012).** *Quantum Models of Cognition and Decision.* Cambridge University Press.
+2. **Pothos, E. M., & Busemeyer, J. R. (2009).** *A quantum probability explanation for violations of 'rational' decision theory.* Proceedings of the Royal Society B, 276(1665), 2171–2178.
+3. **Tversky, A., & Shafir, E. (1992).** *The disjunction effect in choice under uncertainty.* Psychological Science, 3(5), 305–309.
+4. **Wang, Z., Solloway, T., Shiffrin, R. M., & Busemeyer, J. R. (2014).** *Context effects produced by question orders reveal quantum nature of human judgments.* PNAS, 111(26), 9431–9436.
+5. **Broekaert, J., Busemeyer, J. R., & Pothos, E. M. (2020).** *The disjunction effect in two-stage simulated gambles: An experimental study and comparison of a heuristic, Markov, and quantum model.* Cognitive Psychology, 117, 101262.
+6. **Huang, Z., Yang, L., & Jiang, W. (2019).** *Uncertainty measurement with belief entropy on quantum model for decision making.* Applied Mathematics and Computation, 347, 417–428.
+7. **Moreira, C., & Wichert, A. (2016).** *Quantum-Like Bayesian Networks for modeling decision making.* Frontiers in Psychology, 7, 11.
+8. **Li, J.-A., Dong, D., Wei, Z., Liu, Y., Pan, Y., Nori, F., & Zhang, X. (2020).** *Quantum reinforcement learning during human decision-making.* Nature Human Behaviour, 4, 294–307.
+9. **Trueblood, J. S., & Busemeyer, J. R. (2011).** *A quantum probability account of order effects in inference.* Cognitive Science, 35(8), 1518–1552.
+10. **Tobler, W. (1993).** *Three Presentations on Geographical Analysis and Modeling.* NCGIA Technical Report 93-1.
+11. **Bureau of Labor Statistics (BLS).** *American Time Use Survey (ATUS) Summary Tables.*

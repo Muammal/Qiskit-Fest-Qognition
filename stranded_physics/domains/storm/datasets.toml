@@ -1,0 +1,28 @@
+# One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+# licence_confirmed stays false until T-104 reads each licence page.
+
+[[dataset]]
+id = "ibtracs_beryl_2024"
+kind = "storm best track"
+url = "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/ibtracs.since1980.list.v04r01.csv"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "e5658d44d6781268202a052640747425012143c4cec785925a6afe96d97296c4"
+licence = "To be read in T-104"
+licence_confirmed = false
+citation = "Knapp et al. (2010), International Best Track Archive for Climate Stewardship (IBTrACS). doi:10.1175/2009BAMS2755.1"
+split = "reference"
+content_check = "min_bytes:5000"
+notes = "beryl_2024.csv holds only Beryl 2024's rows and a few columns, cut from the full file, whose sha256 is 70a0191dfa495e49a4dd49d1c38e0451d48467bbcb789bdaf2dc01e8cc8744dc. The URL is the archive's usual path, and its exact match to the file held should be confirmed in T-104."
+
+[[dataset]]
+id = "ibtracs"
+kind = "tracks"
+url = "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/ibtracs.since1980.list.v04r01.csv"
+retrieved_utc = "2026-11-03T22:44:14.656192+00:00"
+sha256 = "70a0191dfa495e49a4dd49d1c38e0451d48467bbcb789bdaf2dc01e8cc8744dc"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Knapp, K. R., M. C. Kruk, D. H. Levinson, H. J. Diamond, and C. J. Neumann, 2010, BAMS 91, 363-376, doi:10.1175/2009BAMS2755.1; and Gahtan, J., et al., 2024, IBTrACS Project, Version 4r01, NOAA NCEI, doi:10.25921/82ty-9e16, as requested on the provider page."
+split = "calibration"
+content_check = "min_bytes:10000"
+notes = "file: raw/ibtracs_since1980.csv"

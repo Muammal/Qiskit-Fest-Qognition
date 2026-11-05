@@ -1,0 +1,100 @@
+# terrain T1 settings. These are choices, not measurements, so none of them can count as agreement.
+
+[[parameter]]
+id = "terrain.grid_x0"  # Western edge, snapped to the spacing, past the island at 61.30 W.
+value = 684000.0
+unit = "m"
+valid_min = 660000.0
+valid_max = 700000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.grid_y0"  # Northern edge, snapped to the spacing, past the island at 13.42 N.
+value = 1484460.0
+unit = "m"
+valid_min = 1470000.0
+valid_max = 1500000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.grid_dx"  # Hazards need valley-scale detail; about three GLO-30 cells.
+value = 90.0
+unit = "m"
+valid_min = 30.0
+valid_max = 500.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.grid_nx"
+value = 270
+unit = "dimensionless"
+valid_min = 1
+valid_max = 2000
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.grid_ny"
+value = 397
+unit = "dimensionless"
+valid_min = 1
+valid_max = 2000
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.land_fraction"  # A cell is land when at least this share of its source cells stands above sea level.
+value = 0.5
+unit = "dimensionless"
+valid_min = 0.0
+valid_max = 1.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.channel_area"  # A cell counts as a channel with this much upslope area, about 30 cells.
+value = 250000.0
+unit = "m**2"
+valid_min = 10000.0
+valid_max = 10000000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.zone_danger"  # Rough stand-in for the 2021 red zone. A digitised official map would replace it.
+value = 8000.0
+unit = "m"
+valid_min = 1000.0
+valid_max = 20000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.zone_caution"  # Rough stand-in for the 2021 orange zone.
+value = 10000.0
+unit = "m"
+valid_min = 1000.0
+valid_max = 30000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.valley_window"  # Neighbourhood for finding valley floors, about 1 km across.
+value = 11
+unit = "dimensionless"
+valid_min = 3
+valid_max = 101
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "terrain.valley_depth"  # A valley floor sits at least this far below its neighbourhood mean.
+value = 15.0
+unit = "m"
+valid_min = 1.0
+valid_max = 200.0
+role = "convention"
+status = "assumption"

@@ -1,0 +1,68 @@
+# One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+# No observed winds at St Vincent are held for Beryl yet, so the real-data results are reported, not scored.
+
+[[gate]]
+id = "storm-model"
+title = "Holland wind profile and track replay hold on test data"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/storm/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/storm/*.py", "stranded_physics/domains/storm/params.toml", "stranded_physics/domains/storm/tests/*.py"]
+required = false
+
+[[gate]]
+id = "storm-beryl-peak"
+title = "Peak modelled wind at Kingstown during Hurricane Beryl (reported, no target)"
+kind = "validation"
+scenario = "beryl_2024"
+command = "python -m stranded_physics.domains.storm.measure beryl_peak"
+inputs = ["stranded_physics/domains/storm/*.py", "stranded_physics/domains/storm/params.toml", "stranded_physics/domains/storm/datasets.toml"]
+required = false
+expect = "NO_TARGET"
+role = "prediction"
+split = "reference"
+source = "No wind observation at St Vincent is held for Beryl. A local record would turn this into a scored check."
+
+[[gate]]
+id = "storm-cyclone-rate"
+title = "Named storms per year near St Vincent since 1980 (reported, no target)"
+kind = "validation"
+scenario = "beryl_2024"
+command = "python -m stranded_physics.domains.storm.measure cyclone_rate"
+inputs = ["stranded_physics/domains/storm/*.py", "disaster_data/catalog/cyclones_near_study_islands.csv"]
+required = false
+expect = "NO_TARGET"
+role = "input"
+split = "reference"
+source = "Counted from disaster_data/catalog/cyclones_near_study_islands.csv, built from IBTrACS."
+
+[[gate]]
+id = "storm.records_and_units"
+title = "Storm parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/storm'); load_datasets(p/'datasets.toml', 'storm'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/storm/datasets.toml", "stranded_physics/domains/storm/params.toml"]
+required = true
+
+# Generated storms, sampled from real tracks. These check statistics, because a made-up storm has no record of its own.
+
+[[gate]]
+id = "storm-generator"
+title = "Generated storms obey their rules: straight track, closest pass, dials, repeatability"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/storm/tests/test_generator.py -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/storm/generator.py", "stranded_physics/domains/storm/params.toml", "stranded_physics/domains/storm/tests/test_generator.py"]
+required = false
+
+[[gate]]
+id = "storm-wind-holdout"
+title = "Peak winds sampled from storms before 2005 match those recorded since (Kolmogorov-Smirnov distance)"
+kind = "validation"
+scenario = "generated_storm"
+command = "python -m stranded_physics.domains.storm.measure wind_holdout"
+inputs = ["stranded_physics/domains/storm/generator.py", "stranded_physics/domains/storm/measure.py", "stranded_physics/domains/storm/params.toml", "disaster_data/catalog/cyclones_near_study_islands.csv"]
+required = false
+target = 0.0
+tolerance = 0.25
+role = "prediction"
+split = "holdout"
+source = "IBTrACS rows in disaster_data/catalog/cyclones_near_study_islands.csv: the generator may read only rows with season before 2005; this compares with the rest"

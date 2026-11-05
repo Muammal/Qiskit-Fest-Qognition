@@ -1,0 +1,14 @@
+# One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+
+[[dataset]]
+id = "noaa_tsunamis"
+kind = "catalogue"
+url = "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/tsunamis/events?itemsPerPage=200&page=1"
+retrieved_utc = "2026-11-03T22:39:44.862930+00:00"
+sha256 = "93cefd53fe668a192fc074d2242471db1e0e40da6637a29a4288b4467ad16bcc"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "NCEI/WDS Global Historical Tsunami Database. Citation requested on the provider page: 'Please cite this data/database as: doi:10.7289/V5PN93H7'."
+split = "calibration"
+content_check = "min_bytes:1000"
+notes = "file: raw/noaa_tsunamis.json"

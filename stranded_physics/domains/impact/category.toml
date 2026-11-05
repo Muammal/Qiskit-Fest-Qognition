@@ -1,0 +1,9 @@
+id = "impact"
+title = "Fatalities and evacuation records"
+status = "data_only"
+owner = ""
+first_model = ""
+owns = "fatalities by hazard and distance, evacuation counts, damage records, used as validation targets"
+must_not_own = "any model. These are targets, never inputs"
+outputs = []
+wanted = ["Brown et al. 2017 fatalities database", "EM-DAT records (needs registration)"]

@@ -1,0 +1,157 @@
+# One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+# Holdout targets come from Cole et al., accepted manuscript of Geological Society Special Publication 539. They were committed
+# before the flow model was written or run. A FAIL here is a real result about a simple model, and is not to be tuned away.
+
+[[gate]]
+id = "pdc-model"
+title = "Energy line, barriers, arrival order and time rules hold on test terrain"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/pdc/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/pdc/*.py", "stranded_physics/domains/pdc/params.toml", "stranded_physics/domains/pdc/tests/*.py"]
+required = true
+
+[[gate]]
+id = "pdc-reaches-west-sea"
+title = "Dense flows reach the sea on the west flank"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows west_sea"
+inputs = ["stranded_physics/domains/pdc/*.py", "stranded_physics/domains/pdc/params.toml", "stranded_physics/domains/terrain/*.py", "stranded_physics/validation/st_vincent_flows.py"]
+required = false
+target = 1.0  # 1 when any flow cell touches the sea on bearings 225 to 315 degrees from the vent.
+tolerance = 0.0
+role = "prediction"
+split = "holdout"
+source = "Cole et al.: 'Dense PDCs reached the sea only in the Larikai and Roseau Valleys', on the West flank"
+
+[[gate]]
+id = "pdc-sea-only-on-west"
+title = "Share of flow cells touching the sea that lie off the west flank"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows sea_off_west"
+inputs = ["stranded_physics/domains/pdc/*.py", "stranded_physics/domains/pdc/params.toml", "stranded_physics/domains/terrain/*.py", "stranded_physics/validation/st_vincent_flows.py"]
+required = false
+target = 0.0
+tolerance = 0.1
+role = "prediction"
+split = "holdout"
+source = "Cole et al.: 'Dense PDCs reached the sea only in the Larikai and Roseau Valleys', on the West flank"
+
+[[gate]]
+id = "pdc-southeast-reach"
+title = "Flows on the southeast flank stop near the crater"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows southeast_reach_km"
+inputs = ["stranded_physics/domains/pdc/*.py", "stranded_physics/domains/pdc/params.toml", "stranded_physics/domains/terrain/*.py", "stranded_physics/validation/st_vincent_flows.py"]
+required = false
+target = 1.8  # Kilometres from the vent on bearings 112 to 157 degrees: about 1 km past a rim about 0.8 km out.
+tolerance = 1.0
+role = "prediction"
+split = "holdout"
+source = "Cole et al.: PDCs 'extended short distances (approximately 1 km) down valleys to the southeast'"
+
+[[gate]]
+id = "pdc-first-flow-time"
+title = "First flow starts at the published time"
+kind = "verification"
+command = "python -m stranded_physics.validation.st_vincent_flows first_flow_h"
+inputs = ["stranded_physics/domains/pdc/*.py", "stranded_physics/domains/pdc/params.toml", "stranded_physics/validation/st_vincent_flows.py"]
+required = false
+target = 69.5  # Hours after 8 April 00:00 UTC, which is 21:30 UTC on 10 April. An input, so this only checks it was read correctly.
+tolerance = 0.5
+role = "input"
+split = "reference"
+source = "Cole et al.: 'onset of the first significant PDC activity was associated with U3 activity from 21:30 UTC on 10th April'"
+
+[[gate]]
+id = "pdc.records_and_units"
+title = "Pdc parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/pdc'); load_datasets(p/'datasets.toml', 'pdc'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/pdc/datasets.toml", "stranded_physics/domains/pdc/params.toml"]
+required = true
+
+# T2: a depth-averaged solver. Its settings were committed before it existed, and the real-world targets match T1's.
+# The targets were already known from T1, so these checks are blind to the result, but not to the target.
+
+[[gate]]
+id = "pdc-t2-solver"
+title = "Depth-averaged solver matches exact answers: dam break, lake at rest, parabolic bowl, friction"
+kind = "verification"
+command = "python -m pytest stranded_physics/solvers/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/solvers/tests/*.py"]
+required = true
+
+[[gate]]
+id = "pdc-t2-volume"
+title = "Released flow volume is conserved on the real island"
+kind = "verification"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 volume_error"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+target = 0.0
+tolerance = 0.000001
+role = "anchor"
+split = "reference"
+source = "Conservation of volume, counting what leaves into the sea"
+
+[[gate]]
+id = "pdc-t2-reaches-west-sea"
+model = "t2"
+title = "T2: dense flows reach the sea on the west flank"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 west_sea"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+target = 1.0
+tolerance = 0.0
+role = "prediction"
+split = "holdout"
+source = "Cole et al.: flows 'reached the sea in the Larikai and the Roseau valleys on the western and south-western flank of the volcano only'"
+
+[[gate]]
+id = "pdc-t2-sea-only-on-west"
+model = "t2"
+title = "T2: share of flow cells touching the sea that lie off the west flank"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 sea_off_west"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+target = 0.0
+tolerance = 0.1
+role = "prediction"
+split = "holdout"
+source = "Cole et al.: flows 'reached the sea in the Larikai and the Roseau valleys on the western and south-western flank of the volcano only'"
+
+[[gate]]
+id = "pdc-t2-southeast-reach"
+model = "t2"
+title = "T2: flows on the southeast flank stop near the crater"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 southeast_reach_km"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+target = 1.8
+tolerance = 1.0
+role = "prediction"
+split = "holdout"
+source = "Cole et al.: PDCs 'extended short distances (approximately 1 km) down valleys to the southeast'"
+
+[[gate]]
+id = "pdc-t2-grid-sensitivity"
+model = "t2"
+title = "T2: how far the furthest reach moves between 180 m and 90 m cells (reported, no target)"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.validation.st_vincent_flows_t2 grid_sensitivity"
+inputs = ["stranded_physics/solvers/*.py", "stranded_physics/domains/pdc/model_t2.py", "stranded_physics/domains/pdc/params_t2.toml", "stranded_physics/validation/st_vincent_flows_t2.py"]
+required = false
+expect = "NO_TARGET"
+role = "input"
+split = "reference"
+source = "Real terrain has no exact answer, so this sizes the grid's effect rather than passing or failing it."

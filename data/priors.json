@@ -1,0 +1,30 @@
+{
+  "source": "Bureau of Labor Statistics (BLS) American Time Use Survey (ATUS) Summary Tables (Table A-1)",
+  "description": "Baseline human activity priors and homeostatic urgency weights mapped to the 7 survival actions.",
+  "atus_daily_hours_reference": {
+    "rest": 9.58,
+    "forage": 2.15,
+    "drink": 0.65,
+    "build_shelter": 1.85,
+    "craft": 1.42,
+    "explore": 1.25,
+    "hide": 0.45
+  },
+  "base_uniform_weight": 1.0,
+  "urgency_boosts": {
+    "thirst_critical_lt_0_3": 40.0,
+    "thirst_moderate_lt_0_5": 12.0,
+    "hunger_critical_lt_0_3": 8.0,
+    "hunger_moderate_lt_0_5": 4.0,
+    "warmth_critical_lt_0_4_with_wood": 12.0,
+    "warmth_critical_lt_0_4_no_wood": 10.0,
+    "warmth_moderate_lt_0_65_with_wood": 9.0,
+    "warmth_moderate_lt_0_65_no_wood": 6.0,
+    "daytime_explore_8_to_18": 3.0,
+    "night_rest_21_to_5": 6.0,
+    "low_safety_or_storm_hide": 4.0,
+    "volcanic_warning_hide": 6.0,
+    "energy_critical_lt_0_3_rest": 15.0
+  }
+}
+

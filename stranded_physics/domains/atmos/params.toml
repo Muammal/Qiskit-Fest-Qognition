@@ -1,0 +1,10 @@
+# Exact unit and bearing conversions are named constants in model.py.
+# Bound the hourly-file cache; a numerical memory choice with no effect on replay values.
+[[parameter]]
+id = "atmos.cache_files"
+value = 4
+unit = "dimensionless"
+valid_min = 1
+valid_max = 32
+role = "convention"
+status = "assumption"

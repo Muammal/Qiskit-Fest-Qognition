@@ -1,0 +1,11 @@
+# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "tsunami.wave_speed_shallow"
+value = 45.0
+unit = "m/s"
+valid_min = 5.0
+valid_max = 250.0
+role = "input"
+status = "literature"
+source = "NOAA NGDC Global Historical Tsunami Database"

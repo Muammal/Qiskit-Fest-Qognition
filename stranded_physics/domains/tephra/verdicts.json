@@ -1,0 +1,32 @@
+{
+  "tephra-barbados-first-ash": {
+    "hash": "f6c18807a1df095e061fef65da961ced1e3ed7838d79e1ecd82ebcd13e4b1e55",
+    "max_load_kg_m2": 0.18204575557846558,
+    "reached": true,
+    "value": 48.0,
+    "verdict": "PASS"
+  },
+  "tephra-grain-convergence": {
+    "hash": "b4eaa040466882f2d1f28d3b495c64af288fa71f7149c25361f1024201a39722",
+    "value": 6.666497463850544e-05,
+    "verdict": "PASS"
+  },
+  "tephra-island-cover": {
+    "hash": "7a9072dda45f56e8556c52e70ac1060b8ea29049fbc57e3e0438397c64ba035b",
+    "value": 1.0,
+    "verdict": "PASS"
+  },
+  "tephra-mass-balance": {
+    "hash": "e34f6022ce64ee55c0528b38c6e702031af36f370b83b88931e49ec4744fde7e",
+    "value": 3.9313313579827565e-09,
+    "verdict": "PASS"
+  },
+  "tephra-model": {
+    "hash": "473b261302d825ed269017ffd37c40638eb99f153b110aa7a3f1872e3a39dc4d",
+    "verdict": "PASS"
+  },
+  "tephra.records_and_units": {
+    "hash": "db80d70f4412bf2fe1f93fbdd3552c14f00e6bab2c29560af437d5d93bc5cc3c",
+    "verdict": "PASS"
+  }
+}

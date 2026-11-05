@@ -1,0 +1,67 @@
+# One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+# These only confirm the replay read its source correctly. Replayed weather is an input and cannot count as agreement.
+
+[[gate]]
+id = "atmos-model"
+title = "Replay rules hold on test data"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/atmos/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/atmos/*.py", "stranded_physics/domains/atmos/params.toml", "stranded_physics/domains/atmos/tests/*.py"]
+required = false
+
+[[gate]]
+id = "atmos-wind-200hpa-speed"
+title = "200 hPa wind speed at 12:00 UTC on 9 April matches the source"
+kind = "verification"
+command = "python -m stranded_physics.domains.atmos.measure wind_200hpa_speed"
+inputs = ["stranded_physics/domains/atmos/*.py", "stranded_physics/domains/atmos/datasets.toml"]
+required = false
+target = 23.4167  # 84.3 km/h in the source, in m/s.
+tolerance = 0.01
+role = "input"
+split = "reference"
+source = "wind_speed_200hPa at 2021-04-09T12:00 in upper_wind_st_vincent.json"
+
+[[gate]]
+id = "atmos-wind-200hpa-bearing"
+title = "200 hPa wind bearing at 12:00 UTC on 9 April points where the air moves"
+kind = "verification"
+command = "python -m stranded_physics.domains.atmos.measure wind_200hpa_bearing"
+inputs = ["stranded_physics/domains/atmos/*.py", "stranded_physics/domains/atmos/datasets.toml"]
+required = false
+target = 70.0  # The source gives 250 degrees, the direction it blows from.
+tolerance = 0.01
+role = "input"
+split = "reference"
+source = "wind_direction_200hPa at 2021-04-09T12:00 in upper_wind_st_vincent.json"
+
+[[gate]]
+id = "atmos.records_and_units"
+title = "Atmos parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/atmos'); load_datasets(p/'datasets.toml', 'atmos'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/atmos/datasets.toml", "stranded_physics/domains/atmos/params.toml"]
+required = true
+
+# Weather from real records at any held island, and weather set by hand.
+
+[[gate]]
+id = "atmos-generator"
+title = "Weather windows and hand-set weather obey their rules"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/atmos/tests/test_generator.py -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/atmos/generator.py", "stranded_physics/domains/atmos/generator_params.toml", "stranded_physics/domains/atmos/tests/test_generator.py"]
+required = false
+
+[[gate]]
+id = "atmos-window-matches-source"
+title = "A sampled weather window equals its source records (largest difference, across all held islands)"
+kind = "verification"
+command = "python -m stranded_physics.domains.atmos.generated_measure window_difference"
+inputs = ["stranded_physics/domains/atmos/generator.py", "stranded_physics/domains/atmos/generated_measure.py", "stranded_physics/domains/atmos/datasets.toml"]
+required = false
+target = 0.0
+tolerance = 0.000001
+role = "anchor"
+split = "reference"
+source = "The Open-Meteo files named in datasets.toml. This checks the window reads its source, so it can't count as agreement with reality"

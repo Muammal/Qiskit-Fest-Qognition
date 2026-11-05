@@ -1,0 +1,54 @@
+# One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+# licence_confirmed stays false until T-104 reads each licence page and checks each citation. Raw files stay out of git; fetch.py restores them by hash.
+
+[[dataset]]
+id = "copernicus_glo30_n13w062"
+kind = "digital surface model"
+url = "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N13_00_W062_00_DEM/Copernicus_DSM_COG_10_N13_00_W062_00_DEM.tif"
+retrieved_utc = "2026-11-04T17:05:29Z"
+sha256 = "233bf0afebdbce59f86ebe26c1b039cca243a00a2a6d8773dcbea87981e11231"
+licence = "Copernicus DEM licence, to be read in T-104"
+licence_confirmed = false
+citation = "European Space Agency. Copernicus DEM GLO-30. doi:10.5270/ESA-c5d3d65"
+split = "reference"
+content_check = "min_bytes:2000000"
+notes = "Tile N13 W062 covers all of St Vincent, so the W061 tile named in the original proposal is not needed. A surface model: heights include canopy and buildings."
+
+[[dataset]]
+id = "esa_worldcover_2021_n12w063"
+kind = "land cover"
+url = "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N12W063_Map.tif"
+retrieved_utc = "2026-11-04T17:05:29Z"
+sha256 = "bf3654b915ee9a3652428f15f9891ba254e5ecfeebfce43e5ff28d5dcb4ef054"
+licence = "Stated as CC BY 4.0 by the provider, to be read in T-104"
+licence_confirmed = false
+citation = "Zanaga, D. et al. ESA WorldCover 10 m 2021 v200. doi:10.5281/zenodo.7254221"
+split = "reference"
+content_check = "min_bytes:4000000"
+notes = "Mapped from 2021 imagery, so it may already include some effects of the April 2021 eruption on the northern slopes. Check before using it as pre-eruption cover."
+
+[[dataset]]
+id = "fabdem_v1_2_n10w070"
+kind = "bare-earth estimate"
+url = "https://data.bris.ac.uk/datasets/s5hqmjcdj8yo2ibzi9b4ew3sn/N10W070-N20W060_FABDEM_V1-2.zip"
+retrieved_utc = "2026-11-04T17:05:29Z"
+sha256 = "7f767a32816c9ca252e95c4c58a134aa0661e6263e40af426bf17bc1cb60ac3e"
+licence = "Stated as CC BY-NC-SA 4.0 by the provider, to be read in T-104"
+licence_confirmed = false
+citation = "Hawker, L. et al. A 30 m global map of elevation with forests and buildings removed. Environmental Research Letters. doi:10.1088/1748-9326/ac4d4f"
+split = "reference"
+content_check = "min_bytes:200000000"
+notes = "Machine-learned correction of GLO-30, so not independent of it and not a survey. Used only to size canopy bias; no model reads it. Non-commercial terms: keep it out of the repo and out of any pack."
+
+[[dataset]]
+id = "natural_earth_land"
+kind = "vector"
+url = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zip"
+retrieved_utc = "2026-11-03T22:41:36.130375+00:00"
+sha256 = "e547d749445eaa0964aba76738090ec88f5e63c4585122170f98c67a7ea922dc"
+licence = "Public domain, stated in the Natural Earth terms read in raw/natural_earth_terms.html"
+licence_confirmed = true
+citation = "Made with Natural Earth. Free vector and raster map data @ naturalearthdata.com. ne_10m_land"
+split = "reference"
+content_check = "min_bytes:1000"
+notes = "file: raw/ne_10m_land.zip"

@@ -1,0 +1,15 @@
+{
+  "gas-model": {
+    "hash": "78ddc1dca6f40dcfe48705bb1e1816e637cc04041795fa7a2a0ec58be845ac45",
+    "verdict": "PASS"
+  },
+  "gas-total-so2": {
+    "hash": "7939e921c9ccfa08d61ae0b080b15a8f34d8bf17333bea56799095d2a1e6e1ca",
+    "value": 99.67443982842491,
+    "verdict": "FAIL"
+  },
+  "gas.records_and_units": {
+    "hash": "f0d49d9d74ef03bdb7ac91dec473782d1d81655a712d4756d07f689809ff3ff3",
+    "verdict": "PASS"
+  }
+}

@@ -1,0 +1,9 @@
+id = "ship"
+title = "Ships, hull flooding and lifeboats"
+status = "model"
+owner = ""
+first_model = "compartment flooding on a box hull"
+owns = "hull, compartments, flooding, sinking, lifeboat seats and launch times"
+must_not_own = "people and their decisions"
+outputs = []
+wanted = ["Boat-by-boat occupancy", "Wreck survey of the actual damage"]

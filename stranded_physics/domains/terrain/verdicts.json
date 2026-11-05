@@ -1,0 +1,76 @@
+{
+  "terrain-canopy-bias": {
+    "forest_all_cells": 38614,
+    "forest_all_mean_m": 6.195565780493817,
+    "forest_all_median_m": 5.523376881913578,
+    "forest_all_p90_m": 12.314691251480841,
+    "forest_valley_cells": 12586,
+    "forest_valley_mean_m": 6.722789011050619,
+    "forest_valley_median_m": 5.986432646291007,
+    "forest_valley_p90_m": 13.51908535080284,
+    "hash": "5dbee1965e66cfde7b17576c7ee496897ceb9cd6859136ca2abe0d595f4d8633",
+    "open_all_cells": 4210,
+    "open_all_mean_m": 1.8091167580902947,
+    "open_all_median_m": 1.2288711947665307,
+    "open_all_p90_m": 4.945999854468334,
+    "open_valley_cells": 1416,
+    "open_valley_mean_m": 1.6379944872983836,
+    "open_valley_median_m": 1.0445275174138766,
+    "open_valley_p90_m": 4.913430736244322,
+    "verdict": "NO_TARGET"
+  },
+  "terrain-channels-against-bare-earth": {
+    "bare_earth_channel_cells": 4672,
+    "hash": "a0f679b5031dd45ab76ae88d544c421c089218f95692281cd2fd682b73fcdba4",
+    "shared_share": 0.9881931267130508,
+    "surface_channel_cells": 4743,
+    "verdict": "NO_TARGET"
+  },
+  "terrain-generated-area": {
+    "hash": "c30be7d74aab76030e126dcc0ef28633de03d2c0d9f156d31ce6d35409e82b25",
+    "value": 0.00027268268086633185,
+    "verdict": "PASS"
+  },
+  "terrain-generated-drains": {
+    "hash": "25a3a0e74dbc7960fee2eb52295095e1cc9854baa7a4471121620bda95eb7daa",
+    "value": 1.0,
+    "verdict": "PASS"
+  },
+  "terrain-generated-summit": {
+    "hash": "ff274d17cf96a162fab6eeba12d1a69772716992a02d377344f520c432898bd4",
+    "value": 0.0,
+    "verdict": "PASS"
+  },
+  "terrain-generator": {
+    "hash": "40ce24cf319f72fde7dc550e1489aa3b8519603faf8a95add9a9cddbcc212320",
+    "verdict": "PASS"
+  },
+  "terrain-island-area": {
+    "hash": "0d72e4d9f72bb1b9646b1480b8c950a2b1902e398c0a71576947c819ce8e48b0",
+    "value": 346.8744,
+    "verdict": "PASS"
+  },
+  "terrain-land-drains-to-sea": {
+    "hash": "c8afd9690b087408bda3a795da1197a1d59596999ec54cc08f974cf2a3210165",
+    "value": 1.0,
+    "verdict": "PASS"
+  },
+  "terrain-resampling": {
+    "hash": "19a2fad95f476dcbba4dbb4e09d1ba05b3ba67884671167c961d092b80962287",
+    "verdict": "PASS"
+  },
+  "terrain-summit-height": {
+    "hash": "b71d394ed4f88dec6db2359401d8504ff6ddc15ba2516da309dd4dcadae55e13",
+    "value": 1202.269177321371,
+    "verdict": "PASS"
+  },
+  "terrain-summit-location": {
+    "hash": "1a508e986a128041c20310357cf4791f6109a50f47dcbae8fb03d735a3769a3d",
+    "value": 2006.8881312840347,
+    "verdict": "FAIL"
+  },
+  "terrain.records_and_units": {
+    "hash": "a26585501f7ccc0621f4f4160c2d2d9d4a670362bd6304186801d2956a605677",
+    "verdict": "PASS"
+  }
+}

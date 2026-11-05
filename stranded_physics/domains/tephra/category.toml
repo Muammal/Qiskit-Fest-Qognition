@@ -1,0 +1,9 @@
+id = "tephra"
+title = "Ash and tephra fall"
+status = "model"
+owner = ""
+first_model = "Suzuki source with Gaussian fallout"
+owns = "column, fallout, deposit load, grain size"
+must_not_own = "rain-driven remobilisation"
+outputs = ["tephra.deposit_load"]
+wanted = ["2021 St Vincent isopachs and ash loads", "Barbados ash load measurements"]

@@ -1,0 +1,158 @@
+# One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+# licence_confirmed stays false until T-104 reads each licence page.
+
+[[dataset]]
+id = "st_vincent_plumes"
+kind = "research paper text"
+url = "https://acp.copernicus.org/articles/23/15209/2023/acp-23-15209-2023.html"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "86ed930485587cf9325b72d0c958f4e3547f25a19b85e220e2dbd7b4d103aec3"
+licence = "CC BY 4.0 as stated by Atmospheric Chemistry and Physics, to be read in T-104"
+citation = "Atmospheric Chemistry and Physics 23, 15209 (2023). doi:10.5194/acp-23-15209-2023"
+split = "reference"
+content_check = "min_bytes:50000"
+notes = "Text extracted from the HTML article."
+licence_confirmed = false
+
+[[dataset]]
+id = "st_vincent_ipgp"
+kind = "observatory summary"
+url = "https://www.ipgp.fr/actus-et-agenda/actualites/retour-sur-leruption-de-la-soufriere-de-saint-vincent-et-les-grenadines/"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "fe3a5fff7e33e2b2833699711dc267a7c89a971b2b6d79b515a524d66fc915f5"
+licence = "To be read in T-104"
+citation = "IPGP summary of the 2021 St Vincent eruption"
+split = "reference"
+content_check = "min_bytes:5000"
+notes = "Text extracted from the web page, in French."
+licence_confirmed = false
+
+[[dataset]]
+id = "st_vincent_cole_accepted"
+kind = "research paper"
+url = "https://ueaeprints.uea.ac.uk/id/eprint/91119/1/SP539_2022_292.pdf"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "92f4b691d16eac890f1557f3d5b528fe79cea244bba29b5c57cd3640bcbf69e2"
+licence = "To be read in T-104"
+citation = "Cole et al., Geological Society Special Publication 539. Accepted manuscript"
+split = "reference"
+content_check = "min_bytes:1000000"
+notes = "Plain text for reading sits beside it as st_vincent_cole_accepted.txt."
+licence_confirmed = false
+
+[[dataset]]
+id = "gvp_eruptions"
+kind = "catalogue"
+url = "https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Eruptions&outputFormat=application/json"
+retrieved_utc = "2026-11-03T22:43:56.316230+00:00"
+sha256 = "c8dbc2d91afef5fa8e2b061cb2dd8d8695ecf3bc22b7e1a16923984cc0fe009f"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "not confirmed"
+split = "calibration"
+content_check = "min_bytes:10000"
+notes = "file: raw/gvp_eruptions.json"
+
+[[dataset]]
+id = "gvp_volcanoes"
+kind = "catalogue"
+url = "https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Volcanoes&outputFormat=application/json"
+retrieved_utc = "2026-11-03T22:43:28.549216+00:00"
+sha256 = "93c985d97e9c75d3bec4dfa40b4cc0518c25cf63118ccb3a5053b2dc0fb66cc3"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "not confirmed"
+split = "reference"
+content_check = "min_bytes:10000"
+notes = "file: raw/gvp_volcanoes.json"
+
+[[dataset]]
+id = "st_vincent_cole_accepted"
+kind = "case_study"
+url = "https://ueaeprints.uea.ac.uk/id/eprint/91119/1/SP539_2022_292.pdf"
+retrieved_utc = "2026-11-04T01:15:51.997410+00:00"
+sha256 = "92f4b691d16eac890f1557f3d5b528fe79cea244bba29b5c57cd3640bcbf69e2"
+licence = "Accepted version: Creative Commons Attribution, stated on the repository page"
+licence_confirmed = false
+citation = "Accepted manuscript of Cole et al. 2024. Only pages 2 and 5-12 were read, to confirm the abstract symbol."
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/st_vincent_cole_accepted.pdf"
+
+[[dataset]]
+id = "st_vincent_cole_uea"
+kind = "case_study"
+url = "https://ueaeprints.uea.ac.uk/id/eprint/91119"
+retrieved_utc = "2026-11-04T01:13:54.379443+00:00"
+sha256 = "63ac6eeadc6c7578782e2fc4d17f714fe776f8d5af9f8cb9beca9a825c4b3351"
+licence = "Accepted version: Creative Commons Attribution, stated on the repository page"
+licence_confirmed = false
+citation = "Cole, P. D., et al., 2024, Explosive sequence of La Soufriere St Vincent April 2021, Geological Society Special Publications 539, 81-106, doi:10.1144/SP539-2022-292"
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/st_vincent_cole_uea.html"
+
+[[dataset]]
+id = "st_vincent_ipgp"
+kind = "case_study"
+url = "https://www.ipgp.fr/actus-et-agenda/actualites/retour-sur-leruption-de-la-soufriere-de-saint-vincent-et-les-grenadines/"
+retrieved_utc = "2026-11-03T22:49:00.070194+00:00"
+sha256 = "a1c1cfa02ab850175ac3ef1b15d5cffb55d3c23ec4d86a9443332ad7b47c1b8c"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Institut de Physique du Globe de Paris, Retour sur l'eruption de la Soufriere de Saint-Vincent, 29/04/2021"
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/st_vincent_ipgp.html"
+
+[[dataset]]
+id = "st_vincent_plumes"
+kind = "case_study"
+url = "https://acp.copernicus.org/articles/23/15209/2023/acp-23-15209-2023.html"
+retrieved_utc = "2026-11-03T22:45:32.020323+00:00"
+sha256 = "595eb7068517923a88320c15edba9287424c92ebd5afaa0d4bec85350054f830"
+licence = "Creative Commons Attribution 4.0, stated on the article page"
+licence_confirmed = false
+citation = "Taylor, I. A., et al., 2023, A satellite chronology of plumes from the April 2021 eruption of La Soufriere, St Vincent, Atmos. Chem. Phys. 23, 15209, doi:10.5194/acp-23-15209-2023"
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/st_vincent_plumes.html"
+
+[[dataset]]
+id = "st_vincent_wiki"
+kind = "case_study"
+url = "https://en.wikipedia.org/wiki/2021_eruption_of_La_Soufri%C3%A8re"
+retrieved_utc = "2026-11-04T01:14:03.324687+00:00"
+sha256 = "4d515506c29ac590fc1da17949d9d0f030f24826c5c1c92ca2aad1f78d398514"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "Wikipedia, 2021 eruption of La Soufriere"
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/st_vincent_wiki.html"
+
+[[dataset]]
+id = "upper_wind_st_vincent"
+kind = "case_study"
+url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=13.33&longitude=-61.18&timezone=UTC&start_date=2021-04-01&end_date=2024-12-31&hourly=wind_direction_10m%2Cwind_direction_500hPa%2Cwind_speed_500hPa%2Cwind_direction_200hPa%2Cwind_speed_200hPa"
+retrieved_utc = "2026-11-03T22:45:38.195882+00:00"
+sha256 = "b3160f832e2894912aa14f1b6070b17ae7796c60529d3d078bf9b941df1644e1"
+licence = "CC-BY 4.0, stated in the Open-Meteo terms read in raw/open_meteo_terms.html"
+licence_confirmed = true
+citation = "Open-Meteo.com API, Historical Weather or Historical Forecast endpoint."
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/upper_wind_st_vincent.json"
+
+[[dataset]]
+id = "weather_st_vincent"
+kind = "case_study"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=13.33&longitude=-61.18&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:44:26.421030+00:00"
+sha256 = "0e2af2b2233229191df205a6314f55cbbd97a6a46fd68876719dc8583fffb885"
+licence = "CC-BY 4.0, stated in the Open-Meteo terms read in raw/open_meteo_terms.html"
+licence_confirmed = true
+citation = "Open-Meteo.com API, Historical Weather or Historical Forecast endpoint."
+split = "calibration"
+content_check = "min_bytes:500"
+notes = "file: raw/weather_st_vincent.json"

@@ -1,0 +1,34 @@
+scenario,seed,policy_id,mind,population,survived_or_safe,fatalities_or_high_exposure,survival_or_safety_rate_pct,real_life_policy_recommendation
+titanic,42,historical_baseline,quantum,2208,578,1630,26.18,"Historical baseline: steward knocks ambiguous (gas_plume), rockets collapse (ash_fall), port side women/children only"
+titanic,42,historical_baseline,classical_mixture,2208,536,1672,24.28,"Historical baseline: steward knocks ambiguous (gas_plume), rockets collapse (ash_fall), port side women/children only"
+titanic,42,historical_baseline,classical,2208,839,1369,38.0,"Historical baseline: steward knocks ambiguous (gas_plume), rockets collapse (ash_fall), port side women/children only"
+titanic,42,ambiguous_rockets,quantum,2208,297,1911,13.45,Ambiguous distress rockets: rockets treated as rotation (gas_plume) — tests quantum hesitation without collapse
+titanic,42,ambiguous_rockets,classical_mixture,2208,278,1930,12.59,Ambiguous distress rockets: rockets treated as rotation (gas_plume) — tests quantum hesitation without collapse
+titanic,42,ambiguous_rockets,classical,2208,839,1369,38.0,Ambiguous distress rockets: rockets treated as rotation (gas_plume) — tests quantum hesitation without collapse
+titanic,42,early_pa_alarm,quantum,2208,824,1384,37.32,Unambiguous early ship-wide PA alarm: steward warning mapped to projective collapse (eruption)
+titanic,42,early_pa_alarm,classical_mixture,2208,796,1412,36.05,Unambiguous early ship-wide PA alarm: steward warning mapped to projective collapse (eruption)
+titanic,42,early_pa_alarm,classical,2208,839,1369,38.0,Unambiguous early ship-wide PA alarm: steward warning mapped to projective collapse (eruption)
+titanic,42,open_boarding_both_sides,quantum,2208,1027,1181,46.51,Early PA alarm + open boarding on both sides after women/children (Murdoch policy on port & starboard)
+titanic,42,open_boarding_both_sides,classical_mixture,2208,975,1233,44.16,Early PA alarm + open boarding on both sides after women/children (Murdoch policy on port & starboard)
+titanic,42,open_boarding_both_sides,classical,2208,1045,1163,47.33,Early PA alarm + open boarding on both sides after women/children (Murdoch policy on port & starboard)
+pompeii,42,mapping_A_unambiguous_column,quantum,500,500,0,100.0,Clear hazard communication: eruption column treated as unambiguous danger (eruption collapse)
+pompeii,42,mapping_A_unambiguous_column,classical_mixture,500,500,0,100.0,Clear hazard communication: eruption column treated as unambiguous danger (eruption collapse)
+pompeii,42,mapping_A_unambiguous_column,classical,500,500,0,100.0,Clear hazard communication: eruption column treated as unambiguous danger (eruption collapse)
+pompeii,42,mapping_B_literal_default,quantum,500,500,0,100.0,"Default literal framing: column is gas_plume rotation, pumice is ash_fall collapse"
+pompeii,42,mapping_B_literal_default,classical_mixture,500,500,0,100.0,"Default literal framing: column is gas_plume rotation, pumice is ash_fall collapse"
+pompeii,42,mapping_B_literal_default,classical,500,500,0,100.0,"Default literal framing: column is gas_plume rotation, pumice is ash_fall collapse"
+pompeii,42,mapping_C_ambiguous_cues,quantum,500,468,32,93.6,Ambiguous cues: both column and pumice treated as non-collapsing gas_plume rotations (quantum disjunction delay)
+pompeii,42,mapping_C_ambiguous_cues,classical_mixture,500,500,0,100.0,Ambiguous cues: both column and pumice treated as non-collapsing gas_plume rotations (quantum disjunction delay)
+pompeii,42,mapping_C_ambiguous_cues,classical,500,500,0,100.0,Ambiguous cues: both column and pumice treated as non-collapsing gas_plume rotations (quantum disjunction delay)
+pompeii,42,mapping_D_milder_plus_enslaved_restricted,quantum,500,500,0,100.0,Worst-case ambiguity + household movement restriction on enslaved persons
+pompeii,42,mapping_D_milder_plus_enslaved_restricted,classical_mixture,500,500,0,100.0,Worst-case ambiguity + household movement restriction on enslaved persons
+pompeii,42,mapping_D_milder_plus_enslaved_restricted,classical,500,500,0,100.0,Worst-case ambiguity + household movement restriction on enslaved persons
+waterloo,42,alarm_off_ambiguous_smell,quantum,100,100,0,100.0,No facility alarm: visitors rely on chlorine smell & word of mouth (quantum hesitation increases AEGL-2 exposure)
+waterloo,42,alarm_off_ambiguous_smell,classical_mixture,100,100,0,100.0,No facility alarm: visitors rely on chlorine smell & word of mouth (quantum hesitation increases AEGL-2 exposure)
+waterloo,42,alarm_off_ambiguous_smell,classical,100,100,0,100.0,No facility alarm: visitors rely on chlorine smell & word of mouth (quantum hesitation increases AEGL-2 exposure)
+waterloo,42,alarm_on_ambiguous_mapping_A,quantum,100,99,1,99.0,Staff alarm enabled (mapped to gas_plume rotation): partial reduction in exposure
+waterloo,42,alarm_on_ambiguous_mapping_A,classical_mixture,100,100,0,100.0,Staff alarm enabled (mapped to gas_plume rotation): partial reduction in exposure
+waterloo,42,alarm_on_ambiguous_mapping_A,classical,100,100,0,100.0,Staff alarm enabled (mapped to gas_plume rotation): partial reduction in exposure
+waterloo,42,alarm_on_unambiguous_mapping_B,quantum,100,100,0,100.0,Unambiguous staff alarm (mapped to projective collapse): eliminates quantum hesitation & minimizes AEGL-2 exposure
+waterloo,42,alarm_on_unambiguous_mapping_B,classical_mixture,100,100,0,100.0,Unambiguous staff alarm (mapped to projective collapse): eliminates quantum hesitation & minimizes AEGL-2 exposure
+waterloo,42,alarm_on_unambiguous_mapping_B,classical,100,100,0,100.0,Unambiguous staff alarm (mapped to projective collapse): eliminates quantum hesitation & minimizes AEGL-2 exposure

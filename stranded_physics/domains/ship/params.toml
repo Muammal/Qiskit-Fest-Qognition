@@ -1,0 +1,1151 @@
+# Reporting time is the inquiry anchor, not a fitted model input.
+[[parameter]]
+id = "ship.water_measure_min"
+value = 40.0
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/wilding_day19_03.html#a20422, Q20422: about 40 minutes"
+
+# Required output sentinel when no foundering occurs within the horizon.
+[[parameter]]
+id = "ship.not_foundered_minutes"
+value = 999.0
+unit = "minute"
+valid_min = 900.0
+valid_max = 1000.0
+role = "input"
+status = "assumption"
+
+# Round seawater density from memory; salinity and temperature are not resolved.
+[[parameter]]
+id = "ship.water_density"
+value = 1025.0
+unit = "kg/m**3"
+valid_min = 990.0
+valid_max = 1040.0
+role = "input"
+status = "assumption"
+
+# Conventional standard gravity, not a local measurement; from memory.
+[[parameter]]
+id = "ship.gravity"
+value = 9.80665
+unit = "m/s**2"
+valid_min = 9.7
+valid_max = 9.9
+role = "input"
+status = "assumption"
+
+# Round free-volume fraction for an obstructed hull; no compartment-specific survey is in hand.
+[[parameter]]
+id = "ship.permeability"
+value = 0.85
+unit = "dimensionless"
+valid_min = 0.1
+valid_max = 1.0
+role = "input"
+status = "assumption"
+
+# Round sharp-edged-orifice coefficient from memory; not measured or fitted to Titanic.
+[[parameter]]
+id = "ship.discharge_coefficient"
+value = 0.6
+unit = "dimensionless"
+valid_min = 0.1
+valid_max = 1.0
+role = "input"
+status = "assumption"
+
+# Initial head: testimony says "the head would be about 25 feet"; converted to metres in SETTINGS.
+[[parameter]]
+id = "ship.hole_depth_below_waterline"
+value = 25.0
+unit = "ft"
+valid_min = 0.0
+valid_max = 100.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/wilding_day19_03.html# a20422 (Q20422)"
+
+# Numerical step only: midpoint ingress and exact spill; checked against the 0.5 s baseline.
+[[parameter]]
+id = "ship.integration_step"
+value = 2.0
+unit = "s"
+valid_min = 0.001
+valid_max = 10.0
+role = "input"
+status = "assumption"
+
+# Legacy relaxation tolerance retained for baseline provenance; direct spill does not use it.
+[[parameter]]
+id = "ship.spill_tolerance"
+value = 1e-09
+unit = "m"
+valid_min = 1e-12
+valid_max = 1e-05
+role = "input"
+status = "assumption"
+
+# Legacy relaxation budget retained for baseline provenance; direct spill has no iteration cap.
+[[parameter]]
+id = "ship.spill_iterations"
+value = 256
+unit = "dimensionless"
+valid_min = 1
+valid_max = 10000
+role = "input"
+status = "assumption"
+
+# Generic geometry input default and broad box-hull domain, not a ship record.
+[[parameter]]
+id = "ship.length"
+value = 100.0
+unit = "m"
+valid_min = 1e-06
+valid_max = 10000000.0
+role = "input"
+status = "assumption"
+
+# Generic positive beam input domain.
+[[parameter]]
+id = "ship.beam"
+value = 20.0
+unit = "m"
+valid_min = 1e-06
+valid_max = 1000000.0
+role = "input"
+status = "assumption"
+
+# Generic positive draught input domain.
+[[parameter]]
+id = "ship.draught"
+value = 5.0
+unit = "m"
+valid_min = 1e-06
+valid_max = 100000.0
+role = "input"
+status = "assumption"
+
+# Generic nonnegative dry displacement input domain; arbitrary replacements are allowed.
+[[parameter]]
+id = "ship.displacement"
+value = 10000.0
+unit = "tonne"
+valid_min = 0.0
+valid_max = inf
+role = "input"
+status = "assumption"
+
+# Generic positive integer compartment count; limit bounds storage and overflow work.
+[[parameter]]
+id = "ship.compartment_count"
+value = 10
+unit = "dimensionless"
+valid_min = 1
+valid_max = 10000
+role = "input"
+status = "assumption"
+
+# Generic bulkhead height above initial waterline; zero allows an open partition.
+[[parameter]]
+id = "ship.bulkhead_top"
+value = 3.0
+unit = "m"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "assumption"
+
+# Generic deck height above initial waterline; zero means initial immersion.
+[[parameter]]
+id = "ship.boat_deck"
+value = 10.0
+unit = "m"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "assumption"
+
+# Generic nonnegative opening area domain; zero is an intact compartment.
+[[parameter]]
+id = "ship.breach_area"
+value = 1.0
+unit = "m**2"
+valid_min = 0.0
+valid_max = 1000000000000.0
+role = "input"
+status = "assumption"
+
+# Required 24-hour reporting horizon; changes censoring, not the physical model.
+[[parameter]]
+id = "ship.duration"
+value = 86400.0
+unit = "s"
+valid_min = 0.0
+valid_max = 1000000000000.0
+role = "input"
+status = "assumption"
+
+# Default requested output spacing; internal integration is independently bounded.
+[[parameter]]
+id = "ship.output_step"
+value = 10.0
+unit = "s"
+valid_min = 1e-06
+valid_max = 1000000000.0
+role = "input"
+status = "assumption"
+
+# Axis-relative nonnegative impact, alarm and boat-event input domain.
+[[parameter]]
+id = "ship.event_time"
+value = 0.0
+unit = "s"
+valid_min = 0.0
+valid_max = 1000000000000.0
+role = "input"
+status = "assumption"
+
+# Generic nonnegative integer station capacity domain, separate from historical records.
+[[parameter]]
+id = "ship.boat_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "assumption"
+
+# Flat navigable deck elevation required by the field contract, independent of freeboard.
+[[parameter]]
+id = "ship.deck_elevation"
+value = 1.0
+unit = "m"
+valid_min = 0.0
+valid_max = 10.0
+role = "input"
+status = "assumption"
+
+# Length-proportional split across the six damaged compartments; no measured individual areas exist.
+[[parameter]]
+id = "ship.breach_split_exponent"
+value = 1.0
+unit = "dimensionless"
+valid_min = 0.0
+valid_max = 2.0
+role = "input"
+status = "assumption"
+
+# Use amidships D/E heights for all partitions; omit sheer rather than invent its curve.
+[[parameter]]
+id = "ship.record_freeboard_sheer"
+value = 0.0
+unit = "dimensionless"
+valid_min = 0.0
+valid_max = 1.0
+role = "input"
+status = "assumption"
+
+# Read directly; registered length and the 58 ft deck-table height are used consistently.
+[[parameter]]
+id = "ship.titanic_length_ft"
+value = 852.5
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# registered dimensions, Length row"
+
+# Read directly; registered length and the 58 ft deck-table height are used consistently.
+[[parameter]]
+id = "ship.titanic_beam_ft"
+value = 92.5
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# registered dimensions, Breadth row"
+
+# Read directly; registered length and the 58 ft deck-table height are used consistently.
+[[parameter]]
+id = "ship.titanic_draught_ft"
+value = 34.583333333333336
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# displacement at 34 feet 7 inches"
+
+# Read directly; registered length and the 58 ft deck-table height are used consistently.
+[[parameter]]
+id = "ship.titanic_displacement_long_tons"
+value = 52310.0
+unit = "dimensionless"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# registered dimensions, Displacement row (British long tons)"
+
+# Read directly; registered length and the 58 ft deck-table height are used consistently.
+[[parameter]]
+id = "ship.titanic_boat_deck_ft"
+value = 58.0
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# steel decks table, Boat deck above waterline row"
+
+# Read directly; registered length and the 58 ft deck-table height are used consistently.
+[[parameter]]
+id = "ship.deck_d_ft"
+value = 20.0
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# bulkhead deck heights, D lowest part amidships"
+
+# Read directly; registered length and the 58 ft deck-table height are used consistently.
+[[parameter]]
+id = "ship.deck_e_ft"
+value = 11.0
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# bulkhead deck heights, E lowest part amidships"
+
+# Aggregate aperture estimate, itself inferred from water volume and time; not independent validation.
+[[parameter]]
+id = "ship.titanic_breach_ft2"
+value = 12.0
+unit = "ft**2"
+valid_min = 0.0
+valid_max = 100.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/wilding_day19_03.html# a20422 (Q20422)"
+
+# 1.50 a.m. minus 11.40 p.m.; near-water forecastle observation used as replay onset.
+[[parameter]]
+id = "ship.titanic_bow_awash_min"
+value = 130.0
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# FINAL EFFECT OF THE DAMAGE, forecastle head at 1.50 a. m."
+
+# 2.20 a.m. minus 11.40 p.m.; an observed end for replay, never a flood calibration.
+[[parameter]]
+id = "ship.titanic_foundered_min"
+value = 160.0
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# FINAL EFFECT OF THE DAMAGE, The ship disappeared at 2.20 a. m."
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_0_length_ft"
+value = 46
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, Bow to A"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_0_deck"
+value = 1
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_1_length_ft"
+value = 45
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, A-B"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_1_deck"
+value = 1
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_2_length_ft"
+value = 51
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, B-C"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_2_deck"
+value = 0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_3_length_ft"
+value = 51
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, C-D"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_3_deck"
+value = 0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_4_length_ft"
+value = 54
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, D-E"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_4_deck"
+value = 0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_5_length_ft"
+value = 57
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, E-F"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_5_deck"
+value = 0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_6_length_ft"
+value = 57
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, F-G"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_6_deck"
+value = 0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_7_length_ft"
+value = 57
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, G-H"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_7_deck"
+value = 0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_8_length_ft"
+value = 60
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, H-J"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_8_deck"
+value = 0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_9_length_ft"
+value = 35
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, J-K"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_9_deck"
+value = 1
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_10_length_ft"
+value = 69
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, K-L"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_10_deck"
+value = 1
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_11_length_ft"
+value = 57
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, L-M"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_11_deck"
+value = 1
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_12_length_ft"
+value = 63
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, M-N"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_12_deck"
+value = 1
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_13_length_ft"
+value = 54
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, N-O"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_13_deck"
+value = 1
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Read length from the compartment table; quote column retains its exact table cell.
+[[parameter]]
+id = "ship.compartment_14_length_ft"
+value = 57
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, O-P"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_14_deck"
+value = 1
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Afterpeak derived as 852.5 minus the other 15 lengths.
+[[parameter]]
+id = "ship.compartment_15_length_ft"
+value = 39.5
+unit = "ft"
+valid_min = 0.0
+valid_max = 100000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# separate water-tight compartment table, P to stern, residual from registered length"
+
+# D=1, E=0; A extends to C but is watertight only to D. Afterpeak repeats P.
+[[parameter]]
+id = "ship.compartment_15_deck"
+value = 1
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# transverse bulkheads, watertightness paragraph and bulkhead deck table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_1_capacity"
+value = 40
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_1_launch_min"
+value = 90
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 1 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_2_capacity"
+value = 40
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_2_launch_min"
+value = 125
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 2 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_3_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_3_launch_min"
+value = 80
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 3 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_4_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_4_launch_min"
+value = 136
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 4 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_5_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_5_launch_min"
+value = 75
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 5 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_6_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_6_launch_min"
+value = 75
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 6 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_7_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_7_launch_min"
+value = 65
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 7 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_8_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_8_launch_min"
+value = 90
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 8 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_9_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_9_launch_min"
+value = 100
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 9 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_10_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_10_launch_min"
+value = 100
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 10 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_11_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_11_launch_min"
+value = 105
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 11 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_12_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_12_launch_min"
+value = 105
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 12 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_13_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_13_launch_min"
+value = 115
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 13 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_14_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_14_launch_min"
+value = 110
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 14 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_15_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_15_launch_min"
+value = 115
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 15 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_16_capacity"
+value = 65
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_16_launch_min"
+value = 115
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, No. 16 departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_a_capacity"
+value = 47
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Filled evenly between D (145 min) and loss (160 min); A/B floated as rafts, not davit launches.
+[[parameter]]
+id = "ship.boat_a_launch_min"
+value = 150
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "assumption"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_b_capacity"
+value = 47
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Filled evenly between D (145 min) and loss (160 min); A/B floated as rafts, not davit launches.
+[[parameter]]
+id = "ship.boat_b_launch_min"
+value = 155
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "assumption"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_c_capacity"
+value = 47
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_c_launch_min"
+value = 120
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, C departure narrative/table"
+
+# Capacity, not reported occupancy; No. 1 and No. 2 are emergency cutters.
+[[parameter]]
+id = "ship.boat_d_capacity"
+value = 47
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1000000
+role = "input"
+status = "literature"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# Lifeboats capacities and IV Saving and Rescue: arrangement of boats"
+
+# Minutes after 11.40 impact; No. 7 follows the approximate narrative over the table.
+[[parameter]]
+id = "ship.boat_d_launch_min"
+value = 145
+unit = "minute"
+valid_min = 0.0
+valid_max = 10000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/titanic/british_report_gutenberg_39415.html# IV Saving and Rescue, D departure narrative/table"

@@ -1,0 +1,554 @@
+{
+  "vei_distribution_small_island": {
+    "value": {
+      "0": 0.14732379438261792,
+      "1": 0.16958134605193428,
+      "2": 0.4589295177530472,
+      "3": 0.1489136195018548,
+      "4": 0.06359300476947535,
+      "5": 0.005829358770535241,
+      "6": 0.0047694753577106515,
+      "7": 0.0010598834128245894
+    },
+    "n": 1887,
+    "method": "Confirmed Eruption rows with non-null VEI; Natural Earth spherical landmass classification.",
+    "source_ids": [
+      "gvp_volcanoes",
+      "gvp_eruptions",
+      "natural_earth_land",
+      "natural_earth_minor_islands"
+    ],
+    "region": "Global",
+    "caveat": "Catalogue reporting and selection bias; this is descriptive, not predictive."
+  },
+  "hazard_agents_small_island": {
+    "value": {
+      "A": 2,
+      "G": 3,
+      "G,T": 1,
+      "G,W,T": 1,
+      "I": 2,
+      "I,M": 1,
+      "L": 7,
+      "M": 4,
+      "M,T": 1,
+      "P": 16,
+      "P,I": 2,
+      "P,L": 1,
+      "P,M": 2,
+      "P,M,I": 1,
+      "P,T,M": 1,
+      "P,T,W": 1,
+      "P,W,T": 1,
+      "S": 2,
+      "T": 22,
+      "T, m": 1,
+      "T,G,M": 1,
+      "T,L": 2,
+      "T,P": 1,
+      "T,P,W,I": 1,
+      "W": 7,
+      "W,G": 1,
+      "W,M": 1,
+      "W,P,I": 1,
+      "W,S": 1,
+      "W,T": 1,
+      "m": 3
+    },
+    "n": 113,
+    "method": "Fatal NOAA events; nearest GVP volcano within 30 km, classified small island; literal agent strings counted without splitting compound codes. Case is meaningful: M is mudflows/lahars and m is secondary (post-eruption) mudflows, so keys are not merged. NOAA HazEL on-site legend, read from its front-end bundle: A Avalanche (Debris and landslides); E Electrical (lightning); F Floods (& Jokulhlaups); G Gas (emission from eruptive craters as well as fumarolic/solfataric activity); I Indirect deaths (disease, starvation, exposure, desolation); L Lava flows; M Mudflows/Lahars; m Secondary (post-eruption) mudflows; P Pyroclastic flows, surges, & direct blasts; S Seismic, or volcanic earthquake (tectonic earthquake deaths excluded); T Tephra (ash, bombs, lapilli, steam blasts). Killing either by ballistic impact, or with finer-grained ash, by suffocation, collapse of ash-covered roofs, etc.; W Waves or tsunami.",
+    "source_ids": [
+      "noaa_volcano_events",
+      "gvp_volcanoes",
+      "noaa_hazel_legend"
+    ],
+    "region": "Global",
+    "caveat": "Spatial match is an assumption; unmatched events and events with no agent are excluded. NOAA lists significant events only, so this is a reporting-biased count of fatal events, not of deaths and not a probability per eruption. Compound strings such as \"T,m\" name several agents without splitting deaths between them."
+  },
+  "volcanic_tsunami_count": {
+    "value": 138,
+    "n": 138,
+    "method": "NOAA causeCode 6, which the HazEL legend defines as Volcano; catalogue event rows, not runups. Codes 4 (Volcano and Earthquake), 5 (Volcano, Earthquake, and Landslide) and 7 (Volcano and Landslide) are mixed causes and are excluded.",
+    "source_ids": [
+      "noaa_tsunamis",
+      "noaa_hazel_legend"
+    ],
+    "region": "Global",
+    "caveat": "Catalogue reporting and selection bias; this is descriptive, not predictive."
+  },
+  "small_island_eruption_count": {
+    "value": 2374,
+    "n": 2374,
+    "method": "Confirmed Eruption rows on classified small-island volcanoes, including missing VEI.",
+    "source_ids": [
+      "gvp_eruptions",
+      "gvp_volcanoes"
+    ],
+    "region": "Global",
+    "caveat": "Catalogue reporting and selection bias; this is descriptive, not predictive."
+  },
+  "hazard_fatalities_brown_small_island": {
+    "value": {
+      "Avalanche": {
+        "incidents": 3,
+        "fatalities": 26
+      },
+      "Ballistics": {
+        "incidents": 15,
+        "fatalities": 45
+      },
+      "Eruption (unknown element)": {
+        "incidents": 31,
+        "fatalities": 3406
+      },
+      "Gas": {
+        "incidents": 3,
+        "fatalities": 52
+      },
+      "Indirect (Eruptive) - Evacuation": {
+        "incidents": 1,
+        "fatalities": 15
+      },
+      "Indirect (Eruptive) - Evacuation/Heart-attack": {
+        "incidents": 1,
+        "fatalities": 1
+      },
+      "Indirect (Eruptive) - Evacuation/disease": {
+        "incidents": 1,
+        "fatalities": 25
+      },
+      "Lahars": {
+        "incidents": 8,
+        "fatalities": 2544
+      },
+      "Lava flows": {
+        "incidents": 9,
+        "fatalities": 257
+      },
+      "Multiple - Ballistics, Lahars, PDCs": {
+        "incidents": 1,
+        "fatalities": 1007
+      },
+      "Multiple - Ballistics, PDCs, Tephra": {
+        "incidents": 1,
+        "fatalities": 56
+      },
+      "Multiple - Indirect, Tephra": {
+        "incidents": 1,
+        "fatalities": 1000
+      },
+      "Multiple - Lahars, PDCs": {
+        "incidents": 2,
+        "fatalities": 1289
+      },
+      "Multiple - Lahars, PDCs, Tephra": {
+        "incidents": 1,
+        "fatalities": 1351
+      },
+      "Multiple - PDCs, Tsunami": {
+        "incidents": 1,
+        "fatalities": 1000
+      },
+      "Non-eruptive: Gas": {
+        "incidents": 1,
+        "fatalities": 17
+      },
+      "Non-eruptive: Seismicity": {
+        "incidents": 1,
+        "fatalities": 300
+      },
+      "Non-eruptive: Tsunami": {
+        "incidents": 2,
+        "fatalities": 549
+      },
+      "Non-eruptive: gas": {
+        "incidents": 1,
+        "fatalities": 2
+      },
+      "PDCs": {
+        "incidents": 27,
+        "fatalities": 36693
+      },
+      "Secondary lahars": {
+        "incidents": 2,
+        "fatalities": 5
+      },
+      "Tephra": {
+        "incidents": 7,
+        "fatalities": 350
+      },
+      "Tsunami": {
+        "incidents": 13,
+        "fatalities": 40634
+      }
+    },
+    "n": 133,
+    "method": "Brown et al. 2017 supplementary database. Rows joined on GVP volcano number to our small_island class; the fatal cause strings are the database's own and are not merged; fatalities sum its Number of fatalities column.",
+    "source_ids": [
+      "brown_fatalities",
+      "gvp_volcanoes",
+      "natural_earth_land",
+      "natural_earth_minor_islands"
+    ],
+    "region": "Small islands, global",
+    "caveat": "Our island class is not the database's own island flag (radius of about 5 km or less). Causes include non-eruptive and indirect deaths. Numbers are as listed in the database, some from uncertain historic reports; a few very large events dominate the fatality totals. This describes reported deaths, not the chance of dying."
+  },
+  "cyclone_rate_per_year_st_vincent": {
+    "value": 1.108695652173913,
+    "n": 51,
+    "method": "Unique SID within 200 km; seasons 1980 through 2025; denominator includes zero-storm years. Max wind is lifetime USA_WIND with per-point WMO_WIND fallback, in knots.",
+    "source_ids": [
+      "ibtracs"
+    ],
+    "region": "st_vincent",
+    "caveat": "The final archive year is excluded as potentially incomplete; storm-centre distance is not an impact footprint. Reporting and wind-agency biases remain."
+  },
+  "cyclone_rate_per_year_montserrat": {
+    "value": 1.1304347826086956,
+    "n": 52,
+    "method": "Unique SID within 200 km; seasons 1980 through 2025; denominator includes zero-storm years. Max wind is lifetime USA_WIND with per-point WMO_WIND fallback, in knots.",
+    "source_ids": [
+      "ibtracs"
+    ],
+    "region": "montserrat",
+    "caveat": "The final archive year is excluded as potentially incomplete; storm-centre distance is not an impact footprint. Reporting and wind-agency biases remain."
+  },
+  "cyclone_rate_per_year_miyakejima": {
+    "value": 2.3043478260869565,
+    "n": 106,
+    "method": "Unique SID within 200 km; seasons 1980 through 2025; denominator includes zero-storm years. Max wind is lifetime USA_WIND with per-point WMO_WIND fallback, in knots.",
+    "source_ids": [
+      "ibtracs"
+    ],
+    "region": "miyakejima",
+    "caveat": "The final archive year is excluded as potentially incomplete; storm-centre distance is not an impact footprint. Reporting and wind-agency biases remain."
+  },
+  "cyclone_rate_per_year_stromboli": {
+    "value": 0.0,
+    "n": 0,
+    "method": "Unique SID within 200 km; seasons 1980 through 2025; denominator includes zero-storm years. Max wind is lifetime USA_WIND with per-point WMO_WIND fallback, in knots.",
+    "source_ids": [
+      "ibtracs"
+    ],
+    "region": "stromboli",
+    "caveat": "The final archive year is excluded as potentially incomplete; storm-centre distance is not an impact footprint. Reporting and wind-agency biases remain."
+  },
+  "cyclone_rate_per_year_la_palma": {
+    "value": 0.021739130434782608,
+    "n": 1,
+    "method": "Unique SID within 200 km; seasons 1980 through 2025; denominator includes zero-storm years. Max wind is lifetime USA_WIND with per-point WMO_WIND fallback, in knots.",
+    "source_ids": [
+      "ibtracs"
+    ],
+    "region": "la_palma",
+    "caveat": "The final archive year is excluded as potentially incomplete; storm-centre distance is not an impact footprint. Reporting and wind-agency biases remain."
+  },
+  "weather_markov_st_vincent": {
+    "value": {
+      "calm": {
+        "calm": 0.8760082479228577,
+        "rain": 0.1239614288313421,
+        "storm": 3.0323245800230458e-05
+      },
+      "rain": {
+        "calm": 0.37708698459551704,
+        "rain": 0.6220828336869293,
+        "storm": 0.0008301817175537312
+      },
+      "storm": {
+        "calm": 0.0625,
+        "rain": 0.5625,
+        "storm": 0.375
+      }
+    },
+    "n": 43835,
+    "method": "Consecutive non-overlapping 2-hour bins at even UTC hours: storm if precipitation sum >=10 mm or peak wind >=50 km/h; else calm if sum <0.5 mm; else rain; missing bins excluded.",
+    "source_ids": [
+      "weather_st_vincent"
+    ],
+    "region": "st_vincent",
+    "caveat": "Thresholds are assumptions. Coarse reanalysis grid cell, not a station, with cell elevation 716.0 m; it smooths extremes, so storm bins may be undercounted, while high cells may overstate wind. Transitions are descriptive and seasonally pooled."
+  },
+  "temperature_st_vincent": {
+    "value": {
+      "p5": 19.6,
+      "p50": 21.9,
+      "p95": 24.3,
+      "night_p5": 19.2
+    },
+    "n": 87672,
+    "method": "Hourly Celsius percentiles using numpy linear interpolation; night local mean solar time UTC + longitude/15 hours, local hours 20..6 inclusive.",
+    "source_ids": [
+      "weather_st_vincent"
+    ],
+    "region": "st_vincent",
+    "caveat": "Coarse reanalysis grid cell, not a station, with cell elevation 716.0 m, so it can read colder than the coast. Local mean solar time is an explicit convention; exposure and individual physiology are unresolved."
+  },
+  "weather_markov_montserrat": {
+    "value": {
+      "calm": {
+        "calm": 0.9395233642497915,
+        "rain": 0.0602997295862923,
+        "storm": 0.00017690616391619703
+      },
+      "rain": {
+        "calm": 0.5683607730851825,
+        "rain": 0.4251968503937008,
+        "storm": 0.006442376521116679
+      },
+      "storm": {
+        "calm": 0.14666666666666667,
+        "rain": 0.30666666666666664,
+        "storm": 0.5466666666666666
+      }
+    },
+    "n": 43835,
+    "method": "Consecutive non-overlapping 2-hour bins at even UTC hours: storm if precipitation sum >=10 mm or peak wind >=50 km/h; else calm if sum <0.5 mm; else rain; missing bins excluded.",
+    "source_ids": [
+      "weather_montserrat"
+    ],
+    "region": "montserrat",
+    "caveat": "Thresholds are assumptions. Coarse reanalysis grid cell, not a station, with cell elevation 556.0 m; it smooths extremes, so storm bins may be undercounted, while high cells may overstate wind. Transitions are descriptive and seasonally pooled."
+  },
+  "temperature_montserrat": {
+    "value": {
+      "p5": 20.8,
+      "p50": 23.4,
+      "p95": 25.9,
+      "night_p5": 20.4
+    },
+    "n": 87672,
+    "method": "Hourly Celsius percentiles using numpy linear interpolation; night local mean solar time UTC + longitude/15 hours, local hours 20..6 inclusive.",
+    "source_ids": [
+      "weather_montserrat"
+    ],
+    "region": "montserrat",
+    "caveat": "Coarse reanalysis grid cell, not a station, with cell elevation 556.0 m, so it can read colder than the coast. Local mean solar time is an explicit convention; exposure and individual physiology are unresolved."
+  },
+  "weather_markov_miyakejima": {
+    "value": {
+      "calm": {
+        "calm": 0.9256729359658151,
+        "rain": 0.056922741024921245,
+        "storm": 0.017404323009263593
+      },
+      "rain": {
+        "calm": 0.2828451882845188,
+        "rain": 0.6336401673640167,
+        "storm": 0.08351464435146444
+      },
+      "storm": {
+        "calm": 0.11950336264873254,
+        "rain": 0.06294188653216072,
+        "storm": 0.8175547508191068
+      }
+    },
+    "n": 43835,
+    "method": "Consecutive non-overlapping 2-hour bins at even UTC hours: storm if precipitation sum >=10 mm or peak wind >=50 km/h; else calm if sum <0.5 mm; else rain; missing bins excluded.",
+    "source_ids": [
+      "weather_miyakejima"
+    ],
+    "region": "miyakejima",
+    "caveat": "Thresholds are assumptions. Coarse reanalysis grid cell, not a station, with cell elevation 740.0 m; it smooths extremes, so storm bins may be undercounted, while high cells may overstate wind. Transitions are descriptive and seasonally pooled."
+  },
+  "temperature_miyakejima": {
+    "value": {
+      "p5": 5.3,
+      "p50": 15.0,
+      "p95": 23.1,
+      "night_p5": 5.4
+    },
+    "n": 87672,
+    "method": "Hourly Celsius percentiles using numpy linear interpolation; night local mean solar time UTC + longitude/15 hours, local hours 20..6 inclusive.",
+    "source_ids": [
+      "weather_miyakejima"
+    ],
+    "region": "miyakejima",
+    "caveat": "Coarse reanalysis grid cell, not a station, with cell elevation 740.0 m, so it can read colder than the coast. Local mean solar time is an explicit convention; exposure and individual physiology are unresolved."
+  },
+  "weather_markov_stromboli": {
+    "value": {
+      "calm": {
+        "calm": 0.9682758960949256,
+        "rain": 0.029207884155216222,
+        "storm": 0.0025162197498581544
+      },
+      "rain": {
+        "calm": 0.4135737009544008,
+        "rain": 0.5616825733474726,
+        "storm": 0.024743725698126547
+      },
+      "storm": {
+        "calm": 0.24733475479744135,
+        "rain": 0.11940298507462686,
+        "storm": 0.6332622601279317
+      }
+    },
+    "n": 43835,
+    "method": "Consecutive non-overlapping 2-hour bins at even UTC hours: storm if precipitation sum >=10 mm or peak wind >=50 km/h; else calm if sum <0.5 mm; else rain; missing bins excluded.",
+    "source_ids": [
+      "weather_stromboli"
+    ],
+    "region": "stromboli",
+    "caveat": "Thresholds are assumptions. Coarse reanalysis grid cell, not a station, with cell elevation 847.0 m; it smooths extremes, so storm bins may be undercounted, while high cells may overstate wind. Transitions are descriptive and seasonally pooled."
+  },
+  "temperature_stromboli": {
+    "value": {
+      "p5": 6.6,
+      "p50": 13.0,
+      "p95": 21.9,
+      "night_p5": 6.6
+    },
+    "n": 87672,
+    "method": "Hourly Celsius percentiles using numpy linear interpolation; night local mean solar time UTC + longitude/15 hours, local hours 20..6 inclusive.",
+    "source_ids": [
+      "weather_stromboli"
+    ],
+    "region": "stromboli",
+    "caveat": "Coarse reanalysis grid cell, not a station, with cell elevation 847.0 m, so it can read colder than the coast. Local mean solar time is an explicit convention; exposure and individual physiology are unresolved."
+  },
+  "weather_markov_la_palma": {
+    "value": {
+      "calm": {
+        "calm": 0.9803041695975938,
+        "rain": 0.01824047347612002,
+        "storm": 0.0014553569262861718
+      },
+      "rain": {
+        "calm": 0.3363108530594015,
+        "rain": 0.6574363555158553,
+        "storm": 0.006252791424743189
+      },
+      "storm": {
+        "calm": 0.15989159891598917,
+        "rain": 0.04065040650406504,
+        "storm": 0.7994579945799458
+      }
+    },
+    "n": 43835,
+    "method": "Consecutive non-overlapping 2-hour bins at even UTC hours: storm if precipitation sum >=10 mm or peak wind >=50 km/h; else calm if sum <0.5 mm; else rain; missing bins excluded.",
+    "source_ids": [
+      "weather_la_palma"
+    ],
+    "region": "la_palma",
+    "caveat": "Thresholds are assumptions. Coarse reanalysis grid cell, not a station, with cell elevation 1672.0 m; it smooths extremes, so storm bins may be undercounted, while high cells may overstate wind. Transitions are descriptive and seasonally pooled."
+  },
+  "temperature_la_palma": {
+    "value": {
+      "p5": 3.4,
+      "p50": 9.7,
+      "p95": 19.7,
+      "night_p5": 2.5
+    },
+    "n": 87672,
+    "method": "Hourly Celsius percentiles using numpy linear interpolation; night local mean solar time UTC + longitude/15 hours, local hours 20..6 inclusive.",
+    "source_ids": [
+      "weather_la_palma"
+    ],
+    "region": "la_palma",
+    "caveat": "Coarse reanalysis grid cell, not a station, with cell elevation 1672.0 m, so it can read colder than the coast. Local mean solar time is an explicit convention; exposure and individual physiology are unresolved."
+  },
+  "upper_wind_st_vincent": {
+    "value": {
+      "10m": {
+        "toward_circular_mean_deg": 267.6850789634972,
+        "median_abs_change_per_2h_deg": 4.0
+      },
+      "500hPa": {
+        "toward_circular_mean_deg": 259.0627607228207,
+        "median_abs_change_per_2h_deg": 6.0
+      },
+      "200hPa": {
+        "toward_circular_mean_deg": 88.42484014986104,
+        "median_abs_change_per_2h_deg": 5.0
+      }
+    },
+    "n": 32904,
+    "method": "Meteorological direction +180 modulo 360; circular mean of all hourly bearings; median shortest angular difference between even-UTC 2-hour samples.",
+    "source_ids": [
+      "upper_wind_st_vincent"
+    ],
+    "region": "St Vincent",
+    "caveat": "Surface wind can blow the opposite way from ash transport, and 500 hPa and 200 hPa can differ in speed and bearing. Upper winds here start in April 2021, so this is under four years, not a long climatology. No imputation."
+  },
+  "lead_time_hours_iceland": {
+    "value": [
+      1.3333,
+      0.4167,
+      30.0,
+      0.25,
+      1.0,
+      2.25,
+      1.0833,
+      5.0,
+      0.3833,
+      1.3667,
+      7.0,
+      4.0,
+      1.2667,
+      9.0,
+      4.4,
+      0.5,
+      34.0,
+      6.0,
+      1.3167,
+      2.25,
+      1.5,
+      312.0
+    ],
+    "n": 22,
+    "method": "Parsed from Einarsson 2018 Table 1 by tools/extract_einarsson.py, Iceland only. 24 table rows, 22 with a single stated time. Values the table marks as imprecise (~) or with an assumed eruption start ( ) are kept; the row text shows the mark. One range and one empty cell have no value.",
+    "source_ids": [
+      "einarsson_2018"
+    ],
+    "region": "Iceland",
+    "caveat": "Iceland only. Not a transferable distribution for tropical island eruptions. It measures seismic precursor time to the start of the eruption, and many Icelandic eruptions are basaltic rift events unlike a dome-forming arc volcano."
+  },
+  "case_lead_times": {
+    "value": {
+      "st_vincent_2021": {
+        "unrest_to_onset_hours": null,
+        "unrest_to_onset_precision": "month or year precision only",
+        "onset_to_first_pdc_hours": 24.0,
+        "onset_to_first_pdc_precision": "day"
+      },
+      "heimaey_1973": {
+        "unrest_to_onset_hours": 29.833333333333332,
+        "unrest_to_onset_precision": "minute",
+        "onset_to_first_pdc_hours": null,
+        "onset_to_first_pdc_precision": "missing fact"
+      },
+      "pelee_1902": {
+        "unrest_to_onset_hours": null,
+        "unrest_to_onset_precision": "month or year precision only",
+        "onset_to_first_pdc_hours": 360.0,
+        "onset_to_first_pdc_precision": "day"
+      },
+      "miyakejima_2000": {
+        "unrest_to_onset_hours": 24.0,
+        "unrest_to_onset_precision": "day",
+        "onset_to_first_pdc_hours": 1512.0,
+        "onset_to_first_pdc_precision": "day"
+      },
+      "montserrat_1995": {
+        "unrest_to_onset_hours": null,
+        "unrest_to_onset_precision": "month or year precision only",
+        "onset_to_first_pdc_hours": 6240.0,
+        "onset_to_first_pdc_precision": "day"
+      },
+      "la_palma_2021": {
+        "unrest_to_onset_hours": 192.0,
+        "unrest_to_onset_precision": "day",
+        "onset_to_first_pdc_hours": null,
+        "onset_to_first_pdc_precision": "missing fact"
+      }
+    },
+    "n": 6,
+    "method": "Subtract the headline (first listed) facts in case_studies.json. Both with a time and the same time basis: minute precision. Otherwise whole-day differences of the calendar dates: day precision, value is days x 24. Month-only, year-only or undated facts give null.",
+    "source_ids": [
+      "case_studies"
+    ],
+    "region": "Selected island events",
+    "caveat": "Day-precision values can be wrong by up to about a day, and a value of 0 is possible. Nulls mean the source lacks precision, not that the gap is unknown in the literature. Selected cases, not a random sample. Onset may mean effusive, phreatic or explosive onset, as stated in each fact; St Vincent uses the explosive onset."
+  }
+}

@@ -1,0 +1,4 @@
+# Physics engine extras, on top of requirements.txt. Pin exact versions once each is in use.
+pint==0.26.2
+rasterio==1.5.2
+scipy==1.18.1

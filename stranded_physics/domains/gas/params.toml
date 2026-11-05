@@ -1,0 +1,121 @@
+# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "gas.peak_so2_flux"
+value = 85.0
+unit = "kg/s"
+valid_min = 0.1
+valid_max = 2000.0
+role = "input"
+status = "literature"
+source = "Carn et al. (2016) J. Volcanol. Geotherm. Res. 311:99-134"
+
+# Unconstrained SO2 fraction, chosen before reading gates; not a measured composition.
+[[parameter]]
+id = "gas.so2_mass_fraction"
+value = 0.001
+unit = "dimensionless"
+valid_min = 0.0
+valid_max = 0.1
+role = "input"
+status = "assumption"
+
+# Steady plume calm-wind floor; unresolved dispersion in calm weather.
+[[parameter]]
+id = "gas.min_wind"
+value = 0.5
+unit = "m/s"
+valid_min = 0.01
+valid_max = 10.0
+role = "input"
+status = "assumption"
+
+# Effective height above vent; no measured plume rise.
+[[parameter]]
+id = "gas.release_height"
+value = 100.0
+unit = "m"
+valid_min = 0.0
+valid_max = 5000.0
+role = "input"
+status = "assumption"
+
+# Briggs open country class D coefficient, recalled from memory.
+[[parameter]]
+id = "gas.sigma_y_coefficient"
+value = 0.08
+unit = "dimensionless"
+valid_min = 0.001
+valid_max = 1.0
+role = "input"
+status = "assumption"
+
+# Briggs open country class D coefficient, recalled from memory.
+[[parameter]]
+id = "gas.sigma_y_decay"
+value = 0.0001
+unit = "1/m"
+valid_min = 0.0
+valid_max = 0.1
+role = "input"
+status = "assumption"
+
+# Briggs open country class D coefficient, recalled from memory.
+[[parameter]]
+id = "gas.sigma_z_coefficient"
+value = 0.06
+unit = "dimensionless"
+valid_min = 0.001
+valid_max = 1.0
+role = "input"
+status = "assumption"
+
+# Briggs open country class D coefficient, recalled from memory.
+[[parameter]]
+id = "gas.sigma_z_decay"
+value = 0.0015
+unit = "1/m"
+valid_min = 0.0
+valid_max = 0.1
+role = "input"
+status = "assumption"
+
+# UTC epoch of requested measurement axis start; task-specified measurement convention.
+[[parameter]]
+id = "gas.measure_axis_start"
+value = 1617840000.0
+unit = "s"
+valid_min = 0.0
+valid_max = 4000000000.0
+role = "input"
+status = "assumption"
+
+# UTC epoch of requested integration end; task-specified measurement convention.
+[[parameter]]
+id = "gas.measure_axis_end"
+value = 1618012800.0
+unit = "s"
+valid_min = 0.0
+valid_max = 4000000000.0
+role = "input"
+status = "assumption"
+
+# Hourly resolution requested by task; interval source approximated by Eruption.
+[[parameter]]
+id = "gas.measure_step"
+value = 3600.0
+unit = "s"
+valid_min = 1.0
+valid_max = 86400.0
+role = "input"
+status = "assumption"
+
+# Reproducible measurement RNG; Eruption gas/mass outputs do not depend on this seed.
+[[parameter]]
+id = "gas.measure_seed"
+value = 0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 4294967295
+role = "input"
+status = "assumption"

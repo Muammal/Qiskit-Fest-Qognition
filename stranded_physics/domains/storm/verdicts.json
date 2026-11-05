@@ -1,0 +1,35 @@
+{
+  "storm-beryl-peak": {
+    "closest_km": 75.53214107195339,
+    "hash": "6a2696a8ae4b0111ba8de44a6780ce1bc4731e15c83022a772ff46b550db3d35",
+    "peak_m_s": 42.63812758951193,
+    "time_utc": "2024-07-01T15:00:00Z",
+    "verdict": "NO_TARGET"
+  },
+  "storm-cyclone-rate": {
+    "first_year": 1980,
+    "hash": "93c2dd95da07ea7e51da757000ea1588383257fb6a2ec7500c62532442806815",
+    "last_year": 2025,
+    "named_storms": 47,
+    "radius_km": 200.0,
+    "storms_per_year": 1.0217391304347827,
+    "verdict": "NO_TARGET"
+  },
+  "storm-generator": {
+    "hash": "9dae3b07e16253efe515d6d5f0f55b5934a6b3a22b4c21281006562e4e13eebc",
+    "verdict": "PASS"
+  },
+  "storm-model": {
+    "hash": "e6c77de89ae50eea3066553a46fec4db6d0aa2b07f86cea2792c7e9200a75ec8",
+    "verdict": "PASS"
+  },
+  "storm-wind-holdout": {
+    "hash": "321053ad6c8fa69d554a7a40ef2328252b819d5a4e5ef1522ddcef21c76fbae2",
+    "value": 0.09447491525423724,
+    "verdict": "PASS"
+  },
+  "storm.records_and_units": {
+    "hash": "f15c1b993eb75ec2322cefb264bf271702c49b6610e081f8daa2d67647c03989",
+    "verdict": "PASS"
+  }
+}

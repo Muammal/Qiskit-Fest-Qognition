@@ -1,0 +1,27 @@
+# One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+
+[[dataset]]
+id = "einarsson_2018"
+kind = "article"
+url = "https://www.frontiersin.org/articles/10.3389/feart.2018.00045"
+retrieved_utc = "2026-11-03T22:44:12.563770+00:00"
+sha256 = "7f28a113d592e50609232af929cb90ab83b196fa14e7fb68eb30f1729da3119b"
+licence = "CC BY, stated on the article page"
+licence_confirmed = true
+citation = "Einarsson, P., 2018, Short-Term Seismic Precursors to Icelandic Eruptions 1973-2014, Frontiers in Earth Science 6:45, doi:10.3389/feart.2018.00045"
+split = "reference"
+content_check = "min_bytes:1000"
+notes = "file: raw/einarsson_2018.html"
+
+[[dataset]]
+id = "noaa_earthquakes"
+kind = "catalogue"
+url = "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/earthquakes?itemsPerPage=200&page=1"
+retrieved_utc = "2026-11-03T22:41:29.537966+00:00"
+sha256 = "9ae94b91961a1e5c29ad57b115293ea9ef62ab34f1c199c88be72679442b462f"
+licence = "not confirmed"
+licence_confirmed = false
+citation = "NCEI/WDS Global Significant Earthquake Database, via the HazEL API. Exact citation text not read."
+split = "calibration"
+content_check = "min_bytes:1000"
+notes = "file: raw/noaa_earthquakes.json"

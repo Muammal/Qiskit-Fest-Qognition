@@ -1,0 +1,46 @@
+# lahar T1 settings. All are assumptions until a dated local lahar and rain record is found.
+
+[[parameter]]
+id = "lahar.rain_threshold"  # Near the 5 to 10 mm/h reported for lahars on fresh Caribbean deposits. From memory, so check against Barclay et al. 2007 in T-104.
+value = 5.0
+unit = "mm/h"
+valid_min = 0.5
+valid_max = 100.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "lahar.ash_threshold"  # Enough fresh ash, about 1 mm, to matter.
+value = 1.0
+unit = "kg/m**2"
+valid_min = 0.01
+valid_max = 100.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "lahar.bulking"  # Volume of mudflow per volume of rain runoff, as sediment joins it.
+value = 2.0
+unit = "dimensionless"
+valid_min = 1.0
+valid_max = 5.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "lahar.source_radius"  # Ash this close to the vent feeds a mudflow.
+value = 5000.0
+unit = "m"
+valid_min = 500.0
+valid_max = 15000.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "lahar.reach_radius"  # T1 cannot follow one channel, so mudflows are limited to cells this close to the vent.
+value = 12000.0
+unit = "m"
+valid_min = 1000.0
+valid_max = 30000.0
+role = "convention"
+status = "assumption"

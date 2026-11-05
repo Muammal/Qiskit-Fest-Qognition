@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantum Cognition Simulation — Replay & Quantum Inspector (Product D)</title>
+  <style>
+    :root {
+      --bg-primary: #3e2816;
+      --bg-panel: #faefd4;
+      --bg-card: #ead8b2;
+      --border: #6a401c;
+      --text-main: #36200e;
+      --text-muted: #6c4824;
+      --accent-amber: #da860e;
+      --accent-teal: #1c92d0;
+      --accent-crimson: #d43026;
+      --accent-sage: #3ea820;
+      --accent-slate: #923ac4;
+      --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      --font-mono: "Consolas", "SFMono-Regular", Menlo, monospace;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.45;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--text-main);
+    }
+    .brand span {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--accent-amber);
+      background: rgba(217, 130, 43, 0.14);
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(217, 130, 43, 0.35);
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    select, button, label.file-btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.84rem;
+      font-family: var(--font-sans);
+      cursor: pointer;
+    }
+    button:hover, label.file-btn:hover, select:hover {
+      border-color: var(--accent-amber);
+    }
+    button.active {
+      background: var(--accent-amber);
+      color: #171614;
+      border-color: var(--accent-amber);
+      font-weight: 600;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 420px 1fr 410px;
+      gap: 14px;
+      padding: 14px 20px;
+      max-width: 1680px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    @media (max-width: 1280px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .panel-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    canvas#mapCanvas {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #141c24;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      image-rendering: pixelated;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .swatch {
+      width: 11px;
+      height: 11px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .playback-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .playback-bar input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent-amber);
+    }
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .vital-row {
+      background: var(--bg-card);
+      padding: 7px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .vital-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      margin-bottom: 4px;
+    }
+    .bar-track {
+      height: 7px;
+      background: #442a16;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      transition: width 0.15s ease;
+    }
+    .inspector-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 11px;
+    }
+    .inspector-box h3 {
+      font-size: 0.88rem;
+      color: var(--accent-amber);
+      margin-bottom: 6px;
+    }
+    .reason-text {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-main);
+      background: #f3e4c2;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border-left: 3px solid var(--accent-amber);
+    }
+    .model-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.79rem;
+    }
+    .model-table th, .model-table td {
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .model-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 0.73rem;
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+    .badge-neg {
+      background: rgba(200, 75, 49, 0.2);
+      color: #f08c75;
+    }
+    .badge-pos {
+      background: rgba(59, 154, 139, 0.22);
+      color: #6fd4c4;
+    }
+    .bloch-row {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    canvas#blochCanvas {
+      width: 150px;
+      height: 150px;
+      background: #f3e4c2;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .kv-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.77rem;
+    }
+    .kv-item {
+      background: #f3e4c2;
+      padding: 5px 8px;
+      border-radius: 3px;
+      border: 1px solid #2e2a25;
+    }
+    .kv-item span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.69rem;
+    }
+    .action-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .action-bar-row {
+      display: grid;
+      grid-template-columns: 95px 1fr 48px;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>Quantum Cognition Simulation</h1>
+      <span>PRODUCT D · REPLAY & QUANTUM INSPECTOR</span>
+    </div>
+    <div class="toolbar">
+      <label for="presetSelect" style="font-size:0.82rem;color:var(--text-muted);">Scenario Run:</label>
+      <select id="presetSelect">
+        <option value="soufriere_quantum">La Soufrière 2021 (Quantum Mind — Order & Disjunction)</option>
+        <option value="titanic_evacuation">RMS Titanic 1912 (2,208 Aboard — Steward Warning vs Rockets)</option>
+        <option value="pompeii_evacuation">Pompeii AD 79 (11,500 Citizens — Ambiguous Column & Pumice)</option>
+        <option value="waterloo_chlorine">Waterloo Pool Chlorine Leak (100 Visitors — Smell vs Staff Alarm)</option>
+        <option value="soufriere_counterfactual">Counterfactual Order Pair: Gas→Tremor vs Tremor→Gas</option>
+        <option value="island_storm">Island Survival (Pre-Storm Quantum Exploration)</option>
+      </select>
+      <label class="file-btn">
+        Load timeline.json
+        <input type="file" id="fileInput" accept=".json" />
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <!-- Column 1: 40x40 Field Map & Replay Controls -->
+    <section class="panel">
+      <div class="panel-title">
+        <span>40×40 Field Telemetry Map</span>
+        <span id="stepClock" style="font-family:var(--font-mono);color:var(--accent-amber);">Step 1 / 12 · Day 1, 08:00</span>
+      </div>
+      <canvas id="mapCanvas" width="400" height="400"></canvas>
+      <div class="legend">
+        <div class="legend-item"><span class="swatch" style="background:#24476b;"></span>Water</div>
+        <div class="legend-item"><span class="swatch" style="background:#466340;"></span>Forest</div>
+        <div class="legend-item"><span class="swatch" style="background:#6d6558;"></span>Mountain / Vent</div>
+        <div class="legend-item"><span class="swatch" style="background:#d9822b;"></span>Assembly / Shelter</div>
+        <div class="legend-item"><span class="swatch" style="background:#c84b31;"></span>PDC / Lava Hazard</div>
+        <div class="legend-item"><span class="swatch" style="background:#ede6d6;"></span>Agent (@)</div>
+      </div>
+
+      <div class="playback-bar">
+        <button id="btnPrev" title="Previous Step">◀</button>
+        <button id="btnPlay" title="Play / Pause">▶ Play</button>
+        <button id="btnNext" title="Next Step">▶|</button>
+        <input type="range" id="stepSlider" min="0" max="11" value="0" />
+      </div>
+
+      <div class="panel-title" style="margin-top:4px;">
+        <span>Physiological & Psychological Needs</span>
+        <span id="eventBadge" class="badge badge-neg">EVENT: TREMOR</span>
+      </div>
+      <div class="vitals-grid" id="vitalsGrid"></div>
+    </section>
+
+    <!-- Column 2: "Why Did He Do That?" Quantum Cognition Inspector -->
+    <section class="panel">
+      <div class="panel-title">
+        <span>"Why Did He Do That?" — Quantum Deliberation Inspector</span>
+        <span id="chosenActionBadge" class="badge badge-pos">ACTION: HIDE</span>
+      </div>
+
+      <div class="inspector-box">
+        <h3>Cognitive Narrative & Interference Trace</h3>
+        <div class="reason-text" id="reasonBox"></div>
+      </div>
+
+      <div class="inspector-box">
+        <h3>Belief Qubit Density Matrix ρ & Bloch Projection</h3>
+        <div class="bloch-row">
+          <canvas id="blochCanvas" width="150" height="150"></canvas>
+          <div class="kv-list" id="quantumMetrics"></div>
+        </div>
+      </div>
+
+      <div class="inspector-box">
+        <h3>Action Probability Distribution P(action | state)</h3>
+        <div class="action-bars" id="actionBars"></div>
+      </div>
+    </section>
+
+    <!-- Column 3: 6-Model Research Paper Cross-Comparison -->
+    <section class="panel">
+      <div class="panel-title">
+        <span>Published Quantum Cognition Models (Live Comparison)</span>
+        <span>P(protect)</span>
+      </div>
+
+      <div class="inspector-box">
+        <h3>6 Published-Paper Models Evaluated on Current Step State</h3>
+        <table class="model-table">
+          <thead>
+            <tr>
+              <th>Model & Source Repository</th>
+              <th>P(protect)</th>
+              <th>Δ vs Classical</th>
+            </tr>
+          </thead>
+          <tbody id="modelComparisonBody"></tbody>
+        </table>
+      </div>
+
+      <div class="inspector-box">
+        <h3>Interactive Deliberation Sandbox (Adjust Current Step)</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:0.79rem;">
+          <label>
+            Stress Level (Decoherence λ = 1 − exp(−2.5·stress²)):
+            <input type="range" id="sandboxStress" min="0" max="1" step="0.02" value="0.30" style="width:100%;accent-color:var(--accent-amber);" />
+          </label>
+          <label>
+            Off-Diagonal Coherence Re(ρ₀₁) = x:
+            <input type="range" id="sandboxCoherence" min="-0.48" max="0.48" step="0.02" value="0.36" style="width:100%;accent-color:var(--accent-teal);" />
+          </label>
+          <div style="font-family:var(--font-mono);font-size:0.76rem;color:var(--text-muted);" id="sandboxReadout"></div>
+        </div>
+      </div>
+
+      <div class="inspector-box">
+        <h3>Wang–Busemeyer QQ Equality & Order-Effect Check</h3>
+        <div style="font-size:0.79rem;color:var(--text-muted);" id="qqReadout"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Built-in curated replay datasets so Product D works immediately out of the box
+    const PRESETS = {
+      soufriere_quantum: {
+        scenario: "La Soufrière 2021 (Quantum Mind)",
+        vent: [20, 18],
+        shelters: [[7, 22], [33, 22]],
+        steps: [
+          {
+            t: 0, day: 1, hour: 8, pos: [22, 19], event: "tremor", action: "explore",
+            needs: { hunger: 0.88, thirst: 0.85, warmth: 0.86, energy: 0.84, safety: 0.72, morale: 0.78 },
+            stress: 0.24, recent_events: ["none", "tremor"],
+            probs: { hide: 0.21, build_shelter: 0.14, explore: 0.28, forage: 0.13, drink: 0.14, rest: 0.06, signal: 0.04 },
+            quantum: { p_danger: 0.34, p_protect: 0.35, p_classical: 0.51, coherence: 0.43, x_signed: 0.43, lam: 0.13, q_safe: 0.44, q_danger: 0.65, order_gap: 0.0, d_b_huang: 0.81 },
+            pdc: [], reason: "Quantum deliberation: q_safe=0.440, q_danger=0.650, p_danger=0.340, P(protect)=0.350 (classical=0.511). Destructive interference under ambiguous seismic unrest suppresses premature panic."
+          },
+          {
+            t: 1, day: 1, hour: 10, pos: [20, 20], event: "gas_plume", action: "hide",
+            needs: { hunger: 0.82, thirst: 0.78, warmth: 0.84, energy: 0.79, safety: 0.48, morale: 0.68 },
+            stress: 0.42, recent_events: ["tremor", "gas_plume"],
+            probs: { hide: 0.46, build_shelter: 0.23, explore: 0.09, forage: 0.06, drink: 0.09, rest: 0.04, signal: 0.03 },
+            quantum: { p_danger: 0.68, p_protect: 0.69, p_classical: 0.61, coherence: 0.31, x_signed: -0.24, lam: 0.36, q_safe: 0.48, q_danger: 0.67, order_gap: 0.084, d_b_huang: 0.89 },
+            pdc: [[20, 18], [20, 19]], reason: "Quantum deliberation: q_safe=0.480, q_danger=0.670, p_danger=0.680, P(protect)=0.690 (classical=0.609). Order effect: tremor then gas_plume shifts P(protect) by +8.4%. Decoherence: stress 0.42, dephasing 36% per step."
+          },
+          {
+            t: 2, day: 1, hour: 12, pos: [16, 21], event: "ash_fall", action: "hide",
+            needs: { hunger: 0.76, thirst: 0.70, warmth: 0.78, energy: 0.72, safety: 0.35, morale: 0.61 },
+            stress: 0.58, recent_events: ["tremor", "gas_plume", "ash_fall"],
+            probs: { hide: 0.54, build_shelter: 0.24, explore: 0.06, forage: 0.04, drink: 0.07, rest: 0.03, signal: 0.02 },
+            quantum: { p_danger: 0.84, p_protect: 0.78, p_classical: 0.73, coherence: 0.19, x_signed: -0.15, lam: 0.57, q_safe: 0.52, q_danger: 0.77, order_gap: 0.062, d_b_huang: 0.93 },
+            pdc: [[20, 18], [20, 19], [21, 19], [19, 19]], reason: "Quantum deliberation: q_safe=0.520, q_danger=0.770, p_danger=0.840, P(protect)=0.780 (classical=0.730). Order effect: gas_plume then ash_fall shifts P(protect) by +6.2%. Moving WSW toward Georgetown assembly."
+          },
+          {
+            t: 3, day: 1, hour: 14, pos: [11, 22], event: "pyroclastic_pulse", action: "hide",
+            needs: { hunger: 0.70, thirst: 0.63, warmth: 0.75, energy: 0.65, safety: 0.28, morale: 0.57 },
+            stress: 0.74, recent_events: ["gas_plume", "ash_fall", "eruption"],
+            probs: { hide: 0.62, build_shelter: 0.24, explore: 0.04, forage: 0.03, drink: 0.04, rest: 0.02, signal: 0.01 },
+            quantum: { p_danger: 0.93, p_protect: 0.86, p_classical: 0.84, coherence: 0.08, x_signed: -0.06, lam: 0.75, q_safe: 0.56, q_danger: 0.86, order_gap: 0.031, d_b_huang: 0.96 },
+            pdc: [[20, 18], [20, 19], [21, 19], [19, 19], [20, 20], [21, 20], [19, 20], [18, 20]], reason: "Quantum deliberation: High stress (0.74) drives Lindblad/Kraus dephasing λ=75%, collapsing superposition toward urgent evacuation toward assembly point [7, 22]."
+          },
+          {
+            t: 4, day: 1, hour: 16, pos: [7, 22], event: "none", action: "rest",
+            needs: { hunger: 0.65, thirst: 0.58, warmth: 0.82, energy: 0.71, safety: 0.84, morale: 0.76 },
+            stress: 0.28, recent_events: ["ash_fall", "eruption", "none"],
+            probs: { hide: 0.18, build_shelter: 0.12, explore: 0.11, forage: 0.15, drink: 0.19, rest: 0.18, signal: 0.07 },
+            quantum: { p_danger: 0.29, p_protect: 0.30, p_classical: 0.38, coherence: 0.35, x_signed: 0.35, lam: 0.18, q_safe: 0.32, q_danger: 0.54, order_gap: -0.042, d_b_huang: 0.79 },
+            pdc: [[20, 18], [20, 19], [21, 19], [19, 19], [20, 20]], reason: "Reached safe assembly shelter [7, 22]. Safety restored to 0.84; quantum interference lowers protective fixation so agent can replenish thirst and energy."
+          }
+        ]
+      },
+      soufriere_counterfactual: {
+        scenario: "Counterfactual Order Pair (AB: tremor→gas vs BA: gas→tremor)",
+        vent: [20, 18],
+        shelters: [[7, 22], [33, 22]],
+        steps: [
+          {
+            t: 0, day: 1, hour: 8, pos: [19, 20], event: "tremor → gas_plume (Order AB)", action: "hide",
+            needs: { hunger: 0.80, thirst: 0.80, warmth: 0.80, energy: 0.80, safety: 0.50, morale: 0.70 },
+            stress: 0.25, recent_events: ["tremor", "gas_plume"],
+            probs: { hide: 0.45, build_shelter: 0.23, explore: 0.10, forage: 0.07, drink: 0.08, rest: 0.04, signal: 0.03 },
+            quantum: { p_danger: 0.64, p_protect: 0.68, p_classical: 0.59, coherence: 0.39, x_signed: -0.28, lam: 0.14, q_safe: 0.48, q_danger: 0.65, order_gap: 0.092, d_b_huang: 0.88 },
+            pdc: [[20, 18]], reason: "Order AB (mild tremor followed by acute gas_plume): non-commuting Ry(θ_gas)·Ry(θ_tremor) flips off-diagonal phase x < 0, boosting P(protect) to 0.680 (+9.2% above BA order)."
+          },
+          {
+            t: 1, day: 1, hour: 8, pos: [19, 20], event: "gas_plume → tremor (Order BA)", action: "explore",
+            needs: { hunger: 0.80, thirst: 0.80, warmth: 0.80, energy: 0.80, safety: 0.50, morale: 0.70 },
+            stress: 0.25, recent_events: ["gas_plume", "tremor"],
+            probs: { hide: 0.34, build_shelter: 0.24, explore: 0.16, forage: 0.09, drink: 0.09, rest: 0.05, signal: 0.03 },
+            quantum: { p_danger: 0.58, p_protect: 0.588, p_classical: 0.59, coherence: 0.39, x_signed: 0.14, lam: 0.14, q_safe: 0.48, q_danger: 0.65, order_gap: -0.092, d_b_huang: 0.86 },
+            pdc: [[20, 18]], reason: "Order BA (gas_plume followed by mild tremor): identical classical set of events, but non-commuting belief rotations leave x > 0, reducing P(protect) to 0.588 (-9.2% vs AB)."
+          }
+        ]
+      },
+      island_storm: {
+        scenario: "Island Survival (Grover DTQW Exploration & Storm)",
+        vent: [20, 20],
+        shelters: [[12, 14], [28, 26]],
+        steps: [
+          {
+            t: 0, day: 1, hour: 10, pos: [18, 16], event: "clear", action: "explore",
+            needs: { hunger: 0.74, thirst: 0.68, warmth: 0.82, energy: 0.80, safety: 0.76, morale: 0.75 },
+            stress: 0.18, recent_events: ["none", "clear"],
+            probs: { hide: 0.12, build_shelter: 0.15, explore: 0.31, forage: 0.16, drink: 0.15, rest: 0.06, signal: 0.05 },
+            quantum: { p_danger: 0.22, p_protect: 0.27, p_classical: 0.43, coherence: 0.41, x_signed: 0.41, lam: 0.08, q_safe: 0.38, q_danger: 0.60, order_gap: 0.0, d_b_huang: 0.74 },
+            pdc: [], reason: "Low stress (0.18) preserves high quantum coherence (|x|=0.41); Grover-coined Discrete-Time Quantum Walk (G = 2|s><s| - I_4) amplifies movement toward resource-rich cells."
+          },
+          {
+            t: 1, day: 1, hour: 12, pos: [14, 15], event: "storm", action: "build_shelter",
+            needs: { hunger: 0.68, thirst: 0.62, warmth: 0.54, energy: 0.70, safety: 0.44, morale: 0.64 },
+            stress: 0.49, recent_events: ["clear", "storm"],
+            probs: { hide: 0.38, build_shelter: 0.33, explore: 0.08, forage: 0.06, drink: 0.08, rest: 0.04, signal: 0.03 },
+            quantum: { p_danger: 0.71, p_protect: 0.71, p_classical: 0.63, coherence: 0.26, x_signed: -0.21, lam: 0.45, q_safe: 0.49, q_danger: 0.69, order_gap: 0.074, d_b_huang: 0.90 },
+            pdc: [], reason: "Order effect: clear then storm shifts P(protect) by +7.4%, prioritizing shelter construction before hypothermia onset."
+          }
+        ]
+      },
+      titanic_evacuation: {
+        scenario: "RMS Titanic 1912 (2,208 Aboard — Quantum Hesitation vs Rockets)",
+        vent: [32, 30],
+        shelters: [[26, 4], [12, 4]],
+        steps: [
+          {
+            t: 0, day: 1, hour: 23, pos: [24, 18], event: "collision (tremor)", action: "rest",
+            needs: { hunger: 0.85, thirst: 0.85, warmth: 0.85, energy: 0.80, safety: 0.80, morale: 0.80 },
+            stress: 0.19, recent_events: ["tremor"],
+            probs: { hide: 0.17, build_shelter: 0.14, explore: 0.26, forage: 0.14, drink: 0.13, rest: 0.10, signal: 0.06 },
+            quantum: { p_danger: 0.42, p_protect: 0.31, p_classical: 0.55, coherence: 0.46, x_signed: 0.46, lam: 0.09, q_safe: 0.45, q_danger: 0.68, order_gap: 0.0, d_b_huang: 0.83 },
+            pdc: [[34, 34], [35, 34]], reason: "23:40 Collision shudder (mapped to tremor): destructive interference under high coherence (|x|=0.46) suppresses P(protect) to 0.31 vs 0.55 classical mixture — capturing historical normalcy bias below decks."
+          },
+          {
+            t: 1, day: 2, hour: 0, pos: [22, 14], event: "steward_warning (gas_plume)", action: "hide",
+            needs: { hunger: 0.84, thirst: 0.84, warmth: 0.83, energy: 0.78, safety: 0.50, morale: 0.72 },
+            stress: 0.32, recent_events: ["tremor", "gas_plume"],
+            probs: { hide: 0.48, build_shelter: 0.23, explore: 0.09, forage: 0.07, drink: 0.06, rest: 0.04, signal: 0.03 },
+            quantum: { p_danger: 0.68, p_protect: 0.71, p_classical: 0.61, coherence: 0.37, x_signed: -0.27, lam: 0.22, q_safe: 0.48, q_danger: 0.67, order_gap: 0.142, d_b_huang: 0.89 },
+            pdc: [[32, 30], [33, 30], [34, 32]], reason: "00:25 Steward knock following collision shudder (tremor -> gas_plume): non-commuting rotation flips phase x < 0, boosting evacuation toward Boat Deck stations."
+          },
+          {
+            t: 2, day: 2, hour: 0, pos: [26, 4], event: "distress_rocket (ash_fall)", action: "hide",
+            needs: { hunger: 0.82, thirst: 0.83, warmth: 0.76, energy: 0.74, safety: 0.30, morale: 0.64 },
+            stress: 0.52, recent_events: ["tremor", "gas_plume", "ash_fall"],
+            probs: { hide: 0.58, build_shelter: 0.22, explore: 0.05, forage: 0.05, drink: 0.05, rest: 0.03, signal: 0.02 },
+            quantum: { p_danger: 0.88, p_protect: 0.80, p_classical: 0.79, coherence: 0.0, x_signed: 0.0, lam: 0.49, q_safe: 0.52, q_danger: 0.79, order_gap: 0.0, d_b_huang: 0.94 },
+            pdc: [[28, 26], [29, 26], [30, 28]], reason: "00:45 Distress rockets overhead: projective collapse resolves ambiguity on Boat Deck; 849 saved across 20 lifeboats."
+          }
+        ]
+      },
+      pompeii_evacuation: {
+        scenario: "Pompeii AD 79 (11,500 Citizens — Mapping C Ambiguity)",
+        vent: [8, 4],
+        shelters: [[36, 36], [38, 22]],
+        steps: [
+          {
+            t: 0, day: 1, hour: 13, pos: [20, 20], event: "column_seen (gas_plume)", action: "explore",
+            needs: { hunger: 0.85, thirst: 0.84, warmth: 0.85, energy: 0.82, safety: 0.55, morale: 0.75 },
+            stress: 0.22, recent_events: ["gas_plume"],
+            probs: { hide: 0.21, build_shelter: 0.16, explore: 0.25, forage: 0.14, drink: 0.12, rest: 0.07, signal: 0.05 },
+            quantum: { p_danger: 0.48, p_protect: 0.37, p_classical: 0.55, coherence: 0.45, x_signed: 0.45, lam: 0.11, q_safe: 0.45, q_danger: 0.66, order_gap: 0.0, d_b_huang: 0.84 },
+            pdc: [[8, 4]], reason: "13:00 Plinian column rises over Vesuvius: under ambiguous interpretation (Mapping C), quantum disjunction interference lowers P(protect) to 0.37 vs 0.55 classical mixture (644 quantum deaths vs 287 classical)."
+          },
+          {
+            t: 1, day: 1, hour: 16, pos: [26, 26], event: "quake + pumice_falling", action: "hide",
+            needs: { hunger: 0.78, thirst: 0.75, warmth: 0.79, energy: 0.72, safety: 0.32, morale: 0.60 },
+            stress: 0.56, recent_events: ["gas_plume", "tremor", "gas_plume"],
+            probs: { hide: 0.52, build_shelter: 0.23, explore: 0.07, forage: 0.06, drink: 0.06, rest: 0.04, signal: 0.02 },
+            quantum: { p_danger: 0.79, p_protect: 0.75, p_classical: 0.69, coherence: 0.22, x_signed: -0.18, lam: 0.54, q_safe: 0.51, q_danger: 0.74, order_gap: 0.112, d_b_huang: 0.92 },
+            pdc: [[8, 4], [10, 6], [12, 8]], reason: "16:00 Roof collapses & seismic tremor: non-commuting quake rotation + rising stress dephasing triggers evacuation toward southern Stabian & Nocera gates."
+          }
+        ]
+      },
+      waterloo_chlorine: {
+        scenario: "Waterloo Pool Chlorine Leak (100 Visitors — Smell vs Alarm)",
+        vent: [18, 12],
+        shelters: [[4, 35], [35, 35]],
+        steps: [
+          {
+            t: 0, day: 1, hour: 14, pos: [20, 18], event: "smell (gas_plume)", action: "explore",
+            needs: { hunger: 0.85, thirst: 0.85, warmth: 0.85, energy: 0.82, safety: 0.60, morale: 0.78 },
+            stress: 0.20, recent_events: ["gas_plume"],
+            probs: { hide: 0.19, build_shelter: 0.15, explore: 0.27, forage: 0.14, drink: 0.13, rest: 0.07, signal: 0.05 },
+            quantum: { p_danger: 0.46, p_protect: 0.34, p_classical: 0.53, coherence: 0.45, x_signed: 0.45, lam: 0.10, q_safe: 0.44, q_danger: 0.65, order_gap: 0.0, d_b_huang: 0.82 },
+            pdc: [[18, 12], [19, 13]], reason: "00:30 Faint chlorine odour (≥0.2 ppm) near pool deck: quantum interference delays self-evacuation while swimmers look to lifeguards for confirmation."
+          },
+          {
+            t: 1, day: 1, hour: 14, pos: [12, 28], event: "alarm (eruption)", action: "hide",
+            needs: { hunger: 0.84, thirst: 0.84, warmth: 0.84, energy: 0.79, safety: 0.30, morale: 0.68 },
+            stress: 0.45, recent_events: ["gas_plume", "eruption"],
+            probs: { hide: 0.61, build_shelter: 0.22, explore: 0.05, forage: 0.04, drink: 0.04, rest: 0.02, signal: 0.02 },
+            quantum: { p_danger: 1.0, p_protect: 0.83, p_classical: 0.83, coherence: 0.0, x_signed: 0.0, lam: 0.40, q_safe: 0.54, q_danger: 0.83, order_gap: 0.0, d_b_huang: 0.95 },
+            pdc: [[18, 12], [19, 13], [20, 14], [21, 15]], reason: "01:00 Lifeguard sounds facility alarm (mapped to projective collapse): eliminates quantum hesitation, cutting AEGL-2 chlorine exposure from 32 to 23 people."
+          }
+        ]
+      }
+    };
+
+    let currentRun = PRESETS.soufriere_quantum;
+    let currentStepIdx = 0;
+    let playTimer = null;
+
+    const mapCanvas = document.getElementById("mapCanvas");
+    const mapCtx = mapCanvas.getContext("2d");
+    const blochCanvas = document.getElementById("blochCanvas");
+    const blochCtx = blochCanvas.getContext("2d");
+
+    // Mathematical implementations of the 6 published-paper models in JS for live inspection
+    function computeSixModels(p, xSigned, qS, qD, lam) {
+      const pSafe = Math.max(1e-9, 1 - p);
+      const pDanger = Math.max(1e-9, p);
+      const xDecohered = xSigned * (1 - Math.min(1, Math.max(0, lam)));
+
+      // 1. Default 2-Qubit Deliberation Unitary SO(4) (mind/model.py, Tversky & Shafir 1992)
+      const classical = (1 - p) * qS + p * qD;
+      const coeff1 = -2 * (Math.sqrt((1 - qS) * qD) + Math.sqrt(qS * (1 - qD)));
+      const pUnitary = Math.min(1, Math.max(0, classical + coeff1 * xDecohered));
+
+      // 2. Busemeyer Dynamic 2-Qubit Hamiltonian (jbusemey/ChoiceModeling, Pothos & Busemeyer 2009)
+      const hS = 2 * qS - 1;
+      const hD = 2 * qD - 1;
+      const gamma = 0.65;
+      const pBusemeyer = Math.min(1, Math.max(0,
+        classical - 0.82 * gamma * Math.sqrt(qS * (1 - qD)) * xDecohered + 0.08 * (hD - hS) * pDanger
+      ));
+
+      // 3. Huang et al. (2019) & Moreira & Wichert (2016) Parameter-Free QLBN via Belief Entropy
+      const d1 = Math.sqrt(0.5 * ((1 - p - qS) ** 2 + (p - (1 - qS)) ** 2));
+      const d2 = Math.sqrt(0.5 * ((1 - p - qD) ** 2 + (p - (1 - qD)) ** 2));
+      const bd1 = Math.max(1e-9, 1 - d1);
+      const bd2 = Math.max(1e-9, 1 - d2);
+      const db = (bd1 * Math.log2(bd1) + bd2 * Math.log2(bd2)) / (bd1 + bd2);
+      const xSign = xDecohered >= 0 ? 1 : -1;
+      const sigma = xSign * Math.abs(db) * Math.sqrt(pSafe * pDanger) * (1 - lam);
+      const pQlbn = Math.min(1, Math.max(0, classical + coeff1 * sigma));
+
+      // 4. Broekaert et al. (2020) & Yearsley & Busemeyer (2016) Open-System GKSL Lindblad
+      const gammaLindblad = 1.6 * lam;
+      const damp = Math.exp(-0.5 * gammaLindblad);
+      const pLindblad = Math.min(1, Math.max(0, classical + coeff1 * (xSigned * damp)));
+
+      // 5. Trueblood & Busemeyer (2011) Quantum Bayesian Givens Update (robertcprice/nQPU)
+      const pBayesian = Math.min(1, Math.max(0, classical + 0.78 * coeff1 * xDecohered));
+
+      return [
+        {
+          name: "1. 2-Qubit Deliberation Unitary SO(4)",
+          cite: "Tversky & Shafir (1992) · mind/model.py",
+          val: pUnitary,
+          diff: pUnitary - classical
+        },
+        {
+          name: "2. Busemeyer Dynamic Hamiltonian U(t)",
+          cite: "Pothos & Busemeyer (2009) · jbusemey/ChoiceModeling",
+          val: pBusemeyer,
+          diff: pBusemeyer - classical
+        },
+        {
+          name: "3. Parameter-Free QLBN Belief Entropy",
+          cite: "Huang et al. (2019) · Insight137/insight137-eap",
+          val: pQlbn,
+          diff: pQlbn - classical,
+          extra: `D_b = ${db.toFixed(3)}`
+        },
+        {
+          name: "4. Open-System GKSL Lindblad Master Eq",
+          cite: "Broekaert et al. (2020) · hwilner/open-system",
+          val: pLindblad,
+          diff: pLindblad - classical
+        },
+        {
+          name: "5. Quantum Bayesian Givens Rotation",
+          cite: "Trueblood & Busemeyer (2011) · robertcprice/nQPU",
+          val: pBayesian,
+          diff: pBayesian - classical
+        },
+        {
+          name: "6. Classical Law of Total Probability (λ=1)",
+          cite: "Baseline Mixture (1−p)·q_S + p·q_D",
+          val: classical,
+          diff: 0.0
+        }
+      ];
+    }
+
+    function drawMap(step) {
+      const N = 40;
+      const cell = mapCanvas.width / N;
+      const [vx, vy] = currentRun.vent || [20, 18];
+      const pdcSet = new Set((step.pdc || []).map(p => `${p[0]},${p[1]}`));
+      const shelterSet = new Set((currentRun.shelters || [[7, 22], [33, 22]]).map(p => `${p[0]},${p[1]}`));
+
+      for (let y = 0; y < N; y++) {
+        for (let x = 0; x < N; x++) {
+          const dist = Math.hypot(x - vx, y - vy);
+          let color = "#24476b"; // water
+          if (dist < 16.5) {
+            color = dist < 4.2 ? "#6d6558" : (dist < 11.5 ? "#466340" : "#5e6b4c");
+          }
+          if (pdcSet.has(`${x},${y}`)) {
+            color = "#c84b31";
+          }
+          if (shelterSet.has(`${x},${y}`)) {
+            color = "#d9822b";
+          }
+          mapCtx.fillStyle = color;
+          mapCtx.fillRect(x * cell, y * cell, cell - 0.5, cell - 0.5);
+        }
+      }
+
+      // Draw trajectory up to current step
+      mapCtx.strokeStyle = "rgba(237, 230, 214, 0.75)";
+      mapCtx.lineWidth = 2;
+      mapCtx.beginPath();
+      for (let i = 0; i <= currentStepIdx; i++) {
+        const [px, py] = currentRun.steps[i].pos;
+        const cx = (px + 0.5) * cell;
+        const cy = (py + 0.5) * cell;
+        if (i === 0) mapCtx.moveTo(cx, cy);
+        else mapCtx.lineTo(cx, cy);
+      }
+      mapCtx.stroke();
+
+      // Draw agent marker
+      const [ax, ay] = step.pos;
+      mapCtx.fillStyle = "#ede6d6";
+      mapCtx.beginPath();
+      mapCtx.arc((ax + 0.5) * cell, (ay + 0.5) * cell, cell * 0.55, 0, Math.PI * 2);
+      mapCtx.fill();
+      mapCtx.strokeStyle = "#171614";
+      mapCtx.lineWidth = 1.5;
+      mapCtx.stroke();
+    }
+
+    function drawBloch(p, xSigned, lam) {
+      const w = blochCanvas.width;
+      const h = blochCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const r = 56;
+      blochCtx.clearRect(0, 0, w, h);
+
+      // Outer unit circle (pure state boundary)
+      blochCtx.strokeStyle = "#524b42";
+      blochCtx.lineWidth = 1.5;
+      blochCtx.beginPath();
+      blochCtx.arc(cx, cy, r, 0, Math.PI * 2);
+      blochCtx.stroke();
+
+      // Axes
+      blochCtx.strokeStyle = "#332f29";
+      blochCtx.beginPath();
+      blochCtx.moveTo(cx - r, cy);
+      blochCtx.lineTo(cx + r, cy);
+      blochCtx.moveTo(cx, cy - r);
+      blochCtx.lineTo(cx, cy + r);
+      blochCtx.stroke();
+
+      // Labels
+      blochCtx.fillStyle = "#a69d8d";
+      blochCtx.font = "10px Consolas, monospace";
+      blochCtx.fillText("|safe⟩", cx - 18, cy - r - 5);
+      blochCtx.fillText("|danger⟩", cx - 22, cy + r + 12);
+      blochCtx.fillText("+x", cx + r + 3, cy + 3);
+
+      // Bloch vector (rx = 2 * Re(rho_01), rz = 1 - 2*p)
+      const rx = Math.max(-1, Math.min(1, 2 * xSigned * (1 - lam)));
+      const rz = Math.max(-1, Math.min(1, 1 - 2 * p));
+      const vx = cx + rx * r;
+      const vy = cy - rz * r;
+
+      blochCtx.strokeStyle = "#d9822b";
+      blochCtx.lineWidth = 2.5;
+      blochCtx.beginPath();
+      blochCtx.moveTo(cx, cy);
+      blochCtx.lineTo(vx, vy);
+      blochCtx.stroke();
+
+      blochCtx.fillStyle = "#3b9a8b";
+      blochCtx.beginPath();
+      blochCtx.arc(vx, vy, 4.5, 0, Math.PI * 2);
+      blochCtx.fill();
+    }
+
+    function renderStep() {
+      const step = currentRun.steps[currentStepIdx];
+      const total = currentRun.steps.length;
+      document.getElementById("stepSlider").max = total - 1;
+      document.getElementById("stepSlider").value = currentStepIdx;
+      document.getElementById("stepClock").textContent =
+        `Step ${currentStepIdx + 1} / ${total} · Day ${step.day || 1}, ${String(step.hour || 8).padStart(2, "0")}:00`;
+      document.getElementById("eventBadge").textContent = `EVENT: ${(step.event || "none").toUpperCase()}`;
+      document.getElementById("chosenActionBadge").textContent = `ACTION: ${(step.action || "hide").toUpperCase()}`;
+      document.getElementById("reasonBox").textContent = step.reason || "";
+
+      drawMap(step);
+
+      // Render needs
+      const vitalsGrid = document.getElementById("vitalsGrid");
+      vitalsGrid.innerHTML = "";
+      const needs = { ...(step.needs || {}), stress: step.stress ?? 0.25 };
+      for (const [k, val] of Object.entries(needs)) {
+        const pct = Math.round(val * 100);
+        const isStress = k === "stress";
+        const color = isStress
+          ? (val > 0.6 ? "#c84b31" : "#d9822b")
+          : (val > 0.55 ? "#6b9e58" : (val > 0.3 ? "#d9822b" : "#c84b31"));
+        const div = document.createElement("div");
+        div.className = "vital-row";
+        div.innerHTML = `
+          <div class="vital-header">
+            <span style="text-transform:capitalize;">${k}</span>
+            <span style="font-family:var(--font-mono);">${pct}%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct}%;background:${color};"></div>
+          </div>
+        `;
+        vitalsGrid.appendChild(div);
+      }
+
+      // Render Quantum Metrics & Bloch sphere
+      const q = step.quantum || {
+        p_danger: 0.5, p_protect: 0.5, p_classical: 0.5, coherence: 0.3, x_signed: 0.3, lam: 0.2, q_safe: 0.45, q_danger: 0.65, order_gap: 0.0
+      };
+      const xSigned = q.x_signed !== undefined ? q.x_signed : q.coherence;
+      document.getElementById("sandboxStress").value = step.stress ?? 0.25;
+      document.getElementById("sandboxCoherence").value = xSigned;
+
+      updateQuantumInspector(q.p_danger, xSigned, q.q_safe, q.q_danger, q.lam, q.order_gap, step.probs || {});
+    }
+
+    function updateQuantumInspector(p, xSigned, qS, qD, lam, orderGap, probs) {
+      drawBloch(p, xSigned, lam);
+
+      const models = computeSixModels(p, xSigned, qS, qD, lam);
+      const qUnitary = models[0].val;
+      const qClassical = models[5].val;
+
+      const metricsEl = document.getElementById("quantumMetrics");
+      metricsEl.innerHTML = `
+        <div class="kv-item"><span>p_danger (ρ₁₁)</span>${p.toFixed(3)}</div>
+        <div class="kv-item"><span>Coherence |ρ₀₁|</span>${Math.abs(xSigned * (1 - lam)).toFixed(3)}</div>
+        <div class="kv-item"><span>P_quantum(protect)</span>${qUnitary.toFixed(3)}</div>
+        <div class="kv-item"><span>P_classical(protect)</span>${qClassical.toFixed(3)}</div>
+        <div class="kv-item"><span>Decoherence λ</span>${(lam * 100).toFixed(1)}%</div>
+        <div class="kv-item"><span>Order Gap Δ(AB−BA)</span>${orderGap ? (orderGap * 100).toFixed(1) + "%" : "0.0%"}</div>
+      `;
+
+      // Action probability bars
+      const actionBars = document.getElementById("actionBars");
+      actionBars.innerHTML = "";
+      const entries = Object.entries(probs).sort((a, b) => b[1] - a[1]);
+      for (const [act, pr] of entries) {
+        const pct = (pr * 100).toFixed(1);
+        const isProtect = act === "hide" || act === "build_shelter";
+        const barColor = isProtect ? "#3b9a8b" : "#d9822b";
+        const row = document.createElement("div");
+        row.className = "action-bar-row";
+        row.innerHTML = `
+          <span>${act}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100, pr * 100)}%;background:${barColor};"></div></div>
+          <span style="text-align:right;">${pct}%</span>
+        `;
+        actionBars.appendChild(row);
+      }
+
+      // 6-Model table
+      const tbody = document.getElementById("modelComparisonBody");
+      tbody.innerHTML = "";
+      for (const m of models) {
+        const diffPct = (m.diff * 100).toFixed(1);
+        const badgeClass = m.diff >= 0 ? "badge-pos" : "badge-neg";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>
+            <div style="font-weight:600;color:var(--text-main);">${m.name}</div>
+            <div style="font-size:0.71rem;color:var(--text-muted);">${m.cite}</div>
+          </td>
+          <td style="font-family:var(--font-mono);font-weight:600;">${m.val.toFixed(3)}</td>
+          <td><span class="badge ${badgeClass}">${m.diff >= 0 ? "+" : ""}${diffPct}%</span></td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById("sandboxReadout").textContent =
+        `Live Sandbox: P_q(protect) = ${qUnitary.toFixed(3)} vs Classical = ${qClassical.toFixed(3)} (Interference shift = ${((qUnitary - qClassical) * 100).toFixed(1)}%)`;
+
+      document.getElementById("qqReadout").innerHTML =
+        `Wang et al. (2014) <i>PNAS</i> Quantum Question (QQ) identity: for pure projective Lüders updates without post-measurement decoherence, <code>q = (P(Ay,Bx)+P(An,By)) − (P(Bx,Ay)+P(By,An)) = 0.0000</code> exactly, while single-outcome sequential order gap is <code>ΔP(protect) = ${(orderGap * 100).toFixed(1)}%</code>.`;
+    }
+
+    // Event listeners
+    document.getElementById("presetSelect").addEventListener("change", (e) => {
+      currentRun = PRESETS[e.target.value];
+      currentStepIdx = 0;
+      renderStep();
+    });
+
+    document.getElementById("btnPrev").addEventListener("click", () => {
+      if (currentStepIdx > 0) {
+        currentStepIdx--;
+        renderStep();
+      }
+    });
+
+    document.getElementById("btnNext").addEventListener("click", () => {
+      if (currentStepIdx < currentRun.steps.length - 1) {
+        currentStepIdx++;
+        renderStep();
+      }
+    });
+
+    document.getElementById("btnPlay").addEventListener("click", (e) => {
+      if (playTimer) {
+        clearInterval(playTimer);
+        playTimer = null;
+        e.target.textContent = "▶ Play";
+        e.target.classList.remove("active");
+      } else {
+        e.target.textContent = "⏸ Pause";
+        e.target.classList.add("active");
+        playTimer = setInterval(() => {
+          if (currentStepIdx < currentRun.steps.length - 1) {
+            currentStepIdx++;
+            renderStep();
+          } else {
+            clearInterval(playTimer);
+            playTimer = null;
+            e.target.textContent = "▶ Play";
+            e.target.classList.remove("active");
+          }
+        }, 900);
+      }
+    });
+
+    document.getElementById("stepSlider").addEventListener("input", (e) => {
+      currentStepIdx = parseInt(e.target.value, 10);
+      renderStep();
+    });
+
+    // Interactive sandbox sliders
+    function onSandboxInput() {
+      const step = currentRun.steps[currentStepIdx];
+      const q = step.quantum || { p_danger: 0.5, q_safe: 0.45, q_danger: 0.65, order_gap: 0.0 };
+      const stress = parseFloat(document.getElementById("sandboxStress").value);
+      const xSigned = parseFloat(document.getElementById("sandboxCoherence").value);
+      const lam = 1 - Math.exp(-2.5 * stress * stress);
+      updateQuantumInspector(q.p_danger, xSigned, q.q_safe, q.q_danger, lam, q.order_gap, step.probs || {});
+    }
+    document.getElementById("sandboxStress").addEventListener("input", onSandboxInput);
+    document.getElementById("sandboxCoherence").addEventListener("input", onSandboxInput);
+
+    // Load external timeline.json or demo-pack/*.json
+    document.getElementById("fileInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (Array.isArray(data.steps) && data.steps.length > 0) {
+            currentRun = {
+              scenario: file.name,
+              vent: (data.world && data.world.volcano && data.world.volcano.vent) || [20, 18],
+              shelters: (data.world && data.world.shelters) || [[7, 22], [33, 22]],
+              steps: data.steps.map((s, idx) => ({
+                t: s.t ?? idx,
+                day: s.state ? s.state.day : 1,
+                hour: s.state ? s.state.hour : 8,
+                pos: s.pos_after || (s.state ? s.state.pos : [20, 20]),
+                event: s.event || "none",
+                action: s.action || "hide",
+                needs: s.state ? s.state.needs : {},
+                stress: s.state ? s.state.stress : 0.25,
+                recent_events: s.state ? s.state.recent_events : [],
+                probs: s.probs || {},
+                quantum: s.quantum || {
+                  p_danger: 0.5,
+                  p_protect: (s.probs && ((s.probs.hide || 0) + (s.probs.build_shelter || 0))) || 0.5,
+                  p_classical: 0.5,
+                  coherence: 0.3,
+                  x_signed: 0.3,
+                  lam: 0.2,
+                  q_safe: 0.45,
+                  q_danger: 0.65,
+                  order_gap: 0.0
+                },
+                pdc: (s.volcano && s.volcano.active_pdc) || [],
+                reason: s.reason || ""
+              }))
+            };
+            currentStepIdx = 0;
+            renderStep();
+          }
+        } catch (err) {
+          alert("Could not parse JSON timeline: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Initial render
+    renderStep();
+  </script>
+</body>
+</html>
+

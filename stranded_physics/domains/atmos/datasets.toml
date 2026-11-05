@@ -1,0 +1,158 @@
+# One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+# licence_confirmed stays false until T-104 reads each licence page.
+
+[[dataset]]
+id = "upper_wind_st_vincent"
+kind = "wind by pressure level"
+url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=13.33&longitude=-61.18&timezone=UTC&start_date=2021-04-01&end_date=2024-12-31&hourly=wind_direction_10m%2Cwind_direction_500hPa%2Cwind_speed_500hPa%2Cwind_direction_200hPa%2Cwind_speed_200hPa"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "b3160f832e2894912aa14f1b6070b17ae7796c60529d3d078bf9b941df1644e1"
+licence = "Open-Meteo Historical Forecast API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com historical forecast data"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "A model forecast from a coarse grid cell, not an observation."
+licence_confirmed = false
+
+[[dataset]]
+id = "weather_st_vincent"
+kind = "surface weather"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=13.33&longitude=-61.18&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "0e2af2b2233229191df205a6314f55cbbd97a6a46fd68876719dc8583fffb885"
+licence = "Open-Meteo Archive API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com ERA5-based archive"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "ERA5-based values from a coarse grid cell, not a station. Island rain is likely understated."
+licence_confirmed = false
+
+[[dataset]]
+id = "surface_decade_st_vincent"
+kind = "surface weather"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=13.33&longitude=-61.18&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "0e2af2b2233229191df205a6314f55cbbd97a6a46fd68876719dc8583fffb885"
+licence = "Open-Meteo Archive API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com ERA5-based archive"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download."
+licence_confirmed = false
+
+[[dataset]]
+id = "upper_wind_2023_st_vincent"
+kind = "wind by pressure level"
+url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=13.33&longitude=-61.18&start_date=2023-01-01&end_date=2023-12-31&timezone=UTC&hourly=wind_speed_500hPa,wind_direction_500hPa,wind_speed_200hPa,wind_direction_200hPa"
+retrieved_utc = "2026-11-05T05:16:00Z"
+sha256 = "87bac386c305383b745c573d34429749cde770e690c7485ef54869b7811a0674"
+licence = "Open-Meteo Historical Forecast API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com historical forecast data"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation."
+licence_confirmed = false
+
+[[dataset]]
+id = "surface_decade_la_palma"
+kind = "surface weather"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=28.57&longitude=-17.83&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "102965b80c0a686f12a0f440fdf01a953a422d7ed36a303a1f3b87e633f6c4d4"
+licence = "Open-Meteo Archive API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com ERA5-based archive"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download."
+licence_confirmed = false
+
+[[dataset]]
+id = "upper_wind_2023_la_palma"
+kind = "wind by pressure level"
+url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=28.57&longitude=-17.83&start_date=2023-01-01&end_date=2023-12-31&timezone=UTC&hourly=wind_speed_500hPa,wind_direction_500hPa,wind_speed_200hPa,wind_direction_200hPa"
+retrieved_utc = "2026-11-05T05:16:00Z"
+sha256 = "acc9fceb3cbcef00409e19ea3da63f977fca41d998d9a1daadce801d95f7a5bf"
+licence = "Open-Meteo Historical Forecast API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com historical forecast data"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation."
+licence_confirmed = false
+
+[[dataset]]
+id = "surface_decade_miyakejima"
+kind = "surface weather"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=34.094&longitude=139.526&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "1d782026b6f1d018cdd4d6038eccdccd526d489037fb0724f57da7a1d54b1122"
+licence = "Open-Meteo Archive API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com ERA5-based archive"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download."
+licence_confirmed = false
+
+[[dataset]]
+id = "upper_wind_2023_miyakejima"
+kind = "wind by pressure level"
+url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=34.094&longitude=139.526&start_date=2023-01-01&end_date=2023-12-31&timezone=UTC&hourly=wind_speed_500hPa,wind_direction_500hPa,wind_speed_200hPa,wind_direction_200hPa"
+retrieved_utc = "2026-11-05T05:16:00Z"
+sha256 = "2c74e29d2efd68e96865f7eb4efb2fe2199f2590d2970101e8b885146b4d5ad1"
+licence = "Open-Meteo Historical Forecast API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com historical forecast data"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation."
+licence_confirmed = false
+
+[[dataset]]
+id = "surface_decade_montserrat"
+kind = "surface weather"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=16.72&longitude=-62.18&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "b7619904b4835fec1862faeee7eb295068db951b81c5a8c890f9b92952450bd0"
+licence = "Open-Meteo Archive API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com ERA5-based archive"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download."
+licence_confirmed = false
+
+[[dataset]]
+id = "upper_wind_2023_montserrat"
+kind = "wind by pressure level"
+url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=16.72&longitude=-62.18&start_date=2023-01-01&end_date=2023-12-31&timezone=UTC&hourly=wind_speed_500hPa,wind_direction_500hPa,wind_speed_200hPa,wind_direction_200hPa"
+retrieved_utc = "2026-11-05T05:16:00Z"
+sha256 = "bbc76c2c0b59f20ce4931c442f1aa50b9e729a9bd46ec63e9b3ca4fe1b24b60a"
+licence = "Open-Meteo Historical Forecast API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com historical forecast data"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation."
+licence_confirmed = false
+
+[[dataset]]
+id = "surface_decade_stromboli"
+kind = "surface weather"
+url = "https://archive-api.open-meteo.com/v1/archive?latitude=38.789&longitude=15.213&timezone=UTC&start_date=2015-01-01&end_date=2024-12-31&hourly=temperature_2m%2Cprecipitation%2Cwind_speed_10m%2Cwind_direction_10m"
+retrieved_utc = "2026-11-03T22:45:38Z"
+sha256 = "cbdaaeac168fb177c36e857d0aa80745f77e3772db5f8eb4428b445d84936511"
+licence = "Open-Meteo Archive API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com ERA5-based archive"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download."
+licence_confirmed = false
+
+[[dataset]]
+id = "upper_wind_2023_stromboli"
+kind = "wind by pressure level"
+url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=38.789&longitude=15.213&start_date=2023-01-01&end_date=2023-12-31&timezone=UTC&hourly=wind_speed_500hPa,wind_direction_500hPa,wind_speed_200hPa,wind_direction_200hPa"
+retrieved_utc = "2026-11-05T05:16:00Z"
+sha256 = "61f8a67f98f2f8b7f29ef6697ab7b69455ae7c4a99900bb68a5c0416b4a92120"
+licence = "Open-Meteo Historical Forecast API, stated as CC BY 4.0, to be read in T-104"
+citation = "Open-Meteo.com historical forecast data"
+split = "reference"
+content_check = "json_key:hourly"
+notes = "Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation."
+licence_confirmed = false

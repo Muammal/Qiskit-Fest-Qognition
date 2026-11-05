@@ -1,0 +1,10 @@
+study,domain,known_a,known_b,unknown,scored,source
+Shafir & Tversky 1992,prisoner's dilemma,0.97,0.84,0.63,yes,"Pothos & Busemeyer 2009, Table 2, doi:10.1098/rspb.2009.0121"
+Croson 1999,prisoner's dilemma,0.67,0.32,0.30,yes,"Pothos & Busemeyer 2009, Table 2"
+Li & Taplin 2002,prisoner's dilemma,0.83,0.66,0.60,yes,"Pothos & Busemeyer 2009, Table 2"
+Busemeyer Matthew Wang 2006,prisoner's dilemma,0.91,0.84,0.66,yes,"Pothos & Busemeyer 2009, Table 2"
+Kuhberger Komunska Perner 2001 exp 3,two-stage gamble,0.80,0.38,0.43,yes,"Broekaert Busemeyer Pothos 2020, Table 2, patterns summed"
+Lambdin & Burdsal 2007 coin,two-stage gamble,0.64,0.47,0.39,yes,"Broekaert Busemeyer Pothos 2020, Table 2, patterns summed"
+Broekaert Busemeyer Pothos 2020 exp 1,two-stage gamble,0.45,0.66,0.60,yes,"Broekaert Busemeyer Pothos 2020, Table 2, patterns summed"
+Tversky & Shafir 1992,two-stage gamble,0.69,0.59,0.36,no,"ETA was solved from this, so it is a fit and not a test"
+Tversky & Shafir 1992 between,two-stage gamble,0.69,0.57,0.38,no,"The same experiment's other design. Excluded with it"

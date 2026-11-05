@@ -1,0 +1,9 @@
+id = "exposure"
+title = "Shelter, materials and lethality"
+status = "model"
+owner = ""
+first_model = "fragility curves"
+owns = "shelter materials, ash roof load, dynamic pressure fragility, burns"
+must_not_own = "needs and physiology"
+outputs = []
+wanted = ["Building damage survey for St Vincent 2021", "Ash load collapse thresholds"]

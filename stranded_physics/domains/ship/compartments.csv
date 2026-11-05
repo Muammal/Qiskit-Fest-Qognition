@@ -1,0 +1,17 @@
+name,length_ft,watertight_to,quote
+Bow to A,46,D,46
+A-B,45,D,45
+B-C,51,E,51
+C-D,51,E,51
+D-E,54,E,54
+E-F,57,E,57
+F-G,57,E,57
+G-H,57,E,57
+H-J,60,E,60
+J-K,35,D,35
+K-L,69,D,69
+L-M,57,D,57
+M-N,63,D,63
+N-O,54,D,54
+O-P,57,D,57
+P to stern,39.5,D,

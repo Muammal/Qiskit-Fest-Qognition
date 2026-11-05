@@ -1,0 +1,10 @@
+{
+  "exposure-model": {
+    "hash": "bb617139100bc82804460c972ee2a89484daf5c322471083b2efcb218a908225",
+    "verdict": "PASS"
+  },
+  "exposure.records_and_units": {
+    "hash": "b545eacb409523179fc5cc027231178ab09e38d53b0ea7aaea258569db0bdf58",
+    "verdict": "PASS"
+  }
+}

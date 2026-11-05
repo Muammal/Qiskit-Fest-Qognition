@@ -1,0 +1,80 @@
+# A mixed group near the Wallibou valley during the 2021 eruption: each mind side by side, with food and a shelter.
+id = "example_village"
+title = "Example: a village near the Wallibou valley, April 2021"
+place = "real"
+start_utc = "2021-04-08T00:00:00+00:00"
+hours = 96
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "weather"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "eruption"
+source = "replay"
+event = "st_vincent_2021"
+
+[[entity]]
+kind = "ash"
+source = "replay"
+
+[[entity]]
+kind = "flow"
+source = "replay"
+
+[[entity]]
+kind = "mudflow"
+source = "replay"
+
+[[entity]]
+kind = "group"
+source = "dials"
+name = "Quantum"
+mind = "quantum"
+count = 4
+radius_km = 1.0
+start_lon = -61.226
+start_lat = 13.317
+
+[[entity]]
+kind = "group"
+source = "dials"
+name = "Control"
+mind = "classical_mixture"
+count = 4
+radius_km = 1.0
+start_lon = -61.226
+start_lat = 13.317
+
+[[entity]]
+kind = "group"
+source = "dials"
+name = "Classical"
+mind = "classical"
+count = 4
+radius_km = 1.0
+start_lon = -61.226
+start_lat = 13.317
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "Barrouallie"
+lon = -61.267
+lat = 13.233
+
+[[entity]]
+kind = "resource"
+source = "dials"
+what = "food"
+name = "Gardens"
+lon = -61.24
+lat = 13.27
