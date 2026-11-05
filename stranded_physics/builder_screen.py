@@ -409,12 +409,12 @@ class BuilderScreen:
             self._text(group, 26, y, self.app.font_small, COLOR_TEXT_HINT)
             y += 18
             for kind in kinds:
-                rect = pygame.Rect(24, y, 226, 46)
+                rect = pygame.Rect(24, y, 226, 40)
                 self._button(rect, "", lambda k=kind: self._add(k))
                 self.hot[-1] = Hot(rect, self.hot[-1].action, f"add:{kind}")
-                self._text(f"+  {kind.capitalize()}", rect.x + 10, rect.y + 6, self.app.font_sub)
-                self._text(KIND_TEXT[kind], rect.x + 10, rect.y + 25, self.app.font_small, COLOR_TEXT_MUTED)
-                y += 52
+                self._text(f"+  {kind.capitalize()}", rect.x + 10, rect.y + 3, self.app.font_sub)
+                self._text(KIND_TEXT[kind], rect.x + 10, rect.y + 21, self.app.font_small, COLOR_TEXT_MUTED)
+                y += 46
             y += 8
 
     def _draw_map(self) -> None:

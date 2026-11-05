@@ -37,7 +37,7 @@ python -m stranded_physics.check <file>                      # What can it hones
 
 From the game's first screen, choose **Build your own scenario** or press `3`. Add entities from the left, click the map to place what's selected, change its settings on the right, then **Save** or **Play this scenario**. In play, `P` follows the next person, and `Q` changes the mind on the same world.
 
-The screen draws from `KINDS` and every rule lives in `entities/draft.py`, so the screen and a hand-written file can't disagree. Saves go to `scenario_cards/saved/` and never overwrite a shipped scenario. Results belong to a scenario's id, so a changed copy of a shipped scenario shows none of the original's results, and it can't be saved until it has a new id.
+The screen draws from `KINDS` and every rule lives in `entities/draft.py`, so the screen and a hand-written file can't disagree. Saves go to `scenario_cards/saved/` and never overwrite a shipped scenario. Results belong to a scenario's id, so a changed copy of a shipped scenario shows none of the original's results, and it can't be saved until it has a new id. A generated island can't be saved with its place set to real.
 
 ## Where an entity's numbers come from
 
@@ -55,29 +55,31 @@ Evidence never carries over. A pass on St Vincent says nothing about a generated
 
 | Kind | What it is | `replay` | `catalogue` | `dials` |
 |---|---|---|---|---|
-| `terrain` | The land | Built | Stage 3 | Stage 3 |
-| `weather` | Wind, rain, temperature | Built | Stage 3 | Stage 3 |
-| `eruption` | Timeline, column, mass | Built | Stage 2 | Stage 2 |
-| `ash` | Fallout from an eruption | Built, needs an eruption | | |
-| `flow` | Hot flows from an eruption | Built, needs an eruption | | |
+| `terrain` | The land | Built | Built: a generated island, sized from real ones | Built |
+| `weather` | Wind, rain, temperature | Built | Built: a window of 2023 at one of 5 held islands, named by `what` | Built |
+| `eruption` | Timeline, column, mass | Built | Built | Built |
+| `ash` | Fallout from an eruption, and what it does to roofs | Built, needs an eruption | | |
+| `flow` | Hot flows from an eruption. `event = "depth_averaged"` chooses the solver | Built, needs an eruption | | |
 | `mudflow` | Rain on ash | Built, needs ash | | |
-| `storm` | Wind from a cyclone | Built | Stage 2 | Stage 2 |
+| `gas` | SO2 downwind | Built, needs an eruption | | |
+| `lava` | A dome that grows until the first explosion | Built, needs an eruption | | |
+| `storm` | Wind from a cyclone | Built | Built | Built |
 | `person` | A body and a mind, at a start point | | | Built |
-| `shelter` | A place to evacuate to, which also prevents storm injury | | | Built. Doesn't yet protect from ash or flows |
-| `resource` | Food or water at a place | | | Built. Wood isn't yet |
-| `group` | Many people with one mind, spread around a point | | | Built. People don't yet see or help each other |
+| `shelter` | A place to evacuate to. It lowers the odds of dying in a flow, and its roof can fail under ash | | | Built |
+| `resource` | Food, water or wood at a place | | | Built |
+| `group` | Many people with one mind, spread around a point | | | Built |
 
 Hunger, thirst and energy belong to the body of each `person`, and their settings live in `domains/agent/params.toml`.
 
 ## Stages
 
-| Stage | Result | Done when |
+| Stage | Result | Status |
 |---|---|---|
-| **1. Interfaces and replay** | St Vincent runs from a scenario file | Its results match the hard-coded scenario exactly |
-| **2. Generated eruptions and storms** | An eruption or storm sampled from real catalogues | Generated sizes, lead times and storm winds match the catalogues statistically, with targets set first |
-| **3. Generated weather and land** | Weather from real records at any held island; generated islands | Weather windows match their source. Generated islands pass the terrain checks |
-| **4. People, shelters, resources** (built, first version) | Many different people on one map; a storm-only scenario runs | Done: the runtime no longer assumes an eruption, and each person sees only their own state. Not yet: people interacting, or shelters protecting from ash and flows |
-| **5. In-game builder** (built, first version) | Pick and adjust entities on a screen | Done: saving and reloading gives an identical file, and the game runs it. Not yet: the game shows one person at a time, and only St Vincent's land can be used until Stage 3 |
+| **1. Interfaces and replay** | St Vincent runs from a scenario file | Done |
+| **2. Generated eruptions and storms** | An eruption or storm sampled from real catalogues | Built. The storm wind holdout passes. **The eruption size holdout fails**, at 0.225 against 0.1 |
+| **3. Generated weather and land** | Weather from real records at any held island; generated islands | Built. Weather windows match their source, and generated islands pass the terrain checks they were given. Real relief isn't compared |
+| **4. People, shelters, resources** | Many different people on one map, who affect each other | Built. Seeing a warned neighbour warns you, an able neighbour helps the injured, wood builds a shelter or a tool, and injuries heal. Their distances are assumptions |
+| **5. In-game builder** | Pick and adjust entities on a screen | Built. The game shows one person at a time, playing alone, so people only affect each other in command-line runs |
 
 ## Rules
 

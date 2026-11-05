@@ -331,3 +331,12 @@ def test_opening_a_draft_keeps_from_file_in_step_with_the_screen(app):
     press(app, "Open")
     press(app, "open:beryl_2024")
     assert app.builder.draft == from_file(ROOT / "stranded_physics/scenario_cards/beryl_2024.toml")
+
+
+def test_every_kind_can_be_added_and_no_button_sits_under_the_footer(app):
+    from stranded_physics.entities.kinds import KINDS
+    app.draw((0, 0))
+    labels = {h.label: h.rect for h in app.builder.hot}
+    footer_top = min(rect.top for label, rect in labels.items() if label in ("New", "Open", "Save"))
+    for kind in KINDS:
+        assert labels[f"add:{kind}"].bottom < footer_top, kind

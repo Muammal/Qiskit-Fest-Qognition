@@ -19,7 +19,7 @@ from stranded_physics.runtime.body import NEED_KEYS, STATE_KEYS
 from stranded_physics.runtime.simulation import PackSimulation
 
 CUT_FRAME = 24
-BLANKED = ("pdc.active", "tephra.deposit_load", "lahar.depth", "eruption.explosion", "eruption.phase", "eruption.mass_rate", "atmos.rain_rate")
+BLANKED = ("pdc.active", "tephra.deposit_load", "exposure.roof_failure", "lahar.depth", "eruption.explosion", "eruption.phase", "eruption.mass_rate", "atmos.rain_rate")
 
 
 def future_blanked(pack: Pack) -> Pack:
@@ -49,7 +49,7 @@ def check() -> dict:
     moved = [n for n in pack.header["fields"] if not np.array_equal(pack._arrays[n], other._arrays[n])]
     results["seed_only_moves_noticed_signs"] = set(moved) <= {"eruption.tremor", "eruption.gas"}
     results["no_model_out_of_domain"] = not [k for k, v in pack.verdicts.items() if v == "OUT_OF_DOMAIN"]
-    results["all_real_categories"] = {row["id"]: row["tier"] for row in pack.header["domains"]} == {k: "T1" for k in ("terrain", "atmos", "eruption", "tephra", "pdc", "lahar")}
+    results["all_real_categories"] = {row["id"]: row["tier"] for row in pack.header["domains"]} == {k: "T1" for k in ("terrain", "atmos", "eruption", "tephra", "exposure", "pdc", "lahar")}
     outcomes = {}
     for mind in ("quantum", "classical"):
         simulation = PackSimulation(pack, mind_type=mind)

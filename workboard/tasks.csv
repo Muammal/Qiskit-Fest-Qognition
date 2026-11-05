@@ -12,13 +12,13 @@ T-301,WS3,atmos T1: replay real wind column and rain,Codex,review,T-001,atmos-mo
 T-302,WS3,storm T1: Holland wind profile and cyclone rates,Codex,review,T-301,storm-model;storm-beryl-peak;storm-cyclone-rate,specs/T-302.md,physics/engine-on-premain,2026-11-04
 T-401,WS4,eruption T1: source timeline for St Vincent 2021,Codex,review,T-001,eruption-model;eruption-plume-scaling;eruption-total-mass,specs/T-401.md,physics/engine-on-premain,2026-11-04
 T-402,WS4,tephra T1: Suzuki and Gaussian fallout,Codex,review,T-401;T-301,tephra-model;tephra-mass-balance;tephra-grain-convergence;tephra-barbados-first-ash;tephra-island-cover,specs/T-402.md,physics/engine-on-premain,2026-11-04
-T-403,WS4,gas T1: Gaussian SO2 plume,,todo,T-401;T-301,,specs/T-403.md,,2026-11-04
+T-403,WS4,gas T1: Gaussian SO2 plume,Codex,review,T-401;T-301,gas-model;gas-total-so2,specs/T-403.md,physics/engine-on-premain,2026-11-05
 T-501,WS5,pdc T1: energy cone runout,Claude,review,T-201;T-401,pdc-model;pdc-reaches-west-sea;pdc-sea-only-on-west;pdc-southeast-reach;pdc-first-flow-time,specs/T-501.md,physics/engine-on-premain,2026-11-04
 T-502,WS5,lahar T1: LAHARZ with rain trigger,Claude,review,T-201;T-301;T-402,lahar-model;lahar-trigger-timing,specs/T-502.md,physics/engine-on-premain,2026-11-04
-T-503,WS5,T2 shared depth-averaged solver,,todo,T-501;T-502,,specs/T-503.md,,2026-11-04
-T-504,WS5,lava T1: dome footprint,,todo,T-401,,specs/T-504.md,,2026-11-04
+T-503,WS5,T2 shared depth-averaged solver,Codex,review,T-501;T-502,pdc-t2-solver;pdc-t2-volume;pdc-t2-reaches-west-sea;pdc-t2-sea-only-on-west;pdc-t2-southeast-reach,specs/T-503.md,physics/engine-on-premain,2026-11-05
+T-504,WS5,lava T1: dome footprint,Codex,review,T-401,lava-model;lava-dome-volume,specs/T-504.md,physics/engine-on-premain,2026-11-05
 T-601,WS6,agent T1: Tobler movement on real terrain,Claude,review,T-201,agent-walking;agent-evacuation-route,specs/T-601.md,physics/engine-on-premain,2026-11-04
-T-602,WS6,agent T1: real physiology mapped to contract needs,,todo,T-001,,specs/T-602.md,,2026-11-04
-T-603,WS6,exposure T1: shelter and lethality,,todo,T-402;T-501,,specs/T-603.md,,2026-11-04
-T-604,WS6,legacy_pack wrapper and --engine switch,,todo,T-001,,specs/T-604.md,,2026-11-04
+T-602,WS6,agent T1: real physiology mapped to contract needs,Claude,review,T-001,,specs/T-602.md,physics/engine-on-premain,2026-11-05
+T-603,WS6,exposure T1: shelter and lethality,Codex,review,T-402;T-501,exposure-model,specs/T-603.md,physics/engine-on-premain,2026-11-05
+T-604,WS6,legacy_pack wrapper and --engine switch,Codex,review,T-001,,specs/T-604.md,physics/engine-on-premain,2026-11-05
 T-701,WS1,End-to-end St Vincent 2021 pack and report,Claude,review,T-402;T-501;T-502;T-601,agent-end-to-end,specs/T-701.md,physics/engine-on-premain,2026-11-04
