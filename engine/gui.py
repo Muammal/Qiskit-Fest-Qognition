@@ -81,7 +81,7 @@ from engine.scenes_pompeii import PompeiiCutscenes
 from engine.site import SiteWorld
 from engine.waterloo import HORIZON as WATERLOO_STEPS, STORY_TEXT as WATERLOO_STORY, WaterlooSimulation
 from engine.gui_site import SitePanels, SiteView, clock_text as site_clock, mini_map as site_mini_map, next_role_patron
-from engine.chlorine import AEGL_MEANING
+from engine.scenes_waterloo import WaterlooCutscenes
 from engine.cutscenes import CutscenePlayer
 
 try:
@@ -777,7 +777,7 @@ class IslandVisualizerApp:
         return {"titanic": TITANIC_STEPS, "pompeii": POMPEII_STEPS, "waterloo": WATERLOO_STEPS}.get(scenario, DEFAULT_STEPS)
 
     def _cutscene_player(self, scenario):
-        player = PompeiiCutscenes if scenario == "pompeii" else CutscenePlayer
+        player = {"pompeii": PompeiiCutscenes, "waterloo": WaterlooCutscenes}.get(scenario, CutscenePlayer)
         return player(self.font_hero, self.font_small)
 
     def _scenario_settings(self):
@@ -924,7 +924,7 @@ class IslandVisualizerApp:
         self.city_view = {"pompeii": CityView, "waterloo": SiteView}[self.scenario](self) if self.scenario in CROWD_SCENARIOS else None
         self.split_panels = {"pompeii": SplitPanels, "waterloo": SitePanels}[self.scenario](self.engine) if self.scenario in CROWD_SCENARIOS else None
         self.show_split_panels = True
-        wanted_player = PompeiiCutscenes if self.scenario == "pompeii" else CutscenePlayer
+        wanted_player = {"pompeii": PompeiiCutscenes, "waterloo": WaterlooCutscenes}.get(self.scenario, CutscenePlayer)
         if type(self.cutscene) is not wanted_player:
             enabled = self.cutscene.enabled
             self.cutscene = wanted_player(self.font_hero, self.font_small)

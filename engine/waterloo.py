@@ -35,6 +35,8 @@ EVENT_MAPPINGS = {
 # The user chose A on meaning after seeing all three, and all three must be reported: it also gives the largest quantum gap.
 DEFAULT_MAPPING = "A"
 FOCUS_ROLE_CYCLE = ("child", "adult", "lifeguard", "desk")
+AERIAL_SCENE_SHARE = .15  # display only: when the aerial shot plays, as a share of everyone
+POOL_SCENE_COUNT = 3  # display only: people leaving the water before that shot plays
 COMPARISON = dict(
     edmonton_2018=dict(evacuated_about=40, ppm=22, source="https://globalnews.ca/news/4060660/chlorine-leak-forces-evacuation-of-edmonton-rec-centre"),
     caution="Another centre and another leak. The Waterloo head-count, cause and injuries are unknown.",
@@ -82,7 +84,7 @@ class WaterlooSimulation:
         self._exit_name = {tile: name for name, tile in self.world.exits.items()}
         self._fields = dict(leave=self.world.next_step_field(self.world.exits.values()),
                             indoors=self.world.next_step_field(sorted(self.world.areas["indoors"])))
-        self._last_decision = {}
+        self._scenes_played = set()
 
     def _default_focus(self):
         role = FOCUS_ROLE_CYCLE[self.seed % len(FOCUS_ROLE_CYCLE)]
@@ -143,6 +145,7 @@ class WaterlooSimulation:
         t = self.t
         if t >= self.horizon or self._finished():
             return None
+        self.scenes = []
         knowing = Counter(tuple(p.pos) for p in self.people if p.status == "site" and p.knows_danger)
         moving = Counter()
         focus_record = None
@@ -161,8 +164,51 @@ class WaterlooSimulation:
             random.setstate(external_state)
         self.moving_tiles = moving
         self._update_alarm(t)
+        self._emit_scenes(t, sum(moving.values()))
         self.t += 1
         return self._focus_step_record(t, focus_record)
+
+    def _add_scene(self, kind, t, caption, focus=False, **extra):
+        self.scenes.append(dict(kind=kind, t=t, caption=caption, focus=focus, role=self.agent.role, **extra))
+
+    def _emit_scenes(self, t, moving_count):
+        """Requests for the display only. Nothing here feeds back into the simulation, and no random numbers are drawn."""
+        once = self._scenes_played
+        if t == LEAK_START_STEP:
+            self._add_scene("leak_start", t, f"Chlorine starts to leak at {self.chlorine.source_ppm:g} ppm at the assumed spot")
+        if self.alarm_step == t + ALARM_DELAY_STEPS:
+            self._add_scene("alarm_cutaway", t, "A staff member knows. The alarm starts 30 seconds later")
+        if self.alarm_step == t:
+            self._add_scene("alarm_pool", t, "The alarm sounds across the pool")
+        in_pool = [p for p in self.people if p.status == "site" and p.last_action == "hide" and p.knows_danger
+                   and tuple(p.pos) in self.world.pool_tiles]
+        if len(in_pool) >= POOL_SCENE_COUNT and "pool_exit" not in once:
+            once.add("pool_exit")
+            self._add_scene("pool_exit", t, f"{len(in_pool)} people in the water start to leave", count=len(in_pool))
+        if moving_count >= max(5, len(self.people) * AERIAL_SCENE_SHARE) and "aerial" not in once:
+            once.add("aerial")
+            people = [(list(p.pos), p.role, p.last_action == "hide") for p in self.people if p.status == "site"]
+            self._add_scene("site_aerial", t, f"From above: {moving_count} people heading off the site",
+                            world=self.world, field=self._fields["leave"], people=people)
+        self._focus_closeup(t)
+
+    def _focus_closeup(self, t):
+        """Close in on the followed person when they learn of the leak and when they leave."""
+        agent, once = self.agent, self._scenes_played
+        moment = None
+        if agent.knows_danger and ("know", agent.id) not in once:
+            once.add(("know", agent.id))
+            moment = f"{agent.label} learns something is wrong"
+        if agent.status == "out" and ("out", agent.id) not in once:
+            once.add(("out", agent.id))
+            moment = f"{agent.label} leaves the site"
+        if moment:
+            from engine.gui_site import thought_text
+            record = self.logs[agent.id][-1] if self.logs.get(agent.id) else None
+            if record is not None and agent.pending_story != "none":
+                record = dict(record, story=STORY_TEXT[agent.pending_story])  # noticed since their last decision
+            self._add_scene("person_closeup", t, moment, focus=True,
+                            thought=thought_text(agent, record, self.chlorine.ppm_at(t, tuple(agent.pos))))
 
     def _update_alarm(self, t):
         if self.first_knew_step is None and any(p.knows_danger for p in self.people):
