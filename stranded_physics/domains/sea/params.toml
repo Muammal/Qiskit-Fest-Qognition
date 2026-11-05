@@ -1,10 +1,79 @@
-# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+# Temperature input range, covering cold seawater through hot tropical water; no extrapolation outside it.
+[[parameter]]
+id = "sea.temperature"
+value = 0.0
+unit = "degC"
+valid_min = -5.0
+valid_max = 40.0
+role = "input"
+status = "assumption"
 
+# Typical seawater freezing point from memory; no salinity-resolved model.
 [[parameter]]
 id = "sea.freezing_point"
 value = -1.9
 unit = "degC"
 valid_min = -3.0
 valid_max = 0.0
+role = "input"
+status = "assumption"
+
+# Round placeholder within the user-provided 10-40 minute swim-failure range. No published 0 C figure is in hand; not a hypothermia median.
+[[parameter]]
+id = "sea.incapacitation_median_at_freezing"
+value = 20.0
+unit = "minute"
+valid_min = 1.0
+valid_max = 120.0
+role = "input"
+status = "assumption"
+
+# Round log-time spread; no near-freezing survival distribution is in hand.
+[[parameter]]
+id = "sea.incapacitation_spread"
+value = 0.6
+unit = "dimensionless"
+valid_min = 0.05
+valid_max = 3.0
+role = "input"
+status = "assumption"
+
+# Round monotone sensitivity: warming lengthens median; not fitted to Titanic.
+[[parameter]]
+id = "sea.incapacitation_warming_rate"
+value = 0.06
+unit = "1/degC"
+valid_min = 0.001
+valid_max = 0.2
+role = "input"
+status = "assumption"
+
+# Round flotation benefit on the median; cannot represent all early cold-shock drowning.
+[[parameter]]
+id = "sea.lifebelt_factor"
+value = 1.5
+unit = "dimensionless"
+valid_min = 1.01
+valid_max = 10.0
+role = "input"
+status = "assumption"
+
+# From memory, not a verified water-temperature observation. Report temperature passage describes weather and is ambiguous about water.
+[[parameter]]
+id = "sea.titanic_temperature"
+value = -2.0
+unit = "degC"
+valid_min = -5.0
+valid_max = 40.0
+role = "input"
+status = "assumption"
+
+# Nonnegative finite exposure-time domain; input is not a measured outcome.
+[[parameter]]
+id = "sea.immersion_minutes"
+value = 0.0
+unit = "minute"
+valid_min = 0.0
+valid_max = inf
 role = "input"
 status = "assumption"

@@ -1,0 +1,55 @@
+{
+  "ship-foundering-time": {
+    "bow_draught_m": 28.219960873482712,
+    "hash": "57a53e4a2a641334705b555f6b474e0b927b62899f88051d1a59f04bc245c6ce",
+    "stern_draught_m": 11.87787776899288,
+    "value": 201.36666666666667,
+    "verdict": "FAIL",
+    "water_tons": 70268.44109865467
+  },
+  "ship-model": {
+    "hash": "30061b9c3912d47f4a8d1f072554f60c722d229dd3162b3c05572c5117d8ba7d",
+    "verdict": "PASS"
+  },
+  "ship-water-at-40-minutes": {
+    "hash": "4a784007ef811873eb8b674ca41768b043f125f39178d3c2654762db52af26df",
+    "value": 18400.54835234533,
+    "verdict": "PASS"
+  },
+  "ship.records_and_units": {
+    "hash": "e314bd01987c3c1600f7d8e51d34b15c9c18032d94123b2a7ee0ecc028037b3d",
+    "verdict": "PASS"
+  },
+  "titanic-saved-adult_female": {
+    "hash": "ebe5213ad1b6130ba38cad1bdf4914952525976a9ab7e896910bf16ad0b1d3b0",
+    "verdict": "FAIL"
+  },
+  "titanic-saved-adult_male": {
+    "hash": "3c5336fa21b240a772887ded9650272f1857491ee83a5ae755570324e4406f2f",
+    "verdict": "FAIL"
+  },
+  "titanic-saved-all": {
+    "hash": "14584dabd0365d556476ab1e18007c7398734138cd0e498e4a23fc0957ba68f1",
+    "verdict": "FAIL"
+  },
+  "titanic-saved-child": {
+    "hash": "cf6bf32294d3a199d275791cb66c6caeeb85ccfbcb50cb3247194d3ec605bf27",
+    "verdict": "FAIL"
+  },
+  "titanic-saved-crew": {
+    "hash": "15ee91dbe0b689e7dba2549c548e35892a0a05115a43b7d34779743b0fd81f0d",
+    "verdict": "FAIL"
+  },
+  "titanic-saved-first_class": {
+    "hash": "bb75b69e9fa68df380dfad9db277f88b7318238ac927b2a9b6215ec0a7d4bca6",
+    "verdict": "FAIL"
+  },
+  "titanic-saved-second_class": {
+    "hash": "0126171256dd982b39fa72662d610645db8c70ea86677560d8a86ac891445cc3",
+    "verdict": "FAIL"
+  },
+  "titanic-saved-third_class": {
+    "hash": "ef9718b73f4706954dae43c910f5f965b2643d8d723b6c5fe80d26226fb6316a",
+    "verdict": "FAIL"
+  }
+}
