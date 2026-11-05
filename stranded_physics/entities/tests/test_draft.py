@@ -100,7 +100,7 @@ def test_a_bad_scenario_setting_is_refused(key, text):
 
 def test_choices_offer_only_what_is_real():
     draft = add_entity(add_entity(new_draft(), "resource"), "person")
-    assert choices(draft.entries[2], "what") == ("water", "food")
+    assert choices(draft.entries[2], "what") == ("water", "food", "wood")
     assert choices(draft.entries[3], "mind") == ("quantum", "classical_mixture", "classical")
     assert choices(draft.entries[0], "event") == ("st_vincent",)
     assert set_choice(draft, 3, "mind", "classical").entries[3]["mind"] == "classical"

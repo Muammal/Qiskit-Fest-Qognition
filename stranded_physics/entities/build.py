@@ -110,7 +110,7 @@ def to_spec(scenario: ScenarioFile, seed: int = 1) -> ScenarioSpec:
     sites = {}
     if people:
         sites = place_sites([person.start for person in people], [(s.settings["lon"], s.settings["lat"]) for s in shelters], world.vent)
-        for what in ("water", "food"):
+        for what in ("water", "food", "wood"):
             found = [to_utm((e.settings["lon"], e.settings["lat"])) for e in scenario.entities if e.kind == "resource" and e.what == what]
             if found:
                 sites[what] = [*sites.get(what, []), *found]

@@ -17,6 +17,10 @@ SUBSTEP_MINUTES = 5  # Hazard contact is checked at this resolution along a walk
 DRINK_REACH_M = 400.  # assumption: close enough to a stream to drink from it.
 FOOD_REACH_M = 400.  # assumption: close enough to gather food.
 SHELTER_REACH_M = 400.  # assumption: close enough to count as sheltered.
+WOOD_REACH_M = 400.  # assumption: close enough to gather wood.
+WOOD_PER_SHELTER = 2  # assumption: carried over from the fictional island.
+MOST_WOOD_CARRIED = 4  # assumption: carried over from the fictional island's food limit.
+INJURY_STEPS = 12  # assumption: a day before an injured person walks normally again. Resting heals twice as fast.
 GALE_M_S = 17.2  # Beaufort force 8, from memory: strong enough for a person to notice and act on.
 HURRICANE_M_S = 32.7  # Beaufort force 12, from memory. assumption: an unsheltered person is injured at this wind.
 STORM_RAIN_MM_H = 5.  # assumption: T0 threshold; a `convention` value in the frozen event mapping.
@@ -116,6 +120,9 @@ class PackSimulation:
         self._walked = (0., 0., 0.)  # Seconds, metres and metres climbed in the current step.
         self.steps: list[dict] = []
         self.warned = False
+        self.built: list[XY] = []  # Shelters this person has built. Only they use them.
+        self.injury_steps_left = 0
+        self.helped = False  # Someone able-bodied is close enough to help. Set by runtime/group.py. It changes the walking only, and never reaches the mind.
 
     def _event(self, t_s: float) -> str:
         """One event per step, by the frozen priority, from what the agent can notice."""
@@ -155,8 +162,8 @@ class PackSimulation:
             return self._nearest_site(sites["assembly"])
         if action == "drink":
             return self._nearest_site(sites["water"])
-        if action == "forage" and sites.get("food"):
-            return self._nearest_site(sites["food"])
+        if action == "forage" and (sites.get("food") or sites.get("wood")):
+            return self._nearest_site([*sites.get("food", ()), *sites.get("wood", ())])
         return None
 
     def _advance(self, action: str, t_s: float) -> None:
@@ -170,7 +177,7 @@ class PackSimulation:
             cell = grid.locate(self.agent.xy_m)
             if goal is not None and cell is not None:
                 # An injured person covers half the ground. This factor is an assumption, carried over from T0.
-                budget = spare_s + SUBSTEP_MINUTES * 60. * (.5 if self.agent.injured else 1.)
+                budget = spare_s + SUBSTEP_MINUTES * 60. * (.5 if self.agent.injured and not self.helped else 1.)
                 reached, spare_s = walk(self._field(goal), cell, budget, (grid.ny, grid.nx))
                 if reached != cell:
                     start, end = self.agent.xy_m, grid.centre(*reached)
@@ -199,8 +206,10 @@ class PackSimulation:
         body.balance = advance(body.balance, STEP_MINUTES / 60., seconds / 3600., pandolf_watts(speed, grade) if seconds else 0.,
                                drank=bool(action == "drink" and water and math.dist(water, body.xy_m) < DRINK_REACH_M), rested=action == "rest",
                                ate_kcal=setting("meal_energy", "kcal") if self._within("food", FOOD_REACH_M) and action == "forage" else 0.)
-        if self.pack.has("storm.max_wind") and self.pack.series("storm.max_wind")[len(self.steps)] >= HURRICANE_M_S and not self._within("assembly", SHELTER_REACH_M):
-            body.injured = True
+        self._use_materials(action)
+        self._heal(action)
+        if self.pack.has("storm.max_wind") and self.pack.series("storm.max_wind")[len(self.steps)] >= HURRICANE_M_S and not self._sheltered():
+            self._injure()
         current = needs(body.balance)
         body.thirst, body.hunger, body.energy = current["thirst"], current["hunger"], current["energy"]
         if event in ("tremor", "gas_plume", "eruption", "ash_fall"):
@@ -213,6 +222,29 @@ class PackSimulation:
         cause = cause_of_death(body.balance)
         if body.alive and cause:
             body.alive, body.cause = False, cause
+
+    def _use_materials(self, action: str) -> None:
+        """Wood is gathered by foraging near it. Two pieces build a shelter where the person stands, and one makes a tool."""
+        stock = self.agent.inventory
+        if action == "forage" and self._within("wood", WOOD_REACH_M) and stock["wood"] < MOST_WOOD_CARRIED:
+            stock["wood"] += 1
+        elif action == "build_shelter" and stock["wood"] >= WOOD_PER_SHELTER and not self._sheltered():
+            stock["wood"] -= WOOD_PER_SHELTER
+            self.built.append(self.agent.xy_m)
+        elif action == "craft" and stock["wood"] >= 1:
+            stock["wood"] -= 1
+            stock["tools"] += 1
+
+    def _injure(self) -> None:
+        self.agent.injured, self.injury_steps_left = True, INJURY_STEPS
+
+    def _heal(self, action: str) -> None:
+        if self.agent.injured:
+            self.injury_steps_left -= 2 if action == "rest" else 1
+            self.agent.injured = self.injury_steps_left > 0
+
+    def _sheltered(self) -> bool:
+        return self._within("assembly", SHELTER_REACH_M) or any(math.dist(point, self.agent.xy_m) < SHELTER_REACH_M for point in self.built)
 
     def step(self) -> dict | None:
         t = len(self.steps)

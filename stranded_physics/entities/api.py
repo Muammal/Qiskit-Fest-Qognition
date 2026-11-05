@@ -14,7 +14,7 @@ PLACES = ("real", "fictional", "generated")
 REQUIRED_KEYS = {"id", "title", "place", "start_utc", "hours", "step_hours", "local_utc_offset", "entity"}
 ENTITY_KEYS = {"kind", "source", "event", "name", "mind", "what"}
 MINDS = ("quantum", "classical_mixture", "classical")
-RESOURCES = ("water", "food")
+RESOURCES = ("water", "food", "wood")
 CATEGORY_OF = {"terrain": "terrain", "weather": "atmos", "eruption": "eruption", "ash": "tephra", "flow": "pdc", "mudflow": "lahar",
                "storm": "storm", "person": "agent", "group": "agent", "shelter": "agent", "resource": "agent"}
 

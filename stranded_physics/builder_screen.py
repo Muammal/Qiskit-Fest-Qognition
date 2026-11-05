@@ -21,13 +21,13 @@ from stranded_physics.runtime.game import build_game, lonlat_to_map, map_to_lonl
 
 KIND_TEXT = {"terrain": "The land", "weather": "Wind, rain, temperature", "eruption": "Timeline, column, mass", "ash": "Fallout from an eruption",
              "flow": "Hot flows from an eruption", "mudflow": "Rain on ash", "storm": "Wind from a cyclone", "person": "A body and a mind",
-             "group": "Many people, one mind", "shelter": "Somewhere to evacuate to", "resource": "Food or water"}
+             "group": "Many people, one mind", "shelter": "Somewhere to evacuate to", "resource": "Food, water or wood"}
 KIND_GROUPS = (("WORLD", ("terrain", "weather")), ("HAZARDS", ("eruption", "ash", "flow", "mudflow", "storm")),
                ("PEOPLE AND PLACES", ("person", "group", "shelter", "resource")))
 KIND_COLORS = {"person": COLOR_PURPLE, "group": COLOR_PURPLE, "shelter": COLOR_GREEN, "resource": COLOR_CYAN, "storm": COLOR_BLUE}
 SOURCE_TEXT = {"replay": "Real record", "catalogue": "Sampled from records", "dials": "Set by hand"}
 MIND_TEXT = {"quantum": "Quantum", "classical_mixture": "Control", "classical": "Classical"}
-WHAT_TEXT = {"water": "Water", "food": "Food"}
+WHAT_TEXT = {"water": "Water", "food": "Food", "wood": "Wood"}
 ROW_H, VISIBLE_ROWS = 32, 8
 OPEN_ROWS = 12
 DETAIL_BOTTOM = 824
@@ -544,7 +544,7 @@ class BuilderScreen:
         self._button((208, y, 90, 50), "Save", self._save)
         self._text("Seed", 322, y + 16, self.app.font_sub, COLOR_PANEL_BG)
         self._field((362, y + 10, 90, 30), "seed", self.seed, self._set_seed)
-        self._text("The game shows one person at a time. People don't yet see or help each other.", 480, y + 16, self.app.font_small, COLOR_PANEL_ALT)
+        self._text("The game shows one person at a time, playing alone. Run a scenario from the command line to have people see and help each other.", 480, y + 16, self.app.font_small, COLOR_PANEL_ALT)
         self._button((1340, y, 248, 50), "PLAY THIS SCENARIO", self._play, color=COLOR_GREEN, ink=COLOR_PANEL_BG, font=self.app.font_title, enabled=not self.problem)
 
     def _draw_modal(self, width: int, height: int) -> pygame.Rect:
