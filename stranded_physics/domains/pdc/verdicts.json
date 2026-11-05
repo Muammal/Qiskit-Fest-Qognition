@@ -1,15 +1,15 @@
 {
   "pdc-first-flow-time": {
-    "hash": "e4b8806abad96435debea598204a4fe05353b7cc6fd5759fe87ee4e3b0ed6ddf",
+    "hash": "7d9344c2e781a4abdb2a390fc0b5ad90bc46e3432f804aeccaf6aac07f9511a3",
     "value": 69.5,
     "verdict": "PASS"
   },
   "pdc-model": {
-    "hash": "7f7681ae906371d756e109cca97dc7924d3639e2e9ff7f7f1fb08d989b622396",
+    "hash": "7691c07a85c88f42f36361e058b681454e254bf344d24f8d5edd62595b402b0f",
     "verdict": "PASS"
   },
   "pdc-reaches-west-sea": {
-    "hash": "6f1bae0c7f42243456bc2f4c5a682449c4e4db61dda13006fccabd8b56a8a7e3",
+    "hash": "3e65f7cd3d85a545c2cf7c69e9cc408889a912a1ea216516d2651e71cfd07bb1",
     "max_reach_km": 8.137428367510187,
     "reached_km2": 30.5694,
     "sea_cells": 143,
@@ -21,7 +21,7 @@
     "west_sea": 1.0
   },
   "pdc-sea-only-on-west": {
-    "hash": "31842c85289efb2b8e4320e88f934df7c544df3205c420aeab97c967c98326f0",
+    "hash": "c19515480e7d26d142a639e02b3dd8a27ede07a705a79195aa2449c2f6e9807c",
     "max_reach_km": 8.137428367510187,
     "reached_km2": 30.5694,
     "sea_cells": 143,
@@ -33,7 +33,7 @@
     "west_sea": 1.0
   },
   "pdc-southeast-reach": {
-    "hash": "243ec8022324fda50771ea807d11e6b088f5441571454338535ead48f240b658",
+    "hash": "7134a88bffca30a64ad1a9f35abe46e218e126fec96dd05b365eb7f454db343d",
     "max_reach_km": 8.137428367510187,
     "reached_km2": 30.5694,
     "sea_cells": 143,
@@ -43,6 +43,68 @@
     "value": 8.137428367510187,
     "verdict": "FAIL",
     "west_sea": 1.0
+  },
+  "pdc-t2-grid-sensitivity": {
+    "hash": "4e9c8e8824a8e840ec3c9caac8462ad5641e2859fc1f62849256d6b808003546",
+    "reach_km_180m": 2.603230873924868,
+    "reach_km_90m": 2.461169701597223,
+    "reached_km2_180m": 5.9292,
+    "reached_km2_90m": 5.2083,
+    "verdict": "NO_TARGET"
+  },
+  "pdc-t2-reaches-west-sea": {
+    "hash": "eb8953314d6339679bd7ef61a5acda07855d50927fdedee19fe73fa6632ea3be",
+    "max_reach_1mm_km": 2.461169701597223,
+    "max_reach_km": 2.461169701597223,
+    "outflow_volume_m3": 0.0,
+    "reached_km2": 5.2083,
+    "release_ring_volume_share": 0.35715673628912886,
+    "sea_cells": 0,
+    "sea_off_west": 0.0,
+    "slowest_arrival_min": 26.161685764306217,
+    "southeast_reach_km": 2.1908880346661253,
+    "value": 0.0,
+    "verdict": "FAIL",
+    "west_sea": 0.0
+  },
+  "pdc-t2-sea-only-on-west": {
+    "hash": "c6cda37619f568e5cfbc41ed314530cdc93f4054d681afb2bfdb57a4dba0d6b2",
+    "max_reach_1mm_km": 2.461169701597223,
+    "max_reach_km": 2.461169701597223,
+    "outflow_volume_m3": 0.0,
+    "reached_km2": 5.2083,
+    "release_ring_volume_share": 0.35715673628912886,
+    "sea_cells": 0,
+    "sea_off_west": 0.0,
+    "slowest_arrival_min": 26.161685764306217,
+    "southeast_reach_km": 2.1908880346661253,
+    "value": 0.0,
+    "verdict": "PASS",
+    "west_sea": 0.0
+  },
+  "pdc-t2-solver": {
+    "hash": "4bbe4978dd62b0bbeec9600667cdfe74812d08c4817a466b41adab1ab516fb7a",
+    "verdict": "PASS"
+  },
+  "pdc-t2-southeast-reach": {
+    "hash": "db022f42e891730f32539cacf27436133e7fd6bde1d74ccfe4f33e97e846b76e",
+    "max_reach_1mm_km": 2.461169701597223,
+    "max_reach_km": 2.461169701597223,
+    "outflow_volume_m3": 0.0,
+    "reached_km2": 5.2083,
+    "release_ring_volume_share": 0.35715673628912886,
+    "sea_cells": 0,
+    "sea_off_west": 0.0,
+    "slowest_arrival_min": 26.161685764306217,
+    "southeast_reach_km": 2.1908880346661253,
+    "value": 2.1908880346661253,
+    "verdict": "PASS",
+    "west_sea": 0.0
+  },
+  "pdc-t2-volume": {
+    "hash": "0ec4d5df86d216481127750f4031e22707f25cddee2cbe4566dd78460e665f26",
+    "value": 1.6454462449036722e-16,
+    "verdict": "PASS"
   },
   "pdc.records_and_units": {
     "hash": "469637ff9af2df775fb8f995cfed962cc6b0b20b38611febef16df44c7de4d4f",
