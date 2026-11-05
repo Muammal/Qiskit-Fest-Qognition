@@ -7,3 +7,25 @@ kind = "verification"
 command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/gas'); load_datasets(p/'datasets.toml', 'gas'); load_parameters(p/'params.toml')\""
 inputs = ["stranded_physics/domains/gas/datasets.toml", "stranded_physics/domains/gas/params.toml"]
 required = true
+
+[[gate]]
+id = "gas-model"
+title = "Gaussian plume rules hold: formula, direction, reflection, time rule"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/gas/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/gas/*.py", "stranded_physics/domains/gas/params.toml", "stranded_physics/domains/gas/tests/*.py"]
+required = false
+
+[[gate]]
+id = "gas-total-so2"
+title = "SO2 released by 00:00 UTC on 10 April (kilotonnes)"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.gas.measure total_so2_kt"
+inputs = ["stranded_physics/domains/gas/*.py", "stranded_physics/domains/gas/params.toml", "stranded_physics/domains/eruption/facts.csv"]
+required = false
+target = 200.0
+tolerance = 100.0  # The workboard says "over 200 kt". Unverified, so wide; check against the satellite record in T-102.
+role = "anchor"
+split = "reference"
+source = "workboard/specs/T-403.md: over 200 kt SO2 by 10 April. An anchor, not a prediction, and not yet traced to a paper"

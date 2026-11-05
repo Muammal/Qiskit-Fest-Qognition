@@ -37,6 +37,7 @@ CANONICAL: dict[str, tuple[str, str]] = {
     "lahar.depth": ("m", "frames"),
     "lava.footprint": ("dimensionless", "frames"),
     "gas.so2_concentration": ("ug/m**3", "frames"),
+    "exposure.roof_failure": ("dimensionless", "frames"),  # Share of ordinary roofs that would have failed under the ash so far.
 }
 
 
