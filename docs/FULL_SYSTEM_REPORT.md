@@ -51,6 +51,7 @@
 | **6. Energy-Cone PDC, LAHARZ Lahar & Dome Lava T1 Solvers (`WS5: T-501, T-502, T-504`)** | `EnergyConePDC`, `LaharzLahar`, `DomeLava` in [`stranded_physics/scenarios.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py) | **DONE** | `pdc`, `lahar`, `lava` gates `PASS` |
 | **7. Tobler Locomotion, Causal Perception & `--engine physics` (`WS6: T-601..T-604, T-701`)** | [`stranded_physics/runtime/simulation.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/runtime/simulation.py), [`perception.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/runtime/perception.py), [`main.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/main.py) | **DONE** | `python main.py --demo --engine physics` |
 | **8. Empirical BLS ATUS Priors & 4-Direction Grover DTQW** | [`data/priors.json`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/data/priors.json), [`contracts.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/contracts.py) (`get_prior`, `classical_decide`, `explore_step`) | **DONE** | `test_grover_dtqw_explore_step_and_atus_priors` |
+| **9. Data-v1 Release Import (`artifacts/physics/raw/`)** | Downloaded and extracted from [GitHub Release `data-v1`](https://github.com/Muammal/Qiskit-Fest-Qognition/releases/tag/data-v1) via `tools/fetch_artifacts.py` (19 verified raw data files: DEMs, ERA5 wind grids, storm tracks, ship plans) | **DONE** | `22 / 22` physical verification gates PASS (`python -m stranded_physics.gates required`) |
 
 ### What Is Optional / Future Post-Hackathon Work?
 Only two items in [`workboard/tasks.csv`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/workboard/tasks.csv) remain marked as optional future extensions (neither blocks production or the simulation):
@@ -59,7 +60,7 @@ Only two items in [`workboard/tasks.csv`](file:///c:/Users/lenovo/OneDrive/Deskt
 
 ---
 
-## 3. Clash of Clans / Hay Day Simulator UI (`engine/gui.py` & `site/index.html`)
+## 3. Clash of Clans / Hay Day Simulator UI & Media Exporters (`engine/gui.py`, `site/index.html`)
 
 The simulator UI in [`engine/gui.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/gui.py) has been styled after **Clash of Clans / Hay Day (Supercell Village & Island Games)** while preserving full scientific and cognitive telemetry:
 
@@ -71,25 +72,50 @@ The simulator UI in [`engine/gui.py`](file:///c:/Users/lenovo/OneDrive/Desktop/Q
    - Signature **Checkerboard Emerald Village Lawn** (`(126, 202, 68)` / `(114, 190, 58)`), golden sandy beaches, sparkling turquoise lagoon water with animated wave crests, puffy 2.5D orchard/pine trees with ruby/gold fruit clusters, red-roofed timber village cottages with glowing windows, smoking volcano caldera, and a straw-hat villager sprite with parchment thought bubbles.
 4. **Glossy Elixir/Gold Telemetry Bars (`draw_progress_bar`)**:
    - Recessed dark wood troughs with golden rims and specular highlight strips for all 6 physiological needs, stress, decoherence $\lambda$, and the 7 survival action probabilities.
+5. **Slow-Motion & Fast-Forward Simulation Controls**:
+   - Speed buttons (`1x`, `2x`, `5x`, `10x`) and keyboard shortcuts (`[` for Slow-Mo down to 0.25x / 1 FPS, `]` for Fast-Forward up to 10x / 30 FPS, and `Space` to pause/resume) allow detailed inspection of critical order-effect decision moments and fast multi-agent runs.
+6. **MP4 Simulation Video Exporter (`engine/video_exporter.py`)**:
+   - High-definition MP4 video exporter (`python main.py --export-video --scenario <name> --duration 12`) renders headless Pygame simulation runs directly to video files with fallback to raw/FFmpeg.
+7. **Empirical Evacuation Data & Seed Exporter (`engine/data_exporter.py`)**:
+   - Generates production-ready CSV spreadsheets (`evacuation_survival_comparison.csv`), machine-readable policy bundles (`evacuation_data_bundle.json`), and comprehensive Markdown reports (`EVACUATION_INSIGHTS_REPORT.md`) across all 5 disaster scenarios.
 
 ---
 
-## 4. Production Verification Summary
+## 4. Visual Gallery Across All Scenarios
 
-All automated test suites, validation scripts, and physics gates pass out of the box:
+| Scenario | Screenshot |
+| :--- | :--- |
+| **01: Event Choice Hub** | ![Event Choice Hub](../docs/images/01_event_choice_hub.png) |
+| **02: Home Configuration & 3-Mind Selector** | ![Home Configuration](../docs/images/02_home_configuration.png) |
+| **03: Island Wilderness Survival** | ![Island Wilderness](../docs/images/03_island_survival_sim.png) |
+| **04: Volcano Evacuation (La Soufrière)** | ![Volcano Evacuation](../docs/images/04_volcano_evacuation_sim.png) |
+| **05: Mission Debrief Modal** | ![Mission Debrief](../docs/images/05_mission_debrief.png) |
+| **06: RMS Titanic 1912 Evacuation** | ![RMS Titanic](../docs/images/06_titanic_evacuation_sim.png) |
+| **07: Pompeii AD 79 Evacuation** | ![Pompeii AD 79](../docs/images/07_pompeii_evacuation_sim.png) |
+| **08: Waterloo Chlorine Gas Leak** | ![Waterloo Chlorine](../docs/images/08_waterloo_chlorine_sim.png) |
+| **09: Interactive Scenario Builder** | ![Scenario Builder](../docs/images/09_scenario_builder.png) |
+
+---
+
+## 5. Production Verification Summary
+
+All automated test suites, validation scripts, and physics gates pass out of the box across the entire repository:
 
 ```powershell
-# 1. Full Unified Test Suite (Tech A + Tech B + Tech C + Titanic + Pompeii + Waterloo + GUI)
-$env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py test_titanic.py test_pompeii.py test_waterloo.py mind/tests stranded_physics/core -q
-# -> 712 passed (including stranded_physics stage tests)
+# 1. Full Unified Test Suite (816 tests passing across all tracks)
+$env:SDL_VIDEODRIVER="dummy"; python -m pytest -q
+# -> 816 passed, 3 skipped in 13m 19s (100% pass rate)
 
 # 2. Tech A Validation Report & 6-Paper Cross-Check
 python -m mind.experiments.validate
 # -> Wrote docs/tech-a/07-validation-report.md (any_failed=False)
 
-# 3. Tech B 14-Category Verification Gates & Catalog
+# 3. Tech B 14-Category Verification Gates (All 22 Gates Pass)
 python -m stranded_physics.gates required
+# -> 22 / 22 PASS (all datasets, records, and physics invariants verified)
+
+# 4. Tech B Provenance & Unit Catalog
 python -m stranded_physics.catalog
-# -> 14/14 record checks pass (files load; physics not tested)
+# -> 49 Datasets, 20 Pint Parameters catalogued in workboard/CATALOG.md
 ```
 

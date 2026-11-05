@@ -72,13 +72,16 @@ flowchart TB
 
 ## 3. Verification & Full Repository Test Suite
 
-All tracks are continuously verified together via `pytest`:
+All tracks and scenarios are continuously verified together via `pytest`:
 
 ```powershell
-# Run the complete 158-test unified suite across Tech A, Tech B, and Tech C:
-$env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q
+# Run the complete 816-test unified suite across all tracks:
+$env:SDL_VIDEODRIVER="dummy"; python -m pytest -q
 ```
 
 - **[`test_contracts_and_engine.py`](../test_contracts_and_engine.py)** (66 tests): Validates frozen contracts, BLS ATUS `data/priors.json` metadata, 4-direction Grover DTQW `explore_step()`, dual-scenario terrain & DEM generation, priority-flood drainage, Tobler hiking speeds, active vs. deposited PDC/lahar lethality, `scripted_events` order-effect counterfactuals, `build_st_vincent_pack()` + `PackSimulation`, selectable `cognition_model` modes, and 3-mind cycling in the Pygame GUI.
 - **[`mind/tests/`](../mind/tests/)** (48 tests, including 12 tests in `test_cognition_models.py`): Validates density-matrix positivity, Tversky & Shafir calibration, non-commuting order effects, phase-damping decoherence limits, reflex overrides, Qiskit circuit equivalence (including `allow_collapse=True`), and all 6 published quantum cognition models (`jbusemey/ChoiceModeling`, `Insight137/insight137-eap`, `hwilner/open-system-decision-dynamics`, `ljaustc/QRL`, `WileQ/QCog`, `robertcprice/nQPU`).
-- **[`stranded_physics/core/tests/`](../stranded_physics/core/tests/)** (44 tests): Validates `pint` unit checking, dataset calibration/holdout split enforcement, domain encapsulation, topological `ScenarioPack` building, SHA-256 tamper detection, causal `perceive()` anti-future-leakage, and `PackSimulation` JSON schema compatibility.
+- **[`stranded_physics/core/tests/`](../stranded_physics/core/tests/) & Physics Domains** (645+ tests): Validates `pint` unit checking, dataset calibration/holdout split enforcement, domain encapsulation, topological `ScenarioPack` building, SHA-256 tamper detection, causal `perceive()` anti-future-leakage, and full domain physics across all 19 raw datasets from `data-v1`.
+- **[`test_titanic.py`](../test_titanic.py), [`test_pompeii.py`](../test_pompeii.py), [`test_waterloo.py`](../test_waterloo.py)** (57 tests): Validates multi-agent crowd evacuation dynamics, flood propagation, tephra roof collapse, and chlorine advection-diffusion.
+- **Physics Verification Gates**: `22 / 22 PASS` (`python -m stranded_physics.gates required`).
+- **Overall Result**: **`816 passed, 3 skipped`** in 13 min 19 sec across the entire repository.
