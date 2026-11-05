@@ -9,3 +9,75 @@ valid_max = 3000.0
 role = "input"
 status = "literature"
 source = "UWI Seismic Research Centre La Soufriere 2021 dome extrusion reports"
+
+# Cole line 103: "Eruptive activity at La Soufriere, St Vincent restarted after a > 40 year hiatus on 27th December 2020" (accent normalized). Midnight UTC is assumed because time of day is unspecified.
+[[parameter]]
+id = "lava.growth_before_axis"
+value = 8812800.0
+unit = "s"
+valid_min = 0.0
+valid_max = 1000000000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/eruption/st_vincent_cole_accepted.txt: lines 103-106, 483-486"
+
+# 20 x 10^6 m3 divided by 27 December 2020 00:00 to 9 April 2021 12:41 UTC; midnight start assumption.
+[[parameter]]
+id = "lava.flux"
+value = 2.235920964665741
+unit = "m**3/s"
+valid_min = 0.0
+valid_max = 1000.0
+role = "input"
+status = "derived"
+source = "artifacts/physics/raw/eruption/st_vincent_cole_accepted.txt: lines 103-106, 483-486"
+
+# Effective kinematic viscosity is unconstrained; wide range for dome rheology.
+[[parameter]]
+id = "lava.viscosity"
+value = 100000000.0
+unit = "m**2/s"
+valid_min = 100.0
+valid_max = 100000000000000.0
+role = "input"
+status = "assumption"
+
+# Huppert 1982 constant-flux coefficient, recalled from memory.
+[[parameter]]
+id = "lava.huppert_coefficient"
+value = 0.715
+unit = "dimensionless"
+valid_min = 0.1
+valid_max = 2.0
+role = "input"
+status = "assumption"
+
+# Conventional standard gravity, recalled from memory; ignores local variation.
+[[parameter]]
+id = "lava.gravity"
+value = 9.80665
+unit = "m/s**2"
+valid_min = 9.0
+valid_max = 10.0
+role = "input"
+status = "assumption"
+
+# UTC epoch of requested measurement axis start; task-specified measurement convention.
+[[parameter]]
+id = "lava.measure_axis_start"
+value = 1617840000.0
+unit = "s"
+valid_min = 0.0
+valid_max = 4000000000.0
+role = "input"
+status = "assumption"
+
+# Task-specified first explosion instant; timing is prescribed here rather than independently verified.
+[[parameter]]
+id = "lava.first_explosion_epoch"
+value = 1617972060.0
+unit = "s"
+valid_min = 0.0
+valid_max = 4000000000.0
+role = "input"
+status = "assumption"
