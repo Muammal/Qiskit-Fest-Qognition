@@ -53,6 +53,7 @@ import math
 import os
 import random
 import sys
+import threading
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -68,6 +69,16 @@ from engine.world import IslandWorld, MAP_SEED
 from engine.agent import SurvivalAgent
 from engine.events import EventGenerator, VOLCANIC
 from engine.simulation import SimulationEngine, DEFAULT_STEPS
+from engine.ship import DECK_ROWS, ShipWorld
+from engine.titanic import TitanicSimulation, STORY_TEXT
+from engine.flood import HORIZON as TITANIC_STEPS
+from engine.lifeboats import TOTAL_SEATS
+from engine.gui_ship import ShipView, mini_map, next_role_person
+from engine.city import CityWorld
+from engine.pompeii import HORIZON as POMPEII_STEPS, STORY_TEXT as POMPEII_STORY, PompeiiSimulation
+from engine.gui_city import CityView, SplitPanels, clock_text, mini_map as city_mini_map, next_role_citizen
+from engine.scenes_pompeii import PompeiiCutscenes
+from engine.cutscenes import CutscenePlayer
 
 try:
     from mind.decoherence import decoherence_strength
@@ -135,6 +146,26 @@ ISLAND_PRESETS = [
     {"label": "Interference Lab (Seed 202)", "seed": 202, "tag": "Order Effect Divergence", "color": COLOR_PURPLE},
     {"label": "Heroic Haven (Seed 777)", "seed": 777, "tag": "Timber Rich | Freshwater", "color": COLOR_CYAN}
 ]
+
+TITANIC_PRESETS = [
+    {"label": "Third-Class Passenger", "seed": 105, "tag": "Far from the boats | Lower decks", "color": COLOR_CYAN},
+    {"label": "First-Class Passenger", "seed": 106, "tag": "Near the boat deck | Upper decks", "color": COLOR_GOLD},
+    {"label": "Server / Steward", "seed": 107, "tag": "Warns the cabins | Works the corridors", "color": COLOR_PURPLE},
+    {"label": "Evacuation Worker", "seed": 108, "tag": "Loads the lifeboats | Told early", "color": COLOR_RED}
+]
+
+POMPEII_PRESETS = [
+    {"label": "Resident", "seed": 105, "tag": "Follow a resident | Random panels", "color": COLOR_CYAN},
+    {"label": "Enslaved Person", "seed": 106, "tag": "Follow an enslaved person | Random panels", "color": COLOR_PURPLE},
+    {"label": "Merchant", "seed": 107, "tag": "Follow a merchant | Random panels", "color": COLOR_GREEN},
+    {"label": "Council Member", "seed": 108, "tag": "Follow a council member | Random panels", "color": COLOR_GOLD}
+]
+POMPEII_SETTINGS = (  # (key, label, options); each changes results, so each is visible before launch
+    # The first option in each row is the default, so B comes first: the user's chosen mapping.
+    ("event_mapping", "Mapping", ("B", "C", "D", "A")), ("population", "People", (11_500, 20_000)),
+    ("date", "Date", ("august", "autumn")), ("quake", "Quake", (True, False)),
+    ("restrict_enslaved", "Enslaved held", (False, True)), ("crowding", "Crowding", (True, False)),
+)
 
 VOLCANO_PRESETS = [
     {"label": "Event Seed 101", "seed": 101, "tag": "Standard Unrest | Timed Pulse", "color": COLOR_CYAN},
@@ -588,7 +619,11 @@ class IslandVisualizerApp:
         self.seed = seed
         self.mind_type = mind_type.lower()
         self.noise_source = noise_source
-        self.max_steps = DEFAULT_STEPS
+        self.max_steps = self._horizon_for(scenario)
+        self.cutscene = self._cutscene_player(scenario)
+        self.pompeii_settings = {key: options[0] for key, _, options in POMPEII_SETTINGS}
+        self._worker, self._worker_result = None, None
+        self.city_view, self.split_panels, self.show_split_panels = None, None, True
         self.step_speed = 0.4
         self.speed_multiplier = 1.0
         self.auto_step_timer = 0.0
@@ -642,6 +677,10 @@ class IslandVisualizerApp:
         return int(max(0, min(WINDOW_WIDTH - 1, vx))), int(max(0, min(WINDOW_HEIGHT - 1, vy)))
 
     def _generate_mini_map(self, seed: int, size: int = 300) -> pygame.Surface:
+        if self.scenario == "titanic":
+            return mini_map(ShipWorld(seed=seed), size)
+        if self.scenario == "pompeii":
+            return city_mini_map(CityWorld(seed=seed), size)
         surf = pygame.Surface((size, size))
         w = IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=seed, scenario=self.scenario)
         t_sz = size / GRID_DIM
@@ -673,24 +712,69 @@ class IslandVisualizerApp:
 
     def _build_event_choice_buttons(self):
         """Constructs buttons for the Event Choice Hub."""
-        c1_x, c2_x = 170, 850
-        card_w, card_y, card_h = 580, 135, 600
+        c1_x, c2_x, c3_x, c4_x = 26, 416, 806, 1196
+        card_w, card_y, card_h = 378, 135, 600
         btn_y = card_y + card_h - 68
         btn_w = card_w - 70
 
         self.card1_rect = pygame.Rect(c1_x, card_y, card_w, card_h)
         self.card2_rect = pygame.Rect(c2_x, card_y, card_w, card_h)
+        self.card3_rect = pygame.Rect(c3_x, card_y, card_w, card_h)
+        self.card4_rect = pygame.Rect(c4_x, card_y, card_w, card_h)
 
         self.btn_choice_island = UIButton(
             (c1_x + 35, btn_y, btn_w, 48),
-            "INITIATE ISLAND SURVIVAL  >>", self.font_title,
+            "ISLAND SURVIVAL  >>", self.font_title,
             bg_color=(56, 158, 28), active_color=COLOR_GREEN, icon="tree"
         )
         self.btn_choice_volcano = UIButton(
             (c2_x + 35, btn_y, btn_w, 48),
-            "INITIATE VOLCANO EVACUATION  >>", self.font_title,
+            "VOLCANO EVACUATION  >>", self.font_title,
             bg_color=(214, 78, 24), active_color=COLOR_ORANGE, icon="volcano"
         )
+        self.btn_choice_titanic = UIButton(
+            (c3_x + 35, btn_y, btn_w, 48),
+            "TITANIC EVACUATION  >>", self.font_title,
+            bg_color=(28, 84, 148), active_color=COLOR_BLUE, icon="launch"
+        )
+        self.btn_choice_pompeii = UIButton(
+            (c4_x + 35, btn_y, btn_w, 48),
+            "POMPEII EVACUATION  >>", self.font_title,
+            bg_color=(140, 66, 40), active_color=COLOR_RED, icon="volcano"
+        )
+
+    def _presets(self):
+        return {"volcano": VOLCANO_PRESETS, "titanic": TITANIC_PRESETS, "pompeii": POMPEII_PRESETS}.get(self.scenario, ISLAND_PRESETS)
+
+    @staticmethod
+    def _horizon_for(scenario):
+        return {"titanic": TITANIC_STEPS, "pompeii": POMPEII_STEPS}.get(scenario, DEFAULT_STEPS)
+
+    def _cutscene_player(self, scenario):
+        player = PompeiiCutscenes if scenario == "pompeii" else CutscenePlayer
+        return player(self.font_hero, self.font_small)
+
+    def _setting_text(self, key, label):
+        value = self.pompeii_settings[key]
+        if isinstance(value, bool):
+            value = "On" if value else "Off"
+        elif isinstance(value, int):
+            value = f"{value:,}"
+        return f"{label}: {str(value).capitalize()}"
+
+    def _build_pompeii_setting_buttons(self, top_y, col2_x):
+        """Replaces the step-length row: Pompeii always runs its whole 32-hour timeline."""
+        self.step_buttons = []
+        width = 167
+        for i, (key, label, _) in enumerate(POMPEII_SETTINGS):
+            rect = (col2_x + 24 + i * (width + 9), top_y + 395, width, 44)
+            self.step_buttons.append(UIButton(rect, self._setting_text(key, label), self.font_small, active_color=COLOR_CYAN))
+
+    def _cycle_pompeii_setting(self, index):
+        key, label, options = POMPEII_SETTINGS[index]
+        current = options.index(self.pompeii_settings[key])
+        self.pompeii_settings[key] = options[(current + 1) % len(options)]
+        self.step_buttons[index].text = self._setting_text(key, label)
 
     def _build_home_buttons(self):
         col2_x = 480
@@ -722,7 +806,7 @@ class IslandVisualizerApp:
         # 2. Preset Buttons (2x2 Grid)
         self.preset_buttons: List[UIButton] = []
         p_y = top_y + 165
-        presets = VOLCANO_PRESETS if self.scenario == "volcano" else ISLAND_PRESETS
+        presets = self._presets()
         for i, preset in enumerate(presets):
             px = col2_x + 24 + (i % 2) * 531
             py = p_y + (i // 2) * 56
@@ -738,7 +822,7 @@ class IslandVisualizerApp:
         self.btn_seed_p1 = UIButton((col2_x + 575, s_y, 45, 38), "+1", self.font_body)
         self.btn_seed_p10 = UIButton((col2_x + 626, s_y, 55, 38), "+10", self.font_body)
         self.btn_seed_p100 = UIButton((col2_x + 687, s_y, 65, 38), "+100", self.font_body)
-        rand_label = "Random Events" if self.scenario == "volcano" else "Random Island"
+        rand_label = "Random Island" if self.scenario == "island" else "Random Events"
         self.btn_seed_rand = UIButton((col2_x + 768, s_y, 270, 38), rand_label, self.font_sub,
                                       active_color=COLOR_YELLOW, icon="random")
 
@@ -749,12 +833,17 @@ class IslandVisualizerApp:
         btn_w = 250
         for i, steps in enumerate(step_choices):
             sx = col2_x + 24 + i * (btn_w + 15)
-            btn = UIButton((sx, st_y, btn_w, 44), f"{steps} Steps ({steps*2}h)", self.font_sub, active_color=COLOR_CYAN)
+            span = f"{steps * 5} min" if self.scenario == "titanic" else f"{steps*2}h"
+            btn = UIButton((sx, st_y, btn_w, 44), f"{steps} Steps ({span})", self.font_sub, active_color=COLOR_CYAN)
             self.step_buttons.append(btn)
+
+        launch_text = "LAUNCH POMPEII SIMULATION" if self.scenario == "pompeii" else "LAUNCH SURVIVAL SIMULATION"
+        if self.scenario == "pompeii":
+            self._build_pompeii_setting_buttons(top_y, col2_x)
 
         # 5. Launch Button
         self.btn_launch = UIButton(
-            (col2_x + 24, top_y + 490, 1046, 68), "LAUNCH SURVIVAL SIMULATION", self.font_hero,
+            (col2_x + 24, top_y + 490, 1046, 68), launch_text, self.font_hero,
             bg_color=(56, 164, 28), active_color=COLOR_GREEN, icon="launch"
         )
         self.btn_hero_launch = self.btn_launch
@@ -783,16 +872,30 @@ class IslandVisualizerApp:
         self.btn_hist_close = UIButton((WINDOW_WIDTH // 2 + 500, 45, 34, 34), "X", self.font_title, bg_color=COLOR_PANEL_BG)
 
     def _init_simulation(self):
-        self.engine = SimulationEngine(
+        self._finish_worker()
+        engine_class = {"titanic": TitanicSimulation, "pompeii": PompeiiSimulation}.get(self.scenario, SimulationEngine)
+        extra = self.pompeii_settings if self.scenario == "pompeii" else {}
+        self.engine = engine_class(
             seed=self.seed,
             mind_type=self.mind_type,
             noise_source=self.noise_source,
-            scenario=self.scenario
+            scenario=self.scenario,
+            **extra
         )
         self.world = self.engine.world
         self.agent = self.engine.agent
         self.event_gen = self.engine.event_gen
         self.decide_fn = self.engine.decide_fn
+        self.ship_view = ShipView(self) if self.scenario == "titanic" else None
+        self.city_view = CityView(self) if self.scenario == "pompeii" else None
+        self.split_panels = SplitPanels(self.engine) if self.scenario == "pompeii" else None
+        self.show_split_panels = True
+        wanted_player = PompeiiCutscenes if self.scenario == "pompeii" else CutscenePlayer
+        if type(self.cutscene) is not wanted_player:
+            enabled = self.cutscene.enabled
+            self.cutscene = wanted_player(self.font_hero, self.font_small)
+            self.cutscene.enabled = enabled
+        self.cutscene.reset()
         self.history: List[Dict[str, Any]] = []
         self.current_decision: Dict[str, Any] = {
             "action": "none",
@@ -818,6 +921,10 @@ class IslandVisualizerApp:
 
     def step_forward(self):
         """Advances the simulation by one 2-hour step."""
+        if self.scenario == "titanic":
+            return self._titanic_step_forward()
+        if self.scenario == "pompeii":
+            return self._pompeii_start_step()
         if not self.agent.is_alive or self.step_idx >= self.max_steps:
             self.show_debrief_modal = True
             return
@@ -858,11 +965,99 @@ class IslandVisualizerApp:
         if not self.agent.is_alive or self.step_idx >= self.max_steps:
             self.show_debrief_modal = True
 
+    def _titanic_step_forward(self):
+        """One five-minute step for everyone aboard; the panels follow the focused person."""
+        if self.step_idx >= self.max_steps:
+            self.show_debrief_modal = True
+            return
+        record = self.engine.step()
+        if record is None:
+            self.show_debrief_modal = True
+            return
+        self.step_idx += 1
+        self.current_event = record["event"]
+        self.current_weather = "calm"
+        self.current_decision = record
+        self._sync_titanic_focus()
+        self.weather.add_action_particles(self.char_screen_x, self.char_screen_y, record["action"])
+        self.bubble_text = record["action_label"]
+        self.bubble_timer = 2.8
+        self.cutscene.enqueue(self.engine.scenes)
+        if self.step_idx >= self.max_steps:
+            self.show_debrief_modal = True
+
+    def _pompeii_start_step(self):
+        """Compute the next step on a separate thread, so the window keeps drawing."""
+        if self._worker is not None:
+            return
+        if self.step_idx >= self.max_steps:
+            self.show_debrief_modal = True
+            return
+        engine = self.engine
+
+        def work():
+            self._worker_result = (engine, engine.step())
+
+        self._worker = threading.Thread(target=work, daemon=True)
+        self._worker.start()
+
+    def _pompeii_poll_step(self):
+        """Show a finished background step. Called from the main loop."""
+        if self._worker is None or self._worker.is_alive():
+            return
+        self._worker = None
+        engine, record = self._worker_result
+        if engine is not self.engine:
+            return
+        if record is None:
+            self.show_debrief_modal = True
+            return
+        self.step_idx += 1
+        self.current_event = record["event"]
+        self.current_weather = "calm"
+        self.current_decision = record
+        self._sync_titanic_focus()
+        self.bubble_text = record["action_label"]
+        self.bubble_timer = 2.8
+        self.cutscene.enqueue(engine.scenes)
+        if self.step_idx >= self.max_steps:
+            self.show_debrief_modal = True
+
+    def _finish_worker(self):
+        """Wait for any running step before the simulation is replaced."""
+        if getattr(self, "_worker", None) is not None:
+            self._worker.join()
+            self._worker = None
+
+    def _sync_titanic_focus(self):
+        """Point the panels at the followed person and rebuild their personal log."""
+        self.agent = self.engine.agent
+        log = self.agent.log if self.scenario == "titanic" else self.engine.logs.get(self.agent.id, [])
+        self.history = [{"t": r["t"] + 1, "state": r["state"], "event": r["event"], "action": r["action"],
+                         "decision": r, "narrative": r["reason"]} for r in log]
+        self.history_scroll = max(0, len(self.history) - 16)
+        if log:
+            self.current_decision = log[-1]
+            self.current_event = log[-1]["event"]
+        view = self.ship_view or self.city_view
+        self.char_target_x, self.char_target_y = view.focus_xy(self.engine)
+
+    def _follow(self, person):
+        self.engine.set_focus(person)
+        self._sync_titanic_focus()
+        self.bubble_text = person.label
+        self.bubble_timer = 2.8
+
     def handle_event(self, event, v_mouse: Optional[Tuple[int, int]] = None) -> bool:
         if v_mouse is None:
             v_mouse = self.get_virtual_mouse_pos()
         if event.type == pygame.QUIT:
             return False
+
+        if self.cutscene.active and (event.type == pygame.KEYDOWN or
+                                     (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
+            self.cutscene.skip()
+            return True
 
         elif event.type == pygame.VIDEORESIZE:
             if not self.is_fullscreen:
@@ -880,6 +1075,18 @@ class IslandVisualizerApp:
                     self._handle_event_choice_click(self.btn_choice_island.rect.center)
                 elif event.key in (pygame.K_2, pygame.K_KP2):
                     self._handle_event_choice_click(self.btn_choice_volcano.rect.center)
+                elif event.key in (pygame.K_3, pygame.K_KP3):
+                    self._handle_event_choice_click(self.btn_choice_titanic.rect.center)
+                elif event.key in (pygame.K_4, pygame.K_KP4):
+                    self._handle_event_choice_click(self.btn_choice_pompeii.rect.center)
+            elif event.key == pygame.K_f and self.app_state == "sim" and self.scenario in ("titanic", "pompeii"):
+                self._follow(next_role_citizen(self.engine) if self.scenario == "pompeii" else next_role_person(self.engine))
+            elif event.key == pygame.K_c and self.app_state == "sim" and self.scenario in ("titanic", "pompeii"):
+                self.cutscene.enabled = not self.cutscene.enabled
+            elif event.key == pygame.K_m and self.app_state == "sim" and self.scenario == "pompeii":
+                self.city_view.toggle()
+            elif event.key == pygame.K_p and self.app_state == "sim" and self.scenario == "pompeii":
+                self.show_split_panels = not self.show_split_panels
             elif event.key == pygame.K_SPACE and self.app_state == "sim":
                 self.is_paused = not self.is_paused
             elif event.key in (pygame.K_RIGHT, pygame.K_n) and self.app_state == "sim":
@@ -915,7 +1122,11 @@ class IslandVisualizerApp:
             dt = self.clock.tick(FPS) / 1000.0
 
             # Auto-stepping during unpaused simulation
-            if self.app_state == "sim" and not self.is_paused and not self.show_debrief_modal and not self.show_history_overlay:
+            self.cutscene.update(dt)
+            if self.scenario == "pompeii":
+                self._pompeii_poll_step()
+            if self.app_state == "sim" and not self.is_paused and not self.show_debrief_modal and not self.show_history_overlay \
+                    and not self.cutscene.active:
                 self.auto_step_timer += dt * self.speed_multiplier
                 if self.auto_step_timer >= self.step_speed:
                     self.auto_step_timer = 0.0
@@ -976,6 +1187,10 @@ class IslandVisualizerApp:
         if self.app_state == "event_choice":
             c1_h = hasattr(self, 'card1_rect') and self.card1_rect.collidepoint(pos)
             c2_h = hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(pos)
+            if self.btn_choice_titanic.check_hover(pos) or self.card3_rect.collidepoint(pos):
+                return True
+            if self.btn_choice_pompeii.check_hover(pos) or self.card4_rect.collidepoint(pos):
+                return True
             return self.btn_choice_island.check_hover(pos) or self.btn_choice_volcano.check_hover(pos) or c1_h or c2_h
 
         elif self.app_state == "home":
@@ -1038,7 +1253,22 @@ class IslandVisualizerApp:
     def _handle_event_choice_click(self, pos: Tuple[int, int]):
         c1_hit = self.btn_choice_island.check_hover(pos) or (hasattr(self, 'card1_rect') and self.card1_rect.collidepoint(pos))
         c2_hit = self.btn_choice_volcano.check_hover(pos) or (hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(pos))
-        if c1_hit:
+        c3_hit = self.btn_choice_titanic.check_hover(pos) or self.card3_rect.collidepoint(pos)
+        c4_hit = self.btn_choice_pompeii.check_hover(pos) or self.card4_rect.collidepoint(pos)
+        self.max_steps = self._horizon_for("titanic" if c3_hit else "pompeii" if c4_hit else "other")
+        if c4_hit:
+            self.scenario = "pompeii"
+            self._build_home_buttons()
+            self._init_simulation()
+            self.preview_mini_map = self._generate_mini_map(self.seed, size=300)
+            self.app_state = "home"
+        elif c3_hit:
+            self.scenario = "titanic"
+            self._build_home_buttons()
+            self._init_simulation()
+            self.preview_mini_map = self._generate_mini_map(self.seed, size=300)
+            self.app_state = "home"
+        elif c1_hit:
             self.scenario = "island"
             self._build_home_buttons()
             self._init_simulation()
@@ -1067,7 +1297,7 @@ class IslandVisualizerApp:
             self.btn_mind_classical.trigger_click()
             return
 
-        presets = VOLCANO_PRESETS if self.scenario == "volcano" else ISLAND_PRESETS
+        presets = self._presets()
         for i, btn in enumerate(self.preset_buttons):
             if btn.check_hover(pos):
                 self.seed = presets[i]["seed"]
@@ -1098,7 +1328,10 @@ class IslandVisualizerApp:
         step_choices = [12, 24, 36, 48]
         for i, btn in enumerate(self.step_buttons):
             if btn.check_hover(pos):
-                self.max_steps = step_choices[i]
+                if self.scenario == "pompeii":
+                    self._cycle_pompeii_setting(i)
+                else:
+                    self.max_steps = step_choices[i]
                 btn.trigger_click()
                 return
 
@@ -1157,6 +1390,15 @@ class IslandVisualizerApp:
             self.btn_nav_fs.trigger_click()
 
         # Map tile click inspector
+        elif pos[0] < MAP_SIZE and pos[1] >= 52 and self.scenario == "titanic":
+            person = self.ship_view.pick_person(self.engine, pos, max(0, self.step_idx - 1))
+            if person is not None:
+                self._follow(person)
+        elif pos[0] < MAP_SIZE and pos[1] >= 52 and self.scenario == "pompeii":
+            person = self.city_view.pick_person(self.engine, pos)
+            if person is not None:
+                self.split_panels.replace(person)
+                self._follow(person)
         elif pos[0] < MAP_SIZE and pos[1] >= 52:
             tx = int(pos[0] / TILE_SIZE)
             ty = int(pos[1] / TILE_SIZE)
@@ -1170,6 +1412,7 @@ class IslandVisualizerApp:
             self.draw_home_screen(mouse_pos)
         elif self.app_state == "sim":
             self.draw_sim_screen(mouse_pos)
+            self.cutscene.draw(self.canvas)
 
     # -------------------------------------------------------------------------
     # Render Event Choice Screen (State 0) - Tactical Research Dossier Style
@@ -1194,8 +1437,8 @@ class IslandVisualizerApp:
         pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (170, header_y + 70), (WINDOW_WIDTH - 170, header_y + 70), 1)
 
         # Scenario Cards Setup
-        c1_x, c2_x = 170, 850
-        card_w, c_y, card_h = 580, 125, 620
+        c1_x, c2_x, c3_x, c4_x = 26, 416, 806, 1196
+        card_w, c_y, card_h = 378, 125, 620
 
         hover_c1 = (hasattr(self, 'card1_rect') and self.card1_rect.collidepoint(mouse_pos)) or self.btn_choice_island.check_hover(mouse_pos)
         hover_c2 = (hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(mouse_pos)) or self.btn_choice_volcano.check_hover(mouse_pos)
@@ -1217,17 +1460,17 @@ class IslandVisualizerApp:
             "hydration, and hypothermia against stochastic maritime gales and predator fauna, harvesting timber "
             "to construct shelters before sub-zero nightfall."
         )
-        render_wrapped_text(self.canvas, desc1, self.font_body, COLOR_TEXT_MUTED, c1_x + 28, c_y + 125, card_w - 56, line_spacing=5, max_lines=4)
+        render_wrapped_text(self.canvas, desc1, self.font_body, COLOR_TEXT_MUTED, c1_x + 28, c_y + 125, card_w - 56, line_spacing=5, max_lines=5)
 
         # Parameter Specifications Table
         f_y = c_y + 235
         self.canvas.blit(self.font_sub.render("TECHNICAL SPECIFICATIONS", True, COLOR_GOLD), (c1_x + 28, f_y))
         f_y += 28
         specs1 = [
-            ("Grid Matrix", "40 × 40 cells (100 km² coverage | 250m scale)", COLOR_CYAN),
-            ("Topography", "Pine canopy, freshwater streams, alpine snowcaps", COLOR_GREEN),
-            ("Environment", "Maritime storms, freezing nights, territorial fauna", COLOR_YELLOW),
-            ("Cognitive Model", "2-qubit belief state interference & exploration walk", COLOR_PURPLE)
+            ("Grid Matrix", "40 × 40 cells (250m scale)", COLOR_CYAN),
+            ("Topography", "Pine canopy, streams, snowcaps", COLOR_GREEN),
+            ("Environment", "Storms, freezing nights, fauna", COLOR_YELLOW),
+            ("Cognitive Model", "2-qubit belief interference", COLOR_PURPLE)
         ]
         for label, val, dot_col in specs1:
             pygame.draw.circle(self.canvas, dot_col, (c1_x + 36, f_y + 8), 3)
@@ -1257,17 +1500,17 @@ class IslandVisualizerApp:
             "gas warnings, navigate around expanding lava flows and toxic ash deposition, and execute "
             "shortest-path routes to designated coastal assembly zones."
         )
-        render_wrapped_text(self.canvas, desc2, self.font_body, COLOR_TEXT_MUTED, c2_x + 28, c_y + 125, card_w - 56, line_spacing=5, max_lines=4)
+        render_wrapped_text(self.canvas, desc2, self.font_body, COLOR_TEXT_MUTED, c2_x + 28, c_y + 125, card_w - 56, line_spacing=5, max_lines=5)
 
         # Parameter Specifications Table
         f_y2 = c_y + 235
         self.canvas.blit(self.font_sub.render("TECHNICAL SPECIFICATIONS", True, COLOR_GOLD), (c2_x + 28, f_y2))
         f_y2 += 28
         specs2 = [
-            ("Grid Matrix", "40 × 40 cells (Calibrated basalt topography)", COLOR_CYAN),
-            ("Corridors", "Central caldera, radial valleys & coastal assembly", COLOR_ORANGE),
-            ("Hazards", "Advancing lava, ash deposition, lethal PDCs & lahars", COLOR_RED),
-            ("Cognitive Model", "Stress-induced decoherence & threat prioritization", COLOR_PURPLE)
+            ("Grid Matrix", "40 × 40 cells (basalt topography)", COLOR_CYAN),
+            ("Corridors", "Caldera, valleys, coastal assembly", COLOR_ORANGE),
+            ("Hazards", "Lava, ash, lethal PDCs & lahars", COLOR_RED),
+            ("Cognitive Model", "Stress-induced decoherence", COLOR_PURPLE)
         ]
         for label, val, dot_col in specs2:
             pygame.draw.circle(self.canvas, dot_col, (c2_x + 36, f_y2 + 8), 3)
@@ -1280,6 +1523,9 @@ class IslandVisualizerApp:
         self.btn_choice_volcano.check_hover(mouse_pos)
         self.btn_choice_volcano.draw(self.canvas)
 
+        self._draw_titanic_card(c3_x, c_y, card_w, card_h, mouse_pos)
+        self._draw_pompeii_card(c4_x, c_y, card_w, card_h, mouse_pos)
+
         # -------------------------------------------------------------
         # Footer Technical Shortcut Bar
         # -------------------------------------------------------------
@@ -1290,9 +1536,60 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, foot_rect, border_radius=4)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, foot_rect, 1, border_radius=4)
 
-        tip_str = "[ 1 ] Initiate Island Survey       [ 2 ] Initiate Volcano Evacuation       [ F11 ] Fullscreen"
+        tip_str = "[ 1 ] Island    [ 2 ] Volcano    [ 3 ] Titanic    [ 4 ] Pompeii    [ F11 ] Fullscreen"
         hint_surf = self.font_mono.render(tip_str, True, COLOR_TEXT_HINT)
         self.canvas.blit(hint_surf, (footer_x + (footer_w - hint_surf.get_width()) // 2, footer_y + (footer_h - hint_surf.get_height()) // 2))
+
+    def _draw_pompeii_card(self, x: int, y: int, w: int, h: int, mouse_pos: Tuple[int, int]):
+        hover = self.card4_rect.collidepoint(mouse_pos) or self.btn_choice_pompeii.check_hover(mouse_pos)
+        self.draw_card(x, y, w, h, border_color=COLOR_RED if hover else COLOR_CARD_BORDER, border_width=1)
+        self.draw_badge(x + 28, y + 24, "HISTORICAL: AD 79", COLOR_RED)
+        self.canvas.blit(self.font_title.render("POMPEII EVACUATION", True, COLOR_TEXT_MAIN), (x + 28, y + 56))
+        self.canvas.blit(self.font_small.render("Two Maps  •  Pumice & Flows  •  Split Screens", True, COLOR_TEXT_MUTED), (x + 28, y + 82))
+        pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (x + 24, y + 108), (x + w - 24, y + 108), 1)
+        desc = ("A whole town shares one mind. News spreads by distance, chance and household servants "
+                "while pumice builds on the roofs and flows come down from Vesuvius. "
+                "The default settings overstate escape; see the sources document.")
+        render_wrapped_text(self.canvas, desc, self.font_body, COLOR_TEXT_MUTED, x + 28, y + 125, w - 56, line_spacing=5, max_lines=5)
+        f_y = y + 235
+        self.canvas.blit(self.font_sub.render("TECHNICAL SPECIFICATIONS", True, COLOR_GOLD), (x + 28, f_y))
+        f_y += 28
+        for label, val, dot_col in (("People", "11,500, or 20,000", COLOR_CYAN),
+                                    ("Maps", "City and region to Vesuvius", COLOR_ORANGE),
+                                    ("Time Step", "15 minutes, about 32 hours", COLOR_RED),
+                                    ("Cognitive Model", "Same mind for every person", COLOR_PURPLE)):
+            pygame.draw.circle(self.canvas, dot_col, (x + 36, f_y + 8), 3)
+            lbl_surf = self.font_mono.render(f"{label:16s}", True, COLOR_TEXT_MAIN)
+            self.canvas.blit(lbl_surf, (x + 48, f_y))
+            self.canvas.blit(self.font_small.render(val, True, COLOR_TEXT_MUTED), (x + 48 + lbl_surf.get_width(), f_y + 1))
+            f_y += 30
+        self.btn_choice_pompeii.check_hover(mouse_pos)
+        self.btn_choice_pompeii.draw(self.canvas)
+
+    def _draw_titanic_card(self, x: int, y: int, w: int, h: int, mouse_pos: Tuple[int, int]):
+        hover = self.card3_rect.collidepoint(mouse_pos) or self.btn_choice_titanic.check_hover(mouse_pos)
+        self.draw_card(x, y, w, h, border_color=COLOR_BLUE if hover else COLOR_CARD_BORDER, border_width=1)
+        self.draw_badge(x + 28, y + 24, "HISTORICAL: 14-15 APRIL 1912", COLOR_BLUE)
+        self.canvas.blit(self.font_title.render("TITANIC EVACUATION", True, COLOR_TEXT_MAIN), (x + 28, y + 56))
+        self.canvas.blit(self.font_small.render("Progressive Flooding  •  Lifeboats  •  Whole Crowd", True, COLOR_TEXT_MUTED), (x + 28, y + 82))
+        pygame.draw.line(self.canvas, COLOR_CARD_BORDER, (x + 24, y + 108), (x + w - 24, y + 108), 1)
+        desc = ("Everyone aboard shares one mind. Each person hears different warnings in a different order, "
+                "while water climbs through the hull and the lifeboats leave at their recorded times.")
+        render_wrapped_text(self.canvas, desc, self.font_body, COLOR_TEXT_MUTED, x + 28, y + 125, w - 56, line_spacing=5, max_lines=5)
+        f_y = y + 235
+        self.canvas.blit(self.font_sub.render("TECHNICAL SPECIFICATIONS", True, COLOR_GOLD), (x + 28, f_y))
+        f_y += 28
+        for label, val, dot_col in (("People Aboard", "2,208 with crew roles", COLOR_CYAN),
+                                    ("Lifeboats", f"20 boats, {TOTAL_SEATS:,} seats", COLOR_ORANGE),
+                                    ("Time Step", "5 minutes, 23:30 to 03:30", COLOR_RED),
+                                    ("Cognitive Model", "Same mind for every person", COLOR_PURPLE)):
+            pygame.draw.circle(self.canvas, dot_col, (x + 36, f_y + 8), 3)
+            lbl_surf = self.font_mono.render(f"{label:16s}", True, COLOR_TEXT_MAIN)
+            self.canvas.blit(lbl_surf, (x + 48, f_y))
+            self.canvas.blit(self.font_small.render(val, True, COLOR_TEXT_MUTED), (x + 48 + lbl_surf.get_width(), f_y + 1))
+            f_y += 30
+        self.btn_choice_titanic.check_hover(mouse_pos)
+        self.btn_choice_titanic.draw(self.canvas)
 
     # -------------------------------------------------------------------------
     # Render Home Screen (State 1) - Field Mission Planning Console
@@ -1318,7 +1615,8 @@ class IslandVisualizerApp:
         title_surf = self.font_hero.render("QUANTUM COGNITION SIMULATION", True, (58, 32, 10))
         self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, 20))
 
-        scen_tag = "VOLCANO ERUPTION EVACUATION" if self.scenario == "volcano" else "ISLAND WILDERNESS SURVIVAL"
+        scen_tag = {"volcano": "VOLCANO ERUPTION EVACUATION", "titanic": "TITANIC EVACUATION, APRIL 1912",
+                    "pompeii": "POMPEII EVACUATION, AD 79"}.get(self.scenario, "ISLAND WILDERNESS SURVIVAL")
         sub_str = f"EXPEDITION: {scen_tag}  •  2-QUBIT QUANTUM COGNITIVE ENGINE"
         sub_surf = self.font_sub.render(sub_str, True, (96, 56, 18))
         self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, 52))
@@ -1342,7 +1640,8 @@ class IslandVisualizerApp:
         leg_y = col1_y + 368
         pygame.draw.circle(self.canvas, COLOR_RED, (col1_x + 36, leg_y + 7), 5)
         pygame.draw.circle(self.canvas, COLOR_TEXT_MAIN, (col1_x + 36, leg_y + 7), 3)
-        leg_surf = self.font_small.render("Red dot: Initial survivor drop-in spawn coordinate", True, COLOR_TEXT_MUTED)
+        legend_text = "Walled town. Each gate leads on to the region map" if self.scenario == "pompeii" else "Red dot: Initial survivor drop-in spawn coordinate"
+        leg_surf = self.font_small.render(legend_text, True, COLOR_TEXT_MUTED)
         self.canvas.blit(leg_surf, (col1_x + 50, leg_y))
 
         # Terrain Statistics
@@ -1351,7 +1650,10 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, stats_box, border_radius=8)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, stats_box, 1, border_radius=8)
 
-        temp_w = IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=self.seed, scenario=self.scenario)
+        if self.scenario == "pompeii":
+            temp_w = CityWorld(seed=self.seed)
+        else:
+            temp_w = ShipWorld(seed=self.seed) if self.scenario == "titanic" else IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=self.seed, scenario=self.scenario)
         land_tiles = sum(1 for row in temp_w.tiles for t in row if t in (1, 2, 3, 4))
         forest_tiles = sum(1 for row in temp_w.tiles for t in row if t == 2)
         streams = len(temp_w.freshwater_tiles)
@@ -1368,6 +1670,28 @@ class IslandVisualizerApp:
             f"Scenario Horizon: {self.scenario.upper()}",
             f"Contract Engine:  contracts.py (Frozen)"
         ]
+        if self.scenario == "titanic":
+            lines = [
+                f"Active Seed:      #{self.seed}",
+                "Grid Geometry:    40x40 Ship Cutaway",
+                "People Aboard:    2,208",
+                f"Lifeboat Seats:   {TOTAL_SEATS:,}",
+                "Compartments:     6 of 16 Breached",
+                "Time Span:        23:30 to 03:30",
+                "Scenario Horizon: TITANIC",
+                "Contract Engine:  contracts.py (Frozen)"
+            ]
+        if self.scenario == "pompeii":
+            lines = [
+                f"Active Seed:      #{self.seed}",
+                "Grid Geometry:    Two 40x40 Maps",
+                f"People:           {self.pompeii_settings['population']:,}",
+                "Gates:            7",
+                f"Event Mapping:    {self.pompeii_settings['event_mapping']}",
+                "Time Span:        About 32 Hours",
+                "Scenario Horizon: POMPEII",
+                "Contract Engine:  contracts.py (Frozen)"
+            ]
         for i, line in enumerate(lines):
             col = COLOR_CYAN if i == 0 else (COLOR_GREEN if i in (2, 3) else COLOR_TEXT_MUTED)
             self.canvas.blit(self.font_mono.render(line, True, col), (stats_box.x + 18, stats_box.y + 18 + i * 36))
@@ -1395,7 +1719,7 @@ class IslandVisualizerApp:
         p_lbl = self.font_title.render(preset_title, True, COLOR_TEXT_MAIN)
         self.canvas.blit(p_lbl, (col2_x + 24, col2_y + 138))
 
-        presets = VOLCANO_PRESETS if self.scenario == "volcano" else ISLAND_PRESETS
+        presets = self._presets()
         for i, p_btn in enumerate(self.preset_buttons):
             p_btn.is_active = (self.seed == presets[i]["seed"])
             p_btn.check_hover(mouse_pos)
@@ -1412,12 +1736,13 @@ class IslandVisualizerApp:
             s_btn.draw(self.canvas)
 
         # 3. Simulation Duration
-        st_lbl = self.font_title.render("3. Simulation Step Horizon (2 Hours per Turn)", True, COLOR_TEXT_MAIN)
+        st_text = "3. Scenario Settings (Each One Changes Results)" if self.scenario == "pompeii" else "3. Simulation Step Horizon (2 Hours per Turn)"
+        st_lbl = self.font_title.render(st_text, True, COLOR_TEXT_MAIN)
         self.canvas.blit(st_lbl, (col2_x + 24, col2_y + 365))
 
         step_choices = [12, 24, 36, 48]
         for i, st_btn in enumerate(self.step_buttons):
-            st_btn.is_active = (self.max_steps == step_choices[i])
+            st_btn.is_active = self.scenario != "pompeii" and (self.max_steps == step_choices[i])
             st_btn.check_hover(mouse_pos)
             st_btn.draw(self.canvas)
 
@@ -1439,6 +1764,13 @@ class IslandVisualizerApp:
             "  * Stress Model: Physiological stress maps to a simulated dephasing channel (stress model); no hardware decoherence is driven live.",
             "  * Survival Metric: Dehydration triggers lethal failure at 24h, Starvation at 72h. Maintain shelter to reduce exposure."
         ]
+        if self.scenario == "pompeii":
+            bullet_lines = [
+                "  * Same Mind: Everyone uses the same unedited mind. Role and status are never passed to it.",
+                "  * News: What people notice depends on distance, being indoors, visibility, chance and household servants.",
+                "  * Mapping: The column and falling pumice are translated into the mind's events. Results depend strongly on this.",
+                "  * Caution: The default settings overstate escape. A demonstration, not a reconstruction. See docs/POMPEII_SOURCES.md."
+            ]
         for i, bl in enumerate(bullet_lines):
             self.canvas.blit(self.font_body.render(bl, True, COLOR_TEXT_MUTED), (hints_box.x + 18, hints_box.y + 40 + i * 26))
 
@@ -1458,7 +1790,8 @@ class IslandVisualizerApp:
         self.draw_atmosphere()
 
         # 3. Dynamic Animated Character
-        self.draw_character()
+        if self.scenario != "pompeii" or self._focus_is_on_shown_map():
+            self.draw_character()
 
         # 4. Top Navigation Bar (Integrated Over Map)
         self.draw_map_navigation_bar(mouse_pos)
@@ -1476,6 +1809,11 @@ class IslandVisualizerApp:
         # 8. End-of-Event Debrief Screen Modal
         if self.show_debrief_modal:
             self.draw_debrief_modal(mouse_pos)
+
+    def _focus_is_on_shown_map(self):
+        """The followed person's avatar only belongs on the map they are actually on."""
+        agent = self.agent
+        return agent.is_alive and agent.status == ("road" if self.city_view.show_region else "city")
 
     def draw_map_navigation_bar(self, mouse_pos: Tuple[int, int]):
         bar_bg = pygame.Surface((MAP_SIZE, 52), pygame.SRCALPHA)
@@ -1509,6 +1847,12 @@ class IslandVisualizerApp:
             btn.draw(self.canvas)
 
     def draw_island_map(self):
+        if self.scenario == "titanic":
+            self.ship_view.draw(self)
+            return
+        if self.scenario == "pompeii":
+            self.city_view.draw(self)
+            return
         t_time = time.time()
         for y in range(GRID_DIM):
             for x in range(GRID_DIM):
@@ -1758,6 +2102,14 @@ class IslandVisualizerApp:
         is_food = (tx, ty) in self.world.food_tiles
 
         desc = "Freshwater Stream" if is_fresh else ("Berry Forage Grove" if is_food else f"{tile_name} Terrain")
+        if self.scenario == "pompeii":
+            if self.city_view.show_region:
+                return
+            tile_name = {0: "Outside or wall", 1: "Street or open", 2: "Garden", 4: "Building"}.get(tile_type, "Unknown")
+            desc = f"{round(self.world.elevation[ty][tx])} m above the sea"
+        if self.scenario == "titanic":
+            tile_name = {0: "Sea or hull", 1: "Open deck", 3: "Stairs", 4: "Interior"}.get(tile_type, "Unknown")
+            desc = "Flooded" if (tx, ty) in self.world.flooded else f"{round(self.world.elevation[ty][tx])} m above the sea"
         if self.scenario == "volcano" and hasattr(self.world, "zones"):
             zone_names = {0: "Safe", 1: "Caution", 2: "Danger"}
             desc += f" | Zone: {zone_names.get(self.world.zones[ty][tx], 'Unknown')}"
@@ -1777,6 +2129,10 @@ class IslandVisualizerApp:
     def draw_dashboard(self):
         panel_x = MAP_SIZE + 16
         panel_w = WINDOW_WIDTH - MAP_SIZE - 32
+        if self.scenario == "pompeii" and self.show_split_panels:
+            self.split_panels.draw(self.canvas, panel_x, 12, panel_w, WINDOW_HEIGHT - 24,
+                                   (self.font_title, self.font_body, self.font_small))
+            return
         curr_y = 12
 
         # Card 1: Survivor Profile & Physiological Vitals (width = 668, height = 230)
@@ -1802,6 +2158,11 @@ class IslandVisualizerApp:
         self.canvas.blit(header_surf, (panel_x + 16, curr_y + 12))
 
         step_txt = f"Day {self.agent.day}  |  {self.agent.hour:02d}:00  (Step {self.step_idx}/{self.max_steps})"
+        if self.scenario == "pompeii":
+            step_txt = f"{clock_text(max(0, self.step_idx - 1))}  (Step {self.step_idx}/{self.max_steps})"
+        if self.scenario == "titanic":
+            minutes = 23 * 60 + 30 + max(0, self.step_idx - 1) * 5
+            step_txt = f"{minutes // 60 % 24:02d}:{minutes % 60:02d} ship's time  (Step {self.step_idx}/{self.max_steps})"
         step_surf = self.font_mono.render(step_txt, True, COLOR_TEXT_MUTED)
         self.canvas.blit(step_surf, (panel_x + panel_w - step_surf.get_width() - 16, curr_y + 12))
 
@@ -1837,6 +2198,10 @@ class IslandVisualizerApp:
 
         inv = self.agent.inventory
         inv_str = f"RESOURCES:   Timber: {inv.get('wood', 0)}   |   Rations: {inv.get('food', 0)}   |   Crafted Tools: {inv.get('tools', 0)}"
+        if self.scenario == "titanic":
+            inv_str = f"{self.agent.label}   |   Lifebelt: {'Yes' if inv.get('lifebelt') else 'No'}"
+        if self.scenario == "pompeii":
+            inv_str = f"{self.agent.label}   |   Knows of danger: {'Yes' if self.agent.knows_danger else 'No'}"
         self.canvas.blit(self.font_body.render(inv_str, True, COLOR_TEXT_MUTED), (panel_x + 16, curr_y + 185))
 
         curr_y += card1_h + 12
@@ -1848,10 +2213,14 @@ class IslandVisualizerApp:
         self.canvas.blit(header_env, (panel_x + 16, curr_y + 12))
 
         ev_upper = self.current_event.upper()
+        if self.scenario == "titanic":
+            ev_upper = STORY_TEXT.get(self.agent.story_event, "NOTHING NEW").upper()
+        if self.scenario == "pompeii":
+            ev_upper = POMPEII_STORY.get(self.agent.story_event, "NOTHING NEW").upper()
         ev_color = COLOR_RED if ev_upper in ("STORM", "INJURY", "ANIMAL", "ERUPTION") else (COLOR_CYAN if ev_upper in ("COLD_NIGHT", "TREMOR") else COLOR_GREEN)
         self.draw_badge(panel_x + 16, curr_y + 38, f"ACTIVE HAZARD: {ev_upper}", ev_color)
 
-        if self.scenario == "volcano" and hasattr(self.engine, "volcano"):
+        if self.scenario in ("volcano", "titanic", "pompeii") and hasattr(self.engine, "volcano"):
             phase = self.engine.volcano.phases[max(0, self.step_idx - 1)]
             phase_col = COLOR_RED if phase == "erupting" else (COLOR_ORANGE if phase == "escalating" else COLOR_GREEN)
             self.draw_badge(panel_x + 240, curr_y + 38, f"PHASE: {phase.upper()}", phase_col)
@@ -1859,11 +2228,24 @@ class IslandVisualizerApp:
         px, py = self.agent.pos
         tile_name = contracts.TILE_TYPES.get(self.world.get_tile(px, py), "Unknown").capitalize()
         pos_txt = f"Sector: [{px:02d}, {py:02d}]  |  Biome: {tile_name}  |  Shelter: {'Sheltered' if self.world.is_in_shelter(px, py) else 'Exposed'}"
+        if self.scenario == "titanic":
+            place = {"boat": f"Lifeboat {self.agent.boat_id}", "water": "In the water"}.get(self.agent.status)
+            if place is None:
+                deck = next((n.upper() for n, row in DECK_ROWS.items() if row == py), "Stairs")
+                place = f"Deck: {deck}"
+            pos_txt = f"{place}  |  {self.current_decision.get('action_label', 'Waiting')}"
+        if self.scenario == "pompeii":
+            place = {"city": "In town", "road": "On the roads", "escaped": "Escaped"}[self.agent.status]
+            pos_txt = f"{place}  |  {self.current_decision.get('action_label', 'Waiting')}"
         self.canvas.blit(self.font_body.render(pos_txt, True, COLOR_TEXT_MUTED), (panel_x + 16, curr_y + 72))
 
         clean_events = [e.upper() for e in self.agent.recent_events if e != "none"] or ["NONE"]
         history_str = " -> ".join(clean_events)
         hist_display = f"Order Effect Chain: [ {history_str} ]"
+        if self.scenario == "titanic":
+            hist_display = f"Mind Inputs: [ {history_str} ]"
+        if self.scenario == "pompeii":
+            hist_display = f"Mind Inputs: [ {history_str} ]"
         max_h_w = panel_w - 32
         if self.font_mono.size(hist_display)[0] > max_h_w:
             while hist_display and self.font_mono.size(hist_display + "... ]")[0] > max_h_w:
@@ -1965,6 +2347,11 @@ class IslandVisualizerApp:
         border_col = COLOR_GOLD if survived else COLOR_RED
         self.draw_card(mx, my, mw, mh, border_color=border_col, border_width=3)
 
+        if self.scenario == "titanic":
+            return self._draw_titanic_debrief(mouse_pos, mx, my, mw, mh, border_col)
+        if self.scenario == "pompeii":
+            return self._draw_pompeii_debrief(mouse_pos, mx, my, mw, mh, border_col)
+
         m_title = "MISSION COMPLETE: 72h SURVIVAL MASTERED" if survived else f"MISSION OVER: SURVIVOR PERISHED ({str(self.agent.cause_of_death).upper()})"
         m_color = COLOR_GOLD if survived else COLOR_RED
         t_surf = self.font_hero.render(m_title, True, m_color)
@@ -2023,6 +2410,75 @@ class IslandVisualizerApp:
     # -------------------------------------------------------------------------
     # Render Full Action History Overlay (Tab / Log Key)
     # -------------------------------------------------------------------------
+    def _draw_pompeii_debrief(self, mouse_pos, mx, my, mw, mh, border_col):
+        focus, engine = self.agent, self.engine
+        counts, table, deaths = engine.counts(), engine.outcome_table(), engine.death_breakdown()
+        title = f"{focus.label} SURVIVED" if focus.is_alive else f"{focus.label} DIED ({str(focus.cause_of_death).upper()})"
+        surf = self.font_hero.render(title, True, border_col)
+        self.canvas.blit(surf, (mx + (mw - surf.get_width()) // 2, my + 22))
+        sub = self.font_sub.render(f"This run: {counts['dead']:,} deaths of {len(engine.people):,}.  Mapping {engine.event_mapping}.  "
+                                   f"Mind {self.mind_type}.  Seed #{self.seed}.", True, COLOR_TEXT_MUTED)
+        self.canvas.blit(sub, (mx + (mw - sub.get_width()) // 2, my + 58))
+        box = pygame.Rect(mx + 36, my + 84, mw - 72, 268)
+        pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, box, border_radius=4)
+        pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, box, 1, border_radius=4)
+        head = self.font_mono.render(f"{'Role':24s}{'Survived':16s}", True, COLOR_TEXT_HINT)
+        self.canvas.blit(head, (box.x + 22, box.y + 10))
+        y = box.y + 32
+        for role, row in table.items():
+            line = f"{role.replace('_', ' ').capitalize():24s}{str(row['survived']) + ' of ' + str(row['total']):16s}"
+            self.canvas.blit(self.font_mono.render(line, True, COLOR_TEXT_MAIN), (box.x + 22, y))
+            y += 20
+        causes = deaths["causes"]
+        line = f"Roof collapse {causes.get('roof_collapse', 0):,}   Pyroclastic flow {causes.get('pyroclastic_flow', 0):,}"
+        self.canvas.blit(self.font_mono.render(line, True, COLOR_TEXT_MUTED), (box.x + 22, y + 6))
+        self.canvas.blit(self.font_small.render("History: about 1,150 bodies found on site, 38% of known victims in the pumice phase. Not a total death toll.",
+                                                True, COLOR_TEXT_HINT), (box.x + 22, y + 32))
+        self.canvas.blit(self.font_small.render("A demonstration, not a reconstruction. The default settings overstate escape; see docs/POMPEII_SOURCES.md.",
+                                                True, COLOR_TEXT_HINT), (box.x + 22, y + 52))
+        for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_scenario, self.btn_modal_home):
+            button.check_hover(mouse_pos)
+            button.draw(self.canvas)
+        self.btn_modal_close.check_hover(mouse_pos)
+        self.btn_modal_close.draw(self.canvas)
+
+    def _draw_titanic_debrief(self, mouse_pos, mx, my, mw, mh, border_col):
+        focus, table = self.agent, self.engine.outcome_table()
+        counts = self.engine.counts()
+        saved = counts["boats"]
+        title = (f"{focus.label} SURVIVED" if focus.is_alive else f"{focus.label} DIED ({str(focus.cause_of_death).upper()})")
+        surf = self.font_hero.render(title, True, border_col)
+        self.canvas.blit(surf, (mx + (mw - surf.get_width()) // 2, my + 26))
+        sub = self.font_sub.render(f"This run: {saved:,} of {len(self.engine.people):,} survived.  History: about 712 of 2,208.",
+                                   True, COLOR_TEXT_MUTED)
+        self.canvas.blit(sub, (mx + (mw - sub.get_width()) // 2, my + 66))
+        box = pygame.Rect(mx + 36, my + 100, mw - 72, 245)
+        pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, box, border_radius=4)
+        pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, box, 1, border_radius=4)
+        names = [("first", "First-class passengers", 324, 201), ("second", "Second-class passengers", 284, 118),
+                 ("third", "Third-class passengers", 709, 181)]
+        crew_keys = ("captain", "officer", "evac_worker", "server", "engine_worker")
+        crew_aboard = sum(table[k]["aboard"] for k in crew_keys)
+        crew_saved = sum(table[k]["saved"] for k in crew_keys)
+        rows = [(label, table[k]["saved"], table[k]["aboard"], past) for k, label, _, past in names]
+        rows.append(("Crew", crew_saved, crew_aboard, 212))
+        head = self.font_mono.render(f"{'Group':30s}{'This run':14s}{'History':14s}", True, COLOR_TEXT_HINT)
+        self.canvas.blit(head, (box.x + 22, box.y + 14))
+        for i, (label, s, aboard, past) in enumerate(rows):
+            line = f"{label:30s}{f'{s} of {aboard}':14s}{f'{past} of {aboard}':14s}"
+            self.canvas.blit(self.font_mono.render(line, True, COLOR_TEXT_MAIN), (box.x + 22, box.y + 46 + i * 30))
+        boats = self.engine.boats
+        used = sum(len(b.aboard) for b in boats.boats + boats.floating)
+        note = f"Lifeboat seats used: {used:,} of {TOTAL_SEATS:,}.  Mind: {self.mind_type}.  Seed #{self.seed}."
+        self.canvas.blit(self.font_mono.render(note, True, COLOR_TEXT_MUTED), (box.x + 22, box.y + 180))
+        hint = "A compressed demonstration, not a reconstruction. Compare Mind reruns this night with another mind."
+        self.canvas.blit(self.font_small.render(hint, True, COLOR_TEXT_HINT), (box.x + 22, box.y + 212))
+        for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_scenario, self.btn_modal_home):
+            button.check_hover(mouse_pos)
+            button.draw(self.canvas)
+        self.btn_modal_close.check_hover(mouse_pos)
+        self.btn_modal_close.draw(self.canvas)
+
     def draw_history_overlay(self, mouse_pos: Tuple[int, int]):
         dim_surf = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
         dim_surf.fill((10, 15, 26, 225))
@@ -2146,7 +2602,8 @@ class IslandVisualizerApp:
         self.canvas.blit(val_surf, (bar_x + bar_w + 8, y))
 
 
-def launch_gui(seed: int = 101, mind: str = "quantum", noise: str = "stub", start_screen: str = "event_choice"):
+def launch_gui(seed: int = 101, mind: str = "quantum", noise: str = "stub", start_screen: str = "event_choice",
+               scenario: str = "volcano"):
     """Launches the complete Pygame Quantum Cognition Simulation starting at the Event Choice Screen."""
-    app = IslandVisualizerApp(seed=seed, mind_type=mind, noise_source=noise, start_screen=start_screen)
+    app = IslandVisualizerApp(seed=seed, mind_type=mind, noise_source=noise, start_screen=start_screen, scenario=scenario)
     app.run()
