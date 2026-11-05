@@ -54,3 +54,31 @@ valid_max = 200.0
 role = "input"
 status = "literature"
 source = "Cole et al., accepted manuscript of Geological Society Special Publication 539 (raw/st_vincent_cole_accepted.pdf): 'onset of the first significant PDC activity was associated with U3 activity from 21:30 UTC on 10th April'"
+
+[[parameter]]
+id = "pdc.generated_collapse_delay"  # St Vincent's: first explosion 12:41 UTC on 9 April, first significant flow 21:30 UTC on 10 April. One eruption, so an example and not a distribution.
+value = 32.8
+unit = "hour"
+valid_min = 0.0
+valid_max = 240.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "pdc.reference_erupted_mass"  # Cole et al.'s whole-eruption fallout mass, the size St Vincent's flows belong to, for scaling a generated eruption.
+value = 8.875e10
+unit = "kg"
+valid_min = 1e9
+valid_max = 1e13
+role = "input"
+status = "derived"
+source = "Cole et al., accepted manuscript of Geological Society Special Publication 539, as held in eruption-total-mass"
+
+[[parameter]]
+id = "pdc.reference_reach"  # Round figure for crater to western sea at St Vincent. The scaling with size is from memory of Iverson et al. 1998 and Hayashi and Self 1992; check in T-104.
+value = 8000.0
+unit = "m"
+valid_min = 1000.0
+valid_max = 30000.0
+role = "input"
+status = "assumption"

@@ -82,10 +82,18 @@ def add_entity(draft: Draft, kind: str) -> Draft:
         entry["mind"] = MINDS[0]
     if kind == "resource":
         entry["what"] = RESOURCES[0]
-    for dial in described.dials:
-        if dial.unit != "degree":
-            entry[dial.name] = int(dial.low) if dial.whole else dial.low
-    return replace(draft, entries=(*draft.entries, entry))
+    return replace(draft, entries=(*draft.entries, {**entry, **_starting_values(described.dials_for(str(entry["source"])), str(entry["source"]))}))
+
+
+def _starting_values(dials: tuple, source: str) -> dict[str, float]:
+    """A catalogue source samples its optional dials, so they start unset. Positions start unset, because no spot is a sensible default."""
+    values: dict[str, float] = {}
+    for dial in dials:
+        if dial.unit == "degree" or (dial.optional and source != "dials"):
+            continue
+        start = dial.low if dial.default is None else dial.default
+        values[dial.name] = int(start) if dial.whole else start
+    return values
 
 
 def remove_entity(draft: Draft, index: int) -> Draft:
@@ -93,7 +101,7 @@ def remove_entity(draft: Draft, index: int) -> Draft:
 
 
 def dials_of(entry: Mapping[str, object]) -> tuple:
-    return KINDS[str(entry["kind"])].dials
+    return KINDS[str(entry["kind"])].dials_for(str(entry["source"]))
 
 
 def set_dial(draft: Draft, index: int, name: str, text: str) -> Draft:
@@ -139,7 +147,7 @@ def choices(entry: Mapping[str, object], key: str) -> tuple[str, ...]:
     """What this setting can honestly be right now. Sources that aren't built aren't offered."""
     kind = KINDS[str(entry["kind"])]
     if key == "event":
-        return kind.events
+        return kind.events if entry["source"] == "replay" else ()
     if key == "source":
         return kind.sources
     if key == "mind":
@@ -149,10 +157,21 @@ def choices(entry: Mapping[str, object], key: str) -> tuple[str, ...]:
     return ()
 
 
+def _with_source(entry: Mapping[str, object], source: str) -> dict[str, object]:
+    """An entry under another source: settings that still apply are kept, and everything else goes, so no stale value can be saved."""
+    kind = KINDS[str(entry["kind"])]
+    dials = kind.dials_for(source)
+    names = {dial.name for dial in dials}
+    kept = {key: value for key, value in entry.items() if key in ("kind", "name", "mind", "what") or key in names}
+    if source == "replay" and kind.events and not kind.model_choice:
+        kept["event"] = kind.events[0]
+    return {**_starting_values(dials, source), **kept, "source": source}
+
+
 def set_choice(draft: Draft, index: int, key: str, value: str) -> Draft:
     if value not in choices(draft.entries[index], key):
         raise InterfaceError(f"{value!r} isn't available for {key}")
-    return _changed(draft, index, {**draft.entries[index], key: value})
+    return _changed(draft, index, _with_source(draft.entries[index], value) if key == "source" else {**draft.entries[index], key: value})
 
 
 def _whole(key: str, text: str) -> int:

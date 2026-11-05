@@ -30,6 +30,7 @@ MIND_TEXT = {"quantum": "Quantum", "classical_mixture": "Control", "classical": 
 WHAT_TEXT = {"water": "Water", "food": "Food"}
 ROW_H, VISIBLE_ROWS = 32, 8
 OPEN_ROWS = 12
+DETAIL_BOTTOM = 824
 MAP_RECT = pygame.Rect(286, 112, 520, 520)
 MAP_KM = 20.
 PIN_REACH_PX = 10
@@ -495,16 +496,18 @@ class BuilderScreen:
         self._text(f"{kind.upper()} SETTINGS", 844, 402, self.app.font_sub, COLOR_GOLD)
         self._text(KIND_TEXT[kind], 844, 420, self.app.font_small, COLOR_TEXT_MUTED)
         y = self._draw_sources(index, entry, 442)
-        for key, label, names in (("event", "Recorded event", None), ("mind", "Mind", MIND_TEXT), ("what", "What it is", WHAT_TEXT)):
+        for key, label, names in (("event", "Model" if kind == "flow" else "Recorded event", None), ("mind", "Mind", MIND_TEXT), ("what", "What it is", WHAT_TEXT)):
             options = edit.choices(entry, key)
             if options:
                 y = self._draw_choice(index, entry, key, label, options, names, y)
         self._text("Name (optional)", 844, y + 8, self.app.font_body, COLOR_TEXT_MUTED)
         self._field((1000, y + 2, 300, 30), f"name:{index}", entry.get("name", ""), lambda text: edit.set_name(self.draft, index, text), empty="No name")
         y += 42
-        for dial in edit.dials_of(entry):
+        dials = edit.dials_of(entry)
+        spacing = min(50, (DETAIL_BOTTOM - y) // max(1, len(dials)))  # A storm has eight dials, and they all have to fit.
+        for dial in dials:
             self._draw_dial(index, entry, dial, y)
-            y += 50
+            y += spacing
 
     def _draw_sources(self, index: int, entry, y: int) -> int:
         self._text("Numbers come from", 844, y + 8, self.app.font_body, COLOR_TEXT_MUTED)

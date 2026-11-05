@@ -58,14 +58,19 @@ class Eruption:
     outputs = tuple(spec("eruption." + name) for name in ("phase", "tremor", "gas", "explosion", "mass_rate", "column_height"))
     parameters = PARAMETERS
 
-    def __init__(self, time):
+    def __init__(self, time, generated=None):
         self.time = time
+        self.generated = generated
 
     def check_validity(self, fields):
         if self.time.n < 1 or self.time.dt_s <= 0 or not np.isfinite(self.time.dt_s) or self.time.t0_utc.utcoffset() is None:
             return ["eruption needs a positive time axis with timezone-aware instants"]
         try:
-            read_events()
+            if self.generated is None:
+                read_events()
+            else:
+                from .generator import validate_generated
+                validate_generated(self.generated)
         except (OSError, ValueError, KeyError) as error:
             return [str(error)]
         return []
@@ -74,10 +79,16 @@ class Eruption:
         reasons = self.check_validity(fields)
         if reasons:
             raise InterfaceError("; ".join(reasons))
-        events = read_events()
-        moments = self.time.t0_utc.timestamp() + np.arange(self.time.n) * self.time.dt_s
+        if self.generated is None:
+            events = read_events()
+            moments = self.time.t0_utc.timestamp() + np.arange(self.time.n) * self.time.dt_s
+            escalation = SETTINGS["escalation_epoch"]
+        else:
+            events = [(e.start_s, e.height_m, e.duration_s) for e in self.generated.events]
+            moments = np.arange(self.time.n) * self.time.dt_s
+            escalation = self.generated.onset_s - self.generated.lead_s
         first = events[0][0]
-        phase = np.where(moments >= first, 2., np.where(moments >= SETTINGS["escalation_epoch"], 1., 0.))
+        phase = np.where(moments >= first, 2., np.where(moments >= escalation, 1., 0.))
         run_up = phase == 1
         tremor, gas = np.zeros(self.time.n), np.zeros(self.time.n)
         draws = rng.random((int(run_up.sum()), 2))

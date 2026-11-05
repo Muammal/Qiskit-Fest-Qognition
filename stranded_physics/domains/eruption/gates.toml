@@ -69,16 +69,16 @@ source = "Smithsonian GVP eruptions in disaster_data/catalog/eruptions.csv: the 
 
 [[gate]]
 id = "eruption-lead-time-sampling"
-title = "Median sampled warning time matches the catalogue's median (ratio)"
+title = "Sampled warning times follow the catalogue (largest gap between the two distributions)"
 kind = "verification"
-command = "python -m stranded_physics.domains.eruption.measure lead_time_ratio"
+command = "python -m stranded_physics.domains.eruption.measure lead_time_distribution"
 inputs = ["stranded_physics/domains/eruption/generator.py", "stranded_physics/domains/eruption/measure.py", "stranded_physics/domains/eruption/params.toml", "disaster_data/catalog/precursor_lead_times.csv"]
 required = false
-target = 1.0
-tolerance = 0.15
+target = 0.0
+tolerance = 0.01  # About three standard errors for 100,000 draws. See workboard/changes/003-lead-time-gate.md for why this replaced a median ratio.
 role = "anchor"
 split = "reference"
-source = "disaster_data/catalog/precursor_lead_times.csv, 24 rows. These are selected cases, so this checks the sampling, not that warnings really look like this"
+source = "disaster_data/catalog/precursor_lead_times.csv. These are selected cases, so this checks the sampling, not that warnings really look like this"
 
 [[gate]]
 id = "eruption-size-4-mass"

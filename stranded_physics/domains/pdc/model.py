@@ -56,6 +56,11 @@ def distance_from(grid: GridSpec, point: XY) -> np.ndarray:
     return np.hypot(*np.meshgrid(xs, ys))
 
 
+def size_scale(erupted_kg: float) -> float:
+    """How far a generated eruption's flows reach, relative to St Vincent's. Runout length goes as volume to the 1/3, as area goes as volume to the 2/3."""
+    return (erupted_kg / SETTINGS["reference_erupted_mass"]) ** (1 / 3)
+
+
 def flow_footprint(elevation: np.ndarray, land: np.ndarray, height_above_channel: np.ndarray, grid: GridSpec, vent: XY) -> np.ndarray:
     """Travel seconds from collapse to each cell. Dense flows keep to valleys, except close to the vent."""
     start = grid.locate(vent)
@@ -73,8 +78,11 @@ class Pdc:
     outputs = (spec("pdc.arrival"), spec("pdc.active"))
     parameters: tuple[Parameter, ...] = PARAMETERS
 
-    def __init__(self, grid: GridSpec, time: TimeAxis, vent: XY) -> None:
+    def __init__(self, grid: GridSpec, time: TimeAxis, vent: XY, first_collapse_s: float | None = None, reach_limit_m: float | None = None) -> None:
+        """Both settings are for a generated eruption. Left out, St Vincent's published date applies, and only the energy line limits reach."""
         self.grid, self.time, self.vent = grid, time, vent
+        self.reach_limit_m = reach_limit_m
+        self.first_collapse_s = SETTINGS["first_collapse_after_axis_start"] if first_collapse_s is None else first_collapse_s
 
     def check_validity(self, fields) -> list[str]:
         return [] if self.grid.locate(self.vent) is not None else ["the vent is outside the flow grid"]
@@ -82,8 +90,10 @@ class Pdc:
     def run(self, fields, rng: np.random.Generator) -> dict[str, float]:
         travel = flow_footprint(fields.get("terrain.elevation", "m", self.grid), fields.get("terrain.land_mask", "dimensionless", self.grid) > 0,
                                 fields.get("terrain.height_above_drainage", "m", self.grid), self.grid, self.vent)
+        if self.reach_limit_m is not None:
+            travel = np.where(distance_from(self.grid, self.vent) <= self.reach_limit_m, travel, np.inf)
         reached = np.isfinite(travel)
-        first = SETTINGS["first_collapse_after_axis_start"]
+        first = self.first_collapse_s
         frame_times = np.arange(self.time.n) * self.time.dt_s
         frames = np.zeros((self.time.n, self.grid.ny, self.grid.nx))
         explosion = fields.get("eruption.explosion", "dimensionless") > 0

@@ -99,6 +99,7 @@ source = "Conservation of volume, counting what leaves into the sea"
 
 [[gate]]
 id = "pdc-t2-reaches-west-sea"
+model = "t2"
 title = "T2: dense flows reach the sea on the west flank"
 kind = "validation"
 scenario = "st_vincent_2021"
@@ -113,6 +114,7 @@ source = "Cole et al.: flows 'reached the sea in the Larikai and the Roseau vall
 
 [[gate]]
 id = "pdc-t2-sea-only-on-west"
+model = "t2"
 title = "T2: share of flow cells touching the sea that lie off the west flank"
 kind = "validation"
 scenario = "st_vincent_2021"
@@ -127,6 +129,7 @@ source = "Cole et al.: flows 'reached the sea in the Larikai and the Roseau vall
 
 [[gate]]
 id = "pdc-t2-southeast-reach"
+model = "t2"
 title = "T2: flows on the southeast flank stop near the crater"
 kind = "validation"
 scenario = "st_vincent_2021"
@@ -141,6 +144,7 @@ source = "Cole et al.: PDCs 'extended short distances (approximately 1 km) down 
 
 [[gate]]
 id = "pdc-t2-grid-sensitivity"
+model = "t2"
 title = "T2: how far the furthest reach moves between 180 m and 90 m cells (reported, no target)"
 kind = "validation"
 scenario = "st_vincent_2021"

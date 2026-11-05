@@ -69,7 +69,7 @@ def build_game(scenario: ScenarioFile, seed: int) -> CustomGame:
     people = people_of(scenario)
     if not people:
         raise InterfaceError("There is nobody to play yet. Add a person or a group")
-    pack = build_pack(to_spec(scenario), seed)
+    pack = build_pack(to_spec(scenario, seed), seed)
     check_events_happen(pack)
     game = CustomGame(pack, people, scenario.title, Shared(pack))
     simulation = game.simulation(people[0].mind)

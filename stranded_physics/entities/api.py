@@ -29,6 +29,8 @@ class Dial:
     high: float
     note: str
     whole: bool = False
+    optional: bool = False  # A catalogue source may leave this unset, and then samples it. A dials source must set it.
+    default: float | None = None  # What the builder starts from, where the low end of the range would be a poor start.
 
 
 @dataclass(frozen=True)
@@ -52,6 +54,15 @@ class ScenarioFile:
     step_hours: int
     local_utc_offset: int
     entities: tuple[EntitySpec, ...]
+
+    def evidence_ids(self) -> frozenset[str]:
+        """Which gate scenarios speak about this scenario: its own id, plus the generators it samples from."""
+        generated = {("eruption", "catalogue"): "generated_eruption", ("storm", "catalogue"): "generated_storm"}
+        return frozenset({self.id, *(generated[(e.kind, e.source)] for e in self.entities if (e.kind, e.source) in generated)})
+
+    def variants(self) -> dict[str, str]:
+        """Categories using a model other than their first one, so each model's evidence stays with that model."""
+        return {"pdc": "t2" for e in self.entities if e.kind == "flow" and e.event == "depth_averaged"}
 
     def uses(self) -> tuple[str, ...]:
         """The engine categories this scenario relies on, in order, for the checker."""

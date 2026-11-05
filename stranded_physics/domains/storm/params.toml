@@ -99,3 +99,160 @@ valid_min = 200.0
 valid_max = 200.0
 role = "convention"
 status = "assumption"
+
+# Training-only season cutoff; later seasons are excluded before inspecting wind or distance.
+[[parameter]]
+id = "storm.wind_before_season"
+value = 2005.0
+unit = "dimensionless"
+valid_min = 1800
+valid_max = 2005
+role = "input"
+status = "literature"
+source = "disaster_data/catalog/cyclones_near_study_islands.csv ; season < 2005, all study islands"
+
+# Wind dial support up to 150 m/s; extrapolating the symmetric Holland model is unvalidated.
+[[parameter]]
+id = "storm.generated_max_wind_m_s"
+value = 50.0
+unit = "m/s"
+valid_min = 0
+valid_max = 150
+role = "input"
+status = "assumption"
+
+# Closest distance dial support; empirical defaults retain all training island-storm rows.
+[[parameter]]
+id = "storm.generated_closest_km"
+value = 100.0
+unit = "km"
+valid_min = 0
+valid_max = 2000
+role = "input"
+status = "assumption"
+
+# Uniform travel bearing referenced to the site, parallel transported to the track; no steering model.
+[[parameter]]
+id = "storm.generated_bearing_deg"
+value = 180.0
+unit = "degree"
+valid_min = 0
+valid_max = 360
+role = "input"
+status = "assumption"
+
+# Uniform uncalibrated translation speed from 1 to 30 m/s; controls wind exposure duration.
+[[parameter]]
+id = "storm.generated_speed_m_s"
+value = 8.0
+unit = "m/s"
+valid_min = 1
+valid_max = 30
+role = "input"
+status = "assumption"
+
+# Uniform uncalibrated radius from 1 to 200 km; strongly controls site wind, not fitted to observations.
+[[parameter]]
+id = "storm.generated_rmax_m"
+value = 30000.0
+unit = "m"
+valid_min = 1000
+valid_max = 200000
+role = "input"
+status = "assumption"
+
+# Scenario-relative closest-pass time; must also fit the supplied axis.
+[[parameter]]
+id = "storm.generated_closest_s"
+value = 0.0
+unit = "s"
+valid_min = 0
+valid_max = 315576000
+role = "input"
+status = "assumption"
+
+# Operational axis support from one microsecond to ten Julian years; long tracks can circle the globe.
+[[parameter]]
+id = "storm.generator_axis_s"
+value = 259200.0
+unit = "s"
+valid_min = 0.000001
+valid_max = 315576000
+role = "input"
+status = "assumption"
+
+# Input geographic coordinate range.
+[[parameter]]
+id = "storm.generated_site_lon"
+value = 0.0
+unit = "degree"
+valid_min = -180
+valid_max = 180
+role = "input"
+status = "literature"
+source = "stranded_physics/core/api.py ; site_lonlat convention"
+
+# Input geographic coordinate range.
+[[parameter]]
+id = "storm.generated_site_lat"
+value = 0.0
+unit = "degree"
+valid_min = -90
+valid_max = 90
+role = "input"
+status = "literature"
+source = "stranded_physics/core/api.py ; site_lonlat convention"
+
+# Task convention: default closest passage in middle half.
+[[parameter]]
+id = "storm.onset_fraction_min"
+value = 0.25
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "literature"
+source = "workboard/ENTITIES.md ; Stage 2 engine task closest_s"
+
+# Task convention: default closest passage in middle half.
+[[parameter]]
+id = "storm.onset_fraction_max"
+value = 0.75
+unit = "dimensionless"
+valid_min = 0
+valid_max = 1
+role = "input"
+status = "literature"
+source = "workboard/ENTITIES.md ; Stage 2 engine task closest_s"
+
+# Hourly fixes anchored on closest_s, extending beyond the axis.
+[[parameter]]
+id = "storm.generator_fix_s"
+value = 3600.0
+unit = "s"
+valid_min = 3600
+valid_max = 3600
+role = "input"
+status = "literature"
+source = "workboard/ENTITIES.md ; Stage 2 engine task track sampling"
+
+# Fixed independent diagnostic seed for reproducible empirical holdout comparisons.
+[[parameter]]
+id = "storm.generator_measure_seed"
+value = 314159.0
+unit = "dimensionless"
+valid_min = 0
+valid_max = 4294967295
+role = "input"
+status = "assumption"
+
+# Task-prescribed wind holdout sample count.
+[[parameter]]
+id = "storm.wind_sample_count"
+value = 100000.0
+unit = "dimensionless"
+valid_min = 100000
+valid_max = 100000
+role = "input"
+status = "literature"
+source = "workboard/ENTITIES.md ; Stage 2 engine task wind_holdout"

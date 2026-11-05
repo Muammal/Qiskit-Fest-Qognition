@@ -16,7 +16,7 @@ import numpy as np
 
 from stranded_physics.core.api import InterfaceError, ScenarioPack, ScenarioSpec, TimeAxis
 from stranded_physics.entities.api import EntitySpec, ScenarioFile, load_scenario
-from stranded_physics.entities.kinds import BUILD_ORDER, KINDS, World, check_entity
+from stranded_physics.entities.kinds import BUILD_ORDER, KINDS, SECONDS_PER_HOUR, World, check_entity, vent_of
 from stranded_physics.st_vincent import to_utm
 
 KM_PER_DEGREE = 111.  # Close enough for spreading people around a point.
@@ -32,8 +32,24 @@ class Person(NamedTuple):
 
 
 def position_of(entity: EntitySpec) -> tuple[float, float]:
-    prefix = "start_" if entity.kind in ("person", "group") else ""
+    prefix = {"person": "start_", "group": "start_", "eruption": "vent_"}.get(entity.kind, "")
     return entity.settings[f"{prefix}lon"], entity.settings[f"{prefix}lat"]
+
+
+def _on_map(entity: EntitySpec) -> bool:
+    return entity.kind in PLACED or (entity.kind == "eruption" and entity.source != "replay")
+
+
+def _check_timing(scenario: ScenarioFile, entity: EntitySpec) -> None:
+    """Refused here rather than in the middle of a build, so the builder can say so at once."""
+    settings, hours = entity.settings, scenario.hours - scenario.step_hours
+    if entity.source == "replay":
+        return
+    for name in ("onset_hours", "closest_hours"):
+        if settings.get(name, 0.) > hours:
+            raise InterfaceError(f"{entity.kind}: {name} = {settings[name]} comes after this {scenario.hours}-hour scenario ends")
+    if entity.kind == "eruption" and "lead_hours" in settings and settings["lead_hours"] > settings.get("onset_hours", hours):
+        raise InterfaceError(f"eruption: a warning of {settings['lead_hours']} hours would start before the scenario does")
 
 
 def check_scenario(scenario: ScenarioFile) -> None:
@@ -47,8 +63,12 @@ def check_scenario(scenario: ScenarioFile) -> None:
             raise InterfaceError(f"{entity.kind} needs {sorted(missing)} in the same scenario")
     if present & {"person", "group"} and "shelter" not in present:
         raise InterfaceError("People need at least one shelter to evacuate to")
+    recorded_eruption = any(e.kind == "eruption" and e.source == "replay" for e in scenario.entities)
     for entity in scenario.entities:
-        if entity.kind in PLACED and CONTRACT_GRID.locate(to_utm(position_of(entity))) is None:
+        _check_timing(scenario, entity)
+        if entity.kind == "flow" and "delay_hours" in entity.settings and recorded_eruption:
+            raise InterfaceError("flow: delay_hours is for a generated eruption. A recorded eruption's flows keep their published time")
+        if _on_map(entity) and CONTRACT_GRID.locate(to_utm(position_of(entity))) is None:
             raise InterfaceError(f"{entity.name or entity.kind} at {position_of(entity)} is outside the map, which covers 20 km around La Soufriere")
 
 
@@ -69,17 +89,18 @@ def people_of(scenario: ScenarioFile) -> list[Person]:
 def check_events_happen(pack: ScenarioPack) -> None:
     """A recorded event outside the scenario's dates would quietly do nothing, so it is refused."""
     if pack.has("storm.max_wind") and not pack.series("storm.max_wind").max() > 0:
-        raise InterfaceError("The storm never happens in this scenario's dates. Beryl needs dates around 30 June to 4 July 2024")
+        raise InterfaceError("The storm never happens in this scenario's dates. A recorded storm such as Beryl needs dates around 30 June to 4 July 2024")
     names = [name for name in ("eruption.phase", "eruption.tremor", "eruption.gas", "eruption.explosion") if pack.has(name)]
     if names and not any(pack.series(name).max() > 0 for name in names):
-        raise InterfaceError("The eruption never happens in this scenario's dates. St Vincent's starts in April 2021")
+        raise InterfaceError("The eruption never happens in this scenario's dates. A recorded eruption such as St Vincent's starts in April 2021")
 
 
-def to_spec(scenario: ScenarioFile) -> ScenarioSpec:
+def to_spec(scenario: ScenarioFile, seed: int = 1) -> ScenarioSpec:
+    """A catalogue entity samples from this seed, so give build_pack the same one."""
     from stranded_physics.packs.st_vincent_2021 import CONTRACT_GRID, place_sites
     check_scenario(scenario)
-    time = TimeAxis(scenario.start_utc, scenario.step_hours * 3600., scenario.hours // scenario.step_hours)
-    world = World(time)
+    time = TimeAxis(scenario.start_utc, scenario.step_hours * SECONDS_PER_HOUR, scenario.hours // scenario.step_hours)
+    world = World(time, seed, vent=next((vent_of(e) for e in scenario.entities if e.kind == "eruption"), None))
     domains = []
     for kind in BUILD_ORDER:
         for entity in (e for e in scenario.entities if e.kind == kind):
@@ -114,7 +135,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     from stranded_physics.packs.builder import build_pack
     from stranded_physics.runtime.group import play_people
-    pack = build_pack(to_spec(scenario), args.seed)
+    pack = build_pack(to_spec(scenario, args.seed), args.seed)
     check_events_happen(pack)
     people = people_of(scenario)
     if not people:

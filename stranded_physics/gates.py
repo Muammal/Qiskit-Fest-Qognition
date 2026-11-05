@@ -20,7 +20,7 @@ from stranded_physics.core.verdicts import judge_rate, judge_value
 
 ROOT = Path(__file__).resolve().parents[1]
 DOMAINS = Path(__file__).resolve().parent / "domains"
-GATE_KEYS = {"id", "title", "kind", "command", "inputs", "required", "target", "tolerance", "rate_low", "rate_high", "role", "split", "expect", "source", "scenario"}
+GATE_KEYS = {"id", "title", "kind", "command", "inputs", "required", "target", "tolerance", "rate_low", "rate_high", "role", "split", "expect", "source", "scenario", "model"}
 OK_FOR_DONE = {"PASS"}
 
 

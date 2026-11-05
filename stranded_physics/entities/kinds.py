@@ -10,12 +10,14 @@ from stranded_physics.st_vincent import UTM, VENT_LONLAT, to_utm
 
 WORLD_LON = ("longitude", "degree", -180., 180.)
 WORLD_LAT = ("latitude", "degree", -90., 90.)
-NOT_BUILT = {("eruption", "catalogue"): 2, ("eruption", "dials"): 2, ("storm", "catalogue"): 2, ("storm", "dials"): 2,
-             ("terrain", "catalogue"): 3, ("terrain", "dials"): 3, ("weather", "catalogue"): 3, ("weather", "dials"): 3}
+NOT_BUILT = {("terrain", "catalogue"): 3, ("terrain", "dials"): 3, ("weather", "catalogue"): 3, ("weather", "dials"): 3}
+GENERATED = ("catalogue", "dials")
 TERRAIN_EVENTS = ("st_vincent",)
 WEATHER_EVENTS = ("st_vincent",)
 ERUPTION_EVENTS = {"st_vincent_2021": VENT_LONLAT}
 STORM_EVENTS = ("beryl_2024",)
+FLOW_MODELS = ("energy_cone", "depth_averaged")  # The energy cone is the default; the solver takes minutes, not seconds.
+SECONDS_PER_HOUR = 3600.
 
 
 def lon_lat_dials(prefix: str, what: str) -> tuple[Dial, Dial]:
@@ -27,8 +29,11 @@ class World:
     """What entities built so far have decided. Later entities read this, so order in the file matters only where stated."""
 
     time: TimeAxis
+    seed: int = 1
     grid: GridSpec | None = None
     vent: XY | None = None
+    onset_s: float | None = None  # When a generated eruption begins. None for a recorded one, whose models know their own dates.
+    erupted_kg: float | None = None  # How much a generated eruption erupts, which sizes its flows.
 
 
 @dataclass(frozen=True)
@@ -39,12 +44,27 @@ class Kind:
     events: tuple[str, ...]
     needs: tuple[str, ...]
     build: Callable[[EntitySpec, World], tuple[Domain, ...]]
+    generated_dials: tuple[Dial, ...] = ()  # Settings for the catalogue and dials sources, where they differ from replay.
+    model_choice: bool = False  # `event` names a model here, not a record, and may be left out for the first one.
+
+    def dials_for(self, source: str) -> tuple[Dial, ...]:
+        return self.generated_dials if source in GENERATED and self.generated_dials else self.dials
+
+
+def _sampled(entity: EntitySpec, name: str, scale: float = 1.) -> float | None:
+    """A dial's value in the generator's unit, or None so that the generator samples it."""
+    return None if name not in entity.settings else entity.settings[name] * scale
+
+
+def vent_of(entity: EntitySpec) -> XY:
+    """Decided before anything is built, because the terrain's hazard zones are measured from it."""
+    return to_utm(ERUPTION_EVENTS[entity.event] if entity.source == "replay" else (entity.settings["vent_lon"], entity.settings["vent_lat"]))
 
 
 def _terrain(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
     from stranded_physics.domains.terrain.model import ST_VINCENT_GRID, Terrain
     world.grid = ST_VINCENT_GRID
-    return (Terrain(),)
+    return (Terrain(vent=world.vent) if world.vent else Terrain(),)
 
 
 def _weather(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
@@ -54,8 +74,15 @@ def _weather(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
 
 def _eruption(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
     from stranded_physics.domains.eruption.model import Eruption
-    world.vent = to_utm(ERUPTION_EVENTS[entity.event])
-    return (Eruption(world.time),)
+    if entity.source == "replay":
+        return (Eruption(world.time),)
+    from stranded_physics.domains.eruption.generator import from_dials
+    from stranded_physics.packs.builder import stream
+    made = from_dials(stream(world.seed, "eruption", "generator"), world.time.dt_s * (world.time.n - 1), size=_sampled(entity, "size"),
+                      lead_s=_sampled(entity, "lead_hours", SECONDS_PER_HOUR), onset_s=_sampled(entity, "onset_hours", SECONDS_PER_HOUR),
+                      column_m=_sampled(entity, "column_m"))
+    world.onset_s, world.erupted_kg = made.onset_s, made.total_mass_kg
+    return (Eruption(world.time, generated=made),)
 
 
 def _ash(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
@@ -64,8 +91,15 @@ def _ash(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
 
 
 def _flow(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
-    from stranded_physics.domains.pdc.model import Pdc
-    return (Pdc(world.grid, world.time, world.vent),)
+    from stranded_physics.domains.pdc.model import Pdc, SETTINGS, size_scale
+    first, scale = None, None
+    if world.onset_s is not None:
+        delay_s = entity.settings["delay_hours"] * SECONDS_PER_HOUR if "delay_hours" in entity.settings else SETTINGS["generated_collapse_delay"]
+        first, scale = world.onset_s + delay_s, size_scale(world.erupted_kg)
+    if entity.event == "depth_averaged":
+        from stranded_physics.domains.pdc.model_t2 import PdcT2
+        return (PdcT2(world.grid, world.time, world.vent, first, 1. if scale is None else scale ** 3),)
+    return (Pdc(world.grid, world.time, world.vent, first, None if scale is None else scale * SETTINGS["reference_reach"]),)
 
 
 def _mudflow(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
@@ -75,21 +109,44 @@ def _mudflow(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
 
 def _storm(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
     from stranded_physics.domains.storm.model import Storm
-    return (Storm(world.time, (entity.settings["site_lon"], entity.settings["site_lat"])),)
+    site = (entity.settings["site_lon"], entity.settings["site_lat"])
+    if entity.source == "replay":
+        return (Storm(world.time, site),)
+    from stranded_physics.domains.storm.generator import generate
+    from stranded_physics.packs.builder import stream
+    made = generate(stream(world.seed, "storm", "generator"), site, world.time.dt_s * (world.time.n - 1), max_wind_m_s=_sampled(entity, "max_wind_m_s"),
+                    closest_km=_sampled(entity, "closest_km"), bearing_deg=_sampled(entity, "bearing_deg"), speed_m_s=_sampled(entity, "speed_m_s"),
+                    rmax_m=_sampled(entity, "rmax_km", 1000.), closest_s=_sampled(entity, "closest_hours", SECONDS_PER_HOUR))
+    return (Storm(world.time, site, generated=made),)
 
 
 def _no_model(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
     return ()  # People and shelters are sites and bodies in the runtime, not fields in a pack.
 
 
+ERUPTION_DIALS = (*lon_lat_dials("vent_", "the vent"),
+                  Dial("size", "VEI", 0, 7, "Volcanic Explosivity Index", whole=True, optional=True, default=4),
+                  Dial("lead_hours", "hour", 0., 720., "Warning time before the first explosion", optional=True, default=24.),
+                  Dial("onset_hours", "hour", 0., 2400., "When the first explosion comes, after the scenario starts", optional=True, default=48.),
+                  Dial("column_m", "m", 100., 60000., "Column height above the vent", optional=True, default=15000.))
+STORM_DIALS = (*lon_lat_dials("site_", "the place whose wind is reported"),
+               Dial("max_wind_m_s", "m/s", 1., 150., "Peak wind of the storm", optional=True, default=50.),
+               Dial("closest_km", "km", 0., 2000., "How close its centre passes", optional=True, default=50.),
+               Dial("bearing_deg", "degrees", 0., 360., "The compass direction it travels toward", optional=True, default=300.),
+               Dial("speed_m_s", "m/s", 1., 30., "How fast its centre moves", optional=True, default=6.),
+               Dial("rmax_km", "km", 1., 200., "Radius of its strongest wind", optional=True, default=30.),
+               Dial("closest_hours", "hour", 0., 2400., "When it passes closest, after the scenario starts", optional=True, default=48.))
+
+
 KINDS: dict[str, Kind] = {kind.name: kind for kind in (
     Kind("terrain", ("replay",), (), TERRAIN_EVENTS, (), _terrain),
     Kind("weather", ("replay",), (), WEATHER_EVENTS, (), _weather),
-    Kind("eruption", ("replay",), (), tuple(ERUPTION_EVENTS), ("terrain",), _eruption),
+    Kind("eruption", ("replay", "catalogue", "dials"), (), tuple(ERUPTION_EVENTS), ("terrain",), _eruption, ERUPTION_DIALS),
     Kind("ash", ("replay",), (), (), ("terrain", "weather", "eruption"), _ash),
-    Kind("flow", ("replay",), (), (), ("terrain", "eruption"), _flow),
+    Kind("flow", ("replay",), (Dial("delay_hours", "hour", 0., 240., "For a generated eruption: how long after its first explosion the first flow comes", optional=True),),
+         FLOW_MODELS, ("terrain", "eruption"), _flow, model_choice=True),
     Kind("mudflow", ("replay",), (), (), ("terrain", "weather", "ash"), _mudflow),
-    Kind("storm", ("replay",), lon_lat_dials("site_", "the place whose wind is reported"), STORM_EVENTS, (), _storm),
+    Kind("storm", ("replay", "catalogue", "dials"), lon_lat_dials("site_", "the place whose wind is reported"), STORM_EVENTS, (), _storm, STORM_DIALS),
     Kind("person", ("dials",), lon_lat_dials("start_", "where this person starts"), (), ("terrain", "weather"), _no_model),
     Kind("group", ("dials",), (*lon_lat_dials("start_", "the middle of this group"), Dial("count", "person", 1, 500, "How many people", whole=True),
                                Dial("radius_km", "km", 0., 20., "How far they spread from the middle")), (), ("terrain", "weather"), _no_model),
@@ -106,10 +163,13 @@ def check_entity(entity: EntitySpec) -> None:
         stage = NOT_BUILT.get((entity.kind, entity.source))
         built = f"Stage {stage} of workboard/ENTITIES.md builds it" if stage else f"{entity.kind} supports {kind.sources}"
         raise InterfaceError(f"{entity.kind} from source {entity.source!r} isn't built yet. {built}.")
-    if entity.source == "replay" and kind.events and entity.event not in kind.events:
+    if entity.source == "replay" and kind.events and entity.event not in kind.events and not (kind.model_choice and entity.event is None):
         raise InterfaceError(f"{entity.kind}: no recorded event {entity.event!r}. Known: {list(kind.events)}")
-    dials = {dial.name: dial for dial in kind.dials}
-    unknown, missing = set(entity.settings) - set(dials), set(dials) - set(entity.settings)
+    if entity.source != "replay" and entity.event is not None:
+        raise InterfaceError(f"{entity.kind}: event names a record, so it can't go with source {entity.source!r}")
+    dials = {dial.name: dial for dial in kind.dials_for(entity.source)}
+    needed = {name for name, dial in dials.items() if entity.source == "dials" or not dial.optional}
+    unknown, missing = set(entity.settings) - set(dials), needed - set(entity.settings)
     if unknown or missing:
         raise InterfaceError(f"{entity.kind}: unknown settings {sorted(unknown)}, missing settings {sorted(missing)}")
     for name, value in entity.settings.items():

@@ -83,9 +83,10 @@ class Storm:
     outputs = (spec("storm.max_wind"),)
     parameters = PARAMETERS
 
-    def __init__(self, time, site_lonlat, files=None):
+    def __init__(self, time, site_lonlat, files=None, generated=None):
         self.time, self.site_lonlat = time, site_lonlat
-        self.files = default_files() if files is None else files
+        self.generated = generated
+        self.files = default_files() if files is None and generated is None else files
 
     def check_validity(self, fields):
         if (self.time.n < 1 or not np.isfinite(self.time.dt_s) or self.time.dt_s <= 0
@@ -94,6 +95,13 @@ class Storm:
         if (len(self.site_lonlat) != 2 or not np.isfinite(self.site_lonlat).all()
                 or abs(self.site_lonlat[0]) > 180 or abs(self.site_lonlat[1]) > 90):
             return ["storm site needs finite longitude/latitude in degrees"]
+        if self.generated is not None:
+            try:
+                from .generator import validate_generated
+                validate_generated(self.generated)
+            except (ValueError, TypeError, AttributeError) as error:
+                return [str(error)]
+            return []
         if len(self.files) != 1:
             return ["storm needs exactly one track file record"]
         path, expected = next(iter(self.files.values()))
@@ -112,9 +120,15 @@ class Storm:
         reasons = self.check_validity(fields)
         if reasons:
             raise InterfaceError("; ".join(reasons))
-        track = read_track(next(iter(self.files.values()))[0])
-        moments = self.time.t0_utc.timestamp() + np.arange(self.time.n) * self.time.dt_s
-        lat, lon, vmax, rmax = [np.interp(moments, track[:, 0], track[:, col]) for col in range(1, 5)]
+        if self.generated is None:
+            track = read_track(next(iter(self.files.values()))[0])
+            moments = self.time.t0_utc.timestamp() + np.arange(self.time.n) * self.time.dt_s
+            lat, lon, vmax, rmax = [np.interp(moments, track[:, 0], track[:, col]) for col in range(1, 5)]
+        else:
+            from .generator import interpolate_track
+            track = self.generated.track
+            moments = np.arange(self.time.n) * self.time.dt_s
+            lat, lon, vmax, rmax = interpolate_track(track, moments)
         distance = great_circle_m(self.site_lonlat, lon, lat)
         winds = np.zeros(self.time.n)
         inside = (moments >= track[0, 0]) & (moments <= track[-1, 0])

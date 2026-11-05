@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import sys
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Mapping
 
 from stranded_physics import gates
 from stranded_physics.core.api import InterfaceError
@@ -30,6 +31,8 @@ class Card:
     title: str
     place: str
     uses: tuple[str, ...]
+    evidence: frozenset[str] = frozenset()  # Gate scenarios that speak about this one. Its own id is always among them.
+    variants: Mapping[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -49,7 +52,7 @@ def read_card(path: Path) -> Card:
     table = tomllib.loads(path.read_text(encoding="utf-8"))
     if "entity" in table:  # A full scenario file: its parts come from its entities.
         scenario = parse_scenario(table, str(path))
-        return Card(scenario.id, scenario.title, scenario.place, scenario.uses())
+        return Card(scenario.id, scenario.title, scenario.place, scenario.uses(), scenario.evidence_ids(), scenario.variants())
     unknown = set(table) - CARD_KEYS
     missing = CARD_KEYS - set(table)
     if unknown or missing:
@@ -67,16 +70,20 @@ def has_model(category: str) -> bool:
     return any(p.name not in NOT_MODEL_FILES for p in (gates.DOMAINS / category).glob("*.py"))
 
 
-def sort_gates(rows: list[tuple[dict, str]], card_id: str) -> dict[str, list[str]]:
-    """Files each gate under what it can honestly say about this scenario. Pure, so its rules can be tested directly."""
+def sort_gates(rows: list[tuple[dict, str]], card_id: str | frozenset[str], variant: str | None = None) -> dict[str, list[str]]:
+    """Files each gate under what it can honestly say about this scenario. Pure, so its rules can be tested directly.
+
+    A real-world result belongs to the model that produced it, so one model's result never counts for another.
+    """
+    ids = {card_id} if isinstance(card_id, str) else card_id
     sorted_rows: dict[str, list[str]] = {"verification": [], "agrees": [], "disagrees": [], "anchors_failing": [], "unscored": []}
     for gate, verdict in rows:
         title = gate.get("title", gate["id"])
         if gate["kind"] != "validation":
             sorted_rows["verification"].append(verdict)
             continue
-        if gate.get("scenario") != card_id:
-            continue  # Evidence from another place says nothing here.
+        if gate.get("scenario") not in ids or gate.get("model") != variant:
+            continue  # Evidence from another place, or another model, says nothing here.
         if gate.get("role") == "prediction" and gate.get("split") == "holdout" and verdict in ("PASS", "FAIL"):
             sorted_rows["agrees" if verdict == "PASS" else "disagrees"].append(title)
         elif verdict == "FAIL":
@@ -96,9 +103,9 @@ def verification_status(verdicts: list[str]) -> str:
     return "PASS" if all(v == "PASS" for v in verdicts) else "NOT_RUN"
 
 
-def assess(category: str, card_id: str) -> PartReport:
+def assess(category: str, card_id: str | frozenset[str], variant: str | None = None) -> PartReport:
     rows = [(gate, gates.current_verdict(category, gate)) for gate in gates.load_gates(category)]
-    filed = sort_gates(rows, card_id)
+    filed = sort_gates(rows, card_id, variant)
     parameters = load_parameters(gates.DOMAINS / category / "params.toml")
     return PartReport(category, has_model(category), verification_status(filed["verification"]), tuple(filed["agrees"]), tuple(filed["disagrees"]),
                       tuple(filed["anchors_failing"]), tuple(filed["unscored"]), sum(p.status == "assumption" for p in parameters), len(parameters))
@@ -138,7 +145,7 @@ def main(argv: list[str]) -> int:
         print(__doc__)
         return 2
     card = read_card(Path(argv[0]))
-    parts = [assess(category, card.id) for category in card.uses]
+    parts = [assess(category, card.evidence or card.id, card.variants.get(category)) for category in card.uses]
     print(report(card, parts))
     return 1 if overall(parts) in (CANNOT_RUN, NOT_VERIFIED) else 0
 

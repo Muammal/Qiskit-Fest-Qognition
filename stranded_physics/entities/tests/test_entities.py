@@ -46,8 +46,8 @@ def test_unknown_kinds_and_sources_are_refused(entity, message):
 
 
 def test_a_source_not_built_yet_says_which_stage_builds_it():
-    with pytest.raises(InterfaceError, match="Stage 2"):
-        checked(TERRAIN, {"kind": "eruption", "source": "catalogue"})
+    with pytest.raises(InterfaceError, match="Stage 3"):
+        checked({"kind": "terrain", "source": "catalogue"})
 
 
 def test_an_unknown_recorded_event_is_refused():

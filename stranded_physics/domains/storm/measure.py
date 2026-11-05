@@ -8,10 +8,25 @@ from pathlib import Path
 import sys
 
 import numpy as np
+from scipy.stats import ks_2samp
 
 from stranded_physics.core.api import InterfaceError, TimeAxis
 from stranded_physics.core.fields import FieldStore, ScopedFields
 from .model import HERE, METRES_PER_KM, SECONDS_PER_HOUR, SETTINGS, Storm
+
+
+def wind_holdout():
+    from .generator import CATALOG, KNOTS_TO_MS, sample_max_wind_m_s
+    rng = np.random.default_rng(int(SETTINGS["generator_measure_seed"]))
+    samples = [sample_max_wind_m_s(rng, before_season=2005)
+               for _ in range(int(SETTINGS["wind_sample_count"]))]
+    with CATALOG.open(encoding="utf-8-sig", newline="") as stream:
+        held = [float(row["max_wind_kt"]) * KNOTS_TO_MS for row in csv.DictReader(stream)
+                if row["season"].strip() and float(row["season"]) >= SETTINGS["wind_before_season"]
+                and row["max_wind_kt"].strip()]
+    if not held:
+        raise InterfaceError("no holdout storm winds")
+    return {"value": float(ks_2samp(samples, held).statistic)}
 
 
 def cyclone_rate(path=None):
@@ -49,10 +64,11 @@ def beryl_peak():
 
 
 def main(argv):
-    if len(argv) != 1 or argv[0] not in ("beryl_peak", "cyclone_rate"):
+    if len(argv) != 1 or argv[0] not in ("beryl_peak", "cyclone_rate", "wind_holdout"):
         return 2
     try:
-        print(json.dumps(beryl_peak() if argv[0] == "beryl_peak" else cyclone_rate()))
+        measure = {"beryl_peak": beryl_peak, "cyclone_rate": cyclone_rate, "wind_holdout": wind_holdout}
+        print(json.dumps(measure[argv[0]]()))
     except (OSError, ValueError, KeyError) as error:
         print(str(error), file=sys.stderr)
         return 1
