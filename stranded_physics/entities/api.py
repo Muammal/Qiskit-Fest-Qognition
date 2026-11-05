@@ -11,11 +11,13 @@ from stranded_physics.core.api import InterfaceError
 
 SOURCES = ("replay", "catalogue", "dials")
 PLACES = ("real", "fictional", "generated")
-REQUIRED_KEYS = {"id", "title", "place", "start_utc", "hours", "step_hours", "local_utc_offset", "entity"}
+REQUIRED_KEYS = {"id", "title", "place", "start_utc", "hours", "local_utc_offset", "entity"}
+STEP_KEYS = {"step_hours", "step_minutes"}  # A scenario gives exactly one. A sinking takes hours, so two-hour steps can't show it.
 ENTITY_KEYS = {"kind", "source", "event", "name", "mind", "what"}
 MINDS = ("quantum", "classical_mixture", "classical")
 RESOURCES = ("water", "food", "wood")
 CATEGORY_OF = {"terrain": "terrain", "weather": "atmos", "eruption": "eruption", "ash": "tephra", "flow": "pdc", "mudflow": "lahar", "gas": "gas", "lava": "lava",
+               "ship": "ship", "breach": "ship", "lifeboats": "ship", "sea": "sea", "passengers": "agent",
                "storm": "storm", "person": "agent", "group": "agent", "shelter": "agent", "resource": "agent"}
 
 
@@ -54,9 +56,14 @@ class ScenarioFile:
     place: str
     start_utc: datetime
     hours: int
-    step_hours: int
+    step_hours: int | None
     local_utc_offset: int
     entities: tuple[EntitySpec, ...]
+    step_minutes: int | None = None
+
+    @property
+    def step_s(self) -> float:
+        return self.step_hours * 3600. if self.step_hours is not None else self.step_minutes * 60.
 
     def evidence_ids(self) -> frozenset[str]:
         """Which gate scenarios speak about this scenario: its own id, plus the generators it samples from."""
@@ -95,18 +102,21 @@ def _entity(entry: dict, where: str) -> EntitySpec:
 
 
 def parse_scenario(table: dict, where: str = "scenario") -> ScenarioFile:
-    unknown, missing = set(table) - REQUIRED_KEYS, REQUIRED_KEYS - set(table)
+    unknown, missing = set(table) - REQUIRED_KEYS - STEP_KEYS, REQUIRED_KEYS - set(table)
     if unknown or missing:
         raise InterfaceError(f"{where}: unknown keys {sorted(unknown)}, missing keys {sorted(missing)}")
+    if len(STEP_KEYS & set(table)) != 1:
+        raise InterfaceError(f"{where}: give one of step_hours or step_minutes")
     if table["place"] not in PLACES:
         raise InterfaceError(f"{where}: place must be one of {PLACES}")
     start = datetime.fromisoformat(table["start_utc"])
     if start.utcoffset() is None:
         raise InterfaceError(f"{where}: start_utc needs a timezone, such as +00:00")
-    if table["hours"] <= 0 or table["step_hours"] <= 0 or table["hours"] % table["step_hours"]:
-        raise InterfaceError(f"{where}: hours must be a positive multiple of step_hours")
-    return ScenarioFile(table["id"], table["title"], table["place"], start, table["hours"], table["step_hours"], table["local_utc_offset"],
-                        tuple(_entity(entry, f"{where}: entity {i + 1}") for i, entry in enumerate(table["entity"])))
+    step_minutes = table["step_minutes"] if "step_minutes" in table else table["step_hours"] * 60
+    if table["hours"] <= 0 or step_minutes <= 0 or (table["hours"] * 60) % step_minutes:
+        raise InterfaceError(f"{where}: hours must be a positive multiple of the step")
+    return ScenarioFile(table["id"], table["title"], table["place"], start, table["hours"], table.get("step_hours"), table["local_utc_offset"],
+                        tuple(_entity(entry, f"{where}: entity {i + 1}") for i, entry in enumerate(table["entity"])), table.get("step_minutes"))
 
 
 def load_scenario(path: Path) -> ScenarioFile:
@@ -122,7 +132,7 @@ def _value(value: object) -> str:
 def dump_scenario(scenario: ScenarioFile) -> str:
     """The file form of a scenario. The builder screen saves through this, so screen and file can't drift apart."""
     lines = [f"id = {_value(scenario.id)}", f"title = {_value(scenario.title)}", f"place = {_value(scenario.place)}",
-             f"start_utc = {_value(scenario.start_utc.isoformat())}", f"hours = {scenario.hours}", f"step_hours = {scenario.step_hours}",
+             f"start_utc = {_value(scenario.start_utc.isoformat())}", f"hours = {scenario.hours}", f"step_hours = {scenario.step_hours}" if scenario.step_hours is not None else f"step_minutes = {scenario.step_minutes}",
              f"local_utc_offset = {scenario.local_utc_offset}"]
     for entity in scenario.entities:
         lines += ["", "[[entity]]", f"kind = {_value(entity.kind)}", f"source = {_value(entity.source)}"]
@@ -130,7 +140,7 @@ def dump_scenario(scenario: ScenarioFile) -> str:
             lines.append(f"event = {_value(entity.event)}")
         if entity.name:
             lines.append(f"name = {_value(entity.name)}")
-        if entity.kind in ("person", "group"):
+        if entity.kind in ("person", "group", "passengers"):
             lines.append(f"mind = {_value(entity.mind)}")
         if entity.what:
             lines.append(f"what = {_value(entity.what)}")

@@ -1,0 +1,127 @@
+# RMS Titanic, 14 to 15 April 1912. Who was aboard and the damage are from the British inquiry. Where people start, how long they take to reach the boat deck, and how the crew filled boats are assumptions.
+# Ship time is taken as UTC-3 (assumption: about right for that position). The scenario starts ten minutes before the collision at 11.40 p.m. and ends about when the Carpathia reached the boats.
+id = "titanic_1912"
+title = "RMS Titanic, April 1912"
+place = "real"
+start_utc = "1912-04-15T02:30:00+00:00"
+hours = 5
+step_minutes = 10
+local_utc_offset = -3
+
+[[entity]]
+kind = "ship"
+source = "replay"
+event = "titanic_1912"
+
+[[entity]]
+kind = "breach"
+source = "replay"
+event = "titanic_1912"
+impact_minutes = 10.0  # 11.40 p.m., ten minutes in.
+alarm_minutes = 35.0  # The report: "at about 12.05 the order was given to uncover the 14 boats under davits".
+
+[[entity]]
+kind = "lifeboats"
+source = "replay"
+event = "titanic_1912"
+women_first = 1
+port_women_only = 1
+
+[[entity]]
+kind = "sea"
+source = "replay"
+event = "titanic_1912"
+
+[[entity]]
+kind = "weather"
+source = "dials"
+rain_mm_h = 0.0  # The report: "the weather was perfectly clear and fine".
+wind_m_s = 0.0
+wind_bearing_deg = 0.0
+temperature_c = 0.0  # The report: the air "eventually fell to 32 F".
+upper_wind_m_s = 0.0
+upper_bearing_deg = 0.0
+
+# First class: amidships, near the boat deck.
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "first_class"
+mind = "quantum"
+men = 175
+women = 144
+children = 6
+deck_from = 0.35
+deck_to = 0.65
+reach_minutes = 5.0
+boat_crew = 0.0
+
+# Second class: aft.
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "second_class"
+mind = "quantum"
+men = 168
+women = 93
+children = 24
+deck_from = 0.65
+deck_to = 0.85
+reach_minutes = 10.0
+boat_crew = 0.0
+
+# Third class: both ends, furthest from the boat deck.
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "third_class"
+mind = "quantum"
+men = 462
+women = 165
+children = 79
+deck_from = 0.05
+deck_to = 0.95
+reach_minutes = 25.0
+boat_crew = 0.0
+
+# Deck crew: at the boats.
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "crew_deck"
+mind = "quantum"
+men = 66
+women = 0
+children = 0
+deck_from = 0.25
+deck_to = 0.65
+reach_minutes = 0.0
+boat_crew = 1.0
+
+# Engine room: lowest in the ship.
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "crew_engine"
+mind = "quantum"
+men = 325
+women = 0
+children = 0
+deck_from = 0.3
+deck_to = 0.7
+reach_minutes = 30.0
+boat_crew = 0.0
+
+# Stewards: throughout the ship.
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "crew_victualling"
+mind = "quantum"
+men = 474
+women = 20
+children = 0
+deck_from = 0.2
+deck_to = 0.8
+reach_minutes = 15.0
+boat_crew = 0.0

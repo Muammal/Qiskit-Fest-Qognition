@@ -149,6 +149,13 @@ def titanic_recorded_sinking() -> tuple[float, float]:
     return SETTINGS["titanic_bow_awash_min"], SETTINGS["titanic_foundered_min"]
 
 
+def titanic_boats_revised() -> tuple[Boat, ...]:
+    """The same boats, at the times in Wormstedt, Fitch and Behe's revised table. It re-examines the 1912 inquiry's table, and all its times are approximate."""
+    with Path(__file__).with_name("boats_revised.csv").open(encoding="utf-8", newline="") as stream:
+        minutes = {row["name"]: float(row["launch_after_impact_min"]) for row in csv.DictReader(stream)}
+    return tuple(Boat(boat.name, boat.capacity, minutes[boat.name], True) for boat in titanic_boats())
+
+
 def titanic_boats() -> tuple[Boat, ...]:
     with Path(__file__).with_name("boats.csv").open(encoding="utf-8", newline="") as stream:
         rows = list(csv.DictReader(stream))

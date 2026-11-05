@@ -17,6 +17,7 @@ class AgentBody:
     tile: list[int]
     hour: int
     day: int = 1
+    minute: int = 0  # Within the hour. The frozen contract shows minds whole hours only.
     hunger: float = .85
     thirst: float = .80
     warmth: float = .90

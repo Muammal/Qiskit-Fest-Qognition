@@ -21,11 +21,11 @@ def perceive(pack: ScenarioPack, xy_m: XY, t_s: float) -> Percept:
 
     return Percept(
         t_s=t_s,
-        felt_tremor=sign("eruption.tremor"),
-        gas_smell=sign("eruption.gas") or (pack.has("gas.so2_concentration") and pack.sample("gas.so2_concentration", xy_m, t_s) >= SO2_SMELL_UG_M3),
+        felt_tremor=sign("eruption.tremor") or sign("ship.impact"),  # The frozen contract has no ship events, so a collision reaches a mind as a tremor,
+        gas_smell=sign("eruption.gas") or sign("ship.alarm") or (pack.has("gas.so2_concentration") and pack.sample("gas.so2_concentration", xy_m, t_s) >= SO2_SMELL_UG_M3),
         explosion_heard=sign("eruption.explosion"),
         ash_kg_m2=pack.sample("tephra.deposit_load", xy_m, t_s) if pack.has("tephra.deposit_load") else 0.,
         rain_mm_h=float(pack.series("atmos.rain_rate")[now]),
-        flow_visible=arrived,
+        flow_visible=arrived or (pack.has("ship.submerged") and pack.sample("ship.submerged", xy_m, t_s) > 0),  # and the crew's call to the boats as the second sign. Water on the deck is the emergency itself.
         wind_m_s=float(pack.series("storm.max_wind")[now]) if pack.has("storm.max_wind") else 0.,
     )

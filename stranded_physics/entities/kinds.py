@@ -16,6 +16,7 @@ TERRAIN_EVENTS = ("st_vincent",)
 WEATHER_EVENTS = ("st_vincent",)
 ERUPTION_EVENTS = {"st_vincent_2021": VENT_LONLAT}
 STORM_EVENTS = ("beryl_2024",)
+SHIP_EVENTS = ("titanic_1912",)
 FLOW_MODELS = ("energy_cone", "depth_averaged")  # The energy cone is the default; the solver takes minutes, not seconds.
 SECONDS_PER_HOUR = 3600.
 WEATHER_ISLANDS = ("st_vincent", "la_palma", "miyakejima", "montserrat", "stromboli")  # Islands whose weather records are held.
@@ -36,6 +37,12 @@ class World:
     vent: XY | None = None
     onset_s: float | None = None  # When a generated eruption begins. None for a recorded one, whose models know their own dates.
     erupted_kg: float | None = None  # How much a generated eruption erupts, which sizes its flows.
+    contract_grid: GridSpec | None = None  # Set by a ship, whose deck replaces the land map.
+    breach: object = None
+    impact_s: float | None = None
+    alarm_s: float | None = None
+    ship: object = None
+    boats: tuple = ()  # Each boat's station, seats and launch time.
 
 
 @dataclass(frozen=True)
@@ -166,6 +173,94 @@ WEATHER_DIALS = (Dial("rain_mm_h", "mm/h", 0., 200., "Rain, constant throughout"
                  Dial("upper_wind_m_s", "m/s", 0., 120., "Wind high up, which carries ash", default=20.),
                  Dial("upper_bearing_deg", "degrees", 0., 360., "The direction high air moves toward", default=90.))
 WEATHER_WINDOW_DIALS = (Dial("month", "month", 1, 12, "Month of 2023 to draw the weather from. Unset, any", whole=True, optional=True),)
+SHIP_TILES_ALONG = 36  # The hull fills 36 of the map's 40 tiles, leaving sea all round.
+MAP_TILES = 40
+BOAT_DECK_FORWARD, BOAT_DECK_AFT = .25, .65  # assumption: where the forward and after groups of boats sit, as shares of the ship's length.
+BOAT_NAMES_PORT = ("B", "D")  # Even numbers and these collapsibles are on the port side, per the 1912 report.
+
+
+def _ship(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+    from stranded_physics.core.api import GridSpec
+    from stranded_physics.domains.ship.model import Ship, ShipDeck, make_ship, titanic_recorded_sinking, titanic_ship
+    settings = entity.settings
+    spec = titanic_ship() if entity.source == "replay" else make_ship(settings["length_m"], settings["beam_m"], settings["draught_m"], settings["displacement_t"],
+                                                                      int(settings["compartments"]), settings["bulkhead_top_m"], settings["boat_deck_m"])
+    dx = spec.length_m / SHIP_TILES_ALONG
+    world.grid = world.contract_grid = GridSpec("LOCAL:ship", 0., MAP_TILES * dx, dx, MAP_TILES, MAP_TILES)
+    world.ship = spec
+    # A replay follows the recorded sinking, so people meet what really happened. A ship with no record sinks as the flooding model says.
+    recorded = None if entity.source != "replay" else tuple(world.impact_s + minutes * 60. for minutes in titanic_recorded_sinking())
+    return (ShipDeck(world.grid, spec), Ship(world.grid, world.time, spec, _breach_of(world.breach, spec), world.impact_s, world.alarm_s, recorded_sinking=recorded))
+
+
+def _breach_of(entity: EntitySpec, spec):
+    from stranded_physics.domains.ship.model import even_breach, titanic_breach
+    if entity.source == "replay":
+        return titanic_breach()
+    first, holed = int(entity.settings["first_compartment"]), int(entity.settings["holed"])
+    if first + holed > len(spec.compartments):
+        raise InterfaceError(f"breach: {holed} compartments from number {first} runs past this ship's {len(spec.compartments)}")
+    return even_breach(spec, first, holed, entity.settings["area_m2"])
+
+
+def _breach(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+    world.impact_s, world.alarm_s = entity.settings["impact_minutes"] * 60., entity.settings["alarm_minutes"] * 60.
+    world.breach = entity
+    return ()
+
+
+def _sea(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+    from stranded_physics.domains.sea.model import Sea, titanic_sea_temperature_c
+    return (Sea(world.time, titanic_sea_temperature_c() if entity.source == "replay" else entity.settings["temperature_c"]),)
+
+
+def boat_position(name: str, spec, grid: GridSpec) -> XY:
+    """Boats stand along the deck edges: port is the north edge of the map, because the bow points west. Numbers start at the bow."""
+    tag = name.replace("No.", "").strip()
+    port = tag in BOAT_NAMES_PORT or (tag.isdigit() and int(tag) % 2 == 0)
+    forward = not tag.isdigit() or int(tag) <= 8
+    bow = (MAP_TILES - SHIP_TILES_ALONG) / 2 * grid.dx_m
+    x = grid.x0_m + bow + (BOAT_DECK_FORWARD if forward else BOAT_DECK_AFT) * spec.length_m
+    y_middle = grid.y0_m - MAP_TILES / 2 * grid.dx_m
+    return x, y_middle + (.5 if port else -.5) * max(spec.beam_m - grid.dx_m, 0.)
+
+
+def _lifeboats(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+    from stranded_physics.domains.ship.model import Boat, Boats, titanic_boats, titanic_boats_revised
+    settings = entity.settings
+    if entity.source == "replay":
+        boats = titanic_boats() if entity.event == "titanic_1912_inquiry_times" else titanic_boats_revised()
+    else:
+        count = int(settings["boats"])
+        first, last = settings["first_launch_minutes"], settings["last_launch_minutes"]
+        boats = tuple(Boat(str(i + 1), int(settings["seats"]), first + (last - first) * i / max(count - 1, 1), False) for i in range(count))
+    world.boats = tuple((boat_position(b.name, world.ship, world.grid), b.capacity, world.impact_s + b.launch_minutes * 60.) for b in boats)
+    return (Boats(world.grid, list(world.boats)),)
+
+
+BREACH_TIMES = (Dial("impact_minutes", "minute", 0., 1440., "When it happens, after the scenario starts", default=10.),
+                Dial("alarm_minutes", "minute", 0., 1440., "When the crew call people to the boats, after the scenario starts", default=35.))
+SHIP_DIALS = (Dial("length_m", "m", 20., 500., "Length of the hull", default=150.), Dial("beam_m", "m", 5., 80., "Width of the hull", default=20.),
+              Dial("draught_m", "m", 1., 30., "Depth below the waterline", default=7.), Dial("displacement_t", "t", 100., 500000., "Weight of the ship", default=15000.),
+              Dial("compartments", "count", 2, 40, "Watertight compartments", whole=True, default=10), Dial("bulkhead_top_m", "m", .5, 40., "Bulkhead tops above the waterline", default=5.),
+              Dial("boat_deck_m", "m", 1., 60., "Boat deck above the waterline", default=15.))
+BREACH_DIALS = (Dial("first_compartment", "index", 0, 39, "First holed compartment, counted from the bow", whole=True, default=0), Dial("holed", "count", 1, 40, "How many compartments are holed", whole=True, default=2),
+                Dial("area_m2", "m2", .001, 50., "Total size of the opening", default=1.), *BREACH_TIMES)
+LIFEBOAT_POLICY = (Dial("women_first", "yes or no", 0, 1, "1 fills boats with women and children first", whole=True, default=1),
+                   Dial("port_women_only", "yes or no", 0, 1, "1 lets men into port boats only as crew", whole=True, default=0))
+LIFEBOAT_DIALS = (Dial("boats", "count", 1, 100, "How many boats", whole=True, default=10), Dial("seats", "person", 1, 200, "Seats in each boat", whole=True, default=40),
+                  Dial("first_launch_minutes", "minute", 0., 1440., "First boat leaves, after the impact", default=30.), Dial("last_launch_minutes", "minute", 0., 1440., "Last boat leaves, after the impact", default=120.),
+                  *LIFEBOAT_POLICY)
+PASSENGER_DIALS = (Dial("men", "person", 0, 5000, "Adult men", whole=True, default=100), Dial("women", "person", 0, 5000, "Adult women", whole=True, default=100),
+                   Dial("children", "person", 0, 5000, "Children", whole=True, default=10), Dial("deck_from", "share", 0., 1., "Start of where they begin, from the bow", default=.2),
+                   Dial("deck_to", "share", 0., 1., "End of where they begin, from the bow", default=.8), Dial("reach_minutes", "minute", 0., 240., "Time to reach the boat deck after the alarm", default=10.),
+                   Dial("boat_crew", "share", 0., 1., "Share who are needed to man the boats, so board regardless", default=0.))
+
+
+def _no_domains(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+    return ()
+
+
 ERUPTION_DIALS = (*lon_lat_dials("vent_", "the vent"),
                   Dial("size", "VEI", 0, 7, "Volcanic Explosivity Index", whole=True, optional=True, default=4),
                   Dial("lead_hours", "hour", 0., 720., "Warning time before the first explosion", optional=True, default=24.),
@@ -191,13 +286,18 @@ KINDS: dict[str, Kind] = {kind.name: kind for kind in (
     Kind("gas", ("replay",), (), (), ("terrain", "weather", "eruption"), _gas),
     Kind("lava", ("replay",), (), (), ("terrain", "eruption"), _lava),
     Kind("storm", ("replay", "catalogue", "dials"), lon_lat_dials("site_", "the place whose wind is reported"), STORM_EVENTS, (), _storm, STORM_DIALS),
+    Kind("ship", ("replay", "dials"), (), SHIP_EVENTS, ("breach",), _ship, SHIP_DIALS),
+    Kind("breach", ("replay", "dials"), BREACH_TIMES, SHIP_EVENTS, ("ship",), _breach, BREACH_DIALS),
+    Kind("lifeboats", ("replay", "dials"), LIFEBOAT_POLICY, (*SHIP_EVENTS, "titanic_1912_inquiry_times"), ("ship",), _lifeboats, LIFEBOAT_DIALS),
+    Kind("sea", ("replay", "dials"), (), SHIP_EVENTS, (), _sea, (Dial("temperature_c", "C", -2., 35., "Water temperature", default=10.),)),
+    Kind("passengers", ("dials",), PASSENGER_DIALS, (), ("ship", "lifeboats", "sea", "weather"), _no_domains),
     Kind("person", ("dials",), lon_lat_dials("start_", "where this person starts"), (), ("terrain", "weather"), _no_model),
     Kind("group", ("dials",), (*lon_lat_dials("start_", "the middle of this group"), Dial("count", "person", 1, 500, "How many people", whole=True),
                                Dial("radius_km", "km", 0., 20., "How far they spread from the middle")), (), ("terrain", "weather"), _no_model),
     Kind("shelter", ("dials",), lon_lat_dials("", "this shelter"), (), ("terrain",), _no_model),
     Kind("resource", ("dials",), lon_lat_dials("", "this resource"), (), ("terrain",), _no_model),
 )}
-BUILD_ORDER = ("terrain", "weather", "eruption", "ash", "flow", "mudflow", "gas", "lava", "storm", "person", "group", "shelter", "resource")
+BUILD_ORDER = ("breach", "ship", "lifeboats", "sea", "passengers", "terrain", "weather", "eruption", "ash", "flow", "mudflow", "gas", "lava", "storm", "person", "group", "shelter", "resource")
 
 
 def check_entity(entity: EntitySpec) -> None:
