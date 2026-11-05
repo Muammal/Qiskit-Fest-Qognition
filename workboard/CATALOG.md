@@ -5,17 +5,17 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 | Category | Status | Owner | Datasets | Parameters | First model |
 |---|---|---|---|---|---|
-| agent | model | unclaimed | 0 | 1 | Tobler walking, ISO 7933 heat strain, load carriage |
-| atmos | model | unclaimed | 2 | 1 | reanalysis forcing replayed per event |
-| eruption | model | unclaimed | 12 | 40 | source timeline and plume rise |
-| exposure | model | unclaimed | 28 | 1 | fragility curves |
-| gas | model | unclaimed | 0 | 1 | Gaussian plume |
+| agent | model | unclaimed | 0 | 17 | Tobler walking, ISO 7933 heat strain, load carriage |
+| atmos | model | unclaimed | 12 | 1 | reanalysis forcing replayed per event |
+| eruption | model | unclaimed | 12 | 92 | source timeline and plume rise |
+| exposure | model | unclaimed | 28 | 7 | fragility curves |
+| gas | model | unclaimed | 0 | 12 | Gaussian plume |
 | impact | data_only | unclaimed | 1 | 1 | none yet |
 | lahar | model | unclaimed | 0 | 5 | LAHARZ, then shallow water |
-| lava | model | unclaimed | 3 | 1 | dome footprint |
-| pdc | model | unclaimed | 3 | 6 | energy cone, then depth-averaged flow |
+| lava | model | unclaimed | 3 | 8 | dome footprint |
+| pdc | model | unclaimed | 3 | 9 | energy cone, then depth-averaged flow |
 | seismic | data_only | unclaimed | 2 | 1 | none yet |
-| storm | model | unclaimed | 2 | 10 | Holland 1980 wind profile |
+| storm | model | unclaimed | 2 | 25 | Holland 1980 wind profile |
 | tephra | model | unclaimed | 0 | 27 | Suzuki source with Gaussian fallout |
 | terrain | model | unclaimed | 4 | 11 | hydrological routing on the real DEM |
 | tsunami | data_only | unclaimed | 1 | 1 | none yet |
@@ -41,6 +41,16 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 |---|---|---|---|---|
 | upper_wind_st_vincent | wind by pressure level | reference | no | A model forecast from a coarse grid cell, not an observation. |
 | weather_st_vincent | surface weather | reference | no | ERA5-based values from a coarse grid cell, not a station. Island rain is likely understated. |
+| surface_decade_st_vincent | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_st_vincent | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
+| surface_decade_la_palma | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_la_palma | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
+| surface_decade_miyakejima | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_miyakejima | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
+| surface_decade_montserrat | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_montserrat | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
+| surface_decade_stromboli | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_stromboli | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
 
 **Still wanted:**
 - ERA5 pressure levels before 2021 (needs a free CDS account)
