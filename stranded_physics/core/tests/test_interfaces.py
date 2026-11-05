@@ -364,7 +364,7 @@ def test_gate_judgement_rules():
 
 def test_every_category_loads_with_strict_records():
     text = catalog.build()
-    expected = {"terrain", "atmos", "storm", "eruption", "tephra", "pdc", "lahar", "lava", "gas", "exposure", "agent", "seismic", "tsunami", "impact"}
+    expected = {"ship", "sea", "terrain", "atmos", "storm", "eruption", "tephra", "pdc", "lahar", "lava", "gas", "exposure", "agent", "seismic", "tsunami", "impact"}
     assert expected == set(gates.categories())
     for category in expected:
         assert f"## {category}:" in text
