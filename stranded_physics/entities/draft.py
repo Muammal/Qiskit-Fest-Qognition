@@ -13,7 +13,7 @@ from typing import Mapping
 from stranded_physics.core.api import InterfaceError
 from stranded_physics.entities.api import MINDS, PLACES, RESOURCES, ScenarioFile, dump_scenario, load_scenario, parse_scenario
 from stranded_physics.entities.build import check_scenario
-from stranded_physics.entities.kinds import KINDS
+from stranded_physics.entities.kinds import KINDS, WEATHER_ISLANDS
 
 CARDS = Path(__file__).resolve().parents[1] / "scenario_cards"
 SAVED = CARDS / "saved"  # Kept apart from the shipped scenarios, which the builder never overwrites.
@@ -153,6 +153,8 @@ def choices(entry: Mapping[str, object], key: str) -> tuple[str, ...]:
     if key == "mind":
         return MINDS if kind.name in ("person", "group") else ()
     if key == "what":
+        if kind.name == "weather" and entry["source"] == "catalogue":
+            return WEATHER_ISLANDS
         return RESOURCES if kind.name == "resource" else ()
     return ()
 
@@ -162,9 +164,11 @@ def _with_source(entry: Mapping[str, object], source: str) -> dict[str, object]:
     kind = KINDS[str(entry["kind"])]
     dials = kind.dials_for(source)
     names = {dial.name for dial in dials}
-    kept = {key: value for key, value in entry.items() if key in ("kind", "name", "mind", "what") or key in names}
+    kept = {key: value for key, value in entry.items() if key in ("kind", "name", "mind") or key in names or (key == "what" and kind.name == "resource")}
     if source == "replay" and kind.events and not kind.model_choice:
         kept["event"] = kind.events[0]
+    if kind.name == "weather" and source == "catalogue":
+        kept["what"] = WEATHER_ISLANDS[0]
     return {**_starting_values(dials, source), **kept, "source": source}
 
 
@@ -244,3 +248,7 @@ def save_draft(draft: Draft, folder: Path = SAVED) -> Path:
 def saved_scenarios(folder: Path = SAVED) -> list[Path]:
     """Shipped scenarios first, then the ones people have saved."""
     return [*sorted(CARDS.glob("*.toml")), *sorted(Path(folder).glob("*.toml"))]
+
+
+def terrain_entry(draft: Draft) -> Mapping[str, object] | None:
+    return next((entry for entry in draft.entries if entry["kind"] == "terrain"), None)

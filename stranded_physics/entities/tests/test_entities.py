@@ -46,8 +46,8 @@ def test_unknown_kinds_and_sources_are_refused(entity, message):
 
 
 def test_a_source_not_built_yet_says_which_stage_builds_it():
-    with pytest.raises(InterfaceError, match="Stage 3"):
-        checked({"kind": "terrain", "source": "catalogue"})
+    with pytest.raises(InterfaceError, match="supports"):
+        checked(TERRAIN, {"kind": "shelter", "source": "catalogue", "lon": -61.2, "lat": 13.3})
 
 
 def test_an_unknown_recorded_event_is_refused():
@@ -95,7 +95,7 @@ def test_saving_and_reloading_gives_the_same_scenario(name, tmp_path):
 
 
 def test_the_scenario_lists_its_categories_for_the_checker():
-    assert load_scenario(CARDS / "st_vincent_2021.toml").uses() == ("terrain", "atmos", "eruption", "tephra", "pdc", "lahar", "agent")
+    assert load_scenario(CARDS / "st_vincent_2021.toml").uses() == ("terrain", "atmos", "eruption", "tephra", "exposure", "pdc", "lahar", "agent")
 
 
 @pytest.mark.skipif(not HAS_RAW, reason="raw data is not held in this checkout")

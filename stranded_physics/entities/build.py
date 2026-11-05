@@ -63,6 +63,8 @@ def check_scenario(scenario: ScenarioFile) -> None:
             raise InterfaceError(f"{entity.kind} needs {sorted(missing)} in the same scenario")
     if present & {"person", "group"} and "shelter" not in present:
         raise InterfaceError("People need at least one shelter to evacuate to")
+    if scenario.place == "real" and any(e.kind == "terrain" and e.source != "replay" for e in scenario.entities):
+        raise InterfaceError("A generated island isn't a real place. Set this scenario's place to generated")
     recorded_eruption = any(e.kind == "eruption" and e.source == "replay" for e in scenario.entities)
     for entity in scenario.entities:
         _check_timing(scenario, entity)
@@ -109,7 +111,9 @@ def to_spec(scenario: ScenarioFile, seed: int = 1) -> ScenarioSpec:
     people = people_of(scenario)
     sites = {}
     if people:
-        sites = place_sites([person.start for person in people], [(s.settings["lon"], s.settings["lat"]) for s in shelters], world.vent)
+        land = next(domain for domain in domains if domain.id == "terrain")
+        generated_land = next(e for e in scenario.entities if e.kind == "terrain").source != "replay"
+        sites = place_sites([person.start for person in people], [(s.settings["lon"], s.settings["lat"]) for s in shelters], world.vent, land if generated_land else None, seed)
         for what in ("water", "food", "wood"):
             found = [to_utm((e.settings["lon"], e.settings["lat"])) for e in scenario.entities if e.kind == "resource" and e.what == what]
             if found:

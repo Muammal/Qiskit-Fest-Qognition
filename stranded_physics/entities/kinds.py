@@ -10,7 +10,7 @@ from stranded_physics.st_vincent import UTM, VENT_LONLAT, to_utm
 
 WORLD_LON = ("longitude", "degree", -180., 180.)
 WORLD_LAT = ("latitude", "degree", -90., 90.)
-NOT_BUILT = {("terrain", "catalogue"): 3, ("terrain", "dials"): 3, ("weather", "catalogue"): 3, ("weather", "dials"): 3}
+NOT_BUILT: dict[tuple[str, str], int] = {}  # Every kind's sources are built now. A later stage that adds one lists it here until then.
 GENERATED = ("catalogue", "dials")
 TERRAIN_EVENTS = ("st_vincent",)
 WEATHER_EVENTS = ("st_vincent",)
@@ -18,6 +18,8 @@ ERUPTION_EVENTS = {"st_vincent_2021": VENT_LONLAT}
 STORM_EVENTS = ("beryl_2024",)
 FLOW_MODELS = ("energy_cone", "depth_averaged")  # The energy cone is the default; the solver takes minutes, not seconds.
 SECONDS_PER_HOUR = 3600.
+WEATHER_ISLANDS = ("st_vincent", "la_palma", "miyakejima", "montserrat", "stromboli")  # Islands whose weather records are held.
+GENERATED_ISLAND_CENTRE = (697000., 1471000.)  # The middle of the game's map, so that a generated island fills it.
 
 
 def lon_lat_dials(prefix: str, what: str) -> tuple[Dial, Dial]:
@@ -46,8 +48,11 @@ class Kind:
     build: Callable[[EntitySpec, World], tuple[Domain, ...]]
     generated_dials: tuple[Dial, ...] = ()  # Settings for the catalogue and dials sources, where they differ from replay.
     model_choice: bool = False  # `event` names a model here, not a record, and may be left out for the first one.
+    catalogue_dials: tuple[Dial, ...] | None = None  # Only where the catalogue source's settings differ from the dials source's.
 
     def dials_for(self, source: str) -> tuple[Dial, ...]:
+        if source == "catalogue" and self.catalogue_dials is not None:
+            return self.catalogue_dials
         return self.generated_dials if source in GENERATED and self.generated_dials else self.dials
 
 
@@ -61,15 +66,32 @@ def vent_of(entity: EntitySpec) -> XY:
     return to_utm(ERUPTION_EVENTS[entity.event] if entity.source == "replay" else (entity.settings["vent_lon"], entity.settings["vent_lat"]))
 
 
-def _terrain(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+def terrain_domain(entity: EntitySpec, seed: int, vent: XY | None = None) -> Domain:
+    """The land an entity describes. The builder's map uses this too, so the map always shows the land that will be played on."""
     from stranded_physics.domains.terrain.model import ST_VINCENT_GRID, Terrain
+    if entity.source == "replay":
+        return Terrain(vent=vent) if vent else Terrain()
+    from stranded_physics.domains.terrain.generator import GeneratedTerrain, sample_island
+    from stranded_physics.packs.builder import stream
+    summit_m, area_km2 = sample_island(stream(seed, "terrain", "generator")) if entity.source == "catalogue" else (None, None)
+    return GeneratedTerrain(ST_VINCENT_GRID, GENERATED_ISLAND_CENTRE, entity.settings.get("summit_m", summit_m), entity.settings.get("area_km2", area_km2), vent=vent)
+
+
+def _terrain(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
+    from stranded_physics.domains.terrain.model import ST_VINCENT_GRID
     world.grid = ST_VINCENT_GRID
-    return (Terrain(vent=world.vent) if world.vent else Terrain(),)
+    return (terrain_domain(entity, world.seed, world.vent),)
 
 
 def _weather(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
-    from stranded_physics.domains.atmos.model import Atmos
-    return (Atmos(world.time),)
+    if entity.source == "replay":
+        from stranded_physics.domains.atmos.model import Atmos
+        return (Atmos(world.time),)
+    from stranded_physics.domains.atmos.generator import WeatherDials, WeatherWindow
+    if entity.source == "catalogue":
+        month = entity.settings.get("month")
+        return (WeatherWindow(world.time, entity.what, month=None if month is None else int(month)),)
+    return (WeatherDials(world.time, *(entity.settings[dial.name] for dial in WEATHER_DIALS)),)
 
 
 def _eruption(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
@@ -135,6 +157,15 @@ def _no_model(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
     return ()  # People and shelters are sites and bodies in the runtime, not fields in a pack.
 
 
+TERRAIN_DIALS = (Dial("summit_m", "m", 100., 3000., "Height of the summit", optional=True, default=900.),
+                 Dial("area_km2", "km2", 10., 250., "Land area of the island", optional=True, default=100.))
+WEATHER_DIALS = (Dial("rain_mm_h", "mm/h", 0., 200., "Rain, constant throughout", default=1.),
+                 Dial("wind_m_s", "m/s", 0., 80., "Surface wind", default=6.),
+                 Dial("wind_bearing_deg", "degrees", 0., 360., "The direction surface air moves toward", default=270.),
+                 Dial("temperature_c", "C", -40., 50., "Air temperature", default=27.),
+                 Dial("upper_wind_m_s", "m/s", 0., 120., "Wind high up, which carries ash", default=20.),
+                 Dial("upper_bearing_deg", "degrees", 0., 360., "The direction high air moves toward", default=90.))
+WEATHER_WINDOW_DIALS = (Dial("month", "month", 1, 12, "Month of 2023 to draw the weather from. Unset, any", whole=True, optional=True),)
 ERUPTION_DIALS = (*lon_lat_dials("vent_", "the vent"),
                   Dial("size", "VEI", 0, 7, "Volcanic Explosivity Index", whole=True, optional=True, default=4),
                   Dial("lead_hours", "hour", 0., 720., "Warning time before the first explosion", optional=True, default=24.),
@@ -150,8 +181,8 @@ STORM_DIALS = (*lon_lat_dials("site_", "the place whose wind is reported"),
 
 
 KINDS: dict[str, Kind] = {kind.name: kind for kind in (
-    Kind("terrain", ("replay",), (), TERRAIN_EVENTS, (), _terrain),
-    Kind("weather", ("replay",), (), WEATHER_EVENTS, (), _weather),
+    Kind("terrain", ("replay", "catalogue", "dials"), (), TERRAIN_EVENTS, (), _terrain, TERRAIN_DIALS),
+    Kind("weather", ("replay", "catalogue", "dials"), (), WEATHER_EVENTS, (), _weather, WEATHER_DIALS, catalogue_dials=WEATHER_WINDOW_DIALS),
     Kind("eruption", ("replay", "catalogue", "dials"), (), tuple(ERUPTION_EVENTS), ("terrain",), _eruption, ERUPTION_DIALS),
     Kind("ash", ("replay",), (), (), ("terrain", "weather", "eruption"), _ash),
     Kind("flow", ("replay",), (Dial("delay_hours", "hour", 0., 240., "For a generated eruption: how long after its first explosion the first flow comes", optional=True),),
@@ -180,6 +211,8 @@ def check_entity(entity: EntitySpec) -> None:
         raise InterfaceError(f"{entity.kind}: no recorded event {entity.event!r}. Known: {list(kind.events)}")
     if entity.source != "replay" and entity.event is not None:
         raise InterfaceError(f"{entity.kind}: event names a record, so it can't go with source {entity.source!r}")
+    if entity.kind == "weather" and entity.source == "catalogue" and entity.what not in WEATHER_ISLANDS:
+        raise InterfaceError(f"weather: what = {entity.what!r} isn't an island with records held. Known: {list(WEATHER_ISLANDS)}")
     dials = {dial.name: dial for dial in kind.dials_for(entity.source)}
     needed = {name for name, dial in dials.items() if entity.source == "dials" or not dial.optional}
     unknown, missing = set(entity.settings) - set(dials), needed - set(entity.settings)

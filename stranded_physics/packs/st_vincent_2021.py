@@ -15,7 +15,7 @@ from stranded_physics.domains.lahar.model import Lahar
 from stranded_physics.domains.pdc.model import Pdc
 from stranded_physics.domains.tephra.model import Tephra
 from stranded_physics.domains.terrain.model import SETTINGS as TERRAIN, ST_VINCENT_GRID as GRID, Terrain
-from stranded_physics.packs.builder import Pack, build_pack
+from stranded_physics.packs.builder import Pack, build_pack, stream
 from stranded_physics.st_vincent import TIME, UTM, VENT_XY, to_utm
 
 SCENARIO_TIME = replace(TIME, n=48)  # 96 hours, so the published first flow, 21:30 UTC on 10 April, is followed by a night of activity.
@@ -36,17 +36,20 @@ def _nearest(mask: np.ndarray, point: XY) -> XY:
     return float(xs[best]), float(ys[best])
 
 
-def place_sites(starts_lonlat: list[tuple[float, float]], assembly_lonlat: list[tuple[float, float]], vent: XY | None) -> dict[str, list[XY]]:
-    """Sites from the real surface: people on land, and water at the nearest real channel, not at a chosen spot."""
-    domain = Terrain()
+def place_sites(starts_lonlat: list[tuple[float, float]], assembly_lonlat: list[tuple[float, float]], vent: XY | None, generated_land=None, seed: int = 0) -> dict[str, list[XY]]:
+    """Sites from the surface: people on land, and water at the nearest channel, not at a chosen spot.
+
+    A generated island's coast depends on its seed, so a site there may need to move further to reach land, and that isn't an error.
+    """
+    domain = Terrain() if generated_land is None else generated_land
     store = FieldStore()
-    domain.run(ScopedFields(store, domain.id, domain.inputs, domain.outputs), np.random.default_rng(0))
+    domain.run(ScopedFields(store, domain.id, domain.inputs, domain.outputs), stream(seed, "terrain"))
     land = store.get("terrain.land_mask", "dimensionless") > 0
     channels = land & (store.get("terrain.flow_accumulation", "m**2") >= TERRAIN["channel_area"])
     wanted = [*[to_utm(p) for p in starts_lonlat], *[to_utm(p) for p in assembly_lonlat]]
     placed = [_nearest(land, point) for point in wanted]
     for point, site in zip(wanted, placed):
-        if math.dist(point, site) > MOST_SNAP_M:
+        if generated_land is None and math.dist(point, site) > MOST_SNAP_M:
             raise InterfaceError(f"site {point} is {math.dist(point, site):.0f} m from land; check its coordinates")
     return {"spawn": placed[:len(starts_lonlat)], "vent": [vent] if vent else [], "assembly": placed[len(starts_lonlat):], "water": [_nearest(channels, point) for point in placed]}
 

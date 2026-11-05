@@ -26,6 +26,25 @@
     "surface_channel_cells": 4743,
     "verdict": "NO_TARGET"
   },
+  "terrain-generated-area": {
+    "hash": "c30be7d74aab76030e126dcc0ef28633de03d2c0d9f156d31ce6d35409e82b25",
+    "value": 0.00027268268086633185,
+    "verdict": "PASS"
+  },
+  "terrain-generated-drains": {
+    "hash": "25a3a0e74dbc7960fee2eb52295095e1cc9854baa7a4471121620bda95eb7daa",
+    "value": 1.0,
+    "verdict": "PASS"
+  },
+  "terrain-generated-summit": {
+    "hash": "ff274d17cf96a162fab6eeba12d1a69772716992a02d377344f520c432898bd4",
+    "value": 0.0,
+    "verdict": "PASS"
+  },
+  "terrain-generator": {
+    "hash": "40ce24cf319f72fde7dc550e1489aa3b8519603faf8a95add9a9cddbcc212320",
+    "verdict": "PASS"
+  },
   "terrain-island-area": {
     "hash": "0d72e4d9f72bb1b9646b1480b8c950a2b1902e398c0a71576947c819ce8e48b0",
     "value": 346.8744,
@@ -37,7 +56,7 @@
     "verdict": "PASS"
   },
   "terrain-resampling": {
-    "hash": "ed302a1ef2bae29611d25aed7b01f07e8cbbd94614565d1f027790a410f2d340",
+    "hash": "19a2fad95f476dcbba4dbb4e09d1ba05b3ba67884671167c961d092b80962287",
     "verdict": "PASS"
   },
   "terrain-summit-height": {

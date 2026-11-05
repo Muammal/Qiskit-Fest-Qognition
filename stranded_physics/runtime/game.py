@@ -11,7 +11,7 @@ from stranded_physics.core.fields import FieldStore, ScopedFields
 from stranded_physics.domains.terrain.model import ST_VINCENT_GRID, Terrain
 from stranded_physics.entities.api import ScenarioFile
 from stranded_physics.entities.build import Person, check_events_happen, people_of, to_spec
-from stranded_physics.packs.builder import build_pack
+from stranded_physics.packs.builder import build_pack, stream
 from stranded_physics.packs.st_vincent_2021 import CONTRACT_GRID
 from stranded_physics.runtime.simulation import PackSimulation, Shared
 from stranded_physics.st_vincent import to_lonlat, to_utm
@@ -92,11 +92,11 @@ def lonlat_to_map(lonlat: tuple[float, float]) -> tuple[float, float]:
     return (x - grid.x0_m) / (grid.nx * grid.dx_m), (grid.y0_m - y) / (grid.ny * grid.dx_m)
 
 
-def terrain_picture(size: int = 130) -> np.ndarray:
-    """The land the map covers, as rows of colours, for choosing where things go. Needs the raw terrain data."""
-    domain = Terrain()
+def terrain_picture(size: int = 130, domain=None, seed: int = 0) -> np.ndarray:
+    """The land the map covers, as rows of colours, for choosing where things go. St Vincent's needs the raw terrain data."""
+    domain = Terrain() if domain is None else domain
     store = FieldStore()
-    domain.run(ScopedFields(store, domain.id, domain.inputs, domain.outputs), np.random.default_rng(0))
+    domain.run(ScopedFields(store, domain.id, domain.inputs, domain.outputs), stream(seed, "terrain"))
     elevation, land = store.get("terrain.elevation", "m"), store.get("terrain.land_mask", "dimensionless") > 0
     grid, full = CONTRACT_GRID, ST_VINCENT_GRID
     centres = (np.arange(size) + .5) / size * grid.nx * grid.dx_m

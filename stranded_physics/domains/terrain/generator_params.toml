@@ -1,0 +1,158 @@
+# Game dial bounds specified in Stage 3 request.
+[[parameter]]
+id = "terrain.summit"
+value = 1000
+unit = "m"
+valid_min = 100
+valid_max = 3000
+role = "input"
+status = "assumption"
+
+# Game map bounds specified in Stage 3 request.
+[[parameter]]
+id = "terrain.area"
+value = 100
+unit = "km**2"
+valid_min = 10
+valid_max = 250
+role = "input"
+status = "assumption"
+
+# Modest angular coast variation keeps large islands inside the map.
+[[parameter]]
+id = "terrain.coast"
+value = 0.05
+unit = "dimensionless"
+valid_min = 0
+valid_max = 0.08
+role = "input"
+status = "assumption"
+
+# Synthetic radial relief; no claim of calibrated geology.
+[[parameter]]
+id = "terrain.valleys"
+value = 0.8
+unit = "dimensionless"
+valid_min = 0
+valid_max = 0.95
+role = "input"
+status = "assumption"
+
+# Simplified treeline proxy without ecological calibration.
+[[parameter]]
+id = "terrain.bare_height"
+value = 800
+unit = "m"
+valid_min = 100
+valid_max = 3000
+role = "input"
+status = "assumption"
+
+# WorldCover tree code required by task.
+[[parameter]]
+id = "terrain.tree_code"
+value = 10
+unit = "dimensionless"
+valid_min = 10
+valid_max = 10
+role = "input"
+status = "assumption"
+
+# WorldCover bare code required by task.
+[[parameter]]
+id = "terrain.bare_code"
+value = 60
+unit = "dimensionless"
+valid_min = 60
+valid_max = 60
+role = "input"
+status = "assumption"
+
+# WorldCover water code recalled from memory, unverified; only labels sea, not land physics.
+[[parameter]]
+id = "terrain.sea_code"
+value = 80
+unit = "dimensionless"
+valid_min = 80
+valid_max = 80
+role = "input"
+status = "assumption"
+
+# Low angular harmonics avoid disconnected pixel-scale coast features.
+[[parameter]]
+id = "terrain.modes"
+value = 5
+unit = "dimensionless"
+valid_min = 2
+valid_max = 10
+role = "input"
+status = "assumption"
+
+# Reuse replay channel threshold scale for synthetic drainage.
+[[parameter]]
+id = "terrain.channel_area"
+value = 250000
+unit = "m**2"
+valid_min = 1
+valid_max = 10000000
+role = "input"
+status = "assumption"
+
+# Gate requests twenty fixed seeds.
+[[parameter]]
+id = "terrain.samples"
+value = 20
+unit = "dimensionless"
+valid_min = 20
+valid_max = 20
+role = "input"
+status = "assumption"
+
+# Three broad radial basins concentrate runoff without matching a real island.
+[[parameter]]
+id = "terrain.valley_modes"
+value = 3
+unit = "dimensionless"
+valid_min = 2
+valid_max = 8
+role = "input"
+status = "assumption"
+
+# Relief anisotropy vanishes near the summit to preserve a central peak.
+[[parameter]]
+id = "terrain.summit_transition"
+value = 0.1
+unit = "dimensionless"
+valid_min = 0.01
+valid_max = 0.5
+role = "input"
+status = "assumption"
+# User-specified gate tolerance; used to refuse grids too coarse for the area dial.
+[[parameter]]
+id = "terrain.area_tolerance"
+value = 0.05
+unit = "dimensionless"
+valid_min = 0.05
+valid_max = 0.05
+role = "input"
+status = "assumption"
+
+# Stage 3 requests this fixed measurement centre on ST_VINCENT_GRID.
+[[parameter]]
+id = "terrain.measure_x"
+value = 697000.0
+unit = "m"
+valid_min = 697000.0
+valid_max = 697000.0
+role = "input"
+status = "assumption"
+
+# Stage 3 requests this fixed measurement centre on ST_VINCENT_GRID.
+[[parameter]]
+id = "terrain.measure_y"
+value = 1471000.0
+unit = "m"
+valid_min = 1471000.0
+valid_max = 1471000.0
+role = "input"
+status = "assumption"

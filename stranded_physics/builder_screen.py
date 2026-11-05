@@ -16,7 +16,8 @@ from stranded_physics import check
 from stranded_physics.core.api import InterfaceError
 from stranded_physics.entities import draft as edit
 from stranded_physics.entities.api import MINDS, PLACES, RESOURCES, SOURCES
-from stranded_physics.entities.kinds import ERUPTION_EVENTS, KINDS, NOT_BUILT
+from stranded_physics.entities.api import EntitySpec
+from stranded_physics.entities.kinds import ERUPTION_EVENTS, KINDS, NOT_BUILT, terrain_domain
 from stranded_physics.runtime.game import build_game, lonlat_to_map, map_to_lonlat, terrain_picture
 
 KIND_TEXT = {"terrain": "The land", "weather": "Wind, rain, temperature", "eruption": "Timeline, column, mass", "ash": "Fallout from an eruption",
@@ -31,6 +32,7 @@ WHAT_TEXT = {"water": "Water", "food": "Food", "wood": "Wood"}
 ROW_H, VISIBLE_ROWS = 32, 8
 OPEN_ROWS = 12
 DETAIL_BOTTOM = 824
+CHOICES_PER_ROW = 3
 MAP_RECT = pygame.Rect(286, 112, 520, 520)
 MAP_KM = 20.
 PIN_REACH_PX = 10
@@ -75,12 +77,33 @@ class BuilderScreen:
         self.picture = None
         self.picture_surface: pygame.Surface | None = None
         self.map_error = ""
-        threading.Thread(target=self._load_picture, daemon=True).start()
+        self.picture_for = None
+        self._refresh_picture()
 
     # ---- Background work ----
-    def _load_picture(self) -> None:
+    def _picture_key(self) -> tuple:
+        """What the map shows depends on the land entity, and on the seed when that land is generated."""
+        land = edit.terrain_entry(self.draft)
+        if land is None or land["source"] == "replay":
+            return ("replay",)
+        return (land["source"], land.get("summit_m"), land.get("area_km2"), self.seed)
+
+    def _refresh_picture(self) -> None:
+        key = self._picture_key()
+        if key == self.picture_for:
+            return
+        self.picture_for, self.picture, self.picture_surface, self.map_error = key, None, None, ""
+        threading.Thread(target=self._load_picture, args=(key,), daemon=True).start()
+
+    def _load_picture(self, key: tuple) -> None:
         try:
-            self.picture = terrain_picture()
+            land = edit.terrain_entry(self.draft)
+            domain = None
+            if land is not None and land["source"] != "replay":
+                domain = terrain_domain(EntitySpec("terrain", str(land["source"]), settings={k: float(land[k]) for k in ("summit_m", "area_km2") if k in land}), self.seed)
+            picture = terrain_picture(domain=domain, seed=self.seed)
+            if key == self.picture_for:  # A newer choice replaces a slower, older one.
+                self.picture = picture
         except Exception as error:  # A window must report this, not crash: teammates may not hold the raw data.
             self.map_error = f"The map needs the raw terrain data, which this copy doesn't hold ({type(error).__name__}). You can still type positions."
 
@@ -397,6 +420,7 @@ class BuilderScreen:
     def _draw_map(self) -> None:
         self.app.draw_card(274, 84, 544, 560)
         self._text("MAP: 20 KM AROUND LA SOUFRIERE. CLICK TO PLACE WHAT'S SELECTED.", 288, 94, self.app.font_small, COLOR_GOLD)
+        self._refresh_picture()
         if self.picture_surface is None and self.picture is not None:
             flipped = pygame.surfarray.make_surface(self.picture.swapaxes(0, 1))
             self.picture_surface = pygame.transform.smoothscale(flipped, MAP_RECT.size)
@@ -496,7 +520,7 @@ class BuilderScreen:
         self._text(f"{kind.upper()} SETTINGS", 844, 402, self.app.font_sub, COLOR_GOLD)
         self._text(KIND_TEXT[kind], 844, 420, self.app.font_small, COLOR_TEXT_MUTED)
         y = self._draw_sources(index, entry, 442)
-        for key, label, names in (("event", "Model" if kind == "flow" else "Recorded event", None), ("mind", "Mind", MIND_TEXT), ("what", "What it is", WHAT_TEXT)):
+        for key, label, names in (("event", "Model" if kind == "flow" else "Recorded event", None), ("mind", "Mind", MIND_TEXT), ("what", "Island" if kind == "weather" else "What it is", WHAT_TEXT)):
             options = edit.choices(entry, key)
             if options:
                 y = self._draw_choice(index, entry, key, label, options, names, y)
@@ -523,9 +547,10 @@ class BuilderScreen:
         self._text(label, 844, y + 8, self.app.font_body, COLOR_TEXT_MUTED)
         for number, option in enumerate(options):
             text = names.get(option, option) if names else option
-            self._button((1000 + number * 190, y + 2, 182, 30), text, lambda o=option: self._apply(lambda: edit.set_choice(self.draft, index, key, o)),
+            row, column = divmod(number, CHOICES_PER_ROW)  # Five islands don't fit on one row.
+            self._button((1000 + column * 190, y + 2 + row * 38, 182, 30), text, lambda o=option: self._apply(lambda: edit.set_choice(self.draft, index, key, o)),
                          active=entry.get(key) == option, font=self.app.font_small)
-        return y + 38
+        return y + 38 * (1 + (len(options) - 1) // CHOICES_PER_ROW)
 
     def _draw_dial(self, index: int, entry, dial, y: int) -> None:
         self._text(dial.note, 844, y, self.app.font_body)
