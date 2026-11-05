@@ -1,6 +1,6 @@
 # Waterloo chlorine leak: research record
 
-Sources for a possible scenario based on the chlorine leak at Moses Springer Community Centre, Waterloo, Ontario, on 30 July 2012. Each entry gives the source, what was taken from it and how far it can be trusted. Nothing has been built yet, and no value here is in the code.
+Sources, method and results for a hypothetical evacuation based on the chlorine leak at Moses Springer Community Centre, Waterloo, Ontario, on 30 July 2012. Each entry gives the source, what was taken from it and how far it can be trusted.
 
 Sources were accessed on 5 November 2026. Labels have the same meanings as in [SOURCES_REPORT.md](SOURCES_REPORT.md). All pages were read through an automated fetch tool, so check every quote and figure against the original before citing it.
 
@@ -10,7 +10,8 @@ Sources were accessed on 5 November 2026. Labels have the same meanings as in [S
 - **The site is well documented.** The centre has a 50 m outdoor pool, one ice pad and one community room. OpenStreetMap gives a building outline of about 3,250 m². No floor plan or capacity was found.
 - **Chlorine hazard values are strong.** EPA and NIOSH give official exposure limits and health effects.
 - **Evacuation timing has one fully read source.** It is a Finnish study of 18 evacuations, none of them at a pool or recreation centre.
-- **A scenario can't honestly be called a reconstruction unless the missing facts are found.** With present sources it would be a hypothetical evacuation at a real site.
+- **This is a hypothetical evacuation at a real site, not a reconstruction.** The user chose to build it now and replace assumptions if the missing facts are found.
+- **The results do not show how people behaved in Waterloo.** There is no real timing or head-count to compare them with.
 
 ## The incident
 
@@ -133,13 +134,109 @@ The Williams Lake case is close in type, since it also combines a pool and an ar
 | [211 Ontario North listing](https://211north.ca/record/73549961/) | Blocked |
 | [ABC4 Utah report](https://www.abc4.com/news/local-news/dozens-hospitalized-after-chlorine-exposure-at-pleasant-grove-pool-2/) | Blocked |
 
+## How it was built
+
+Code: [site.py](../engine/site.py), [chlorine.py](../engine/chlorine.py), [patrons.py](../engine/patrons.py), [waterloo.py](../engine/waterloo.py). Scripts: [waterloo_sweep.py](../tools/waterloo_sweep.py), [waterloo_sensitivity.py](../tools/waterloo_sensitivity.py). Raw results: [waterloo_results/](../tools/waterloo_results/). `mind/` and `contracts.py` were not changed.
+
+| Part | Choice | Status |
+|---|---|---|
+| Map | 40x40 tiles of 5 m. Outlines from OpenStreetMap; drawn building 3,225 sq m, pool 1,225 sq m | read and calculated |
+| Inside | Labelled zones with no inner walls, on one level; 4 doors; fence with 2 gates; 5 map exits | assumption. No inner walls makes indoor escape too easy |
+| Time | Gas and walking every 10 s for up to 2 hours; each person decides once a minute | assumption, the user's choice |
+| Leak | Starts at 14:01:00; 22 ppm held at the source for 15 minutes; pool side by default, with north end and deck as settings | 22 ppm from Edmonton; the rest assumption |
+| Gas spread | Tile to tile, blocked by solid walls, drifting with modelled wind; rates 0.25 and 2 sq m/s; 4 air changes per hour; 0.02 per s outdoors | assumption. Not validated, and heavy-gas sinking is ignored |
+| People | 100 by default, with 40 and 300 as settings; 55% children, 30% adults, 10% lifeguards and instructors, 5% front desk and maintenance | assumption, the user's choice |
+| Speed | Adults 1.3 m/s, children 1.5 m/s, in water 0.5 m/s | Rinne et al.; water speed is an assumption |
+| Noticing | Smell from 0.31 ppm with 20% chance per 10 s, rising with level; word 10% within 10 m; hurrying crowds 10%; alarm 50% indoors and 25% outdoors | threshold sourced; chances assumption |
+| Alarm | Starts 30 s after the first staff member knows, and rings to the end. A switch | assumption |
+| Harm | Highest EPA AEGL level exceeded on a 10, 30 or 60 minute average. Nobody is scripted to be hurt or die | sourced limits; these are not predictions of injury |
+
+**Role affects** where someone starts, their speed by age and whether their knowing starts the alarm. It never reaches the mind and never changes the chance of noticing.
+
+**Three input choices the reader should know about:**
+- **The mind remembers its last 3 events.** At 10-second decisions that would be 30 seconds, so people would forget and stop. Deciding once a minute makes it 3 minutes. It is 6 hours on the island and 45 minutes in Pompeii, so the scenarios are not equivalent.
+- **Stress is updated once per decision,** not every 10 s, so it isn't washed out.
+- **`explore` is the mind's default action,** so before the leak people wander, including out of the pool. The model has no swimming.
+
+**Not modelled:** children following a parent or leader, lifeguards clearing the pool or giving orders, gathering belongings, hesitation at doors, door queues, responders, or anyone turning back for someone else. Most of these would slow leaving or link people's decisions, so they matter.
+
+## Results
+
+Ten seeds, 100 people. Each cell gives the mean time from the leak starting until half have left the site, then the mean number of people above AEGL-1. Everyone left within the run in all of these. Nobody went above AEGL-3.
+
+| Mapping | Mind | Pool side | North end | Deck |
+|---|---|---:|---:|---:|
+| A: all `gas_plume` | `quantum` | 564 s, 6.9 | 559 s, 3.8 | 460 s, 15.9 |
+| A: all `gas_plume` | `classical_mixture` | 241 s, 0.6 | 234 s, 0.4 | 144 s, 1.0 |
+| A: all `gas_plume` | `classical` | 241 s, 0.6 | 234 s, 0.4 | 144 s, 1.0 |
+| B: alarm as `eruption` | `quantum` | 253 s, 1.6 | 236 s, 1.7 | 158 s, 5.0 |
+| B: alarm as `eruption` | `classical_mixture` | 241 s, 0.6 | 235 s, 0.4 | 145 s, 1.0 |
+| B: alarm as `eruption` | `classical` | 241 s, 0.6 | 234 s, 0.4 | 144 s, 1.0 |
+| C: `tremor`, alarm as `gas_plume` | `quantum` | 556 s, 6.3 | 555 s, 3.9 | 460 s, 13.4 |
+| C: `tremor`, alarm as `gas_plume` | `classical_mixture` | 246 s, 1.7 | 232 s, 1.7 | 156 s, 4.6 |
+| C: `tremor`, alarm as `gas_plume` | `classical` | 241 s, 0.6 | 234 s, 0.4 | 144 s, 1.0 |
+
+**Mapping A is the default.** The user chose it on meaning after seeing all three: chlorine is a gas and an alarm is an uncertain warning. This was a choice made after seeing results, and it also gives the largest quantum gap, so all three must be reported.
+
+## Assumption tests
+
+One assumption changed at a time. Ten seeds, pool-side leak. Each cell is the mean time until half have left the site, with the number who left if not everyone did.
+
+| Changed | A, `quantum` | A, `classical_mixture` | B, `quantum` | Above AEGL-1, A `quantum` |
+|---|---:|---:|---:|---:|
+| Baseline | 564 s | 241 s | 253 s | 6.9 |
+| 40 people | 600 s | 218 s | 292 s | 2.9 |
+| 300 people | 489 s | 166 s | 183 s | 17.3 |
+| Source 11 ppm | 587 s | 238 s | 273 s | 4.1 |
+| Source 110 ppm | 560 s | 226 s | 247 s | 12.6 |
+| Leak 5 min | 564 s | 241 s | 253 s | 6.6 |
+| Leak 60 min | 564 s | 241 s | 253 s | 6.9 |
+| Leak at north end | 559 s | 234 s | 236 s | 3.8 |
+| Leak on deck | 460 s | 144 s | 158 s | 15.9 |
+| Decide every 30 s | 627 s | 214 s | 255 s | 3.7 |
+| Decide every 2 min | 804 s | 276 s | 275 s | 11.9 |
+| Alarm off | not reached; 24.5 of 100 left | 318 s; 91.0 of 100 left | not reached; 24.5 of 100 left | 18.6 |
+| Alarm delay 0 s | 552 s | 223 s | 232 s | 7.5 |
+| Alarm delay 2 min | 630 s | 294 s | 344 s | 9.8 |
+| Alarm heard half as often | 902 s | 250 s | 282 s | 8.1 |
+| Smell chance x0.5 | 588 s | 233 s | 272 s | 6.4 |
+| Smell chance x2 | 554 s | 235 s | 246 s | 6.8 |
+| Word chance x0.5 | 601 s | 286 s | 285 s | 7.6 |
+| Word chance x2 | 542 s | 200 s | 229 s | 7.1 |
+| Indoor spread x0.2 | 598 s | 244 s | 282 s | 3.7 |
+| Indoor spread x2 | 557 s | 232 s | 249 s | 9.5 |
+| Ventilation 1 per hour | 564 s | 238 s | 253 s | 7.4 |
+| Ventilation 10 per hour | 572 s | 241 s | 253 s | 5.1 |
+| Outdoor thinning x0.25 | 564 s | 241 s | 253 s | 6.9 |
+| Wading 0.25 m/s | 576 s | 244 s | 255 s | 6.9 |
+| Children walk at adult speed | 570 s | 249 s | 256 s | 6.6 |
+
+**Reading these:**
+- **The alarm dominates.** With it off under mapping A, about 25 of 100 `quantum` people leave against about 91 for the no-coherence control. A and B are identical with no alarm, because they differ only in how the alarm is read.
+- **How often the alarm is heard, and how often people decide, move the quantum result most.** Half as often takes `quantum` from 564 s to 902 s; deciding every 2 minutes takes it to 804 s. The controls move far less.
+- **The quantum gap depends on the mapping.** About 323 s under A, about 12 s under B, against the same control. It reflects how repeated `gas_plume` inputs act on the mind, and says nothing yet about real people.
+- **Gas settings mostly change exposure, not timing.** Leak length, ventilation and outdoor thinning hardly change timing, because most people learn from the alarm or from others.
+- **Not tested:** time of day and wind, door count and positions, the fence, the starting places, the role mix, and combined changes.
+
+**A bug found by these tests:** an earlier version threw away leftover walking time each step, so adults walked at 1.0 m/s instead of 1.3, and people could get stuck in slow water. It was fixed, tests were added and every result here was rerun. Earlier figures shared during development are superseded.
+
+## On screen
+
+`python gui_island.py --scenario waterloo`, or key 5 on the first screen. Green shows chlorine, with colour exaggerated and a minimum opacity from 0.05 ppm. Six short skippable cutscenes play: the assumed leak, a building cutaway, across the pool, the water's edge, from above, and a close-up. They are illustrations; tests confirm they never change a result. Written thoughts are templates built from model values.
+
+## What can and cannot be claimed
+
+**Supported, as statements about the model:** at this site and with these assumptions, how an alarm is translated for the mind strongly affects the quantum mind's evacuation time, and removing coherence shortens it under mappings A and C.
+
+**Not supported:** that this shows what happened on 30 July 2012, that anyone was or wasn't at risk that day, that the centre's staff or safety systems behaved in any particular way, or that quantum cognition explains evacuation behaviour. Named real places call for particular care: this should always be described as hypothetical.
+
 ## What this means for a scenario
 
 **Supported by sources:** the site's main features, chlorine's density and exposure limits, official public advice, the rough range of walking speeds, and the existence of similar incidents.
 
 **Would be assumptions unless more is found:** who and how many were inside, the leak's location, size, cause and spread, interior layout, and how people leaving a pool behave.
 
-**Three findings that affect design:**
+**Three findings from the research stage that shaped the design:**
 1. **Official advice differs by location.** The CDC tells people indoors to get out, and people outdoors to go in. On a site with both, moving the wrong way could increase exposure, and this may be the most interesting decision in the scenario.
 2. **The scale is very different.** Comparable events involve tens to perhaps hundreds of people, over minutes to about two hours, on one site. Pompeii had 11,500 people over 32 hours. Results could be dominated by small assumptions, and a few people can swing the percentages.
 3. **The mind has no chlorine event.** A translation into its existing events would be needed, without changing the mind. Its `gas_plume` event is the obvious candidate, but it was written for a volcano. Pompeii showed that this choice can decide the result, so it should get the same side-by-side testing.
