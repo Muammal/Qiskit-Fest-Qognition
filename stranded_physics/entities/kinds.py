@@ -175,7 +175,8 @@ WEATHER_DIALS = (Dial("rain_mm_h", "mm/h", 0., 200., "Rain, constant throughout"
 WEATHER_WINDOW_DIALS = (Dial("month", "month", 1, 12, "Month of 2023 to draw the weather from. Unset, any", whole=True, optional=True),)
 SHIP_TILES_ALONG = 36  # The hull fills 36 of the map's 40 tiles, leaving sea all round.
 MAP_TILES = 40
-BOAT_DECK_FORWARD, BOAT_DECK_AFT = .25, .65  # assumption: where the forward and after groups of boats sit, as shares of the ship's length.
+BOAT_DECK_FORWARD, BOAT_DECK_AFT = .25, .65  # assumption: where the forward and after groups of boats begin, as shares of the ship's length.
+BOAT_SPACING = .03  # assumption: about one tile between boats, so no two share a place.
 BOAT_NAMES_PORT = ("B", "D")  # Even numbers and these collapsibles are on the port side, per the 1912 report.
 
 
@@ -215,14 +216,17 @@ def _sea(entity: EntitySpec, world: World) -> tuple[Domain, ...]:
 
 
 def boat_position(name: str, spec, grid: GridSpec) -> XY:
-    """Boats stand along the deck edges: port is the north edge of the map, because the bow points west. Numbers start at the bow."""
+    """Each boat has its own place, because it has its own launch time. Port is the north edge of the map, because the bow points west. Boats run along the deck in number order."""
     tag = name.replace("No.", "").strip()
     port = tag in BOAT_NAMES_PORT or (tag.isdigit() and int(tag) % 2 == 0)
-    forward = not tag.isdigit() or int(tag) <= 8
+    if tag.isdigit():
+        order = (int(tag) - 1) // 2
+        share = BOAT_DECK_FORWARD + order * BOAT_SPACING if order < 4 else BOAT_DECK_AFT + (order - 4) * BOAT_SPACING
+    else:
+        share = BOAT_DECK_FORWARD - BOAT_SPACING * (2 if tag in ("A", "B") else 1)  # The collapsibles sat forward of the numbered boats, by the bridge.
     bow = (MAP_TILES - SHIP_TILES_ALONG) / 2 * grid.dx_m
-    x = grid.x0_m + bow + (BOAT_DECK_FORWARD if forward else BOAT_DECK_AFT) * spec.length_m
     y_middle = grid.y0_m - MAP_TILES / 2 * grid.dx_m
-    return x, y_middle + (.5 if port else -.5) * max(spec.beam_m - grid.dx_m, 0.)
+    return grid.x0_m + bow + share * spec.length_m, y_middle + (.5 if port else -.5) * max(spec.beam_m - grid.dx_m, 0.)
 
 
 def _lifeboats(entity: EntitySpec, world: World) -> tuple[Domain, ...]:

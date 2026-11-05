@@ -72,6 +72,7 @@ class ShipSimulation(PackSimulation):
         super().__init__(pack, mind_type=passenger.mind, person=index, shared=shared)
         self.passenger, self.stations, self.lifebelt = passenger, stations, lifebelt
         self.boat: BoatStation | None = None
+        self.heading_for_boat = False  # True once this person has chosen to go and reached the boat deck. A start position stands in for a cabin decks below.
         self.in_water_since: float | None = None
         self.fate = float(self.luck.random())
         self.temperature_c = float(pack.series("sea.temperature")[0])
@@ -83,13 +84,16 @@ class ShipSimulation(PackSimulation):
 
     def _walk_goal(self, action: str) -> XY | None:
         """Only a person who has reached the boat deck, and chooses to go, heads for a boat that is still there and has seats."""
-        if self.boat is not None or self.in_water_since is not None or action != "hide" or not self.warned or self._clock() < self.free_to_go_s:
+        at_work = self.passenger.boat_crew and self._clock() >= self.free_to_go_s
+        if self.boat is not None or self.in_water_since is not None or self._clock() < self.free_to_go_s or not (at_work or (action == "hide" and self.warned)):
             return None
         open_boats = [station.xy for station in self.stations if station.seats > 0 and station.launch_s > self._clock()]
         return self._nearest_site(open_boats) if open_boats else None
 
     def after_step(self, clock_s: float) -> None:
         """The water reaches whoever is not in a boat. Each person's fate is drawn once, so a longer time in the water can only make death likelier."""
+        if self.steps and clock_s >= self.free_to_go_s and (self.passenger.boat_crew or self.steps[-1]["action"] == "hide"):
+            self.heading_for_boat = True
         if not self.agent.alive or self.boat is not None:
             return
         if self.in_water_since is None and self.pack.sample("ship.submerged", self.agent.xy_m, min(clock_s, self.pack.time.dt_s * (self.pack.time.n - 1))) > 0:
@@ -100,7 +104,7 @@ class ShipSimulation(PackSimulation):
 
 def _board(people: list[ShipSimulation], stations: list[BoatStation], clock_s: float, women_first: bool, port_women_only: bool, reach_m: float, port_y: float) -> None:
     """The crew fill each boat from whoever has reached it: seamen first, then women and children if that's the order, then men."""
-    waiting = [person for person in people if person.agent.alive and person.boat is None and person.in_water_since is None]
+    waiting = [person for person in people if person.agent.alive and person.boat is None and person.in_water_since is None and person.heading_for_boat]
     for station in stations:
         if station.launch_s <= clock_s - 1e-9 or station.seats <= 0:
             continue
@@ -138,9 +142,9 @@ def play_ship(pack: ScenarioPack, scenario: ScenarioFile) -> list[ShipSimulation
         for person in people:
             person.step()
         clock = (step + 1) * pack.time.dt_s
-        _board(people, stations, clock, women_first, port_only, BOARD_REACH_TILES * grid.dx_m, port_y)
         for person in people:
             person.after_step(clock)
+        _board(people, stations, clock, women_first, port_only, BOARD_REACH_TILES * grid.dx_m, port_y)
     return people
 
 

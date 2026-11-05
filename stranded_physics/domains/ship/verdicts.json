@@ -1,55 +1,79 @@
 {
   "ship-foundering-time": {
     "bow_draught_m": 28.219960873482712,
-    "hash": "57a53e4a2a641334705b555f6b474e0b927b62899f88051d1a59f04bc245c6ce",
+    "hash": "7d9733b14215a1feae661ca239f976c920dd6c849b8658322a0aa97f7d641b61",
     "stern_draught_m": 11.87787776899288,
     "value": 201.36666666666667,
     "verdict": "FAIL",
     "water_tons": 70268.44109865467
   },
   "ship-model": {
-    "hash": "30061b9c3912d47f4a8d1f072554f60c722d229dd3162b3c05572c5117d8ba7d",
+    "hash": "db4bf549db5e9365de0545a5f75547f1bf2ad1cfe22619823ca07f4aa703cd7f",
     "verdict": "PASS"
   },
   "ship-water-at-40-minutes": {
-    "hash": "4a784007ef811873eb8b674ca41768b043f125f39178d3c2654762db52af26df",
+    "hash": "b6bf07a8d76a7ec559011e8581a5969d8c2b2368ed31ed0f5dbb7a87f8bcb663",
     "value": 18400.54835234533,
     "verdict": "PASS"
   },
   "ship.records_and_units": {
-    "hash": "e314bd01987c3c1600f7d8e51d34b15c9c18032d94123b2a7ee0ecc028037b3d",
+    "hash": "f22eb56b4967b64cc9c000c9e87886d14370fc313a3c18693b6040cb469d8068",
     "verdict": "PASS"
   },
   "titanic-saved-adult_female": {
-    "hash": "ebe5213ad1b6130ba38cad1bdf4914952525976a9ab7e896910bf16ad0b1d3b0",
+    "hash": "885464aaf80956a5f8c5ad7e925fe78e2c7cb4673e51d144927d6a3ade464d72",
+    "in_boats": 0.029986369831894594,
+    "people": 2201,
+    "value": 0.002369668246445498,
     "verdict": "FAIL"
   },
   "titanic-saved-adult_male": {
-    "hash": "3c5336fa21b240a772887ded9650272f1857491ee83a5ae755570324e4406f2f",
+    "hash": "a4387332f32c8226cd430fc2cb229c4f26a4adae33970ff0fc4e1bee078efc9c",
+    "in_boats": 0.029986369831894594,
+    "people": 2201,
+    "value": 0.043712574850299404,
     "verdict": "FAIL"
   },
   "titanic-saved-all": {
-    "hash": "14584dabd0365d556476ab1e18007c7398734138cd0e498e4a23fc0957ba68f1",
+    "hash": "2f9f57fcdb11c9eb13d760a246de3c61d5b4ae04fdbf4323af765cfcd8d9e475",
+    "in_boats": 0.029986369831894594,
+    "people": 2201,
+    "value": 0.034075420263516586,
     "verdict": "FAIL"
   },
   "titanic-saved-child": {
-    "hash": "cf6bf32294d3a199d275791cb66c6caeeb85ccfbcb50cb3247194d3ec605bf27",
+    "hash": "3059ae1969db2ec76c8d1f02c70993fb1834f5d8b193b1755a95885f8fbf0979",
+    "in_boats": 0.029986369831894594,
+    "people": 2201,
+    "value": 0.009174311926605505,
     "verdict": "FAIL"
   },
   "titanic-saved-crew": {
-    "hash": "15ee91dbe0b689e7dba2549c548e35892a0a05115a43b7d34779743b0fd81f0d",
+    "hash": "c855f40a69e4936877dd674eb1ec6f9e505ddef0f07fa3e94b3f7ea341b7061c",
+    "in_boats": 0.029986369831894594,
+    "people": 2201,
+    "value": 0.07796610169491526,
     "verdict": "FAIL"
   },
   "titanic-saved-first_class": {
-    "hash": "bb75b69e9fa68df380dfad9db277f88b7318238ac927b2a9b6215ec0a7d4bca6",
+    "hash": "f9f6184ec87ed7dad3218ec14da3bc9f7208377cc3ed70f4abd4225c766a8037",
+    "in_boats": 0.029986369831894594,
+    "people": 2201,
+    "value": 0.006153846153846154,
     "verdict": "FAIL"
   },
   "titanic-saved-second_class": {
-    "hash": "0126171256dd982b39fa72662d610645db8c70ea86677560d8a86ac891445cc3",
+    "hash": "95f38963484f354f0b8847cfc7ea6ba03dce001a94b9a128a189728972ca8464",
+    "in_boats": 0.029986369831894594,
+    "people": 2201,
+    "value": 0.0035087719298245615,
     "verdict": "FAIL"
   },
   "titanic-saved-third_class": {
-    "hash": "ef9718b73f4706954dae43c910f5f965b2643d8d723b6c5fe80d26226fb6316a",
+    "hash": "cf0abef9106793a8230bcb849e31244676c6f7ed1c691bc95722237d6b06feef",
+    "in_boats": 0.029986369831894594,
+    "people": 2201,
+    "value": 0.00424929178470255,
     "verdict": "FAIL"
   }
 }

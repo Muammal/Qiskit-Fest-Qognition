@@ -64,6 +64,11 @@ Evidence never carries over. A pass on St Vincent says nothing about a generated
 | `gas` | SO2 downwind | Built, needs an eruption | | |
 | `lava` | A dome that grows until the first explosion | Built, needs an eruption | | |
 | `storm` | Wind from a cyclone | Built | Built | Built |
+| `ship` | Hull, compartments and decks. It is its own map, so it can't share a scenario with land | Built: the Titanic | | Built |
+| `breach` | Where a hull is holed, how large the opening is, and when | Built: the Titanic | | Built |
+| `lifeboats` | Seats, launch times, and who the crew let in first | Built: the Titanic, at revised or 1912 times | | Built |
+| `sea` | Water temperature, and how long a person lasts in it | Built: the Titanic | | Built |
+| `passengers` | People aboard, by men, women and children, with where they start and how long they take to reach the boat deck | | | Built |
 | `person` | A body and a mind, at a start point | | | Built |
 | `shelter` | A place to evacuate to. It lowers the odds of dying in a flow, and its roof can fail under ash | | | Built |
 | `resource` | Food, water or wood at a place | | | Built |
@@ -80,6 +85,12 @@ Hunger, thirst and energy belong to the body of each `person`, and their setting
 | **3. Generated weather and land** | Weather from real records at any held island; generated islands | Built. Weather windows match their source, and generated islands pass the terrain checks they were given. Real relief isn't compared |
 | **4. People, shelters, resources** | Many different people on one map, who affect each other | Built. Seeing a warned neighbour warns you, an able neighbour helps the injured, wood builds a shelter or a tool, and injuries heal. Their distances are assumptions |
 | **5. In-game builder** | Pick and adjust entities on a screen | Built. The game shows one person at a time, playing alone, so people only affect each other in command-line runs |
+
+## Ships
+
+A ship scenario lists a `ship`, a `breach`, `lifeboats`, a `sea`, `weather` and its `passengers`, and uses `step_minutes` in place of `step_hours`, because a sinking takes hours. Run one with `python -m stranded_physics.entities.build run <file>`. The game window can't play one yet, and the builder's map doesn't show a deck.
+
+A replay follows the recorded sinking, so people meet what really happened. A ship set by hand sinks as the flooding model says.
 
 ## Rules
 

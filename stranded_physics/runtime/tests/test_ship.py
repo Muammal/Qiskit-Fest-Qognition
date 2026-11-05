@@ -60,7 +60,38 @@ def stations_and_people(pack, file, count=1):
 
 def place(people_here, xy):
     for person in people_here:
-        person.agent.xy_m = xy
+        person.agent.xy_m, person.heading_for_boat = xy, True
+
+
+def test_someone_who_never_chose_to_go_does_not_board_however_close():
+    file, pack = built(boats(), people(women=2, men=0))
+    aboard = stations_and_people(pack, file)
+    station = BoatStation(aboard[0].agent.xy_m, 2, 99999.)
+    for person in aboard:
+        person.agent.xy_m = station.xy
+    _board(aboard, [station], 0., True, False, 5., 0.)
+    assert not any(p.boat for p in aboard) and station.seats == 2
+
+
+def test_choosing_to_go_only_counts_after_reaching_the_boat_deck():
+    file, pack = built(boats(), people(women=1, men=0, reach_minutes=60.))
+    person = stations_and_people(pack, file)[0]
+    person.decide_fn = go("hide")
+    person.step()
+    person.after_step(600.)
+    assert not person.heading_for_boat
+    person.free_to_go_s = 0.
+    person.after_step(1200.)
+    assert person.heading_for_boat
+
+
+def test_seamen_go_to_the_boats_as_their_duty_not_their_choice():
+    file, pack = built(boats(), people(men=2, women=0, boat_crew=1., reach_minutes=0.))
+    person = stations_and_people(pack, file)[0]
+    person.decide_fn, person.free_to_go_s = go("rest"), 0.
+    person.step()
+    person.after_step(600.)
+    assert person.heading_for_boat
 
 
 def test_women_and_children_board_first():
@@ -111,9 +142,8 @@ def test_a_boat_that_has_left_takes_nobody():
 def test_people_in_a_boat_survive_and_people_left_behind_do_not():
     file, pack = built(boats(count=1, seats=200), people(men=0, women=20))
     aboard = play_ship(pack, file)
-    for person in aboard:
-        assert person.agent.alive == (person.boat is not None) or person.in_water_since is not None
     assert all(person.agent.alive for person in aboard if person.boat is not None)
+    assert all(person.in_water_since is not None for person in aboard if person.boat is None)
 
 
 def test_nobody_leaves_before_reaching_the_boat_deck():
@@ -198,3 +228,20 @@ def test_two_hour_scenarios_need_no_new_key():
     with pytest.raises(InterfaceError, match="one of step_hours"):
         parse_scenario({"id": "x", "title": "x", "place": "fictional", "start_utc": "2000-01-01T00:00:00+00:00", "hours": 4, "local_utc_offset": 0, "entity": [WEATHER]})
     assert np.isclose(scenario().step_s, 600.)
+
+
+def test_each_titanic_boat_keeps_its_own_place_seats_and_time():
+    """Boats sharing a cell merge, and all leave with the earliest. That made the fleet leave at 12.40 in the first full run."""
+    from pathlib import Path
+    from stranded_physics.domains.ship.model import titanic_boats_revised
+    from stranded_physics.entities.api import load_scenario
+    file = load_scenario(Path(__file__).resolve().parents[2] / "scenario_cards" / "titanic_1912.toml")
+    pack = build_pack(to_spec(file, 1), 1)
+    stations = pack.sites["assembly"]
+    assert len(stations) == 20
+    cells = {pack.grid.locate(xy) for xy in stations}
+    assert len(cells) == 20, "two boats share a cell"
+    assert sum(pack.sample("boats.capacity", xy) for xy in stations) == 1178
+    assert sorted(round(pack.sample("boats.launch", xy) / 60. - 10.) for xy in stations) == sorted(round(boat.launch_minutes) for boat in titanic_boats_revised())
+    for xy in stations:
+        assert pack.sample("terrain.land_mask", xy) > 0, "a boat station is off the deck"
