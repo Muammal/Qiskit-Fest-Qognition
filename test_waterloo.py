@@ -4,8 +4,11 @@ import json
 import numpy as np
 import pytest
 
-from engine.chlorine import LEAK_SITES, LEAK_START_STEP, SOURCE_PPM, ChlorineModel, exposure_level, wind_at
+import contracts
+from engine.chlorine import LEAK_SITES, LEAK_START_STEP, ODOUR_PPM, SOURCE_PPM, ChlorineModel, exposure_level, wind_at
+from engine.patrons import POPULATION_SETTINGS, role_counts, smell_chance
 from engine.site import BUILDING, DOORS, POOL, POOL_GATES, PROVENANCE, SITE_M_PER_TILE, SiteWorld
+from engine.waterloo import EVENT_MAPPINGS, WaterlooSimulation
 from engine.world import IslandWorld
 
 
@@ -178,3 +181,105 @@ def test_brief_exposure_is_averaged_over_the_full_window():
 
 def test_wind_table_uses_the_day_s_values():
     assert wind_at(0, 14) == pytest.approx((6.4 / 3.6, 223))
+
+
+# --- People and simulation ---
+
+@pytest.fixture(scope="module")
+def run():
+    sim = WaterlooSimulation(seed=3, event_mapping="B")
+    sim.run()
+    return sim
+
+
+def test_role_counts_add_up_at_every_setting():
+    for population in POPULATION_SETTINGS:
+        counts = role_counts(population)
+        assert sum(counts.values()) == population
+        assert all(counts[role] >= 1 for role in counts)
+
+
+def test_start_places_are_walkable_and_everyone_shares_one_mind(world):
+    calls = []
+
+    def spy(state):
+        calls.append(sorted(state))
+        return contracts.classical_decide(state)
+
+    sim = WaterlooSimulation(seed=1, decide_fn=spy)
+    assert all(world.walkable(tuple(p.pos)) for p in sim.people)
+    sim.step()
+    assert not any(key in {"role", "id", "status", "knows_danger"} for keys in calls for key in keys)
+
+
+def test_runs_are_reproducible_with_a_seed():
+    first, second = WaterlooSimulation(seed=4), WaterlooSimulation(seed=4)
+    first.run(60), second.run(60)
+    assert [p.pos for p in first.people] == [p.pos for p in second.people]
+
+
+def test_gas_never_depends_on_the_mind(world):
+    quantum = WaterlooSimulation(seed=4, mind_type="quantum")
+    classical = WaterlooSimulation(seed=4, mind_type="classical")
+    assert (quantum.chlorine.ppm == classical.chlorine.ppm).all()
+
+
+def test_nobody_knows_before_the_leak():
+    sim = WaterlooSimulation(seed=5)
+    sim.run(LEAK_START_STEP)
+    assert sim.counts()["knows"] == 0
+
+
+def test_smelling_depends_only_on_level():
+    assert smell_chance(ODOUR_PPM * .9) == 0
+    assert smell_chance(ODOUR_PPM) == pytest.approx(.2)
+    assert smell_chance(100.) == 1
+
+
+def test_people_decide_once_per_interval():
+    sim = WaterlooSimulation(seed=6, decision_seconds=60)
+    sim.run(36)
+    log = sim.logs[sim.agent.id]
+    assert len(log) == 6
+    assert all(b["t"] - a["t"] == 6 for a, b in zip(log, log[1:]))
+
+
+def test_alarm_comes_only_after_a_staff_member_knows():
+    sim = WaterlooSimulation(seed=7, scripted_events={})
+    while sim.alarm_step is None and sim.t < sim.horizon and sim.step():
+        pass
+    assert sim.alarm_step is not None
+    assert any(p.knows_danger and p.role in ("lifeguard", "desk") for p in sim.people)
+
+
+def test_alarm_can_be_switched_off():
+    sim = WaterlooSimulation(seed=7, alarm=False)
+    sim.run()
+    assert sim.alarm_step is None
+
+
+def test_nobody_leaves_without_knowing_and_nobody_dies(run):
+    assert all(p.knows_danger for p in run.people if p.status == "out")
+    assert all(p.is_alive for p in run.people)
+
+
+def test_exposure_is_reported_for_everyone(run):
+    summary = run.exposure_summary()
+    assert sum(summary.values()) == len(run.people)
+    assert all(len(p.exposure) == run.t for p in run.people)
+
+
+def test_every_mapping_uses_events_the_mind_accepts():
+    for mapping in EVENT_MAPPINGS.values():
+        assert set(mapping.values()) <= set(contracts.EVENTS)
+        assert set(mapping) == {"smell", "word_of_mouth", "crowd_moving", "alarm"}
+
+
+def test_timeline_is_json_ready(run):
+    timeline = run.timeline()
+    assert json.dumps(timeline["crowd"])
+    assert set(timeline["evacuation"]) == {"first_knew", "alarm", "first_off_site", "half_off_site", "all_off_site"}
+
+
+def test_population_setting_changes_the_count():
+    assert len(WaterlooSimulation(seed=1, population=300).people) == 300
