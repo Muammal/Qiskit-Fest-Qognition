@@ -178,6 +178,12 @@ Five seeds (1-5), one change at a time. Mean deaths. Full table in [POMPEII_SOUR
 
 ---
 
+## A risk in how the mind is loaded
+
+`contracts.py` and `mind/quantum_mind.py` import each other. If `mind` is imported first, `contracts.quantum_decide` silently uses a heuristic stub instead of the quantum mind, with no error. Checked on 5 November 2026: the window and command-line launchers, the Titanic, Pompeii and Waterloo simulations and the three sweep scripts all load the real mind. A test-only `conftest.py` keeps plain `pytest` on the real mind. The fallback itself remains, so any new script should import `contracts` first and confirm that decisions include a `quantum` field.
+
+---
+
 ## What can and cannot be claimed
 
 **Supported, as statements about the model:**

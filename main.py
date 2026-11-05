@@ -22,6 +22,7 @@ from engine.simulation import SimulationEngine, DEFAULT_STEPS
 from engine.batch_runner import run_batch_comparison, curate_demo_pack
 from engine.titanic import TitanicSimulation
 from engine.pompeii import PompeiiSimulation
+from engine.waterloo import WaterlooSimulation
 import contracts
 
 # Terminal ANSI formatting
@@ -98,6 +99,8 @@ def run_live_demo(
         sim = TitanicSimulation(seed=seed, mind_type=mind, noise_source=noise)
     elif scenario == "pompeii":
         sim = PompeiiSimulation(seed=seed, mind_type=mind, noise_source=noise)
+    elif scenario == "waterloo":
+        sim = WaterlooSimulation(seed=seed, mind_type=mind, noise_source=noise)
     else:
         sim = SimulationEngine(seed=seed, mind_type=mind, noise_source=noise, scenario=scenario)
     max_steps = getattr(sim, "horizon", DEFAULT_STEPS)
@@ -141,7 +144,8 @@ def run_live_demo(
     print(f"\n{BOLD}========================================================================{RESET}")
     if timeline["outcome"] == "survived":
         span = {"titanic": f"{len(timeline['steps']) * 5} minutes",
-                "pompeii": f"{len(timeline['steps']) * 15 / 60:.1f} hours"}.get(scenario, f"{len(timeline['steps']) * 2} hours")
+                "pompeii": f"{len(timeline['steps']) * 15 / 60:.1f} hours",
+                "waterloo": f"{len(timeline['steps']) * 10 / 60:.1f} minutes"}.get(scenario, f"{len(timeline['steps']) * 2} hours")
         print(f"{BOLD}{GREEN}  >>> MISSION OUTCOME: SURVIVED! Successfully endured {span}. <<<{RESET}")
     else:
         print(f"{BOLD}{RED}  >>> MISSION OUTCOME: DIED ({str(timeline['cause']).upper()}) at Step {len(timeline['steps'])}. <<<{RESET}")
@@ -162,7 +166,7 @@ def main():
     parser.add_argument("--engine", type=str, default="legacy",
                         choices=["legacy", "physics"], help="Simulation runtime (legacy or T1 St. Vincent physics pack)")
     parser.add_argument("--noise", type=str, default="stub", help="Noise source profile")
-    parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano", "titanic", "pompeii"], help="Choose scenario directly")
+    parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano", "titanic", "pompeii", "waterloo"], help="Choose scenario directly")
     parser.add_argument("--speed", type=float, default=0.2, help="Seconds delay per step during live demo")
 
     args = parser.parse_args()

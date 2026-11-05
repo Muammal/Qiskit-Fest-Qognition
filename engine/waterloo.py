@@ -11,6 +11,7 @@ from collections import Counter
 from pathlib import Path
 
 import contracts
+from engine.events import EventGenerator
 from engine.chlorine import (DEFAULT_LEAK_SITE, HORIZON, LEAK_MINUTES, LEAK_START_STEP, SOURCE_PPM, START_HOUR, STEP_SECONDS, AEGL_MEANING,
                              ChlorineModel, exposure_level)
 from engine.patrons import (ALARM_DELAY_STEPS, ALARM_HEAR_CHANCE, CROWD_CHANCE, CROWD_NOTICE_COUNT, DECISION_SECONDS, DEFAULT_POPULATION,
@@ -55,6 +56,9 @@ class WaterlooSimulation:
         self.initial_world = copy.deepcopy(self.world.export_dict())
         self.chlorine = ChlorineModel(seed, self.world, leak_site=leak_site, source_ppm=source_ppm, leak_minutes=leak_minutes)
         self.volcano = self.chlorine  # GUI and exports read hazards through this shared attribute name
+        self.event_gen = EventGenerator(seed, horizon=HORIZON)
+        self.event_gen.weather = ['calm'] * HORIZON  # the day's rain was 0 in the modelled weather
+        self.event_gen.world_events = list(self.chlorine.world_events)
         self.people = build_patrons(self.world, seed, population, decision_seconds)
         self.agent = self._default_focus()
         self.watched = {self.agent.id}
@@ -254,7 +258,7 @@ class WaterlooSimulation:
         world['chlorine'] = self.chlorine.export_dict()
         focus = self.agent
         return dict(world=world, steps=self.steps, evacuation=self.timing(), start_hour=START_HOUR,
-                    outcome='off_site' if focus.status == 'out' else 'on_site',
+                    outcome='survived', cause=None,  # nobody is scripted to die; see exposure
                     focus=dict(id=focus.id, role=focus.role, label=focus.label, status=focus.status, exposure_level=exposure_level(focus.exposure)),
                     crowd=dict(counts=self.counts(), by_role=self.outcome_table(), exposure=self.exposure_summary(),
                                event_mapping=self.event_mapping, comparison=COMPARISON))

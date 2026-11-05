@@ -15,6 +15,9 @@ from .titanic import TitanicSimulation
 from .city import CityWorld, RegionWorld
 from .eruption import EruptionModel
 from .pompeii import PompeiiSimulation
+from .site import SiteWorld
+from .chlorine import ChlorineModel
+from .waterloo import WaterlooSimulation
 
 __all__ = [
     "IslandWorld",

@@ -283,3 +283,56 @@ def test_timeline_is_json_ready(run):
 
 def test_population_setting_changes_the_count():
     assert len(WaterlooSimulation(seed=1, population=300).people) == 300
+
+
+# --- Window ---
+
+@pytest.fixture(scope="module")
+def app():
+    import os
+    os.environ["SDL_VIDEODRIVER"] = "dummy"
+    os.environ["SDL_AUDIODRIVER"] = "dummy"
+    from engine.gui import IslandVisualizerApp
+    return IslandVisualizerApp(seed=105, start_screen="event_choice", scenario="volcano")
+
+
+def test_window_opens_waterloo_runs_and_draws_every_screen(app):
+    app.draw()
+    app._handle_event_choice_click(app.btn_choice_waterloo.rect.center)
+    assert (app.app_state, app.scenario, app.max_steps) == ("home", "waterloo", 721)
+    app.draw()
+    app._init_simulation()
+    assert isinstance(app.engine, WaterlooSimulation)
+    assert app.engine.event_mapping == "A" and len(app.engine.people) == 100
+    app.app_state = "sim"
+    for _ in range(12):
+        app.step_forward()
+        app._worker.join()
+        app._pompeii_poll_step()
+    app.draw()
+    app.show_split_panels = False
+    app.draw()
+    app.show_split_panels = True
+    app.show_debrief_modal = True
+    app.draw()
+    app.show_debrief_modal = False
+
+
+def test_every_setting_button_cycles_and_reaches_the_simulation(app):
+    app.scenario = "waterloo"
+    app._build_home_buttons()
+    for i in range(6):
+        app._cycle_pompeii_setting(i)
+    app._init_simulation()
+    assert app.engine.event_mapping == "B"
+    assert len(app.engine.people) == 40
+    assert app.engine.chlorine.leak_site == "north_end"
+    assert app.engine.alarm_enabled is False
+    for i, count in enumerate((2, 2, 2, 2, 2, 1)):
+        for _ in range(count):
+            app._cycle_pompeii_setting(i)
+
+
+def test_pompeii_settings_are_not_touched_by_waterloo_buttons(app):
+    assert app.pompeii_settings["event_mapping"] == "B"
+    assert app.pompeii_settings["population"] == 11_500

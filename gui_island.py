@@ -12,7 +12,7 @@ def main():
     parser.add_argument("--seed", type=int, default=101, help="Seed for event hazards and terrain")
     parser.add_argument("--mind", type=str, default="quantum", choices=["quantum", "classical"], help="Mind engine")
     parser.add_argument("--noise", type=str, default="stub", help="Noise source profile")
-    parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano", "titanic", "pompeii"], help="Direct scenario launch")
+    parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano", "titanic", "pompeii", "waterloo"], help="Direct scenario launch")
 
     args = parser.parse_args()
     start_screen = "home" if args.scenario else "event_choice"

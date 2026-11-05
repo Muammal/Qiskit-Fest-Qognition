@@ -78,6 +78,10 @@ from engine.city import CityWorld
 from engine.pompeii import HORIZON as POMPEII_STEPS, STORY_TEXT as POMPEII_STORY, PompeiiSimulation
 from engine.gui_city import CityView, SplitPanels, clock_text, mini_map as city_mini_map, next_role_citizen
 from engine.scenes_pompeii import PompeiiCutscenes
+from engine.site import SiteWorld
+from engine.waterloo import HORIZON as WATERLOO_STEPS, STORY_TEXT as WATERLOO_STORY, WaterlooSimulation
+from engine.gui_site import SitePanels, SiteView, clock_text as site_clock, mini_map as site_mini_map, next_role_patron
+from engine.chlorine import AEGL_MEANING
 from engine.cutscenes import CutscenePlayer
 
 try:
@@ -166,6 +170,19 @@ POMPEII_SETTINGS = (  # (key, label, options); each changes results, so each is 
     ("date", "Date", ("august", "autumn")), ("quake", "Quake", (True, False)),
     ("restrict_enslaved", "Enslaved held", (False, True)), ("crowding", "Crowding", (True, False)),
 )
+
+WATERLOO_PRESETS = [
+    {"label": "Child", "seed": 104, "tag": "Follow a child | Random panels", "color": COLOR_GOLD},
+    {"label": "Adult", "seed": 105, "tag": "Follow an adult | Random panels", "color": COLOR_CYAN},
+    {"label": "Lifeguard or Instructor", "seed": 106, "tag": "Follow a lifeguard | Random panels", "color": COLOR_RED},
+    {"label": "Front Desk or Maintenance", "seed": 107, "tag": "Follow front desk staff | Random panels", "color": COLOR_GREEN}
+]
+WATERLOO_SETTINGS = (  # first option is the default; A is the user's chosen mapping
+    ("event_mapping", "Mapping", ("A", "B", "C")), ("population", "People", (100, 40, 300)),
+    ("leak_site", "Leak", ("pool_side", "north_end", "deck")), ("source_ppm", "Source ppm", (22.0, 11.0, 110.0)),
+    ("leak_minutes", "Leak min", (15.0, 5.0, 60.0)), ("alarm", "Alarm", (True, False)),
+)
+CROWD_SCENARIOS = ("pompeii", "waterloo")
 
 VOLCANO_PRESETS = [
     {"label": "Event Seed 101", "seed": 101, "tag": "Standard Unrest | Timed Pulse", "color": COLOR_CYAN},
@@ -622,6 +639,7 @@ class IslandVisualizerApp:
         self.max_steps = self._horizon_for(scenario)
         self.cutscene = self._cutscene_player(scenario)
         self.pompeii_settings = {key: options[0] for key, _, options in POMPEII_SETTINGS}
+        self.waterloo_settings = {key: options[0] for key, _, options in WATERLOO_SETTINGS}
         self._worker, self._worker_result = None, None
         self.city_view, self.split_panels, self.show_split_panels = None, None, True
         self.step_speed = 0.4
@@ -681,6 +699,8 @@ class IslandVisualizerApp:
             return mini_map(ShipWorld(seed=seed), size)
         if self.scenario == "pompeii":
             return city_mini_map(CityWorld(seed=seed), size)
+        if self.scenario == "waterloo":
+            return site_mini_map(SiteWorld(seed=seed), size)
         surf = pygame.Surface((size, size))
         w = IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=seed, scenario=self.scenario)
         t_sz = size / GRID_DIM
@@ -742,38 +762,52 @@ class IslandVisualizerApp:
             "POMPEII EVACUATION  >>", self.font_title,
             bg_color=(140, 66, 40), active_color=COLOR_RED, icon="volcano"
         )
+        self.card5_rect = pygame.Rect(26, 752, 1548, 84)
+        self.btn_choice_waterloo = UIButton(
+            (1196 + 35, 770, btn_w, 48),
+            "WATERLOO CHLORINE LEAK  >>", self.font_sub,
+            bg_color=(70, 120, 60), active_color=COLOR_GREEN, icon="launch"
+        )
 
     def _presets(self):
-        return {"volcano": VOLCANO_PRESETS, "titanic": TITANIC_PRESETS, "pompeii": POMPEII_PRESETS}.get(self.scenario, ISLAND_PRESETS)
+        return {"volcano": VOLCANO_PRESETS, "titanic": TITANIC_PRESETS, "pompeii": POMPEII_PRESETS, "waterloo": WATERLOO_PRESETS}.get(self.scenario, ISLAND_PRESETS)
 
     @staticmethod
     def _horizon_for(scenario):
-        return {"titanic": TITANIC_STEPS, "pompeii": POMPEII_STEPS}.get(scenario, DEFAULT_STEPS)
+        return {"titanic": TITANIC_STEPS, "pompeii": POMPEII_STEPS, "waterloo": WATERLOO_STEPS}.get(scenario, DEFAULT_STEPS)
 
     def _cutscene_player(self, scenario):
         player = PompeiiCutscenes if scenario == "pompeii" else CutscenePlayer
         return player(self.font_hero, self.font_small)
 
+    def _scenario_settings(self):
+        if self.scenario == "waterloo":
+            return WATERLOO_SETTINGS, self.waterloo_settings
+        return POMPEII_SETTINGS, self.pompeii_settings
+
     def _setting_text(self, key, label):
-        value = self.pompeii_settings[key]
+        value = self._scenario_settings()[1][key]
         if isinstance(value, bool):
             value = "On" if value else "Off"
         elif isinstance(value, int):
             value = f"{value:,}"
-        return f"{label}: {str(value).capitalize()}"
+        elif isinstance(value, float):
+            value = f"{value:g}"
+        return f"{label}: {str(value).replace('_', ' ').capitalize()}"
 
     def _build_pompeii_setting_buttons(self, top_y, col2_x):
         """Replaces the step-length row: Pompeii always runs its whole 32-hour timeline."""
         self.step_buttons = []
         width = 167
-        for i, (key, label, _) in enumerate(POMPEII_SETTINGS):
+        for i, (key, label, _) in enumerate(self._scenario_settings()[0]):
             rect = (col2_x + 24 + i * (width + 9), top_y + 395, width, 44)
             self.step_buttons.append(UIButton(rect, self._setting_text(key, label), self.font_small, active_color=COLOR_CYAN))
 
     def _cycle_pompeii_setting(self, index):
-        key, label, options = POMPEII_SETTINGS[index]
-        current = options.index(self.pompeii_settings[key])
-        self.pompeii_settings[key] = options[(current + 1) % len(options)]
+        rows, values = self._scenario_settings()
+        key, label, options = rows[index]
+        current = options.index(values[key])
+        values[key] = options[(current + 1) % len(options)]
         self.step_buttons[index].text = self._setting_text(key, label)
 
     def _build_home_buttons(self):
@@ -837,8 +871,8 @@ class IslandVisualizerApp:
             btn = UIButton((sx, st_y, btn_w, 44), f"{steps} Steps ({span})", self.font_sub, active_color=COLOR_CYAN)
             self.step_buttons.append(btn)
 
-        launch_text = "LAUNCH POMPEII SIMULATION" if self.scenario == "pompeii" else "LAUNCH SURVIVAL SIMULATION"
-        if self.scenario == "pompeii":
+        launch_text = {"pompeii": "LAUNCH POMPEII SIMULATION", "waterloo": "LAUNCH WATERLOO SIMULATION"}.get(self.scenario, "LAUNCH SURVIVAL SIMULATION")
+        if self.scenario in CROWD_SCENARIOS:
             self._build_pompeii_setting_buttons(top_y, col2_x)
 
         # 5. Launch Button
@@ -873,8 +907,8 @@ class IslandVisualizerApp:
 
     def _init_simulation(self):
         self._finish_worker()
-        engine_class = {"titanic": TitanicSimulation, "pompeii": PompeiiSimulation}.get(self.scenario, SimulationEngine)
-        extra = self.pompeii_settings if self.scenario == "pompeii" else {}
+        engine_class = {"titanic": TitanicSimulation, "pompeii": PompeiiSimulation, "waterloo": WaterlooSimulation}.get(self.scenario, SimulationEngine)
+        extra = self._scenario_settings()[1] if self.scenario in CROWD_SCENARIOS else {}
         self.engine = engine_class(
             seed=self.seed,
             mind_type=self.mind_type,
@@ -887,8 +921,8 @@ class IslandVisualizerApp:
         self.event_gen = self.engine.event_gen
         self.decide_fn = self.engine.decide_fn
         self.ship_view = ShipView(self) if self.scenario == "titanic" else None
-        self.city_view = CityView(self) if self.scenario == "pompeii" else None
-        self.split_panels = SplitPanels(self.engine) if self.scenario == "pompeii" else None
+        self.city_view = {"pompeii": CityView, "waterloo": SiteView}[self.scenario](self) if self.scenario in CROWD_SCENARIOS else None
+        self.split_panels = {"pompeii": SplitPanels, "waterloo": SitePanels}[self.scenario](self.engine) if self.scenario in CROWD_SCENARIOS else None
         self.show_split_panels = True
         wanted_player = PompeiiCutscenes if self.scenario == "pompeii" else CutscenePlayer
         if type(self.cutscene) is not wanted_player:
@@ -923,7 +957,7 @@ class IslandVisualizerApp:
         """Advances the simulation by one 2-hour step."""
         if self.scenario == "titanic":
             return self._titanic_step_forward()
-        if self.scenario == "pompeii":
+        if self.scenario in CROWD_SCENARIOS:
             return self._pompeii_start_step()
         if not self.agent.is_alive or self.step_idx >= self.max_steps:
             self.show_debrief_modal = True
@@ -1079,13 +1113,15 @@ class IslandVisualizerApp:
                     self._handle_event_choice_click(self.btn_choice_titanic.rect.center)
                 elif event.key in (pygame.K_4, pygame.K_KP4):
                     self._handle_event_choice_click(self.btn_choice_pompeii.rect.center)
-            elif event.key == pygame.K_f and self.app_state == "sim" and self.scenario in ("titanic", "pompeii"):
-                self._follow(next_role_citizen(self.engine) if self.scenario == "pompeii" else next_role_person(self.engine))
-            elif event.key == pygame.K_c and self.app_state == "sim" and self.scenario in ("titanic", "pompeii"):
+                elif event.key in (pygame.K_5, pygame.K_KP5):
+                    self._handle_event_choice_click(self.btn_choice_waterloo.rect.center)
+            elif event.key == pygame.K_f and self.app_state == "sim" and self.scenario in ("titanic", "pompeii", "waterloo"):
+                self._follow({"pompeii": next_role_citizen, "waterloo": next_role_patron}.get(self.scenario, next_role_person)(self.engine))
+            elif event.key == pygame.K_c and self.app_state == "sim" and self.scenario in ("titanic", "pompeii", "waterloo"):
                 self.cutscene.enabled = not self.cutscene.enabled
             elif event.key == pygame.K_m and self.app_state == "sim" and self.scenario == "pompeii":
                 self.city_view.toggle()
-            elif event.key == pygame.K_p and self.app_state == "sim" and self.scenario == "pompeii":
+            elif event.key == pygame.K_p and self.app_state == "sim" and self.scenario in CROWD_SCENARIOS:
                 self.show_split_panels = not self.show_split_panels
             elif event.key == pygame.K_SPACE and self.app_state == "sim":
                 self.is_paused = not self.is_paused
@@ -1123,7 +1159,7 @@ class IslandVisualizerApp:
 
             # Auto-stepping during unpaused simulation
             self.cutscene.update(dt)
-            if self.scenario == "pompeii":
+            if self.scenario in CROWD_SCENARIOS:
                 self._pompeii_poll_step()
             if self.app_state == "sim" and not self.is_paused and not self.show_debrief_modal and not self.show_history_overlay \
                     and not self.cutscene.active:
@@ -1191,6 +1227,8 @@ class IslandVisualizerApp:
                 return True
             if self.btn_choice_pompeii.check_hover(pos) or self.card4_rect.collidepoint(pos):
                 return True
+            if self.btn_choice_waterloo.check_hover(pos) or self.card5_rect.collidepoint(pos):
+                return True
             return self.btn_choice_island.check_hover(pos) or self.btn_choice_volcano.check_hover(pos) or c1_h or c2_h
 
         elif self.app_state == "home":
@@ -1255,8 +1293,15 @@ class IslandVisualizerApp:
         c2_hit = self.btn_choice_volcano.check_hover(pos) or (hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(pos))
         c3_hit = self.btn_choice_titanic.check_hover(pos) or self.card3_rect.collidepoint(pos)
         c4_hit = self.btn_choice_pompeii.check_hover(pos) or self.card4_rect.collidepoint(pos)
-        self.max_steps = self._horizon_for("titanic" if c3_hit else "pompeii" if c4_hit else "other")
-        if c4_hit:
+        c5_hit = self.btn_choice_waterloo.check_hover(pos) or self.card5_rect.collidepoint(pos)
+        self.max_steps = self._horizon_for("titanic" if c3_hit else "pompeii" if c4_hit else "waterloo" if c5_hit else "other")
+        if c5_hit:
+            self.scenario = "waterloo"
+            self._build_home_buttons()
+            self._init_simulation()
+            self.preview_mini_map = self._generate_mini_map(self.seed, size=300)
+            self.app_state = "home"
+        elif c4_hit:
             self.scenario = "pompeii"
             self._build_home_buttons()
             self._init_simulation()
@@ -1328,7 +1373,7 @@ class IslandVisualizerApp:
         step_choices = [12, 24, 36, 48]
         for i, btn in enumerate(self.step_buttons):
             if btn.check_hover(pos):
-                if self.scenario == "pompeii":
+                if self.scenario in CROWD_SCENARIOS:
                     self._cycle_pompeii_setting(i)
                 else:
                     self.max_steps = step_choices[i]
@@ -1394,7 +1439,7 @@ class IslandVisualizerApp:
             person = self.ship_view.pick_person(self.engine, pos, max(0, self.step_idx - 1))
             if person is not None:
                 self._follow(person)
-        elif pos[0] < MAP_SIZE and pos[1] >= 52 and self.scenario == "pompeii":
+        elif pos[0] < MAP_SIZE and pos[1] >= 52 and self.scenario in CROWD_SCENARIOS:
             person = self.city_view.pick_person(self.engine, pos)
             if person is not None:
                 self.split_panels.replace(person)
@@ -1525,6 +1570,7 @@ class IslandVisualizerApp:
 
         self._draw_titanic_card(c3_x, c_y, card_w, card_h, mouse_pos)
         self._draw_pompeii_card(c4_x, c_y, card_w, card_h, mouse_pos)
+        self._draw_waterloo_banner(mouse_pos)
 
         # -------------------------------------------------------------
         # Footer Technical Shortcut Bar
@@ -1536,9 +1582,20 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, foot_rect, border_radius=4)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, foot_rect, 1, border_radius=4)
 
-        tip_str = "[ 1 ] Island    [ 2 ] Volcano    [ 3 ] Titanic    [ 4 ] Pompeii    [ F11 ] Fullscreen"
+        tip_str = "[ 1 ] Island    [ 2 ] Volcano    [ 3 ] Titanic    [ 4 ] Pompeii    [ 5 ] Waterloo    [ F11 ] Fullscreen"
         hint_surf = self.font_mono.render(tip_str, True, COLOR_TEXT_HINT)
         self.canvas.blit(hint_surf, (footer_x + (footer_w - hint_surf.get_width()) // 2, footer_y + (footer_h - hint_surf.get_height()) // 2))
+
+    def _draw_waterloo_banner(self, mouse_pos: Tuple[int, int]):
+        rect = self.card5_rect
+        hover = rect.collidepoint(mouse_pos) or self.btn_choice_waterloo.check_hover(mouse_pos)
+        self.draw_card(rect.x, rect.y, rect.width, rect.height, border_color=COLOR_GREEN if hover else COLOR_CARD_BORDER, border_width=1)
+        self.draw_badge(rect.x + 24, rect.y + 12, "LOCAL: WATERLOO, ONTARIO", COLOR_GREEN)
+        self.canvas.blit(self.font_title.render("MOSES SPRINGER CHLORINE LEAK", True, COLOR_TEXT_MAIN), (rect.x + 290, rect.y + 12))
+        self.canvas.blit(self.font_small.render("A hypothetical evacuation at a real site. Most details of the 30 July 2012 leak are unknown, so the leak and head-count are labelled settings.",
+                                                True, COLOR_TEXT_MUTED), (rect.x + 24, rect.y + 52))
+        self.btn_choice_waterloo.check_hover(mouse_pos)
+        self.btn_choice_waterloo.draw(self.canvas)
 
     def _draw_pompeii_card(self, x: int, y: int, w: int, h: int, mouse_pos: Tuple[int, int]):
         hover = self.card4_rect.collidepoint(mouse_pos) or self.btn_choice_pompeii.check_hover(mouse_pos)
@@ -1616,7 +1673,7 @@ class IslandVisualizerApp:
         self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, 20))
 
         scen_tag = {"volcano": "VOLCANO ERUPTION EVACUATION", "titanic": "TITANIC EVACUATION, APRIL 1912",
-                    "pompeii": "POMPEII EVACUATION, AD 79"}.get(self.scenario, "ISLAND WILDERNESS SURVIVAL")
+                    "pompeii": "POMPEII EVACUATION, AD 79", "waterloo": "WATERLOO CHLORINE LEAK (HYPOTHETICAL)"}.get(self.scenario, "ISLAND WILDERNESS SURVIVAL")
         sub_str = f"EXPEDITION: {scen_tag}  •  2-QUBIT QUANTUM COGNITIVE ENGINE"
         sub_surf = self.font_sub.render(sub_str, True, (96, 56, 18))
         self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, 52))
@@ -1640,7 +1697,7 @@ class IslandVisualizerApp:
         leg_y = col1_y + 368
         pygame.draw.circle(self.canvas, COLOR_RED, (col1_x + 36, leg_y + 7), 5)
         pygame.draw.circle(self.canvas, COLOR_TEXT_MAIN, (col1_x + 36, leg_y + 7), 3)
-        legend_text = "Walled town. Each gate leads on to the region map" if self.scenario == "pompeii" else "Red dot: Initial survivor drop-in spawn coordinate"
+        legend_text = {"pompeii": "Walled town. Each gate leads on to the region map", "waterloo": "Real outlines. Doors, fence and inside are assumed"}.get(self.scenario, "Red dot: Initial survivor drop-in spawn coordinate")
         leg_surf = self.font_small.render(legend_text, True, COLOR_TEXT_MUTED)
         self.canvas.blit(leg_surf, (col1_x + 50, leg_y))
 
@@ -1652,6 +1709,8 @@ class IslandVisualizerApp:
 
         if self.scenario == "pompeii":
             temp_w = CityWorld(seed=self.seed)
+        elif self.scenario == "waterloo":
+            temp_w = SiteWorld(seed=self.seed)
         else:
             temp_w = ShipWorld(seed=self.seed) if self.scenario == "titanic" else IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=self.seed, scenario=self.scenario)
         land_tiles = sum(1 for row in temp_w.tiles for t in row if t in (1, 2, 3, 4))
@@ -1690,6 +1749,17 @@ class IslandVisualizerApp:
                 f"Event Mapping:    {self.pompeii_settings['event_mapping']}",
                 "Time Span:        About 32 Hours",
                 "Scenario Horizon: POMPEII",
+                "Contract Engine:  contracts.py (Frozen)"
+            ]
+        if self.scenario == "waterloo":
+            lines = [
+                f"Active Seed:      #{self.seed}",
+                "Grid Geometry:    40x40, 5 m per tile",
+                f"People:           {self.waterloo_settings['population']}",
+                f"Leak:             {self.waterloo_settings['leak_site'].replace('_', ' ').capitalize()}",
+                f"Event Mapping:    {self.waterloo_settings['event_mapping']}",
+                "Time Span:        Up to 2 Hours",
+                "Scenario Horizon: WATERLOO",
                 "Contract Engine:  contracts.py (Frozen)"
             ]
         for i, line in enumerate(lines):
@@ -1736,13 +1806,13 @@ class IslandVisualizerApp:
             s_btn.draw(self.canvas)
 
         # 3. Simulation Duration
-        st_text = "3. Scenario Settings (Each One Changes Results)" if self.scenario == "pompeii" else "3. Simulation Step Horizon (2 Hours per Turn)"
+        st_text = "3. Scenario Settings (Each One Changes Results)" if self.scenario in CROWD_SCENARIOS else "3. Simulation Step Horizon (2 Hours per Turn)"
         st_lbl = self.font_title.render(st_text, True, COLOR_TEXT_MAIN)
         self.canvas.blit(st_lbl, (col2_x + 24, col2_y + 365))
 
         step_choices = [12, 24, 36, 48]
         for i, st_btn in enumerate(self.step_buttons):
-            st_btn.is_active = self.scenario != "pompeii" and (self.max_steps == step_choices[i])
+            st_btn.is_active = self.scenario not in CROWD_SCENARIOS and (self.max_steps == step_choices[i])
             st_btn.check_hover(mouse_pos)
             st_btn.draw(self.canvas)
 
@@ -1771,6 +1841,13 @@ class IslandVisualizerApp:
                 "  * Mapping: The column and falling pumice are translated into the mind's events. Results depend strongly on this.",
                 "  * Caution: The default settings overstate escape. A demonstration, not a reconstruction. See docs/POMPEII_SOURCES.md."
             ]
+        if self.scenario == "waterloo":
+            bullet_lines = [
+                "  * Same Mind: Everyone uses the same unedited mind. Role is never passed to it. Each person decides once a minute.",
+                "  * Warning: People learn by smell, from people nearby, from others hurrying, and from an alarm a staff member triggers.",
+                "  * Exposure: Reported against EPA planning levels. These do not predict injury, and nobody is scripted to die.",
+                "  * Caution: A hypothetical at a real site, not a reconstruction. Leak, head-count and inside are assumed. See docs/WATERLOO_SOURCES.md."
+            ]
         for i, bl in enumerate(bullet_lines):
             self.canvas.blit(self.font_body.render(bl, True, COLOR_TEXT_MUTED), (hints_box.x + 18, hints_box.y + 40 + i * 26))
 
@@ -1790,7 +1867,10 @@ class IslandVisualizerApp:
         self.draw_atmosphere()
 
         # 3. Dynamic Animated Character
-        if self.scenario != "pompeii" or self._focus_is_on_shown_map():
+        if self.scenario == "waterloo":
+            if self.agent.status == "site":
+                self.draw_character()
+        elif self.scenario != "pompeii" or self._focus_is_on_shown_map():
             self.draw_character()
 
         # 4. Top Navigation Bar (Integrated Over Map)
@@ -1850,7 +1930,7 @@ class IslandVisualizerApp:
         if self.scenario == "titanic":
             self.ship_view.draw(self)
             return
-        if self.scenario == "pompeii":
+        if self.scenario in CROWD_SCENARIOS:
             self.city_view.draw(self)
             return
         t_time = time.time()
@@ -2107,6 +2187,9 @@ class IslandVisualizerApp:
                 return
             tile_name = {0: "Outside or wall", 1: "Street or open", 2: "Garden", 4: "Building"}.get(tile_type, "Unknown")
             desc = f"{round(self.world.elevation[ty][tx])} m above the sea"
+        if self.scenario == "waterloo":
+            tile_name = "Pool" if (tx, ty) in self.world.pool_tiles else {0: "Creek", 1: "Open ground", 3: "Wall, fence or building", 4: "Indoors"}.get(tile_type, "Unknown")
+            desc = f"{self.engine.chlorine.ppm_at(max(0, self.step_idx - 1), (tx, ty)):.2f} ppm chlorine"
         if self.scenario == "titanic":
             tile_name = {0: "Sea or hull", 1: "Open deck", 3: "Stairs", 4: "Interior"}.get(tile_type, "Unknown")
             desc = "Flooded" if (tx, ty) in self.world.flooded else f"{round(self.world.elevation[ty][tx])} m above the sea"
@@ -2129,7 +2212,7 @@ class IslandVisualizerApp:
     def draw_dashboard(self):
         panel_x = MAP_SIZE + 16
         panel_w = WINDOW_WIDTH - MAP_SIZE - 32
-        if self.scenario == "pompeii" and self.show_split_panels:
+        if self.scenario in CROWD_SCENARIOS and self.show_split_panels:
             self.split_panels.draw(self.canvas, panel_x, 12, panel_w, WINDOW_HEIGHT - 24,
                                    (self.font_title, self.font_body, self.font_small))
             return
@@ -2160,6 +2243,8 @@ class IslandVisualizerApp:
         step_txt = f"Day {self.agent.day}  |  {self.agent.hour:02d}:00  (Step {self.step_idx}/{self.max_steps})"
         if self.scenario == "pompeii":
             step_txt = f"{clock_text(max(0, self.step_idx - 1))}  (Step {self.step_idx}/{self.max_steps})"
+        if self.scenario == "waterloo":
+            step_txt = f"{site_clock(max(0, self.step_idx - 1))}  (Step {self.step_idx}/{self.max_steps})"
         if self.scenario == "titanic":
             minutes = 23 * 60 + 30 + max(0, self.step_idx - 1) * 5
             step_txt = f"{minutes // 60 % 24:02d}:{minutes % 60:02d} ship's time  (Step {self.step_idx}/{self.max_steps})"
@@ -2202,6 +2287,8 @@ class IslandVisualizerApp:
             inv_str = f"{self.agent.label}   |   Lifebelt: {'Yes' if inv.get('lifebelt') else 'No'}"
         if self.scenario == "pompeii":
             inv_str = f"{self.agent.label}   |   Knows of danger: {'Yes' if self.agent.knows_danger else 'No'}"
+        if self.scenario == "waterloo":
+            inv_str = f"{self.agent.label}   |   Knows of danger: {'Yes' if self.agent.knows_danger else 'No'}"
         self.canvas.blit(self.font_body.render(inv_str, True, COLOR_TEXT_MUTED), (panel_x + 16, curr_y + 185))
 
         curr_y += card1_h + 12
@@ -2217,10 +2304,12 @@ class IslandVisualizerApp:
             ev_upper = STORY_TEXT.get(self.agent.story_event, "NOTHING NEW").upper()
         if self.scenario == "pompeii":
             ev_upper = POMPEII_STORY.get(self.agent.story_event, "NOTHING NEW").upper()
+        if self.scenario == "waterloo":
+            ev_upper = WATERLOO_STORY.get(self.agent.story_event, "NOTHING NEW").upper()
         ev_color = COLOR_RED if ev_upper in ("STORM", "INJURY", "ANIMAL", "ERUPTION") else (COLOR_CYAN if ev_upper in ("COLD_NIGHT", "TREMOR") else COLOR_GREEN)
         self.draw_badge(panel_x + 16, curr_y + 38, f"ACTIVE HAZARD: {ev_upper}", ev_color)
 
-        if self.scenario in ("volcano", "titanic", "pompeii") and hasattr(self.engine, "volcano"):
+        if self.scenario in ("volcano", "titanic", "pompeii", "waterloo") and hasattr(self.engine, "volcano"):
             phase = self.engine.volcano.phases[max(0, self.step_idx - 1)]
             phase_col = COLOR_RED if phase == "erupting" else (COLOR_ORANGE if phase == "escalating" else COLOR_GREEN)
             self.draw_badge(panel_x + 240, curr_y + 38, f"PHASE: {phase.upper()}", phase_col)
@@ -2237,6 +2326,9 @@ class IslandVisualizerApp:
         if self.scenario == "pompeii":
             place = {"city": "In town", "road": "On the roads", "escaped": "Escaped"}[self.agent.status]
             pos_txt = f"{place}  |  {self.current_decision.get('action_label', 'Waiting')}"
+        if self.scenario == "waterloo":
+            place = "Off the site" if self.agent.status == "out" else "On the site"
+            pos_txt = f"{place}  |  {self.current_decision.get('action_label', 'Waiting')}"
         self.canvas.blit(self.font_body.render(pos_txt, True, COLOR_TEXT_MUTED), (panel_x + 16, curr_y + 72))
 
         clean_events = [e.upper() for e in self.agent.recent_events if e != "none"] or ["NONE"]
@@ -2244,7 +2336,7 @@ class IslandVisualizerApp:
         hist_display = f"Order Effect Chain: [ {history_str} ]"
         if self.scenario == "titanic":
             hist_display = f"Mind Inputs: [ {history_str} ]"
-        if self.scenario == "pompeii":
+        if self.scenario in CROWD_SCENARIOS:
             hist_display = f"Mind Inputs: [ {history_str} ]"
         max_h_w = panel_w - 32
         if self.font_mono.size(hist_display)[0] > max_h_w:
@@ -2351,6 +2443,8 @@ class IslandVisualizerApp:
             return self._draw_titanic_debrief(mouse_pos, mx, my, mw, mh, border_col)
         if self.scenario == "pompeii":
             return self._draw_pompeii_debrief(mouse_pos, mx, my, mw, mh, border_col)
+        if self.scenario == "waterloo":
+            return self._draw_waterloo_debrief(mouse_pos, mx, my, mw, mh, border_col)
 
         m_title = "MISSION COMPLETE: 72h SURVIVAL MASTERED" if survived else f"MISSION OVER: SURVIVOR PERISHED ({str(self.agent.cause_of_death).upper()})"
         m_color = COLOR_GOLD if survived else COLOR_RED
@@ -2410,6 +2504,40 @@ class IslandVisualizerApp:
     # -------------------------------------------------------------------------
     # Render Full Action History Overlay (Tab / Log Key)
     # -------------------------------------------------------------------------
+    def _draw_waterloo_debrief(self, mouse_pos, mx, my, mw, mh, border_col):
+        focus, engine = self.agent, self.engine
+        counts, table, timing = engine.counts(), engine.outcome_table(), engine.timing()
+        title = f"{focus.label} LEFT THE SITE" if focus.status == "out" else f"{focus.label} IS STILL ON SITE"
+        surf = self.font_hero.render(title, True, border_col)
+        self.canvas.blit(surf, (mx + (mw - surf.get_width()) // 2, my + 22))
+        sub = self.font_sub.render(f"This run: {counts['off_site']} of {len(engine.people)} off the site.  Mapping {engine.event_mapping}.  "
+                                   f"Mind {self.mind_type}.  Seed #{self.seed}.", True, COLOR_TEXT_MUTED)
+        self.canvas.blit(sub, (mx + (mw - sub.get_width()) // 2, my + 58))
+        box = pygame.Rect(mx + 36, my + 84, mw - 72, 268)
+        pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, box, border_radius=4)
+        pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, box, 1, border_radius=4)
+        head = self.font_mono.render(f"{'Role':26s}{'Off site':12s}{'AEGL-1':8s}{'AEGL-2':8s}{'AEGL-3':8s}", True, COLOR_TEXT_HINT)
+        self.canvas.blit(head, (box.x + 22, box.y + 10))
+        y = box.y + 32
+        for role, row in table.items():
+            levels = row["levels"]
+            line = f"{role.capitalize():26s}{str(row['off_site']) + ' of ' + str(row['total']):12s}{levels['1']:<8d}{levels['2']:<8d}{levels['3']:<8d}"
+            self.canvas.blit(self.font_mono.render(line, True, COLOR_TEXT_MAIN), (box.x + 22, y))
+            y += 20
+        def seconds(value):
+            return "not reached" if value is None else f"{value} s"
+        line = f"After the leak starts: first knew {seconds(timing['first_knew'])}, alarm {seconds(timing['alarm'])}, half off site {seconds(timing['half_off_site'])}"
+        self.canvas.blit(self.font_small.render(line, True, COLOR_TEXT_MUTED), (box.x + 22, y + 8))
+        self.canvas.blit(self.font_small.render("AEGL columns count people whose highest level was that one. EPA planning limits, not predictions of injury.",
+                                                True, COLOR_TEXT_HINT), (box.x + 22, y + 34))
+        self.canvas.blit(self.font_small.render("A hypothetical at a real site, not a reconstruction. The real head-count, leak and injuries are unknown; see docs/WATERLOO_SOURCES.md.",
+                                                True, COLOR_TEXT_HINT), (box.x + 22, y + 54))
+        for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_scenario, self.btn_modal_home):
+            button.check_hover(mouse_pos)
+            button.draw(self.canvas)
+        self.btn_modal_close.check_hover(mouse_pos)
+        self.btn_modal_close.draw(self.canvas)
+
     def _draw_pompeii_debrief(self, mouse_pos, mx, my, mw, mh, border_col):
         focus, engine = self.agent, self.engine
         counts, table, deaths = engine.counts(), engine.outcome_table(), engine.death_breakdown()
