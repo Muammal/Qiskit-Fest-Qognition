@@ -1,0 +1,10 @@
+# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+
+[[parameter]]
+id = "ship.water_density"
+value = 1025.0
+unit = "kg/m**3"
+valid_min = 990.0
+valid_max = 1040.0
+role = "input"
+status = "assumption"

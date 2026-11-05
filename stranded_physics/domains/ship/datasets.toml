@@ -1,0 +1,40 @@
+# One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+
+[[dataset]]
+id = "british_report_gutenberg"
+kind = "official inquiry report"
+url = "https://www.gutenberg.org/cache/epub/39415/pg39415-images.html"
+retrieved_utc = "2026-11-05T15:40:00Z"
+sha256 = "c0d17bccb4dc94cfc46b0c6cf3a169b38bbb8b0b63062df09aac304431141666"
+licence = "Project Gutenberg, public domain in the USA, stated on the page; to be read in T-104"
+licence_confirmed = false
+citation = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 30 July 1912, as printed by the US Senate"
+split = "reference"
+content_check = "min_bytes:10000"
+notes = "file: artifacts/physics/raw/titanic/british_report_gutenberg_39415.html"
+
+[[dataset]]
+id = "wilding_day19"
+kind = "inquiry testimony"
+url = "https://www.titanicinquiry.org/BOTInq/BOTInq19Wilding03.php"
+retrieved_utc = "2026-11-05T15:40:00Z"
+sha256 = "b43d5b0fb65e6cdbc68468459a4cd2a2a38da9681001c548e20913eb44e6e947"
+licence = "Licence not confirmed; 1912 testimony, to be read in T-104"
+licence_confirmed = false
+citation = "British Wreck Commissioner's Inquiry, day 19, testimony of Edward Wilding"
+split = "reference"
+content_check = "min_bytes:10000"
+notes = "file: artifacts/physics/raw/titanic/wilding_day19_03.html"
+
+[[dataset]]
+id = "wilding_day20"
+kind = "inquiry testimony"
+url = "https://www.titanicinquiry.org/BOTInq/BOTInq20Wilding03.php"
+retrieved_utc = "2026-11-05T15:40:00Z"
+sha256 = "72d4eefe082c76f4894f8ad3574f85ae319b6f3a1e517f3675410e5e28110cd4"
+licence = "Licence not confirmed; 1912 testimony, to be read in T-104"
+licence_confirmed = false
+citation = "British Wreck Commissioner's Inquiry, day 20, testimony of Edward Wilding"
+split = "reference"
+content_check = "min_bytes:10000"
+notes = "file: artifacts/physics/raw/titanic/wilding_day20_03.html"

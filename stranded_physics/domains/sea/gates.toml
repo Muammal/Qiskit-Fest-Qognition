@@ -1,0 +1,17 @@
+# One [[gate]] per check.
+
+[[gate]]
+id = "sea.records_and_units"
+title = "Sea parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/sea'); load_datasets(p/'datasets.toml', 'sea'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/sea/datasets.toml", "stranded_physics/domains/sea/params.toml"]
+required = true
+
+[[gate]]
+id = "sea-model"
+title = "Immersion rules hold: colder is worse, time is worse, a lifebelt helps, repeatable"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/sea/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/sea/*.py", "stranded_physics/domains/sea/params.toml", "stranded_physics/domains/sea/tests/*.py"]
+required = false
