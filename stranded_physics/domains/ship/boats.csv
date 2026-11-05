@@ -1,0 +1,21 @@
+name,capacity,launch_after_impact_min,from_record,quote
+No. 1,40,90,true,1.10
+No. 2,40,125,true,1.45
+No. 3,65,80,true,1.0
+No. 4,65,136,true,1.56
+No. 5,65,75,true,12.55
+No. 6,65,75,true,12.55
+No. 7,65,65,true,at about 12.45 Mr. Murdoch gave the order to lower No. 7 boat (on the starboard side) to the water.
+No. 8,65,90,true,1.10
+No. 9,65,100,true,1.20
+No. 10,65,100,true,1.20
+No. 11,65,105,true,1.25
+No. 12,65,105,true,1.25
+No. 13,65,115,true,1.35
+No. 14,65,110,true,1.30
+No. 15,65,115,true,1.35
+No. 16,65,115,true,1.35
+A,47,150,false,
+B,47,155,false,
+C,47,120,true,1.40
+D,47,145,true,2.05

@@ -37,6 +37,14 @@ CANONICAL: dict[str, tuple[str, str]] = {
     "lahar.depth": ("m", "frames"),
     "lava.footprint": ("dimensionless", "frames"),
     "gas.so2_concentration": ("ug/m**3", "frames"),
+    "ship.water_mass": ("kg", "series"),  # Water inside the hull.
+    "ship.afloat": ("dimensionless", "series"),
+    "ship.impact": ("dimensionless", "series"),  # 1 on the frame people feel the collision.
+    "ship.alarm": ("dimensionless", "series"),  # 1 from the frame the crew start calling people to the boats.
+    "ship.submerged": ("dimensionless", "frames"),  # 1 where the sea has reached the deck people stand on.
+    "boats.capacity": ("dimensionless", "static"),  # Seats in the boat at each station cell, else 0.
+    "boats.launch": ("s", "arrival"),  # When the boat at each station cell leaves. Infinity where there is none.
+    "sea.temperature": ("degC", "series"),
     "exposure.roof_failure": ("dimensionless", "frames"),  # Share of ordinary roofs that would have failed under the ash so far.
 }
 

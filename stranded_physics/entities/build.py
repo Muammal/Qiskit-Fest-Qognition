@@ -42,7 +42,7 @@ def _on_map(entity: EntitySpec) -> bool:
 
 def _check_timing(scenario: ScenarioFile, entity: EntitySpec) -> None:
     """Refused here rather than in the middle of a build, so the builder can say so at once."""
-    settings, hours = entity.settings, scenario.hours - scenario.step_hours
+    settings, hours = entity.settings, scenario.hours - scenario.step_s / SECONDS_PER_HOUR
     if entity.source == "replay":
         return
     for name in ("onset_hours", "closest_hours"):
@@ -56,6 +56,8 @@ def check_scenario(scenario: ScenarioFile) -> None:
     """Every entity can be built, and everything each one depends on is present."""
     from stranded_physics.packs.st_vincent_2021 import CONTRACT_GRID
     present = {entity.kind for entity in scenario.entities}
+    if "ship" in present and present & {"terrain", "person", "group", "eruption", "shelter"}:
+        raise InterfaceError("A ship is its own map, so it can't share a scenario with land, or with people placed on land. Use passengers")
     for entity in scenario.entities:
         check_entity(entity)
         missing = set(KINDS[entity.kind].needs) - present
@@ -101,7 +103,7 @@ def to_spec(scenario: ScenarioFile, seed: int = 1) -> ScenarioSpec:
     """A catalogue entity samples from this seed, so give build_pack the same one."""
     from stranded_physics.packs.st_vincent_2021 import CONTRACT_GRID, place_sites
     check_scenario(scenario)
-    time = TimeAxis(scenario.start_utc, scenario.step_hours * SECONDS_PER_HOUR, scenario.hours // scenario.step_hours)
+    time = TimeAxis(scenario.start_utc, scenario.step_s, round(scenario.hours * SECONDS_PER_HOUR / scenario.step_s))
     world = World(time, seed, vent=next((vent_of(e) for e in scenario.entities if e.kind == "eruption"), None))
     domains = []
     for kind in BUILD_ORDER:
@@ -119,7 +121,10 @@ def to_spec(scenario: ScenarioFile, seed: int = 1) -> ScenarioSpec:
             if found:
                 sites[what] = [*sites.get(what, []), *found]
     local_hour = (time.t0_utc.hour + scenario.local_utc_offset) % 24
-    return ScenarioSpec(scenario.id, world.grid, CONTRACT_GRID, time, local_hour, tuple(domains), sites)
+    if world.ship is not None:
+        from stranded_physics.runtime.ship import ship_sites
+        sites = ship_sites(scenario, world)
+    return ScenarioSpec(scenario.id, world.grid, world.contract_grid or CONTRACT_GRID, time, local_hour, tuple(domains), sites)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -141,6 +146,12 @@ def main(argv: list[str] | None = None) -> int:
     from stranded_physics.runtime.group import play_people
     pack = build_pack(to_spec(scenario, args.seed), args.seed)
     check_events_happen(pack)
+    if pack.has("ship.afloat"):
+        from stranded_physics.runtime.ship import play_ship, summary
+        print(f"{scenario.id}: pack {pack.content_hash[:12]}")
+        for label, share in summary(play_ship(pack, scenario)).items():
+            print(f"  {label}: {share:.3f}")
+        return 0
     people = people_of(scenario)
     if not people:
         print(f"{scenario.id}: built pack {pack.content_hash[:12]}, with fields {sorted(pack.header['fields'])}. It has no people, so there is nothing to play.")

@@ -14,7 +14,6 @@ from stranded_physics.domains.agent.walking import TravelField, travel_field, wa
 from stranded_physics.runtime.body import AgentBody, to_state
 from stranded_physics.runtime.perception import perceive
 
-STEP_MINUTES = 120
 SUBSTEP_MINUTES = 5  # Hazard contact is checked at this resolution along a walk.
 DRINK_REACH_M = 400.  # assumption: close enough to a stream to drink from it.
 FOOD_REACH_M = 400.  # assumption: close enough to gather food.
@@ -22,7 +21,8 @@ SHELTER_REACH_M = 400.  # assumption: close enough to count as sheltered.
 WOOD_REACH_M = 400.  # assumption: close enough to gather wood.
 WOOD_PER_SHELTER = 2  # assumption: carried over from the fictional island.
 MOST_WOOD_CARRIED = 4  # assumption: carried over from the fictional island's food limit.
-INJURY_STEPS = 12  # assumption: a day before an injured person walks normally again. Resting heals twice as fast.
+INJURY_STEPS = 12  # assumption: in two-hour steps, a day before an injured person walks normally again. Resting heals twice as fast.
+TWO_HOURS_MINUTES = 120
 LUCK_STREAM = 603  # Keeps who survives apart from every other random stream, so a choice of mind changes nothing else.
 GALE_M_S = 17.2  # Beaufort force 8, from memory: strong enough for a person to notice and act on.
 HURRICANE_M_S = 32.7  # Beaufort force 12, from memory. assumption: an unsheltered person is injured at this wind.
@@ -125,6 +125,7 @@ class PackSimulation:
         self.warned = False
         self.built: list[XY] = []  # Shelters this person has built. Only they use them.
         self.injury_steps_left = 0
+        self.step_minutes = round(pack.time.dt_s / 60.)
         self.luck = np.random.default_rng([pack.seed, person, LUCK_STREAM])
         self.flow_met_on_step: int | None = None  # A flow is one event in a step, however many substeps it covers.
         self.roof_failed_share = 0.  # The roof failure share at this person's shelter when last checked.
@@ -179,7 +180,7 @@ class PackSimulation:
         grid = self.pack.grid
         spare_s = 0.
         seconds, metres, climbed = 0., 0., 0.
-        for minute in range(0, STEP_MINUTES, SUBSTEP_MINUTES):
+        for minute in range(0, self.step_minutes, SUBSTEP_MINUTES):
             clock = t_s + minute * 60.
             cell = grid.locate(self.agent.xy_m)
             if goal is not None and cell is not None:
@@ -209,7 +210,7 @@ class PackSimulation:
         speed = metres / seconds if seconds else 0.
         grade = 100. * climbed / metres if metres else 0.
         water = self._walk_goal("drink")
-        body.balance = advance(body.balance, STEP_MINUTES / 60., seconds / 3600., pandolf_watts(speed, grade) if seconds else 0.,
+        body.balance = advance(body.balance, self.step_minutes / 60., seconds / 3600., pandolf_watts(speed, grade) if seconds else 0.,
                                drank=bool(action == "drink" and water and math.dist(water, body.xy_m) < DRINK_REACH_M), rested=action == "rest",
                                ate_kcal=setting("meal_energy", "kcal") if self._within("food", FOOD_REACH_M) and action == "forage" else 0.)
         self._use_materials(action)
@@ -223,7 +224,9 @@ class PackSimulation:
             self.warned = True
             body.safety = max(0., body.safety - .1)
             body.stress = min(1., body.stress + .08)
-        body.hour += 2
+        body.minute += self.step_minutes
+        body.hour += body.minute // 60
+        body.minute %= 60
         if body.hour >= 24:
             body.hour, body.day = body.hour - 24, body.day + 1
         cause = cause_of_death(body.balance)
@@ -251,7 +254,7 @@ class PackSimulation:
             return
         t_s = len(self.steps) * self.pack.time.dt_s
         body, load = self.agent, self.pack.sample("tephra.deposit_load", self.agent.xy_m, t_s)
-        tiredness = ash_energy_cost_per_hour(load, self._sheltered()) * STEP_MINUTES / 60. * setting("fatigue_span", "kcal")
+        tiredness = ash_energy_cost_per_hour(load, self._sheltered()) * self.step_minutes / 60. * setting("fatigue_span", "kcal")
         body.balance = replace(body.balance, fatigue_kcal=body.balance.fatigue_kcal + float(tiredness))
         if self.pack.has("exposure.roof_failure") and self._sheltered():
             share = self.pack.sample("exposure.roof_failure", self.agent.xy_m, t_s)
@@ -275,7 +278,7 @@ class PackSimulation:
             stock["tools"] += 1
 
     def _injure(self) -> None:
-        self.agent.injured, self.injury_steps_left = True, INJURY_STEPS
+        self.agent.injured, self.injury_steps_left = True, round(INJURY_STEPS * TWO_HOURS_MINUTES / self.step_minutes)
 
     def _heal(self, action: str) -> None:
         if self.agent.injured:

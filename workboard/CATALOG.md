@@ -14,7 +14,9 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 | lahar | model | unclaimed | 0 | 5 | LAHARZ, then shallow water |
 | lava | model | unclaimed | 3 | 8 | dome footprint |
 | pdc | model | unclaimed | 3 | 9 | energy cone, then depth-averaged flow |
+| sea | model | unclaimed | 0 | 8 | temperature and time to incapacitation |
 | seismic | data_only | unclaimed | 2 | 1 | none yet |
+| ship | model | unclaimed | 6 | 107 | compartment flooding on a box hull |
 | storm | model | unclaimed | 2 | 25 | Holland 1980 wind profile |
 | tephra | model | unclaimed | 0 | 27 | Suzuki source with Gaussian fallout |
 | terrain | model | unclaimed | 4 | 11 | hydrological routing on the real DEM |
@@ -188,6 +190,15 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 - Primary paper on the first flow timing
 - FlowDat or similar runout statistics
 
+## sea: The sea and immersion in it
+
+**Owns:** water temperature, survival in the water
+
+**Must not own:** the ship
+
+**Still wanted:**
+- Published immersion survival data near 0 C
+
 ## seismic: Earthquakes
 
 **Owns:** earthquake catalogues near volcanoes, felt reports
@@ -201,6 +212,25 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 **Still wanted:**
 - Local seismic network catalogue (UWI SRC); global catalogues miss small local swarms
+
+## ship: Ships, hull flooding and lifeboats
+
+**Owns:** hull, compartments, flooding, sinking, lifeboat seats and launch times
+
+**Must not own:** people and their decisions
+
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| british_report_gutenberg | official inquiry report | reference | no | file: artifacts/physics/raw/titanic/british_report_gutenberg_39415.html |
+| wilding_day19 | inquiry testimony | reference | no | file: artifacts/physics/raw/titanic/wilding_day19_03.html |
+| wilding_day20 | inquiry testimony | reference | no | file: artifacts/physics/raw/titanic/wilding_day20_03.html |
+| bot_report_saved | official inquiry report | reference | no | file: artifacts/physics/raw/titanic/bot_report_saved.html. Agrees with the Gutenberg copy on the saved figures |
+| wormstedt_revised | revised launch times | reference | no | file: artifacts/physics/raw/titanic/wormstedt_revised.html. All times are approximate, as the page says. Boats A and B floated off rather than being lowered |
+| wikipedia_sinking | encyclopedia article | reference | no | file: artifacts/physics/raw/titanic/wikipedia_sinking.html. Secondary, for cross-checks only: water at -2 C, and modern counts of 712 saved of 2,208 |
+
+**Still wanted:**
+- Boat-by-boat occupancy
+- Wreck survey of the actual damage
 
 ## storm: Tropical storms and cyclones
 

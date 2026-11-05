@@ -1,0 +1,79 @@
+# One [[dataset]] per source: id, kind, url, retrieved_utc, sha256, licence, licence_confirmed, citation, split, content_check, notes.
+
+[[dataset]]
+id = "british_report_gutenberg"
+kind = "official inquiry report"
+url = "https://www.gutenberg.org/cache/epub/39415/pg39415-images.html"
+retrieved_utc = "2026-11-05T15:40:00Z"
+sha256 = "c0d17bccb4dc94cfc46b0c6cf3a169b38bbb8b0b63062df09aac304431141666"
+licence = "Project Gutenberg, public domain in the USA, stated on the page; to be read in T-104"
+licence_confirmed = false
+citation = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 30 July 1912, as printed by the US Senate"
+split = "reference"
+content_check = "min_bytes:10000"
+notes = "file: artifacts/physics/raw/titanic/british_report_gutenberg_39415.html"
+
+[[dataset]]
+id = "wilding_day19"
+kind = "inquiry testimony"
+url = "https://www.titanicinquiry.org/BOTInq/BOTInq19Wilding03.php"
+retrieved_utc = "2026-11-05T15:40:00Z"
+sha256 = "b43d5b0fb65e6cdbc68468459a4cd2a2a38da9681001c548e20913eb44e6e947"
+licence = "Licence not confirmed; 1912 testimony, to be read in T-104"
+licence_confirmed = false
+citation = "British Wreck Commissioner's Inquiry, day 19, testimony of Edward Wilding"
+split = "reference"
+content_check = "min_bytes:10000"
+notes = "file: artifacts/physics/raw/titanic/wilding_day19_03.html"
+
+[[dataset]]
+id = "wilding_day20"
+kind = "inquiry testimony"
+url = "https://www.titanicinquiry.org/BOTInq/BOTInq20Wilding03.php"
+retrieved_utc = "2026-11-05T15:40:00Z"
+sha256 = "72d4eefe082c76f4894f8ad3574f85ae319b6f3a1e517f3675410e5e28110cd4"
+licence = "Licence not confirmed; 1912 testimony, to be read in T-104"
+licence_confirmed = false
+citation = "British Wreck Commissioner's Inquiry, day 20, testimony of Edward Wilding"
+split = "reference"
+content_check = "min_bytes:10000"
+notes = "file: artifacts/physics/raw/titanic/wilding_day20_03.html"
+
+[[dataset]]
+id = "bot_report_saved"
+kind = "official inquiry report"
+url = "https://www.titanicinquiry.org/BOTInq/BOTReport/botRepSaved.php"
+retrieved_utc = "2026-11-05T16:00:00Z"
+sha256 = "b53d0fe3fce3eb3cbe9496779ffb4de2f0f874b75b70e30af428e907232abf09"
+licence = "Licence not confirmed; 1912 report, to be read in T-104"
+licence_confirmed = false
+citation = "British Wreck Commissioner's report, Numbers Saved"
+split = "reference"
+content_check = "min_bytes:2000"
+notes = "file: artifacts/physics/raw/titanic/bot_report_saved.html. Agrees with the Gutenberg copy on the saved figures"
+
+[[dataset]]
+id = "wormstedt_revised"
+kind = "revised launch times"
+url = "https://wormstedt.com/Titanic/revised.html"
+retrieved_utc = "2026-11-05T16:00:00Z"
+sha256 = "0c8e407c973f21c1948d1b28d5b5d45027c682b4242c810cdc7247c94cb2e785"
+licence = "Licence not confirmed, to be read in T-104"
+licence_confirmed = false
+citation = "Wormstedt, Fitch and Behe, Titanic: The Lifeboat Launching Sequence Re-Examined"
+split = "reference"
+content_check = "min_bytes:2000"
+notes = "file: artifacts/physics/raw/titanic/wormstedt_revised.html. All times are approximate, as the page says. Boats A and B floated off rather than being lowered"
+
+[[dataset]]
+id = "wikipedia_sinking"
+kind = "encyclopedia article"
+url = "https://en.wikipedia.org/wiki/Sinking_of_the_Titanic"
+retrieved_utc = "2026-11-05T16:00:00Z"
+sha256 = "83283d94f08794b9f20aaa91e1f62aef8067d896f39b0da1c15997dbd3002db1"
+licence = "CC BY-SA, to be read in T-104"
+licence_confirmed = false
+citation = "Wikipedia, Sinking of the Titanic"
+split = "reference"
+content_check = "min_bytes:2000"
+notes = "file: artifacts/physics/raw/titanic/wikipedia_sinking.html. Secondary, for cross-checks only: water at -2 C, and modern counts of 712 saved of 2,208"
