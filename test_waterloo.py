@@ -1,8 +1,10 @@
 """Tests for the Waterloo chlorine leak scenario."""
 import json
 
+import numpy as np
 import pytest
 
+from engine.chlorine import LEAK_SITES, LEAK_START_STEP, SOURCE_PPM, ChlorineModel, exposure_level, wind_at
 from engine.site import BUILDING, DOORS, POOL, POOL_GATES, PROVENANCE, SITE_M_PER_TILE, SiteWorld
 from engine.world import IslandWorld
 
@@ -100,3 +102,79 @@ def test_every_provenance_entry_has_a_status_and_sourced_ones_have_a_link():
         assert entry["status"] in {"sourced", "assumption", "unconfirmed"}
         if entry["status"] == "sourced":
             assert entry["url"].startswith("https://")
+
+
+# --- Chlorine model ---
+
+@pytest.fixture(scope="module")
+def leak(world):
+    return ChlorineModel(1, world)
+
+
+def test_nothing_before_the_leak_and_a_two_hour_run(leak):
+    assert leak.horizon == 721
+    assert leak.ppm[:LEAK_START_STEP].max() == 0
+    assert leak.world_events[LEAK_START_STEP] == "chlorine_leak"
+    assert leak.world_events.count("chlorine_leak") == 1
+
+
+def test_source_holds_its_level_only_while_leaking_then_fades(leak):
+    x, y = leak.source
+    assert leak.ppm[leak.leak_end_step - 1, y, x] == pytest.approx(SOURCE_PPM, rel=.15)
+    assert leak.ppm[-1].max() < leak.ppm[leak.leak_end_step - 1].max() / 2
+
+
+def test_forecast_never_depends_on_the_seed(world):
+    assert (ChlorineModel(1, world).ppm == ChlorineModel(2, world).ppm).all()
+
+
+def test_solid_walls_hold_no_gas(world, leak):
+    for x, y in world.nearby_building_tiles:
+        assert leak.ppm[:, y, x].max() == 0
+
+
+def test_gas_only_gets_outside_through_doors(world):
+    # A leak inside the north end: gas is always stronger in the doorway than just beyond it.
+    model = ChlorineModel(1, world, leak_site="north_end")
+    x, y = world.doors["north"]
+    during = range(LEAK_START_STEP, model.leak_end_step)
+    assert all(model.ppm[t, y - 1, x] < model.ppm[t, y, x] for t in during)
+    # With no door nearby, the far side of the solid east wall stays almost clear.
+    assert model.ppm[:, 12, 24].max() < .1 * model.ppm[:, 12, 22].max()
+
+
+def test_outdoor_gas_drifts_downwind(world):
+    # At 14:00 the wind comes from about 223 degrees, so gas should lean north-east of a deck leak.
+    model = ChlorineModel(1, world, leak_site="deck")
+    x, y = model.source
+    t = model.leak_end_step - 1
+    assert model.ppm[t, y - 3, x + 3] > model.ppm[t, y + 3, x - 3]
+
+
+def test_level_scales_with_the_source(world):
+    low, high = ChlorineModel(1, world), ChlorineModel(1, world, source_ppm=110.)
+    assert high.ppm.max() == pytest.approx(low.ppm.max() * 5, rel=.05)
+
+
+def test_all_leak_sites_are_settings_on_open_tiles(world):
+    for name, p in LEAK_SITES.items():
+        assert p not in world.wall_tiles
+        assert ChlorineModel(1, world, leak_site=name).ppm.max() > 0
+
+
+def test_exposure_levels_follow_the_epa_table():
+    steps = lambda minutes: minutes * 6
+    assert exposure_level([0.] * steps(60)) == 0
+    assert exposure_level([.6] * steps(10)) == 1
+    assert exposure_level([3.] * steps(10)) == 2
+    assert exposure_level([2.1] * steps(60)) == 2
+    assert exposure_level([60.] * steps(10)) == 3
+    assert exposure_level([21.] * steps(60)) == 3
+
+
+def test_brief_exposure_is_averaged_over_the_full_window():
+    assert exposure_level([3.] * 6) == 0  # one minute at 3 ppm averages 0.3 ppm over ten minutes
+
+
+def test_wind_table_uses_the_day_s_values():
+    assert wind_at(0, 14) == pytest.approx((6.4 / 3.6, 223))
