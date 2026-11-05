@@ -229,3 +229,19 @@ def test_disabling_cutscenes_queues_nothing():
     player.enabled = False
     player.enqueue([dict(kind="float_off", t=3, caption="c", focus=True, side="port", role="passenger", trim_deg=1.)])
     assert not player.active
+
+
+def test_gui_three_mind_cards_and_titanic_policy_mappings(app):
+    app._handle_mouse_click(app.btn_choice_titanic.rect.center)
+    app._handle_mouse_click(app.btn_mind_mixture.rect.center)
+    assert app.mind_type == "classical_mixture"
+    app._handle_mouse_click(app.btn_mind_classical.rect.center)
+    assert app.mind_type == "classical"
+    app._handle_mouse_click(app.btn_mind_quantum.rect.center)
+    assert app.mind_type == "quantum"
+    sim_amb = TitanicSimulation(seed=42, mind_type="quantum", event_mapping="ambiguous_rockets")
+    sim_pa_open = TitanicSimulation(seed=42, mind_type="quantum", event_mapping="early_pa_alarm", allow_all_sides=True)
+    sim_amb.run()
+    sim_pa_open.run()
+    assert sim_pa_open.counts()["boats"] > sim_amb.counts()["boats"]
+

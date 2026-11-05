@@ -236,6 +236,13 @@ def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
     Delegates to mind.quantum_mind.quantum_decide; falls back to the
     heuristic stub if mind/ is unavailable.
     """
+    global _quantum_decide_impl
+    if _quantum_decide_impl is None:
+        try:
+            from mind.quantum_mind import quantum_decide as _impl
+            _quantum_decide_impl = _impl
+        except ImportError:
+            pass
     if _quantum_decide_impl is not None:
         return _quantum_decide_impl(state)
     return _quantum_decide_stub(state)

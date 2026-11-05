@@ -30,6 +30,12 @@ EVENT_NAMES = {
     "steward_warning": "gas_plume", "crowd_moving": "gas_plume", "orders_to_crew": "gas_plume",
     "distress_rocket": "ash_fall", "officers_told_ship_will_sink": "eruption", "water_at_feet": "eruption",
 }
+EVENT_MAPPINGS = {
+    "default": {},  # Rockets trigger projective collapse (ash_fall), steward warning is ambiguous (gas_plume)
+    "ambiguous_rockets": {"distress_rocket": "gas_plume"},  # Rockets treated as ambiguous rotation (tests quantum coherence)
+    "early_pa_alarm": {"steward_warning": "eruption", "orders_to_crew": "eruption"},  # Unambiguous PA / alarm policy intervention
+}
+DEFAULT_MAPPING = "default"
 STORY_TEXT = {
     "none": "Nothing new", "collision": "A shudder runs through the ship",
     "ship_tilting": "The deck is visibly tilting", "steward_warning": "A steward says to put on lifebelts",
@@ -53,10 +59,16 @@ HISTORICAL = dict(aboard=2208, saved=712, source="Wikipedia casualty table citin
 
 class TitanicSimulation:
     def __init__(self, seed=42, mind_type='quantum', noise_source='stub', decide_fn=None,
-                 scenario='titanic', scripted_events=None):
+                 scenario='titanic', scripted_events=None, event_mapping=DEFAULT_MAPPING,
+                 warned_only_hide=False, crew_seats=3, allow_all_sides=False):
         self.seed, self.mind_type = seed, mind_type.lower()
         self.noise_source, self.scenario = noise_source, scenario
         self.scripted_events = dict(scripted_events) if scripted_events else {}
+        self.event_mapping = event_mapping
+        self.event_names = {**EVENT_NAMES, **EVENT_MAPPINGS.get(event_mapping, {})}
+        self.warned_only_hide = warned_only_hide
+        self.crew_seats = crew_seats
+        self.allow_all_sides = allow_all_sides
         self.horizon = HORIZON
         self.world = ShipWorld(seed=seed)
         self.initial_world = copy.deepcopy(self.world.export_dict())
@@ -65,7 +77,7 @@ class TitanicSimulation:
         self.event_gen = EventGenerator(seed, horizon=HORIZON)
         self.event_gen.weather = ['calm'] * HORIZON  # Wikipedia: clear, flat calm night
         self.event_gen.world_events = list(self.flood.world_events)
-        self.boats = LifeboatSchedule(self.world)
+        self.boats = LifeboatSchedule(self.world, crew_seats=crew_seats, allow_all_sides=allow_all_sides)
         self.people = build_crowd(self.world, seed)
         self.agent = self._default_focus()
         if decide_fn:
@@ -198,7 +210,7 @@ class TitanicSimulation:
     def _step_person(self, agent, t, warned, fields, crowding, moving):
         world = self.world
         story = self._perceive(agent, t, warned)
-        event = EVENT_NAMES.get(story, "none")
+        event = self.event_names.get(story, "none")
         agent.story_event = story
         in_shelter = world.is_in_shelter(*agent.pos) and agent.status == "aboard"
         agent.apply_event(event, in_shelter)
@@ -208,7 +220,8 @@ class TitanicSimulation:
         agent.last_action = action
         before = tuple(agent.pos)
         if agent.status == "aboard":
-            agent.execute_ship_action(action, world, fields, crowding, self.rng)
+            agent.execute_ship_action(action, world, fields, crowding, self.rng,
+                                      warned_only_hide=self.warned_only_hide)
             if tuple(agent.pos) != before and action == "hide":
                 moving[before] += 1
         agent.step_decay(world.is_in_shelter(*agent.pos) and agent.status == "aboard")
@@ -363,4 +376,28 @@ class TitanicSimulation:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(timeline, separators=(',', ':')), encoding='utf-8')
         return timeline
+
+
+def compare_titanic_policies(seed=42, minds=('quantum', 'classical_mixture', 'classical')):
+    """Run counterfactual evacuation policy interventions across cognitive models."""
+    policies = {
+        "historical_baseline": dict(event_mapping="default", warned_only_hide=False, allow_all_sides=False),
+        "ambiguous_rockets": dict(event_mapping="ambiguous_rockets", warned_only_hide=False, allow_all_sides=False),
+        "early_pa_alarm": dict(event_mapping="early_pa_alarm", warned_only_hide=False, allow_all_sides=False),
+        "open_boarding_both_sides": dict(event_mapping="early_pa_alarm", warned_only_hide=False, allow_all_sides=True),
+    }
+    results = {}
+    for policy_name, kwargs in policies.items():
+        results[policy_name] = {}
+        for mind in minds:
+            sim = TitanicSimulation(seed=seed, mind_type=mind, **kwargs)
+            sim.run()
+            counts = sim.counts()
+            results[policy_name][mind] = dict(
+                saved=counts["boats"],
+                dead=counts["dead"],
+                survival_rate=round(counts["boats"] / len(sim.people), 4),
+            )
+    return results
+
 

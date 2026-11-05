@@ -13,8 +13,8 @@ description: "Qiskit Fall Fest — Quantum Decision-Making Under Volcanic & Wild
 > *"Can quantum probability explain why humans make counterintuitive survival decisions under extreme environmental stress?"*
 
 - **Tech A (`mind/`)**: 2-Qubit Quantum Cognitive Architecture + **6 Quantum Cognition Models Adapted From Published Papers**
-- **Tech B (`stranded_physics/`, `disaster_data/`, `contracts.py`)**: 49 Empirical Disaster Datasets, 14 Physics Categories, 9 Simplified Stand-In Solvers, ATUS Priors & Grover Quantum Walk
-- **Tech C (`engine/`, `main.py`)**: Dual-Scenario Simulator with **Clash of Clans / Hay Day Village UI** (1600×900)
+- **Tech B (`stranded_physics/`, `disaster_data/`, `contracts.py`)**: 49 Empirical Disaster Datasets, 14 Physics Categories, Stage 1–5 Physics Engine, ATUS Priors & Grover Quantum Walk
+- **Tech C (`engine/`, `main.py`)**: **5 Evacuation & Survival Scenarios** (`Island`, `Volcano`, `Titanic`, `Pompeii`, `Waterloo`) + **Interactive Scenario Builder** (1600×900)
 - **Product D (`site/index.html`)**: Interactive Web Replay & *"Why Did He Do That?"* Quantum Inspector
 
 ---
@@ -167,14 +167,18 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 | Verification Suite | Command | Status |
 |---|---|---|
-| **Full Unified Pytest Suite** | `python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q` | **`158 passed`** |
+| **Full Unified Pytest Suite** | `python -m pytest test_contracts_and_engine.py test_titanic.py test_pompeii.py test_waterloo.py mind/tests stranded_physics/core -q` | **`712 passed`** |
 | **Tech A Validation & 6-Paper Cross-Check** | `python -m mind.experiments.validate` | **`PASS` (`any_failed=False`)** |
 | **Tech B 14-Category Verification Gates** | `python -m stranded_physics.gates required` | **`14 / 14` record checks pass (files load; physics not tested)** |
 | **Tech B Provenance & Unit Catalog** | `python -m stranded_physics.catalog` | **49 Datasets, 20 Pint Params** |
 
-### Key Empirical & Mathematical Findings
+### Key Empirical & Mathematical Findings Across 5 Evacuation Scenarios
 - **Disjunction Effect**: At $p = 0.50$, quantum interference reduces $P(\text{protect})$ by **$-18.0\%$** below the classical mixture baseline ($0.370$ vs. $0.550$), matching Tversky & Shafir (1992).
 - **Order Effect (`tremor` $\leftrightarrow$ `gas_plume`)**: Produces a **$14.2\%$ to $16.8\%$** swing in protective action probability at low stress ($\lambda = 0$), decaying smoothly to $0\%$ as stress-driven decoherence reaches $\lambda = 1$.
+- **Crowd Evacuation Survival & Policy Design (`Titanic`, `Pompeii`, `Waterloo`)**:
+  - **Pompeii (11,500 citizens)**: Under ambiguous cues (`Mapping C`), quantum disjunction interference results in **644 deaths** vs. **287** in classical mixture; under `Mapping D` + enslaved restrictions, quantum fatalities reach **981**.
+  - **Titanic (2,208 aboard)**: Treating rockets as ambiguous reduces quantum survival from **849** to **815**; introducing an unambiguous early PA alarm + open both-side boarding policy boosts survival to **913+**.
+  - **Waterloo Chlorine Leak (100 visitors)**: Triggering an unambiguous staff alarm collapses quantum hesitation and cuts disabling AEGL-2 chlorine exposures from **32** to **23** (`-28%`).
 
 ---
 

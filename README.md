@@ -1,15 +1,28 @@
-# Quantum Cognition Simulation: Decision-Making & Multi-Scenario Survival
+# Quantum Cognition Simulation: Decision-Making & Multi-Scenario Evacuation Survival
 
-[![Integration Tests](https://img.shields.io/badge/tests-158%20passed-brightgreen.svg)](#daily-integration--verification-testing)
+[![Integration Tests](https://img.shields.io/badge/tests-712%20passed-brightgreen.svg)](#daily-integration--verification-testing)
 [![Qiskit](https://img.shields.io/badge/Qiskit-2.x-6929C4.svg)](https://qiskit.org/)
 [![Status](https://img.shields.io/badge/Tech%20A%20%2B%20B%20%2B%20C%20%2B%20D-Unified-success.svg)](#unified-track-documentation-tech-a--tech-b--tech-c--product-d)
 [![Resolution](https://img.shields.io/badge/Resolution-1600%C3%97900%20(Fullscreen%20Scaled)-blueviolet.svg)](#fullscreen--interactive-controls)
 
-> **"Can quantum probability explain why humans make counterintuitive survival decisions under extreme environmental stress?"**
+> **"Can quantum probability explain why humans make counterintuitive evacuation and survival decisions under extreme environmental stress — and how can we use it to improve real-life evacuation survival rates?"**
 
 > **Start here:** the project notebook, [`notebooks/stranded_quantum_cognition.ipynb`](notebooks/stranded_quantum_cognition.ipynb), states what is real, what is a model, and where this falls short. Engine results are in [`workboard/ENGINE_STATUS.md`](workboard/ENGINE_STATUS.md).
 
-**Quantum Cognition Simulation** is an interactive multi-scenario cognitive modeling and physical hazard platform. The system simulates human decision-making under existential pressure by contrasting a **2-qubit quantum cognition architecture**—alongside **6 quantum cognition models adapted from published papers and open-source code** (exhibiting non-commuting order effects, Tversky–Shafir interference, Belief Entropy QLBN, Busemeyer dynamic Hamiltonians, and Lindblad open-system decoherence)—against a **zero-coherence classical mixture control ($\lambda=1$)** and an empirical **classical rational baseline** (derived from Bureau of Labor Statistics American Time Use Survey utility priors and calibrated against 49 real-world volcanic/disaster datasets).
+**Quantum Cognition Simulation** is an interactive multi-scenario cognitive modeling, crowd evacuation, and physical hazard platform. The system simulates human decision-making under existential pressure across **five evacuation and survival scenarios** (**Island Wilderness**, **Volcano Eruption**, **RMS Titanic 1912**, **Pompeii AD 79**, and **Waterloo Pool Chlorine Leak**) plus an **Interactive Scenario Builder**. It contrasts a **2-qubit quantum cognition architecture**—alongside **6 quantum cognition models adapted from published papers and open-source code** (exhibiting non-commuting order effects, Tversky–Shafir disjunction interference, Belief Entropy QLBN, Busemeyer dynamic Hamiltonians, and Lindblad open-system decoherence)—against a **zero-coherence classical mixture control ($\lambda=1$)** and a **classical rational baseline**.
+
+---
+
+## Five Evacuation & Survival Scenarios + Custom Scenario Builder
+
+| # | Scenario | Scale & Horizon | Physical Hazard Engine | Real-Life Evacuation & Cognitive Insight |
+|---|---|---|---|---|
+| **1** | **Island Wilderness (`island`)** | 1 agent, 36 steps (72 h) | 40×40 DEM, Markov storms, exposure & dehydration | Grover DTQW spatial exploration & shelter timing before storm hypothermia |
+| **2** | **Volcano Evacuation (`volcano`)** | 1 agent (or multi-agent builder), 36 steps | Caldera DEM, active PDCs, surges, lahars, downwind ash & Tobler Dijkstra paths | Cue order effects (`Tremor → Gas` vs `Gas → Tremor` shifts $P(\text{protect})$ by $\pm 15.6\%$) |
+| **3** | **RMS Titanic 1912 (`titanic`)** | **2,208 agents** across 10 decks, 44 steps (5 min/step) | Progressive compartment flooding (`engine/flood.py`) & 20 lifeboats (`1,178` seats, Wormstedt schedule) | Captures below-deck normalcy bias; unambiguous PA alarm + open both-side boarding increases survival from **849** (`38.5%`) to **913+** (`41.3%`) |
+| **4** | **Pompeii AD 79 (`pompeii`)** | **11,500 citizens** across households, 128 steps (15 min/step) | Plinian column, pumice accumulation, roof collapses & pyroclastic surges (`engine/eruption.py`) | Under ambiguous warning mappings (`C`/`D`), quantum disjunction interference causes **644–981 fatalities** vs **287–679** in classical mixture |
+| **5** | **Waterloo Pool Chlorine Leak (`waterloo`)** | **100 swimmers & staff**, 721 steps (10 sec/step) | 2D chlorine gas advection-diffusion plume (`engine/chlorine.py`) & EPA AEGL-1/2/3 thresholds | Quantum hesitation under faint chlorine odour causes **32 AEGL-2 exposures** without alarm vs **23** when staff trigger an unambiguous alarm |
+| **6** | **Scenario Builder (`engine/builder.py`)** | Custom multi-person packs | Interactive terrain, hazard, and multi-agent placement editor | Build, save, and replay custom evacuation packs directly in the GUI (`[B]`) |
 
 ---
 
@@ -156,13 +169,16 @@ start site/index.html
 | Screen | Control | Action |
 |---|---|---|
 | **Any Screen** | `F11` or `[Fullscreen]` Button | **Toggle Fullscreen / Windowed Mode** (with automatic aspect-ratio letterboxing) |
-| **Event Choice Hub** | `[1]` / `[2]` | **Select Island Survival** (`1`) or **Volcano Evacuation** (`2`) |
+| **Event Choice Hub** | `[1]` / `[2]` / `[3]` / `[4]` / `[5]` | **Select Island** (`1`), **Volcano** (`2`), **Titanic** (`3`), **Pompeii** (`4`), or **Waterloo** (`5`) |
+| **Event Choice Hub** | `B` or `[Build Scenario]` | **Open Interactive Scenario Builder** (`engine/builder.py`) |
 | **Event Choice Hub** | Click on Card or Button | **Open Scenario Configuration** |
 | **Configuration Hub** | `ENTER` or `SPACE` | **Launch Simulation** |
 | **Configuration Hub** | `ESC` or `< Change Scenario` | **Return to Event Choice Hub** |
 | **Simulation View** | `SPACE` | **Play / Pause** auto-stepping |
-| **Simulation View** | `RIGHT ARROW` or `N` | **Step Forward** single 2-hour turn |
+| **Simulation View** | `RIGHT ARROW` or `N` | **Step Forward** single turn |
 | **Simulation View** | `Q` or `[Mind Toggle]` Button | **Cycle Mind Live** (`Quantum` $\to$ `Classical Mixture` $\to$ `Classical Rational`) |
+| **Simulation View** | `F` | **Follow Next Person / Role** (in crowd scenarios & custom builder packs) |
+| **Simulation View** | `P` / `M` / `X` | **Toggle Split Panels** (`P`), **Region Map** (`M` in Pompeii), or **Skip Cutscene** (`X`) |
 | **Simulation View** | `[Speed]` Button | **Cycle Speed** (0.5×, 1×, 2×, 4×) |
 | **Simulation View** | `E` | **Toggle Evacuation Map Overlay** (zones, assembly points, Dijkstra paths) |
 | **Simulation View** | `TAB` or `[Action Log]` Button | **Toggle Chronological Action History Overlay** (mouse wheel scrolls) |
@@ -173,10 +189,10 @@ start site/index.html
 
 ## Daily Integration & Verification Testing
 
-Run the unified 158-test suite (`158 passed`) across **Tech A**, **Tech B**, and **Tech C**:
+Run the unified 712-test suite (`712 passed`) across **Tech A**, **Tech B**, **Tech C**, **Titanic**, **Pompeii**, and **Waterloo**:
 
 ```powershell
-$env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q
+$env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py test_titanic.py test_pompeii.py test_waterloo.py mind/tests stranded_physics/core -q
 ```
 
 ---

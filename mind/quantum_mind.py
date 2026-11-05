@@ -239,3 +239,6 @@ def quantum_decide(state, cognition_model="default"):
 def classical_mixture_decide(state):
     """quantum_decide with lam forced to 1 (D-control): no order-gap text."""
     return _decide(state, force_lam=1.0, suppress_order_gap=True)
+
+
+contracts._quantum_decide_impl = quantum_decide

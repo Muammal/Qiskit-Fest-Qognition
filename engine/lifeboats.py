@@ -42,10 +42,11 @@ TOTAL_SEATS = sum(row["seats"] for row in BOAT_TABLE + FLOAT_OFF)
 
 
 class Lifeboat:
-    def __init__(self, row, deck_row):
+    def __init__(self, row, deck_row, allow_all_sides=False):
         self.id, self.side, self.kind = row["id"], row["side"], row["kind"]
         self.seats, self.launch_step = row["seats"], row["launch_step"]
         self.station = (row["x"], deck_row)
+        self.allow_all_sides = allow_all_sides
         self.aboard = []
         self.crew_aboard = 0
         self.state = "stowed"  # stowed, loading, lowered, floated
@@ -56,7 +57,7 @@ class Lifeboat:
 
     def eligible(self, agent):
         """Boarding order is the ship's rule, applied equally to every mind."""
-        if agent.group in ("woman", "child"):
+        if agent.group in ("woman", "child") or self.allow_all_sides:
             return True
         return self.side == MEN_ALLOWED_SIDE
 
@@ -66,10 +67,12 @@ class Lifeboat:
 
 
 class LifeboatSchedule:
-    def __init__(self, world):
+    def __init__(self, world, crew_seats=CREW_SEATS, allow_all_sides=False):
         deck_row = world.assembly_points[0][1]
-        self.boats = [Lifeboat(row, deck_row) for row in BOAT_TABLE]
-        self.floating = [Lifeboat(row, deck_row) for row in FLOAT_OFF]
+        self.crew_seats = crew_seats
+        self.allow_all_sides = allow_all_sides
+        self.boats = [Lifeboat(row, deck_row, allow_all_sides=allow_all_sides) for row in BOAT_TABLE]
+        self.floating = [Lifeboat(row, deck_row, allow_all_sides=allow_all_sides) for row in FLOAT_OFF]
         self.water_rescued = 0
 
     def open_stations(self, t):
@@ -96,7 +99,7 @@ class LifeboatSchedule:
                            key=lambda a: (a.group == "man", a.id))
             # Rowers board only as the boat is about to leave, so organisers keep working.
             if t >= boat.launch_step - 1:
-                seats_left = CREW_SEATS - boat.crew_aboard
+                seats_left = self.crew_seats - boat.crew_aboard
                 order = sorted(organisers, key=lambda a: a.id)[:max(0, seats_left)] + order
             for agent in order:
                 if limit <= 0 or boat.free_seats <= 0:

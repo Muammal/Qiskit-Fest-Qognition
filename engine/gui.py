@@ -834,20 +834,26 @@ class IslandVisualizerApp:
             bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="fullscreen"
         )
 
-        # 1. Mind Toggle Cards
-        card_w = 515
+        # 1. Mind Toggle Cards (3-Way Comparative Architecture)
+        mind_card_w = 338
         self.btn_mind_quantum = UIButton(
-            (col2_x + 24, top_y + 36, card_w, 80), "2-Qubit Quantum Mind", self.font_title,
-            subtext="Non-commuting belief rotations + simulated dephasing (stress model)",
+            (col2_x + 24, top_y + 36, mind_card_w, 80), "2-Qubit Quantum Mind", self.font_title,
+            subtext="Non-commuting rotations + stress dephasing",
             subfont=self.font_small, active_color=COLOR_PURPLE, icon="quantum"
         )
+        self.btn_mind_mixture = UIButton(
+            (col2_x + 378, top_y + 36, mind_card_w, 80), "Classical Mixture Control", self.font_title,
+            subtext="Same gates & channels, diagonal density (p=1)",
+            subfont=self.font_small, active_color=COLOR_CYAN, icon="quantum"
+        )
         self.btn_mind_classical = UIButton(
-            (col2_x + 555, top_y + 36, card_w, 80), "Classical Rational Mind", self.font_title,
-            subtext="Deterministic utility from hand-set urgency weights",
+            (col2_x + 732, top_y + 36, mind_card_w, 80), "Classical Rational Mind", self.font_title,
+            subtext="Deterministic utility from hand-set weights",
             subfont=self.font_small, active_color=COLOR_BLUE, icon="classical"
         )
 
         # 2. Preset Buttons (2x2 Grid)
+        card_w = 515
         self.preset_buttons: List[UIButton] = []
         p_y = top_y + 165
         presets = self._presets()
@@ -1262,7 +1268,7 @@ class IslandVisualizerApp:
         elif self.app_state == "home":
             btns = [
                 self.btn_home_back_scenario, self.btn_home_fs,
-                self.btn_mind_quantum, self.btn_mind_classical,
+                self.btn_mind_quantum, self.btn_mind_mixture, self.btn_mind_classical,
                 self.btn_seed_m100, self.btn_seed_m10, self.btn_seed_m1,
                 self.btn_seed_p1, self.btn_seed_p10, self.btn_seed_p100, self.btn_seed_rand,
                 self.btn_launch
@@ -1419,10 +1425,17 @@ class IslandVisualizerApp:
             return
         if self.btn_mind_quantum.check_hover(pos):
             self.mind_type = "quantum"
+            self._show_mind_on_button()
             self.btn_mind_quantum.trigger_click()
+            return
+        if self.btn_mind_mixture.check_hover(pos):
+            self.mind_type = "classical_mixture"
+            self._show_mind_on_button()
+            self.btn_mind_mixture.trigger_click()
             return
         if self.btn_mind_classical.check_hover(pos):
             self.mind_type = "classical"
+            self._show_mind_on_button()
             self.btn_mind_classical.trigger_click()
             return
 
@@ -1870,10 +1883,13 @@ class IslandVisualizerApp:
         self.canvas.blit(m_lbl, (col2_x + 24, col2_y + 16))
 
         self.btn_mind_quantum.is_active = (self.mind_type == "quantum")
+        self.btn_mind_mixture.is_active = (self.mind_type == "classical_mixture")
         self.btn_mind_classical.is_active = (self.mind_type == "classical")
         self.btn_mind_quantum.check_hover(mouse_pos)
+        self.btn_mind_mixture.check_hover(mouse_pos)
         self.btn_mind_classical.check_hover(mouse_pos)
         self.btn_mind_quantum.draw(self.canvas)
+        self.btn_mind_mixture.draw(self.canvas)
         self.btn_mind_classical.draw(self.canvas)
 
         # 2. Presets & Custom Stepper
@@ -1926,6 +1942,13 @@ class IslandVisualizerApp:
             "  * Stress Model: Physiological stress maps to a simulated dephasing channel (stress model); no hardware decoherence is driven live.",
             "  * Survival: Without water, death comes at about 58 h. All rates are assumed. Maintain shelter to reduce exposure."
         ]
+        if self.scenario == "titanic":
+            bullet_lines = [
+                "  * Same Mind: All 2,208 aboard run the same unedited mind. Role and class are never passed to it.",
+                "  * Perception: Collision shudder, steward knocks, rockets, trim and rising water reach people by deck and position.",
+                "  * Lifeboats: 20 boats (1,178 seats) launch on Wormstedt's schedule; boarding follows port/starboard rules.",
+                "  * Historical Context: 712 of 2,208 survived historically. See docs/TITANIC_SOURCES.md."
+            ]
         if self.scenario == "pompeii":
             bullet_lines = [
                 "  * Same Mind: Everyone uses the same unedited mind. Role and status are never passed to it.",

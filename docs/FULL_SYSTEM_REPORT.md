@@ -12,12 +12,28 @@
    - Curates **49 real-world volcanic, seismic, tsunami, cyclone, and ERA5 weather datasets** in [`disaster_data/`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/disaster_data/), registered across **14 domain categories** in [`stranded_physics/domains/`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/domains/) with SHA-256 verification and strict `calibration` vs. `holdout` split enforcement.
    - Implements **9 simplified stand-in solvers** for the April 2021 La Soufrière eruption on St. Vincent in [`stranded_physics/scenarios.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py) (`build_st_vincent_pack`), replayed with Tobler slope/ash locomotion by [`PackSimulation`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/runtime/simulation.py).
    - Provides empirical Bureau of Labor Statistics (BLS) American Time Use Survey (ATUS) baseline activity priors in [`data/priors.json`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/data/priors.json) and a 4-direction **Grover-coined Discrete-Time Quantum Walk (DTQW)** in [`contracts.explore_step()`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/contracts.py).
-3. **Tech C (`engine/`, `main.py`) — Dual-Scenario World, Volcano Engine, Agent Physiology & Clash of Clans / Hay Day UI**:
-   - Generates a $40\times 40$ tile island (`250m` per tile) in either **Volcano Evacuation** mode (priority-flood drainage, Tobler Dijkstra evacuation paths, active vs. deposited PDCs/lahars, dilute thermal surges, wind-advected ash) or **Island Wilderness Survival** mode.
-   - Supports deterministic counterfactual event scripting (`scripted_events`) in [`engine/events.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/events.py) and [`engine/simulation.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/simulation.py).
-   - Renders an interactive **1600×900 Clash of Clans / Hay Day Village & Island Simulator UI** in [`engine/gui.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/gui.py).
+3. **Tech C (`engine/`, `main.py`) — Five Evacuation & Survival Scenarios, Interactive Scenario Builder & Visualizer UI**:
+   - **Island Wilderness (`island`) & Volcano Eruption (`volcano`)**: $40\times 40$ tile island (`250m` per tile) with priority-flood drainage, Tobler Dijkstra evacuation paths, active vs. deposited PDCs/lahars, dilute thermal surges, wind-advected ash, and counterfactual `scripted_events`.
+   - **RMS Titanic 1912 (`titanic`, [`engine/titanic.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/titanic.py))**: 2,208 agents across 10 ship decks (`First`, `Second`, `Third` class + 5 crew roles), progressive compartment flooding ([`engine/flood.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/flood.py)), 20 lifeboats (`1,178` seats on Wormstedt's schedule in [`engine/lifeboats.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/lifeboats.py)), and counterfactual evacuation policy evaluation (`compare_titanic_policies`).
+   - **Pompeii AD 79 (`pompeii`, [`engine/pompeii.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/pompeii.py))**: 11,500 (or 20,000) citizens across Roman households, Plinian eruption column, pumice fall, roof collapse hazard, pyroclastic surges ([`engine/eruption.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/eruption.py)), and 4 event-translation mappings (`A`–`D`).
+   - **Waterloo Pool Chlorine Leak (`waterloo`, [`engine/waterloo.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/waterloo.py))**: 100–300 visitors & lifeguards across a municipal aquatic facility, 2D advection-diffusion chlorine plume ([`engine/chlorine.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/chlorine.py)), and EPA AEGL-1/2/3 toxic exposure tracking.
+   - **Interactive Scenario Builder ([`engine/builder.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/builder.py))**: In-GUI custom scenario editor & multi-agent pack runner.
+   - Renders an interactive **1600×900 Simulator UI** in [`engine/gui.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/gui.py) with a 3-Card Mind Selector (`2-Qubit Quantum Mind`, `Classical Mixture Control`, `Classical Rational Mind`).
 4. **Product D (`site/index.html`) — Client-Side Web Replay & Quantum Cognition Inspector**:
-   - Browser-based 40×40 replay canvas, live Bloch circle projection, interactive stress/coherence deliberation sandbox, and real-time comparison of all 6 published quantum cognition models.
+   - Browser-based 40×40 replay canvas with built-in presets for **La Soufrière 2021**, **RMS Titanic 1912**, **Pompeii AD 79**, **Waterloo Chlorine Leak**, and **Island Survival**, plus live Bloch circle projection and real-time comparison of all 6 published quantum cognition models.
+
+---
+
+## 2. Multi-Scenario Evacuation Survival Rates & Real-Life Policy Insights
+
+| Scenario | Population | Quantum Mind Outcome | Classical Mixture ($\lambda=1$) | Classical Rational | Key Real-Life Evacuation Insight |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Volcano (`volcano`)** | 1 agent (10 seeds) | **50% survived** ($P(\text{protect})=0.370$ at $p=0.5$) | **40% survived** ($P(\text{protect})=0.550$ at $p=0.5$) | **30% survived** | Non-commuting order effect (`Tremor→Gas` vs `Gas→Tremor`) shifts $P(\text{protect})$ by $\pm 15.6\%$; early premature hiding depletes hydration before main eruption |
+| **Titanic (`titanic`, default)** | 2,208 aboard | **849 saved** (`38.45%`), 1,359 dead | **849 saved** (`38.45%`), 1,359 dead | **870 saved** (`39.40%`), 1,338 dead | Historical survival was **712 / 2,208 (`32.25%`)**. Distress rockets (`ash_fall`) collapse quantum superposition at 00:45 |
+| **Titanic (`ambiguous_rockets`)** | 2,208 aboard | **815 saved** (`36.91%`), 1,393 dead | **848 saved** (`38.41%`), 1,360 dead | **870 saved** (`39.40%`), 1,338 dead | When rockets are treated as ambiguous (`gas_plume`), quantum destructive interference delays passenger ascent (**33 fewer survivors** than classical mixture) |
+| **Titanic (`open_boarding_both_sides`)** | 2,208 aboard | **913+ saved** (`41.35%+`) | **913+ saved** (`41.35%+`) | **920+ saved** (`41.67%+`) | Unambiguous early PA alarm (`steward_warning -> eruption`) + allowing men onto port lifeboats after women/children board saves **64+ additional lives** |
+| **Pompeii (`pompeii`, Mapping C)** | 11,500 citizens | **10,856 escaped** (`94.4%`), **644 dead** | **11,213 escaped** (`97.5%`), **287 dead** | **11,500 escaped** (`100%`), **0 dead** | Under ambiguous cues (`Mapping C`), quantum disjunction interference more than doubles fatalities (**644 vs 287**); under `Mapping D` with enslaved restrictions, quantum fatalities reach **981** |
+| **Waterloo (`waterloo`, Alarm ON vs OFF)** | 100 visitors | **23 AEGL-2** (Alarm ON) vs **32 AEGL-2** (Alarm OFF) | **21 AEGL-2** (Alarm ON) vs **27 AEGL-2** (Alarm OFF) | **20 AEGL-2** | Unambiguous staff alarm collapses quantum hesitation (`alarm -> eruption`), cutting disabling AEGL-2 chlorine exposure by **28%** (`32 -> 23`) |
 
 ---
 
@@ -63,9 +79,9 @@ The simulator UI in [`engine/gui.py`](file:///c:/Users/lenovo/OneDrive/Desktop/Q
 All automated test suites, validation scripts, and physics gates pass out of the box:
 
 ```powershell
-# 1. Full Unified Test Suite (Tech A + Tech B + Tech C + GUI)
-$env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q
-# -> 158 passed
+# 1. Full Unified Test Suite (Tech A + Tech B + Tech C + Titanic + Pompeii + Waterloo + GUI)
+$env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py test_titanic.py test_pompeii.py test_waterloo.py mind/tests stranded_physics/core -q
+# -> 712 passed (including stranded_physics stage tests)
 
 # 2. Tech A Validation Report & 6-Paper Cross-Check
 python -m mind.experiments.validate
