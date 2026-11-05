@@ -98,3 +98,52 @@ kind = "verification"
 command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/terrain'); load_datasets(p/'datasets.toml', 'terrain'); load_parameters(p/'params.toml')\""
 inputs = ["stranded_physics/domains/terrain/datasets.toml", "stranded_physics/domains/terrain/params.toml"]
 required = true
+
+# Generated islands. There is no real place to compare with, so these hold them to the same checks as the real surface.
+
+[[gate]]
+id = "terrain-generator"
+title = "Generated islands obey their rules: dials, repeatability, one island, sea all round"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/terrain/tests/test_generator.py -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/terrain/generator.py", "stranded_physics/domains/terrain/generator_params.toml", "stranded_physics/domains/terrain/tests/test_generator.py"]
+required = false
+
+[[gate]]
+id = "terrain-generated-drains"
+title = "Every land cell drains to the sea on generated islands (worst of 20)"
+kind = "verification"
+command = "python -m stranded_physics.domains.terrain.generated_measure drains"
+inputs = ["stranded_physics/domains/terrain/generator.py", "stranded_physics/domains/terrain/generated_measure.py", "stranded_physics/domains/terrain/generator_params.toml"]
+required = false
+target = 1.0
+tolerance = 0.0
+role = "anchor"
+split = "reference"
+source = "The same check as terrain-land-drains-to-sea, on islands that aren't real"
+
+[[gate]]
+id = "terrain-generated-area"
+title = "Generated islands have the land area asked for (largest relative error of 20)"
+kind = "verification"
+command = "python -m stranded_physics.domains.terrain.generated_measure area_error"
+inputs = ["stranded_physics/domains/terrain/generator.py", "stranded_physics/domains/terrain/generated_measure.py", "stranded_physics/domains/terrain/generator_params.toml"]
+required = false
+target = 0.0
+tolerance = 0.05
+role = "anchor"
+split = "reference"
+source = "The dial or catalogue value it was asked for"
+
+[[gate]]
+id = "terrain-generated-summit"
+title = "Generated islands have the summit height asked for (largest relative error of 20)"
+kind = "verification"
+command = "python -m stranded_physics.domains.terrain.generated_measure summit_error"
+inputs = ["stranded_physics/domains/terrain/generator.py", "stranded_physics/domains/terrain/generated_measure.py", "stranded_physics/domains/terrain/generator_params.toml"]
+required = false
+target = 0.0
+tolerance = 0.05
+role = "anchor"
+split = "reference"
+source = "The dial or catalogue value it was asked for"
