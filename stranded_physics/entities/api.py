@@ -28,6 +28,7 @@ class Dial:
     low: float
     high: float
     note: str
+    whole: bool = False
 
 
 @dataclass(frozen=True)

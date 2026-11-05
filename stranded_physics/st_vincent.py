@@ -18,5 +18,10 @@ def to_utm(lonlat: tuple[float, float]) -> XY:
     return float(x[0]), float(y[0])
 
 
+def to_lonlat(xy: XY) -> tuple[float, float]:
+    lon, lat = transform(UTM, "EPSG:4326", [xy[0]], [xy[1]])
+    return float(lon[0]), float(lat[0])
+
+
 VENT_XY = to_utm(VENT_LONLAT)
 BARBADOS_XY = to_utm(BARBADOS_LONLAT)

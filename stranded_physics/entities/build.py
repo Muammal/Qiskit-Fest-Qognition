@@ -14,13 +14,15 @@ from typing import NamedTuple
 
 import numpy as np
 
-from stranded_physics.core.api import InterfaceError, ScenarioSpec, TimeAxis
-from stranded_physics.entities.api import ScenarioFile, load_scenario
+from stranded_physics.core.api import InterfaceError, ScenarioPack, ScenarioSpec, TimeAxis
+from stranded_physics.entities.api import EntitySpec, ScenarioFile, load_scenario
 from stranded_physics.entities.kinds import BUILD_ORDER, KINDS, World, check_entity
 from stranded_physics.st_vincent import to_utm
 
-
 KM_PER_DEGREE = 111.  # Close enough for spreading people around a point.
+
+
+PLACED = ("person", "group", "shelter", "resource")
 
 
 class Person(NamedTuple):
@@ -29,8 +31,14 @@ class Person(NamedTuple):
     mind: str
 
 
+def position_of(entity: EntitySpec) -> tuple[float, float]:
+    prefix = "start_" if entity.kind in ("person", "group") else ""
+    return entity.settings[f"{prefix}lon"], entity.settings[f"{prefix}lat"]
+
+
 def check_scenario(scenario: ScenarioFile) -> None:
     """Every entity can be built, and everything each one depends on is present."""
+    from stranded_physics.packs.st_vincent_2021 import CONTRACT_GRID
     present = {entity.kind for entity in scenario.entities}
     for entity in scenario.entities:
         check_entity(entity)
@@ -39,6 +47,9 @@ def check_scenario(scenario: ScenarioFile) -> None:
             raise InterfaceError(f"{entity.kind} needs {sorted(missing)} in the same scenario")
     if present & {"person", "group"} and "shelter" not in present:
         raise InterfaceError("People need at least one shelter to evacuate to")
+    for entity in scenario.entities:
+        if entity.kind in PLACED and CONTRACT_GRID.locate(to_utm(position_of(entity))) is None:
+            raise InterfaceError(f"{entity.name or entity.kind} at {position_of(entity)} is outside the map, which covers 20 km around La Soufriere")
 
 
 def people_of(scenario: ScenarioFile) -> list[Person]:
@@ -53,6 +64,15 @@ def people_of(scenario: ScenarioFile) -> list[Person]:
                 angle, distance = rng.uniform(0., 2. * math.pi), entity.settings["radius_km"] * math.sqrt(rng.uniform()) / KM_PER_DEGREE
                 people.append(Person(f"{entity.name or 'group'} {number + 1}", (entity.settings["start_lon"] + distance * math.cos(angle), entity.settings["start_lat"] + distance * math.sin(angle)), entity.mind))
     return people
+
+
+def check_events_happen(pack: ScenarioPack) -> None:
+    """A recorded event outside the scenario's dates would quietly do nothing, so it is refused."""
+    if pack.has("storm.max_wind") and not pack.series("storm.max_wind").max() > 0:
+        raise InterfaceError("The storm never happens in this scenario's dates. Beryl needs dates around 30 June to 4 July 2024")
+    names = [name for name in ("eruption.phase", "eruption.tremor", "eruption.gas", "eruption.explosion") if pack.has(name)]
+    if names and not any(pack.series(name).max() > 0 for name in names):
+        raise InterfaceError("The eruption never happens in this scenario's dates. St Vincent's starts in April 2021")
 
 
 def to_spec(scenario: ScenarioFile) -> ScenarioSpec:
@@ -95,6 +115,7 @@ def main(argv: list[str] | None = None) -> int:
     from stranded_physics.packs.builder import build_pack
     from stranded_physics.runtime.group import play_people
     pack = build_pack(to_spec(scenario), args.seed)
+    check_events_happen(pack)
     people = people_of(scenario)
     if not people:
         print(f"{scenario.id}: built pack {pack.content_hash[:12]}, with fields {sorted(pack.header['fields'])}. It has no people, so there is nothing to play.")

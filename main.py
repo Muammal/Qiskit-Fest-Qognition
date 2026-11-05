@@ -140,6 +140,12 @@ def run_live_demo(
     print(f"{BOLD}========================================================================{RESET}\n")
 
 
+def open_builder(app):
+    """The scenario builder, imported only when asked for, so the original scenarios run without the physics packages."""
+    from stranded_physics.builder_screen import BuilderScreen
+    return BuilderScreen(app)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Quantum Cognition Simulation")
     parser.add_argument("--gui", action="store_true", help="Launch interactive 2D Pygame simulation (default)")
@@ -182,7 +188,7 @@ def main():
         from engine.gui import launch_gui
         start_screen = "home" if args.scenario else "event_choice"
         print(f"Launching Quantum Cognition Simulation (Seed={args.seed}, Mind={args.mind})...")
-        launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen)
+        launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen, builder_factory=open_builder)
 
 
 if __name__ == "__main__":

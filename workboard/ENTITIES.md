@@ -33,6 +33,12 @@ python -m stranded_physics.entities.build run <file> --seed 1
 python -m stranded_physics.check <file>                      # What can it honestly claim?
 ```
 
+## The in-game builder
+
+From the game's first screen, choose **Build your own scenario** or press `3`. Add entities from the left, click the map to place what's selected, change its settings on the right, then **Save** or **Play this scenario**. In play, `P` follows the next person, and `Q` changes the mind on the same world.
+
+The screen draws from `KINDS` and every rule lives in `entities/draft.py`, so the screen and a hand-written file can't disagree. Saves go to `scenario_cards/saved/` and never overwrite a shipped scenario. Results belong to a scenario's id, so a changed copy of a shipped scenario shows none of the original's results, and it can't be saved until it has a new id.
+
 ## Where an entity's numbers come from
 
 Every entity states its `source`:
@@ -71,7 +77,7 @@ Hunger, thirst and energy belong to the body of each `person`, and their setting
 | **2. Generated eruptions and storms** | An eruption or storm sampled from real catalogues | Generated sizes, lead times and storm winds match the catalogues statistically, with targets set first |
 | **3. Generated weather and land** | Weather from real records at any held island; generated islands | Weather windows match their source. Generated islands pass the terrain checks |
 | **4. People, shelters, resources** (built, first version) | Many different people on one map; a storm-only scenario runs | Done: the runtime no longer assumes an eruption, and each person sees only their own state. Not yet: people interacting, or shelters protecting from ash and flows |
-| **5. In-game builder** | Pick and adjust entities on a screen | Saving and reloading gives an identical file, and the game runs it |
+| **5. In-game builder** (built, first version) | Pick and adjust entities on a screen | Done: saving and reloading gives an identical file, and the game runs it. Not yet: the game shows one person at a time, and only St Vincent's land can be used until Stage 3 |
 
 ## Rules
 

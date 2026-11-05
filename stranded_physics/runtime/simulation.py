@@ -47,7 +47,9 @@ class PackWorld:
         self.assembly_points = [tuple(self.to_tile(p)) for p in pack.sites["assembly"]]
         self.freshwater_tiles = [tuple(self.to_tile(p)) for p in pack.sites["water"]]
         self.clean_springs = self.freshwater_tiles[1:]
-        self.food_tiles: list[tuple[int, int]] = []
+        self.food_tiles = [tuple(self.to_tile(p)) for p in pack.sites.get("food", ())]
+        self.route_from_spawn: list[list[int]] = []  # No straight line to draw: real routes follow the terrain.
+        self.scale_m_per_tile = grid.dx_m
         self.shelter_tiles: list[tuple[int, int]] = []
         self.lava, self.pdc, self.lahar = set(), set(), set()
         self.ash = 0.
@@ -72,7 +74,7 @@ class PackWorld:
         return self.tiles[y][x] if 0 <= x < self.width and 0 <= y < self.height else 0
 
     def is_in_shelter(self, x: int, y: int) -> bool:
-        return self.get_tile(x, y) == TILE_CODES["shelter"]
+        return (x, y) in self.assembly_points
 
     def ash_at(self, x: int, y: int) -> float:
         return self.ash
@@ -248,7 +250,7 @@ class PackSimulation:
                     "world_events": [r["event"] for r in self.steps], "hazard_by_step": []}
         phase = self.pack.series("eruption.phase")
         erupting = np.flatnonzero(phase == 2)
-        arrival = self.pack.frame("pdc.arrival")
+        arrival = self.pack.frame("pdc.arrival") if self.pack.has("pdc.arrival") else np.array([])
         finite = arrival[np.isfinite(arrival)]
         return {"vent": list(self.world.vent), "erupts": bool(erupting.size),
                 "onset_step": int(erupting[0]) if erupting.size else None,
@@ -266,19 +268,21 @@ class PackSimulation:
         t_s = step * self.pack.time.dt_s
         grid = self.pack.contract_grid
         flows = [[col, row] for row in range(grid.ny) for col in range(grid.nx)
-                 if self.pack.sample("pdc.active", grid.centre(row, col), t_s) > 0]
-        load = self.pack.frame("tephra.deposit_load", t_s)
-        ash = round(float(load.max()), 3)
+                 if self.pack.sample("pdc.active", grid.centre(row, col), t_s) > 0] if self.pack.has("pdc.active") else []
+        ash = round(float(self.pack.frame("tephra.deposit_load", t_s).max()), 3) if self.pack.has("tephra.deposit_load") else 0.
         return {"new_lava": [], "new_pdc": flows, "active_pdc": flows, "surge": [],
                 "new_lahar": [], "active_lahar": [], "ash": ash,
                 "ash_grid": ["0" * grid.nx for _ in range(grid.ny)], "wind_deg": 0.0}
+
+    def _weather_labels(self) -> list[str]:
+        return ["storm" if r >= STORM_RAIN_MM_H else "rain" if r > 0 else "calm" for r in self.pack.series("atmos.rain_rate")]
 
     def timeline(self) -> dict:
         volcano = self._volcano_export()
         world = self.world.export_dict()
         world.update(seed=self.seed, mind=self.mind_type, noise_source=self.noise_source, initial_tiles=self.world.tiles,
                      volcano=volcano, pack_hash=self.pack.content_hash, pack_verdicts=dict(self.pack.verdicts),
-                     weather=["storm" if r >= STORM_RAIN_MM_H else "rain" if r > 0 else "calm" for r in self.pack.series("atmos.rain_rate")])
+                     weather=self._weather_labels())
         left = next((r["t"] for r in self.steps if self.world.zones[r["pos_after"][1]][r["pos_after"][0]] != 2), None)
         safe = next((r["t"] for r in self.steps if self.world.zones[r["pos_after"][1]][r["pos_after"][0]] == 0), None)
         pdc = volcano["first_pdc_step"]

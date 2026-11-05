@@ -29,9 +29,26 @@ class AgentBody:
     cause: str | None = None
     inventory: dict[str, int] = field(default_factory=lambda: {"wood": 0, "food": 0, "tools": 0})
     balance: Body = field(init=False)
+    recent_events: list[str] = field(default_factory=lambda: ["none", "none"])  # For showing only. The mind gets them through to_state.
 
     def __post_init__(self) -> None:
         self.balance = start_body(self.thirst, self.hunger, self.energy)
+
+    @property
+    def pos(self) -> list[int]:
+        return self.tile
+
+    @property
+    def needs(self) -> dict[str, float]:
+        return {key: getattr(self, key) for key in NEED_KEYS}
+
+    @property
+    def is_alive(self) -> bool:
+        return self.alive
+
+    @property
+    def cause_of_death(self) -> str | None:
+        return self.cause
 
 
 def to_state(body: AgentBody, recent_events: list[str]) -> dict:

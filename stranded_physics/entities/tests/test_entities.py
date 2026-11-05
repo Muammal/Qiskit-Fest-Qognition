@@ -24,7 +24,7 @@ TERRAIN = {"kind": "terrain", "source": "replay", "event": "st_vincent"}
 WEATHER = {"kind": "weather", "source": "replay", "event": "st_vincent"}
 ERUPTION = {"kind": "eruption", "source": "replay", "event": "st_vincent_2021"}
 PERSON = {"kind": "person", "source": "dials", "start_lon": -61.2, "start_lat": 13.3}
-SHELTER = {"kind": "shelter", "source": "dials", "lon": -61.2, "lat": 13.2}
+SHELTER = {"kind": "shelter", "source": "dials", "lon": -61.267, "lat": 13.233}
 
 
 def checked(*entities, **changes):
