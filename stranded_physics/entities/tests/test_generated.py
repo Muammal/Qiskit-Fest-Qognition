@@ -14,6 +14,9 @@ from stranded_physics.entities.build import check_scenario, to_spec
 from stranded_physics.entities.kinds import check_entity
 from stranded_physics.st_vincent import to_utm
 
+ROOT = Path(__file__).resolve().parents[3]
+HAS_RAW = (ROOT / "artifacts/physics/raw/atmos/weather_st_vincent.json").exists()
+needs_raw = pytest.mark.skipif(not HAS_RAW, reason="raw data is not held in this checkout")
 CARDS = Path(__file__).resolve().parents[2] / "scenario_cards"
 VENT = {"vent_lon": -61.18, "vent_lat": 13.33}
 SITE = {"site_lon": -61.227, "site_lat": 13.158}
@@ -27,17 +30,20 @@ def domains(card: str, seed: int) -> dict:
     return {domain.id: domain for domain in to_spec(load_scenario(CARDS / f"{card}.toml"), seed).domains}
 
 
+@needs_raw
 def test_a_catalogue_eruption_depends_on_the_seed_and_repeats():
     first, again, other = (domains("generated_eruption", seed)["eruption"].generated for seed in (1, 1, 2))
     assert first == again
     assert first != other
 
 
+@needs_raw
 def test_a_flow_follows_a_generated_eruption_not_the_published_date():
     built = domains("generated_eruption", 1)
     assert built["pdc"].first_collapse_s == pytest.approx(built["eruption"].generated.onset_s + 6 * 3600.)
 
 
+@needs_raw
 def test_a_flow_with_no_delay_set_uses_the_labelled_assumption():
     scenario = load_scenario(CARDS / "generated_eruption.toml")
     entities = tuple(replace(e, settings={}) if e.kind == "flow" else e for e in scenario.entities)
@@ -45,11 +51,13 @@ def test_a_flow_with_no_delay_set_uses_the_labelled_assumption():
     assert built["pdc"].first_collapse_s == pytest.approx(built["eruption"].generated.onset_s + PDC_SETTINGS["generated_collapse_delay"])
 
 
+@needs_raw
 def test_a_recorded_eruption_keeps_its_published_flow_time():
     built = {d.id: d for d in to_spec(load_scenario(CARDS / "st_vincent_2021.toml")).domains}
     assert built["pdc"].first_collapse_s == PDC_SETTINGS["first_collapse_after_axis_start"]
 
 
+@needs_raw
 def test_the_depth_averaged_model_can_be_chosen():
     scenario = load_scenario(CARDS / "st_vincent_2021.toml")
     entities = tuple(replace(e, event="depth_averaged") if e.kind == "flow" else e for e in scenario.entities)
@@ -58,6 +66,7 @@ def test_the_depth_averaged_model_can_be_chosen():
     assert chosen.variants() == {"pdc": "t2"}
 
 
+@needs_raw
 def test_dials_override_sampling():
     check_entity(eruption(size=3))
     scenario = load_scenario(CARDS / "generated_eruption.toml")
@@ -114,11 +123,13 @@ def test_a_long_catalogue_warning_cannot_break_a_short_scenario():
         assert made.lead_s <= .75 * 40 * 3600.
 
 
+@needs_raw
 def test_a_catalogue_storm_depends_on_the_seed():
     first, other = (domains("generated_storm", seed)["storm"].generated for seed in (1, 2))
     assert first.max_wind_m_s != other.max_wind_m_s or first.closest_km != other.closest_km
 
 
+@needs_raw
 def test_each_generated_card_builds_a_pack_and_someone_can_play_it():
     from stranded_physics.entities.build import check_events_happen
     from stranded_physics.packs.builder import build_pack
@@ -186,6 +197,7 @@ def test_a_small_eruption_makes_small_flows():
     assert size_scale(PDC_SETTINGS["reference_erupted_mass"] / 1000.) == pytest.approx(.1)
 
 
+@needs_raw
 def test_flows_stay_within_their_reach_limit():
     from stranded_physics.domains.pdc.model import distance_from
     from stranded_physics.packs.builder import build_pack
@@ -199,6 +211,7 @@ def test_flows_stay_within_their_reach_limit():
     assert reached.any() and distance_from(spec.grid, flow.vent)[reached].max() <= flow.reach_limit_m
 
 
+@needs_raw
 def test_gas_and_lava_build_from_a_scenario_and_someone_can_play_it():
     from stranded_physics.packs.builder import build_pack
     from stranded_physics.runtime.group import play_people

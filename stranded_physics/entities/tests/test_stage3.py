@@ -15,6 +15,9 @@ from stranded_physics.entities.kinds import WEATHER_ISLANDS, check_entity
 from stranded_physics.packs.builder import build_pack
 from stranded_physics.runtime.simulation import PackSimulation
 
+ROOT = Path(__file__).resolve().parents[3]
+HAS_RAW = (ROOT / "artifacts/physics/raw/atmos/weather_st_vincent.json").exists()
+needs_raw = pytest.mark.skipif(not HAS_RAW, reason="raw data is not held in this checkout")
 CARD = Path(__file__).resolve().parents[2] / "scenario_cards" / "generated_island.toml"
 
 
@@ -46,12 +49,14 @@ def scenario():
     return load_scenario(CARD)
 
 
+@needs_raw
 def test_the_seed_changes_the_island_and_it_repeats():
     first, again, other = (build_pack(to_spec(scenario(), seed), seed) for seed in (1, 1, 2))
     assert first.content_hash == again.content_hash
     assert not np.array_equal(first.frame("terrain.elevation"), other.frame("terrain.elevation"))
 
 
+@needs_raw
 def test_a_whole_generated_scenario_plays_on_its_own_land():
     for seed in (1, 2, 3):
         pack = build_pack(to_spec(scenario(), seed), seed)
@@ -63,6 +68,7 @@ def test_a_whole_generated_scenario_plays_on_its_own_land():
         assert PackSimulation(pack, mind_type="classical").run()["steps"]
 
 
+@needs_raw
 def test_dials_set_the_island():
     entities = tuple(replace(e, source="dials", settings={"summit_m": 800., "area_km2": 60.}) if e.kind == "terrain" else e for e in scenario().entities)
     pack = build_pack(to_spec(replace(scenario(), entities=entities), 1), 1)

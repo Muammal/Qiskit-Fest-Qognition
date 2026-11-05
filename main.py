@@ -20,6 +20,9 @@ from engine.world import IslandWorld
 from engine.agent import SurvivalAgent
 from engine.simulation import SimulationEngine, DEFAULT_STEPS
 from engine.batch_runner import run_batch_comparison, curate_demo_pack
+from engine.titanic import TitanicSimulation
+from engine.pompeii import PompeiiSimulation
+from engine.waterloo import WaterlooSimulation
 import contracts
 
 # Terminal ANSI formatting
@@ -96,9 +99,15 @@ def run_live_demo(
         from stranded_physics.runtime.simulation import PackSimulation
         pack = build(seed)
         sim = PackSimulation(pack, mind_type=mind, noise_source=noise)
+    elif scenario == "titanic":
+        sim = TitanicSimulation(seed=seed, mind_type=mind, noise_source=noise)
+    elif scenario == "pompeii":
+        sim = PompeiiSimulation(seed=seed, mind_type=mind, noise_source=noise)
+    elif scenario == "waterloo":
+        sim = WaterlooSimulation(seed=seed, mind_type=mind, noise_source=noise)
     else:
         sim = SimulationEngine(seed=seed, mind_type=mind, noise_source=noise, scenario=scenario)
-    max_steps = DEFAULT_STEPS
+    max_steps = getattr(sim, "horizon", DEFAULT_STEPS)
 
     def on_step(step_record: Dict[str, Any], engine: Any):
         t = step_record["t"]
@@ -138,7 +147,10 @@ def run_live_demo(
 
     print(f"\n{BOLD}========================================================================{RESET}")
     if timeline["outcome"] == "survived":
-        print(f"{BOLD}{GREEN}  >>> MISSION OUTCOME: SURVIVED! Successfully endured {len(timeline['steps']) * 2} hours. <<<{RESET}")
+        span = {"titanic": f"{len(timeline['steps']) * 5} minutes",
+                "pompeii": f"{len(timeline['steps']) * 15 / 60:.1f} hours",
+                "waterloo": f"{len(timeline['steps']) * 10 / 60:.1f} minutes"}.get(scenario, f"{len(timeline['steps']) * 2} hours")
+        print(f"{BOLD}{GREEN}  >>> MISSION OUTCOME: SURVIVED! Successfully endured {span}. <<<{RESET}")
     else:
         print(f"{BOLD}{RED}  >>> MISSION OUTCOME: DIED ({str(timeline['cause']).upper()}) at Step {len(timeline['steps'])}. <<<{RESET}")
     print(f"{BOLD}========================================================================{RESET}\n")
@@ -164,7 +176,7 @@ def main():
     parser.add_argument("--engine", type=str, default="legacy",
                         choices=["legacy", "physics", "legacy_pack"], help="Simulation runtime: legacy, the T1 St. Vincent physics pack, or the fictional island through the pack runtime")
     parser.add_argument("--noise", type=str, default="stub", help="Noise source profile")
-    parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano"], help="Choose scenario directly")
+    parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano", "titanic", "pompeii", "waterloo"], help="Choose scenario directly")
     parser.add_argument("--speed", type=float, default=0.2, help="Seconds delay per step during live demo")
 
     args = parser.parse_args()
@@ -192,7 +204,8 @@ def main():
         from engine.gui import launch_gui
         start_screen = "home" if args.scenario else "event_choice"
         print(f"Launching Quantum Cognition Simulation (Seed={args.seed}, Mind={args.mind})...")
-        launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen, builder_factory=open_builder)
+        launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen,
+                   scenario=args.scenario or "volcano", builder_factory=open_builder)
 
 
 if __name__ == "__main__":
