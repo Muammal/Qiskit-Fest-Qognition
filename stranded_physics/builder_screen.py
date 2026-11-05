@@ -22,9 +22,10 @@ from stranded_physics.runtime.game import build_game, lonlat_to_map, map_to_lonl
 
 KIND_TEXT = {"terrain": "The land", "weather": "Wind, rain, temperature", "eruption": "Timeline, column, mass", "ash": "Fallout from an eruption",
              "flow": "Hot flows from an eruption", "mudflow": "Rain on ash", "gas": "SO2 downwind", "lava": "A growing dome", "storm": "Wind from a cyclone", "person": "A body and a mind",
-             "group": "Many people, one mind", "shelter": "Somewhere to evacuate to", "resource": "Food, water or wood"}
+             "group": "Many people, one mind", "shelter": "Somewhere to evacuate to", "resource": "Food, water or wood",
+             "ship": "Hull and compartments", "breach": "Where it's holed", "lifeboats": "Seats, launch times", "sea": "Water temperature", "passengers": "People aboard"}
 KIND_GROUPS = (("WORLD", ("terrain", "weather")), ("HAZARDS", ("eruption", "ash", "flow", "mudflow", "gas", "lava", "storm")),
-               ("PEOPLE AND PLACES", ("person", "group", "shelter", "resource")))
+               ("AT SEA", ("ship", "breach", "lifeboats", "sea", "passengers")), ("PEOPLE AND PLACES", ("person", "group", "shelter", "resource")))
 KIND_COLORS = {"person": COLOR_PURPLE, "group": COLOR_PURPLE, "shelter": COLOR_GREEN, "resource": COLOR_CYAN, "storm": COLOR_BLUE}
 SOURCE_TEXT = {"replay": "Real record", "catalogue": "Sampled from records", "dials": "Set by hand"}
 MIND_TEXT = {"quantum": "Quantum", "classical_mixture": "Control", "classical": "Classical"}
@@ -398,8 +399,8 @@ class BuilderScreen:
         self._text("Place", 722, 18, self.app.font_small, COLOR_TEXT_MUTED)
         following = PLACES[(PLACES.index(header["place"]) + 1) % len(PLACES)]
         self._button((722, 36, 100, 30), str(header["place"]).capitalize(), lambda: self._apply(lambda: edit.set_header(self.draft, "place", following)))
-        self._text(f"{header['step_hours']} h steps", 1272, 42, self.app.font_small, COLOR_TEXT_MUTED)
-        self._text(f"{int(header['hours']) // int(header['step_hours'])} steps", 1272, 24, self.app.font_small, COLOR_TEXT_MUTED)
+        self._text(f"{header['step_hours']} h steps" if "step_hours" in header else f"{header['step_minutes']} min steps", 1272, 42, self.app.font_small, COLOR_TEXT_MUTED)
+        self._text(f"{int(header['hours']) * 60 // (int(header['step_hours']) * 60 if 'step_hours' in header else int(header['step_minutes']))} steps", 1272, 24, self.app.font_small, COLOR_TEXT_MUTED)
 
     def _draw_palette(self) -> None:
         self.app.draw_card(12, 84, 250, 744)
@@ -409,13 +410,13 @@ class BuilderScreen:
             self._text(group, 26, y, self.app.font_small, COLOR_TEXT_HINT)
             y += 18
             for kind in kinds:
-                rect = pygame.Rect(24, y, 226, 40)
+                rect = pygame.Rect(24, y, 226, 28)
                 self._button(rect, "", lambda k=kind: self._add(k))
                 self.hot[-1] = Hot(rect, self.hot[-1].action, f"add:{kind}")
-                self._text(f"+  {kind.capitalize()}", rect.x + 10, rect.y + 3, self.app.font_sub)
-                self._text(KIND_TEXT[kind], rect.x + 10, rect.y + 21, self.app.font_small, COLOR_TEXT_MUTED)
-                y += 46
-            y += 8
+                self._text(f"+ {kind.capitalize()}", rect.x + 6, rect.y + 5, self.app.font_small)
+                self._text(KIND_TEXT[kind], rect.x + 88, rect.y + 6, self.app.font_small, COLOR_TEXT_MUTED)
+                y += 31
+            y += 4
 
     def _draw_map(self) -> None:
         self.app.draw_card(274, 84, 544, 560)

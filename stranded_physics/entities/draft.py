@@ -45,7 +45,7 @@ def from_file(path: Path) -> Draft:
         table = _table(path)
     except (tomllib.TOMLDecodeError, UnicodeDecodeError, ValueError, KeyError, TypeError) as error:
         raise InterfaceError(f"Can't read {Path(path).name}: {error}") from error
-    return Draft({key: table[key] for key in HEADER_KEYS}, tuple(table["entity"]))
+    return Draft({key: table[key] for key in (*HEADER_KEYS, "step_minutes") if key in table}, tuple(table["entity"]))
 
 
 def new_draft() -> Draft:
@@ -78,7 +78,7 @@ def add_entity(draft: Draft, kind: str) -> Draft:
     entry: dict[str, object] = {"kind": kind, "source": described.sources[0]}
     if described.events:
         entry["event"] = described.events[0]
-    if kind in ("person", "group"):
+    if kind in ("person", "group", "passengers"):
         entry["mind"] = MINDS[0]
     if kind == "resource":
         entry["what"] = RESOURCES[0]
@@ -151,7 +151,7 @@ def choices(entry: Mapping[str, object], key: str) -> tuple[str, ...]:
     if key == "source":
         return kind.sources
     if key == "mind":
-        return MINDS if kind.name in ("person", "group") else ()
+        return MINDS if kind.name in ("person", "group", "passengers") else ()
     if key == "what":
         if kind.name == "weather" and entry["source"] == "catalogue":
             return WEATHER_ISLANDS

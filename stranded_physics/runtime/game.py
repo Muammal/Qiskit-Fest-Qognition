@@ -66,6 +66,8 @@ class CustomGame:
 
 def build_game(scenario: ScenarioFile, seed: int) -> CustomGame:
     """The slow part, meant for a background thread: the pack, hazard frames and walking routes are all ready before play starts."""
+    if any(entity.kind == "ship" for entity in scenario.entities):
+        raise InterfaceError("Ship scenarios run from the command line for now: python -m stranded_physics.entities.build run <file>")
     people = people_of(scenario)
     if not people:
         raise InterfaceError("There is nobody to play yet. Add a person or a group")

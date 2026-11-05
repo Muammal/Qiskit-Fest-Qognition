@@ -22,6 +22,7 @@ CARD_KEYS = {"id", "title", "place", "uses"}
 PLACES = ("real", "fictional", "generated")
 NOT_MODEL_FILES = {"__init__.py", "measure.py", "fetch.py"}
 CANNOT_RUN, NOT_VERIFIED = "CANNOT RUN", "NOT VERIFIED"
+DISAGREES = "DISAGREES WITH EVERY SCORED OBSERVATION"
 NOT_VALIDATED, PARTLY, AGREES = "VERIFIED, NOT VALIDATED HERE", "PARTLY VALIDATED", "AGREES WITH EVERY SCORED OBSERVATION"
 
 
@@ -119,6 +120,8 @@ def overall(parts: list[PartReport]) -> str:
     agrees, disagrees = sum(len(p.agrees) for p in parts), sum(len(p.disagrees) for p in parts)
     if not agrees and not disagrees:
         return NOT_VALIDATED
+    if not agrees:
+        return DISAGREES
     return AGREES if not disagrees else PARTLY
 
 

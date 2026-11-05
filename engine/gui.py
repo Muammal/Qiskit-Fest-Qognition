@@ -81,7 +81,7 @@ from engine.scenes_pompeii import PompeiiCutscenes
 from engine.site import SiteWorld
 from engine.waterloo import HORIZON as WATERLOO_STEPS, STORY_TEXT as WATERLOO_STORY, WaterlooSimulation
 from engine.gui_site import SitePanels, SiteView, clock_text as site_clock, mini_map as site_mini_map, next_role_patron
-from engine.chlorine import AEGL_MEANING
+from engine.scenes_waterloo import WaterlooCutscenes
 from engine.cutscenes import CutscenePlayer
 
 try:
@@ -756,11 +756,6 @@ class IslandVisualizerApp:
             "VOLCANO EVACUATION  >>", self.font_title,
             bg_color=(214, 78, 24), active_color=COLOR_ORANGE, icon="volcano"
         )
-        self.btn_choice_build = UIButton(
-            (26, 843, 380, 40),
-            "BUILD YOUR OWN SCENARIO  >>", self.font_sub,
-            bg_color=(146, 58, 196), active_color=COLOR_PURPLE, icon="menu"
-        )
         self.btn_choice_titanic = UIButton(
             (c3_x + 35, btn_y, btn_w, 48),
             "TITANIC EVACUATION  >>", self.font_title,
@@ -771,11 +766,18 @@ class IslandVisualizerApp:
             "POMPEII EVACUATION  >>", self.font_title,
             bg_color=(140, 66, 40), active_color=COLOR_RED, icon="volcano"
         )
-        self.card5_rect = pygame.Rect(26, 752, 1548, 84)
+        # The bottom row is shared: the Waterloo banner on the left, the scenario builder on the right.
+        self.card5_rect = pygame.Rect(26, 752, 1010, 84)
         self.btn_choice_waterloo = UIButton(
-            (1196 + 35, 770, btn_w, 48),
+            (self.card5_rect.right - btn_w - 24, 770, btn_w, 48),
             "WATERLOO CHLORINE LEAK  >>", self.font_sub,
             bg_color=(70, 120, 60), active_color=COLOR_GREEN, icon="launch"
+        )
+        self.card_build_rect = pygame.Rect(self.card5_rect.right + 16, 752, WINDOW_WIDTH - 26 - self.card5_rect.right - 16, 84)
+        self.btn_choice_build = UIButton(
+            (self.card_build_rect.centerx - 230, 770, 460, 48),
+            "BUILD YOUR OWN SCENARIO  >>", self.font_title,
+            bg_color=(146, 58, 196), active_color=COLOR_PURPLE, icon="menu"
         )
 
     def _presets(self):
@@ -786,7 +788,7 @@ class IslandVisualizerApp:
         return {"titanic": TITANIC_STEPS, "pompeii": POMPEII_STEPS, "waterloo": WATERLOO_STEPS}.get(scenario, DEFAULT_STEPS)
 
     def _cutscene_player(self, scenario):
-        player = PompeiiCutscenes if scenario == "pompeii" else CutscenePlayer
+        player = {"pompeii": PompeiiCutscenes, "waterloo": WaterlooCutscenes}.get(scenario, CutscenePlayer)
         return player(self.font_hero, self.font_small)
 
     def _scenario_settings(self):
@@ -944,7 +946,7 @@ class IslandVisualizerApp:
         self.city_view = {"pompeii": CityView, "waterloo": SiteView}[self.scenario](self) if self.scenario in CROWD_SCENARIOS else None
         self.split_panels = {"pompeii": SplitPanels, "waterloo": SitePanels}[self.scenario](self.engine) if self.scenario in CROWD_SCENARIOS else None
         self.show_split_panels = True
-        wanted_player = PompeiiCutscenes if self.scenario == "pompeii" else CutscenePlayer
+        wanted_player = {"pompeii": PompeiiCutscenes, "waterloo": WaterlooCutscenes}.get(self.scenario, CutscenePlayer)
         if type(self.cutscene) is not wanted_player:
             enabled = self.cutscene.enabled
             self.cutscene = wanted_player(self.font_hero, self.font_small)
@@ -1146,6 +1148,12 @@ class IslandVisualizerApp:
                     self._handle_event_choice_click(self.btn_choice_build.rect.center)
             elif self.app_state == "home" and event.key == pygame.K_RETURN:
                 self._handle_home_click(self.btn_launch.rect.center)
+            elif self.app_state == "sim" and event.key == pygame.K_r:
+                self._init_simulation()
+            elif self.app_state == "sim" and event.key == pygame.K_h:
+                self.app_state = self._menu_state()
+            elif self.app_state == "sim" and event.key == pygame.K_p and self.custom_game is not None:
+                self._next_person()
             elif event.key == pygame.K_f and self.app_state == "sim" and self.scenario in ("titanic", "pompeii", "waterloo"):
                 self._follow({"pompeii": next_role_citizen, "waterloo": next_role_patron}.get(self.scenario, next_role_person)(self.engine))
             elif event.key == pygame.K_c and self.app_state == "sim" and self.scenario in ("titanic", "pompeii", "waterloo"):
@@ -1154,12 +1162,6 @@ class IslandVisualizerApp:
                 self.city_view.toggle()
             elif event.key == pygame.K_p and self.app_state == "sim" and self.scenario in CROWD_SCENARIOS:
                 self.show_split_panels = not self.show_split_panels
-            elif self.app_state == "sim" and event.key == pygame.K_p and self.custom_game is not None:
-                self._next_person()
-            elif self.app_state == "sim" and event.key == pygame.K_r:
-                self._init_simulation()
-            elif self.app_state == "sim" and event.key == pygame.K_h:
-                self.app_state = self._menu_state()
             elif event.key == pygame.K_SPACE and self.app_state == "sim":
                 self.is_paused = not self.is_paused
             elif event.key in (pygame.K_RIGHT, pygame.K_n) and self.app_state == "sim":
@@ -1320,8 +1322,9 @@ class IslandVisualizerApp:
                 return True
             if self.btn_choice_waterloo.check_hover(pos) or self.card5_rect.collidepoint(pos):
                 return True
-            c3_h = self.btn_choice_build.check_hover(pos)
-            return self.btn_choice_island.check_hover(pos) or self.btn_choice_volcano.check_hover(pos) or c1_h or c2_h or c3_h
+            if self.btn_choice_build.check_hover(pos) or (hasattr(self, 'card_build_rect') and self.card_build_rect.collidepoint(pos)):
+                return True
+            return self.btn_choice_island.check_hover(pos) or self.btn_choice_volcano.check_hover(pos) or c1_h or c2_h
 
         elif self.app_state == "home":
             btns = [
@@ -1729,22 +1732,19 @@ class IslandVisualizerApp:
         self._draw_titanic_card(c3_x, c_y, card_w, card_h, mouse_pos)
         self._draw_pompeii_card(c4_x, c_y, card_w, card_h, mouse_pos)
         self._draw_waterloo_banner(mouse_pos)
-        self.btn_choice_build.check_hover(mouse_pos)
-        self.btn_choice_build.draw(self.canvas)
-        if self.notice:
-            self.canvas.blit(self.font_small.render(self.notice, True, COLOR_RED), (26, 884))
+        self._draw_build_card(mouse_pos)
 
         # -------------------------------------------------------------
         # Footer Technical Shortcut Bar
         # -------------------------------------------------------------
-        footer_w, footer_h = 760, 34
+        footer_w, footer_h = 900, 34
         footer_x = (WINDOW_WIDTH - footer_w) // 2
         footer_y = WINDOW_HEIGHT - 54
         foot_rect = pygame.Rect(footer_x, footer_y, footer_w, footer_h)
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, foot_rect, border_radius=4)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, foot_rect, 1, border_radius=4)
 
-        tip_str = "[1] Island  [2] Volcano  [3] Titanic  [4] Pompeii  [5] Waterloo  [6] Build  [F11] Fullscreen"
+        tip_str = "[ 1 ] Island   [ 2 ] Volcano   [ 3 ] Titanic   [ 4 ] Pompeii   [ 5 ] Waterloo   [ B ] Build   [ F11 ] Fullscreen"
         hint_surf = self.font_mono.render(tip_str, True, COLOR_TEXT_HINT)
         self.canvas.blit(hint_surf, (footer_x + (footer_w - hint_surf.get_width()) // 2, footer_y + (footer_h - hint_surf.get_height()) // 2))
 
@@ -1754,10 +1754,19 @@ class IslandVisualizerApp:
         self.draw_card(rect.x, rect.y, rect.width, rect.height, border_color=COLOR_GREEN if hover else COLOR_CARD_BORDER, border_width=1)
         self.draw_badge(rect.x + 24, rect.y + 12, "LOCAL: WATERLOO, ONTARIO", COLOR_GREEN)
         self.canvas.blit(self.font_title.render("MOSES SPRINGER CHLORINE LEAK", True, COLOR_TEXT_MAIN), (rect.x + 290, rect.y + 12))
-        self.canvas.blit(self.font_small.render("A hypothetical evacuation at a real site. Most details of the 30 July 2012 leak are unknown, so the leak and head-count are labelled settings.",
-                                                True, COLOR_TEXT_MUTED), (rect.x + 24, rect.y + 52))
+        text_width = self.btn_choice_waterloo.rect.x - rect.x - 48
+        render_wrapped_text(self.canvas, "A hypothetical evacuation at a real site. Most details of the 30 July 2012 leak are unknown, so the leak and head-count are labelled settings.",
+                            self.font_small, COLOR_TEXT_MUTED, rect.x + 24, rect.y + 42, text_width, line_spacing=2, max_lines=2)
         self.btn_choice_waterloo.check_hover(mouse_pos)
         self.btn_choice_waterloo.draw(self.canvas)
+
+    def _draw_build_card(self, mouse_pos: Tuple[int, int]):
+        rect = self.card_build_rect
+        hover = self.btn_choice_build.check_hover(mouse_pos)
+        self.draw_card(rect.x, rect.y, rect.width, rect.height, border_color=COLOR_PURPLE if hover else COLOR_CARD_BORDER, border_width=1)
+        self.btn_choice_build.draw(self.canvas)
+        if self.notice:
+            render_wrapped_text(self.canvas, self.notice, self.font_small, COLOR_RED, rect.x + 16, rect.bottom - 18, rect.width - 32, line_spacing=2, max_lines=1)
 
     def _draw_pompeii_card(self, x: int, y: int, w: int, h: int, mouse_pos: Tuple[int, int]):
         hover = self.card4_rect.collidepoint(mouse_pos) or self.btn_choice_pompeii.check_hover(mouse_pos)
@@ -2064,11 +2073,6 @@ class IslandVisualizerApp:
         if self.show_debrief_modal:
             self.draw_debrief_modal(mouse_pos)
 
-    def _focus_is_on_shown_map(self):
-        """The followed person's avatar only belongs on the map they are actually on."""
-        agent = self.agent
-        return agent.is_alive and agent.status == ("road" if self.city_view.show_region else "city")
-
     def draw_custom_game_label(self):
         game = self.custom_game
         label = f"{game.title}  |  Following {game.person.name} ({game.index + 1} of {len(game.people)})  |  [P] next person"
@@ -2077,6 +2081,11 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, (248, 234, 198), box, border_radius=6)
         pygame.draw.rect(self.canvas, (106, 64, 28), box, 2, border_radius=6)
         self.canvas.blit(shown, (box.x + 10, box.y + 4), (0, 0, box.width - 20, shown.get_height()))
+
+    def _focus_is_on_shown_map(self):
+        """The followed person's avatar only belongs on the map they are actually on."""
+        agent = self.agent
+        return agent.is_alive and agent.status == ("road" if self.city_view.show_region else "city")
 
     def draw_map_navigation_bar(self, mouse_pos: Tuple[int, int]):
         bar_bg = pygame.Surface((MAP_SIZE, 52), pygame.SRCALPHA)

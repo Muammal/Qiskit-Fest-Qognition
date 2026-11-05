@@ -29,6 +29,9 @@ python -m stranded_physics.check stranded_physics/scenario_cards/st_vincent_2021
 | Storm | Codex | Holland profile on Hurricane Beryl's real track | Tests pass. Nothing to score it against yet |
 | Generated storms | Codex | Winds sampled from catalogues, straight tracks, or set by hand | Wind holdout passes, at 0.094 against 0.25. That checks peak winds only, not tracks or local impact |
 | Old fictional island | Codex | Its hazards as a pack, so both worlds share one runtime (T-604) | Hazards match exactly. Survival differs, because the body model differs |
+| Ship flooding | Codex | Compartments on a box hull, with trim and spilling over bulkheads | **Founders at 201 minutes against 160** |
+| Immersion | Codex | Time in the water, by temperature and lifebelt | Rules tested. **Not fitted to survival data** |
+| Lifeboats and boarding | Claude | Shared seats, launch times, who the crew let in first | Rules tested. See the Titanic section |
 | Scenario checker | Claude | Reports what each part of a scenario can support | Works |
 
 ## Blind checks against 2021
@@ -58,6 +61,49 @@ The solver's scheme for moving flow over small bed steps was derived here, not t
 ## A gate we changed after it failed
 
 `eruption-lead-time-sampling` could not be passed by any correct sampler, so it now compares whole distributions. See [changes/003-lead-time-gate.md](changes/003-lead-time-gate.md). It's a check of the sampling, not of reality, and it should be reviewed by someone else.
+
+## The Titanic
+
+The scenario is `scenario_cards/titanic_1912.toml`: 2,201 people, with the ship, damage, boats and who was aboard from the 1912 British inquiry. Targets were committed before any ship model existed, but everyone working on this knows how it ended, so they are blind to the result and not to the target. Boat times come from Wormstedt, Fitch and Behe's revised table, with the 1912 table held for comparison.
+
+**The flooding model, tested alone:**
+
+| Check | Record | Model | Verdict |
+|---|---|---|---|
+| Water after 40 minutes | About 16,000 tons | 18,401 tons | PASS, but it's an anchor: the 12 square feet was worked out from this |
+| Time to founder | 160 minutes, within 30 | 201 minutes | **FAIL** |
+
+A box hull with no tuning sinks about a quarter too slowly. Because of that, the people below meet the *recorded* sinking, not this model's.
+
+**Who was saved, in one run of each mind:**
+
+| Group | Record | Quantum (the scored one) | Control | Classical (reported, unscored) |
+|---|---|---|---|---|
+| Everyone | 32.3% | **3.4%** | 3.4% | 33.9% |
+| Adult men | 20.3% | 4.4% | 4.4% | 12.9% |
+| Adult women | 74.4% | **0.2%** | 0.2% | 100% |
+| Children | 52.3% | 0.9% | 0.9% | 100% |
+| First class | 62.5% | 0.6% | 0.6% | 51.7% |
+| Second class | 41.4% | 0.4% | 0.4% | 63.9% |
+| Third class | 25.2% | 0.4% | 0.4% | 43.6% |
+
+**This scenario does not reproduce the Titanic.** With the quantum mind, every people gate fails. Why, as far as we know:
+
+- **Minds decide too late.** The quantum mind first chooses to go at about 2:10 a.m. The control chooses it once at about 11:50 p.m., before the alarm, and not again. Both were built for two-hour steps, and nothing rescales them for ten-minute ones.
+- **Everyone with the same mind decides alike.** Minds pick their top action, so people differ only in where they start.
+- **Nobody is ordered to the boats.** Real stewards sent people up. Here only the 66 deck crew go as a duty, and they are almost all the survivors in the quantum and control runs.
+- **The classical mind's 33.9% isn't agreement.** Its total is close, but its breakdown is wrong.
+
+**Don't read the gap between minds as a result about people.** It comes from when each mind's fixed rules happen to trip at this step size.
+
+**Two faults found on the way, both in the wiring, and both fixed after the first results were seen:**
+
+1. In the first full run, all boats shared four deck cells, so they merged and left with the earliest boat. Saved: 21.3%.
+2. With that fixed, saved came out at 33.0%, almost exactly the record, and **that was an artefact.** People who had never chosen to go boarded because their starting point happened to be near a boat. Requiring the choice dropped it to 3.4%.
+
+Neither fix was aimed at a target, but the final numbers aren't from a first, blind run, and this section should be read that way.
+
+**Assumed, and set before any run:** where each group starts, how long each takes to reach the boat deck, two seamen per boat, and lifebelts for everyone. **Not fitted:** the time people last in the water has a median of 20 minutes at freezing, or 30 with a lifebelt. Wikipedia's "within 15 to 30 minutes" is a cross-check only. **Sources disagree:** the inquiry counts 711 saved of 2,201, and modern work counts 712 of 2,208.
 
 ## What the minds do on the real island
 
@@ -95,3 +141,5 @@ The minds decide differently, which says nothing about which is better. Eight of
 | Exposure from flow speed and depth | The solver has both, and the odds ignore them |
 | T-104 licences and citations | Lets raw data into git, and checks what's cited from memory |
 | Someone independent reruns the gates | Required before any task counts as done |
+| Decide how crew orders work on a ship, then commit the targets again | The Titanic can't show who is saved until people are sent to the boats |
+| Rescale minds to the step size | They were built for two-hour steps |

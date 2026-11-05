@@ -7,6 +7,7 @@ import pytest
 import contracts
 from engine.chlorine import LEAK_SITES, LEAK_START_STEP, ODOUR_PPM, SOURCE_PPM, ChlorineModel, exposure_level, wind_at
 from engine.patrons import POPULATION_SETTINGS, role_counts, smell_chance
+from engine.scenes_waterloo import SCENES, WaterlooCutscenes
 from engine.site import BUILDING, DOORS, POOL, POOL_GATES, PROVENANCE, SITE_M_PER_TILE, SiteWorld
 from engine.waterloo import EVENT_MAPPINGS, WaterlooSimulation
 from engine.world import IslandWorld
@@ -336,3 +337,57 @@ def test_every_setting_button_cycles_and_reaches_the_simulation(app):
 def test_pompeii_settings_are_not_touched_by_waterloo_buttons(app):
     assert app.pompeii_settings["event_mapping"] == "B"
     assert app.pompeii_settings["population"] == 11_500
+
+
+# --- Cutscenes ---
+
+def _all_scenes(sim):
+    scenes = []
+    while sim.step() is not None:
+        scenes += sim.scenes
+    return scenes
+
+
+def test_every_scene_kind_can_play_and_draws(world):
+    pygame = pytest.importorskip("pygame")
+    pygame.init()
+    canvas = pygame.Surface((1600, 900))
+    font = pygame.font.SysFont("arial", 14)
+    scenes = _all_scenes(WaterlooSimulation(seed=3))
+    kinds = {scene["kind"] for scene in scenes}
+    assert kinds == set(SCENES)
+    for scene in scenes:
+        player = WaterlooCutscenes(font, font)
+        player.enqueue([scene])
+        player.elapsed = 1.
+        player.draw(canvas)
+
+
+def test_scenes_never_change_a_result():
+    played, plain = WaterlooSimulation(seed=8), WaterlooSimulation(seed=8)
+    played.run()
+    plain._emit_scenes = lambda t, moving: None
+    plain.run()
+    assert [p.pos for p in played.people] == [p.pos for p in plain.people]
+    assert played.exposure_summary() == plain.exposure_summary()
+    assert played.timing() == plain.timing()
+
+
+def test_only_the_alarm_scenes_play_once_per_run_and_only_with_an_alarm():
+    with_alarm = [s["kind"] for s in _all_scenes(WaterlooSimulation(seed=3))]
+    assert with_alarm.count("leak_start") == with_alarm.count("alarm_cutaway") == with_alarm.count("pool_exit") == 1
+    without = [s["kind"] for s in _all_scenes(WaterlooSimulation(seed=3, alarm=False))]
+    assert "alarm_cutaway" not in without and "alarm_pool" not in without
+
+
+def test_closeup_text_agrees_with_the_moment_it_shows():
+    sim = WaterlooSimulation(seed=3)
+    scenes = _all_scenes(sim)
+    learned = next(s for s in scenes if s["kind"] == "person_closeup" and "learns" in s["caption"])
+    assert "noticed nothing new" not in learned["thought"]
+
+
+def test_alarm_pool_scene_plays_when_the_alarm_starts():
+    sim = WaterlooSimulation(seed=3)
+    scenes = _all_scenes(sim)
+    assert next(s for s in scenes if s["kind"] == "alarm_pool")["t"] == sim.alarm_step

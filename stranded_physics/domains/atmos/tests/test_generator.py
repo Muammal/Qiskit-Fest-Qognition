@@ -1,10 +1,14 @@
 from datetime import datetime, timezone
+from pathlib import Path
 import numpy as np
 import pytest
 from stranded_physics.core.api import TimeAxis, InterfaceError
 from stranded_physics.core.fields import FieldStore, ScopedFields
 from stranded_physics.domains.atmos.generator import WeatherWindow, WeatherDials, ISLANDS
 
+RAW = Path(__file__).resolve().parents[4] / "artifacts/physics/raw/atmos"
+HAS_RAW = RAW.is_dir() and any(RAW.iterdir())
+needs_raw = pytest.mark.skipif(not HAS_RAW, reason="raw data is not held in this checkout")
 AXIS = TimeAxis(datetime(2000,1,1,tzinfo=timezone.utc),7200,8)
 
 
@@ -19,6 +23,7 @@ def run(model,seed=1):
     return store
 
 
+@needs_raw
 @pytest.mark.parametrize("island",ISLANDS)
 def test_windows(island):
     a,b = WeatherWindow(AXIS,island,12),WeatherWindow(AXIS,island,12)
@@ -47,6 +52,7 @@ def test_refusals():
             WeatherWindow(TimeAxis(AXIS.t0_utc,dt,n),"st_vincent")
 
 
+@needs_raw
 @pytest.mark.parametrize("last",[False,True])
 def test_year_edges_match_raw(last):
     import json

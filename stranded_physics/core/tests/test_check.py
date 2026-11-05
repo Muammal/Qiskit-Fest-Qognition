@@ -61,6 +61,7 @@ def test_own_tests_must_all_pass_and_have_been_run():
     ([part()], check.NOT_VALIDATED),
     ([part(agrees=("a",)), part(disagrees=("b",))], check.PARTLY),
     ([part(agrees=("a",))], check.AGREES),
+    ([part(disagrees=("b",))], check.DISAGREES),
 ])
 def test_overall_result(parts, expected):
     assert check.overall(parts) == expected

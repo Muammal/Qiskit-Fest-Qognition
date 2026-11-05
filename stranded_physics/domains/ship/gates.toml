@@ -1,0 +1,158 @@
+# One [[gate]] per check. Targets are from the 1912 British inquiry, and were committed before any ship model existed.
+# They are blind to the result, but not to the target: the author knows how the Titanic ended.
+
+[[gate]]
+id = "ship.records_and_units"
+title = "Ship parameters and dataset records pass unit and split checks"
+kind = "verification"
+command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/ship'); load_datasets(p/'datasets.toml', 'ship'); load_parameters(p/'params.toml')\""
+inputs = ["stranded_physics/domains/ship/datasets.toml", "stranded_physics/domains/ship/params.toml"]
+required = true
+
+[[gate]]
+id = "ship-model"
+title = "Flooding rules hold: exact fills, conservation, bulkheads, trim, time rule"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/ship/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/ship/*.py", "stranded_physics/domains/ship/*.csv", "stranded_physics/domains/ship/params.toml", "stranded_physics/domains/ship/tests/*.py"]
+required = false
+
+[[gate]]
+id = "ship-water-at-40-minutes"
+title = "Water in the hull 40 minutes after the collision (tons)"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.domains.ship.measure water_at_40_minutes"
+inputs = ["stranded_physics/domains/ship/*.py", "stranded_physics/domains/ship/*.csv", "stranded_physics/domains/ship/params.toml"]
+required = false
+target = 16000.0
+tolerance = 3200.0
+role = "anchor"
+split = "reference"
+source = "Wilding, British inquiry, Q20422 area: about 16,000 tons in about 40 minutes. His 12 square feet was worked out from this, so this checks the model against its own input, and is not a prediction"
+
+[[gate]]
+id = "ship-foundering-time"
+title = "Minutes from collision to foundering"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.domains.ship.measure foundering_minutes"
+inputs = ["stranded_physics/domains/ship/*.py", "stranded_physics/domains/ship/*.csv", "stranded_physics/domains/ship/params.toml"]
+required = false
+target = 160.0
+tolerance = 30.0
+role = "prediction"
+split = "holdout"
+source = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 1912: 'At 11.40 p. m. on that day she struck an iceberg and at 2.20 a. m. on the next day she foundered'"
+
+[[gate]]
+id = "titanic-saved-all"
+title = "Share of everyone aboard who were saved"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.validation.titanic saved_all"
+inputs = ["stranded_physics/validation/titanic.py", "stranded_physics/runtime/*.py", "stranded_physics/domains/ship/*.py", "stranded_physics/domains/sea/*.py", "stranded_physics/scenario_cards/titanic_1912.toml"]
+required = false
+target = 0.323
+tolerance = 0.1
+role = "prediction"
+split = "holdout"
+source = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 1912, Numbers Saved: 711 out of 2,201, or 32.30 per cent"
+
+[[gate]]
+id = "titanic-saved-adult_male"
+title = "Share of adult males saved"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.validation.titanic saved_adult_male"
+inputs = ["stranded_physics/validation/titanic.py", "stranded_physics/runtime/*.py", "stranded_physics/domains/ship/*.py", "stranded_physics/domains/sea/*.py", "stranded_physics/scenario_cards/titanic_1912.toml"]
+required = false
+target = 0.2027
+tolerance = 0.1
+role = "prediction"
+split = "holdout"
+source = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 1912, Numbers Saved: 338 out of 1,667, or 20.27 per cent"
+
+[[gate]]
+id = "titanic-saved-adult_female"
+title = "Share of adult females saved"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.validation.titanic saved_adult_female"
+inputs = ["stranded_physics/validation/titanic.py", "stranded_physics/runtime/*.py", "stranded_physics/domains/ship/*.py", "stranded_physics/domains/sea/*.py", "stranded_physics/scenario_cards/titanic_1912.toml"]
+required = false
+target = 0.7435
+tolerance = 0.15
+role = "prediction"
+split = "holdout"
+source = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 1912, Numbers Saved: 316 out of 425, or 74.35 per cent"
+
+[[gate]]
+id = "titanic-saved-child"
+title = "Share of children saved"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.validation.titanic saved_child"
+inputs = ["stranded_physics/validation/titanic.py", "stranded_physics/runtime/*.py", "stranded_physics/domains/ship/*.py", "stranded_physics/domains/sea/*.py", "stranded_physics/scenario_cards/titanic_1912.toml"]
+required = false
+target = 0.5229
+tolerance = 0.2
+role = "prediction"
+split = "holdout"
+source = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 1912, Numbers Saved: 57 out of 109, or 52.29 per cent"
+
+[[gate]]
+id = "titanic-saved-first_class"
+title = "Share of first-class passengers saved"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.validation.titanic saved_first_class"
+inputs = ["stranded_physics/validation/titanic.py", "stranded_physics/runtime/*.py", "stranded_physics/domains/ship/*.py", "stranded_physics/domains/sea/*.py", "stranded_physics/scenario_cards/titanic_1912.toml"]
+required = false
+target = 0.6246
+tolerance = 0.15
+role = "prediction"
+split = "holdout"
+source = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 1912, Numbers Saved: 203 out of 325, or 62.46 per cent"
+
+[[gate]]
+id = "titanic-saved-second_class"
+title = "Share of second-class passengers saved"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.validation.titanic saved_second_class"
+inputs = ["stranded_physics/validation/titanic.py", "stranded_physics/runtime/*.py", "stranded_physics/domains/ship/*.py", "stranded_physics/domains/sea/*.py", "stranded_physics/scenario_cards/titanic_1912.toml"]
+required = false
+target = 0.414
+tolerance = 0.15
+role = "prediction"
+split = "holdout"
+source = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 1912, Numbers Saved: 118 out of 285, or 41.40 per cent"
+
+[[gate]]
+id = "titanic-saved-third_class"
+title = "Share of third-class passengers saved"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.validation.titanic saved_third_class"
+inputs = ["stranded_physics/validation/titanic.py", "stranded_physics/runtime/*.py", "stranded_physics/domains/ship/*.py", "stranded_physics/domains/sea/*.py", "stranded_physics/scenario_cards/titanic_1912.toml"]
+required = false
+target = 0.2521
+tolerance = 0.15
+role = "prediction"
+split = "holdout"
+source = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 1912, Numbers Saved: 178 out of 706, or 25.21 per cent"
+
+[[gate]]
+id = "titanic-saved-crew"
+title = "Share of crew saved"
+kind = "validation"
+scenario = "titanic_1912"
+command = "python -m stranded_physics.validation.titanic saved_crew"
+inputs = ["stranded_physics/validation/titanic.py", "stranded_physics/runtime/*.py", "stranded_physics/domains/ship/*.py", "stranded_physics/domains/sea/*.py", "stranded_physics/scenario_cards/titanic_1912.toml"]
+required = false
+target = 0.2395
+tolerance = 0.15
+role = "prediction"
+split = "holdout"
+source = "Report on the Loss of the Steamship Titanic, British Wreck Commissioner, 1912, Numbers Saved: 212 out of 885, or 23.95 per cent"
