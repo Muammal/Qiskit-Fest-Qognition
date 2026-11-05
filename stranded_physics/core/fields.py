@@ -14,9 +14,15 @@ CANONICAL: dict[str, tuple[str, str]] = {
     "terrain.land_mask": ("dimensionless", "static"),
     "terrain.zone": ("dimensionless", "static"),  # 0 safe, 1 caution, 2 danger. Static, never from future hazards.
     "terrain.land_cover": ("dimensionless", "static"),
+    "terrain.flow_accumulation": ("m**2", "static"),  # Upslope contributing area of each cell.
+    "terrain.height_above_drainage": ("m", "static"),
     "atmos.rain_rate": ("mm/h", "series"),
-    "atmos.wind_speed": ("m/s", "series"),
+    "atmos.wind_speed": ("m/s", "series"),  # At 10 m.
     "atmos.wind_bearing": ("degree", "series"),  # The bearing air moves toward. 0 north, 90 east.
+    "atmos.wind_speed_500hpa": ("m/s", "series"),
+    "atmos.wind_bearing_500hpa": ("degree", "series"),
+    "atmos.wind_speed_200hpa": ("m/s", "series"),
+    "atmos.wind_bearing_200hpa": ("degree", "series"),
     "atmos.air_temperature": ("degC", "series"),
     "storm.max_wind": ("m/s", "series"),
     "eruption.phase": ("dimensionless", "series"),  # 0 unrest, 1 escalating, 2 erupting, 3 fading.
@@ -24,12 +30,14 @@ CANONICAL: dict[str, tuple[str, str]] = {
     "eruption.gas": ("dimensionless", "series"),
     "eruption.explosion": ("dimensionless", "series"),
     "eruption.mass_rate": ("kg/s", "series"),
+    "eruption.column_height": ("m", "series"),  # Above the vent.
     "tephra.deposit_load": ("kg/m**2", "frames"),
     "pdc.arrival": ("s", "arrival"),  # First arrival time. Infinity where a flow never reaches.
     "pdc.active": ("dimensionless", "frames"),
     "lahar.depth": ("m", "frames"),
     "lava.footprint": ("dimensionless", "frames"),
     "gas.so2_concentration": ("ug/m**3", "frames"),
+    "exposure.roof_failure": ("dimensionless", "frames"),  # Share of ordinary roofs that would have failed under the ash so far.
 }
 
 

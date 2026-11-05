@@ -1,6 +1,29 @@
 {
+  "atmos-generator": {
+    "hash": "4bb7d5a23fe3872716a992d63a8cdbc18bafab9f7083ebb421f0f8d72e779b84",
+    "verdict": "PASS"
+  },
+  "atmos-model": {
+    "hash": "68b3bbc30b3fc016517d03936733a732eeb407f186e84f21f3dac5b05e410612",
+    "verdict": "PASS"
+  },
+  "atmos-wind-200hpa-bearing": {
+    "hash": "6c3c41e6633d729c4b4fdb7c3f38b866da35d0f2e02bf4518e9a9cdde3774cd9",
+    "value": 70.0,
+    "verdict": "PASS"
+  },
+  "atmos-wind-200hpa-speed": {
+    "hash": "f994841395b73f4d458c363c43167bca365b8e4279becb365d20ffc637967d2c",
+    "value": 23.416666666666664,
+    "verdict": "PASS"
+  },
+  "atmos-window-matches-source": {
+    "hash": "e12cb78bc70b79e2925756ce6ea6c5874c7be622edf0ab27b85c6d632d1e23cd",
+    "value": 8.881784197001252e-16,
+    "verdict": "PASS"
+  },
   "atmos.records_and_units": {
-    "hash": "1a922cc920141b7368a785bfe70408d877e9a7d2e4524a95f64bbf49c4336765",
+    "hash": "4de54c79b41de0a974eb0252ca15905fa0597a2549b1670498f0f1cc721e11b6",
     "verdict": "PASS"
   }
 }

@@ -90,10 +90,14 @@ def run_live_demo(
     print(f"  Configuration: Engine={engine_mode.upper()} | Scenario={scenario.upper()} | Seed={seed} | Mind={mind.upper()} | Noise={noise}")
     print(f"  Legend: {BLUE}~{RESET} Water  {YELLOW}.{RESET} Plains  {GREEN}^{RESET} Forest  M Mountain  {MAGENTA}S{RESET} Shelter  {BOLD}{RED}@{RESET} Agent\n")
 
-    if engine_mode == "physics":
-        from stranded_physics.scenarios import build_st_vincent_pack
+    if engine_mode == "legacy_pack":
+        from stranded_physics.packs.legacy import build_legacy_pack
         from stranded_physics.runtime.simulation import PackSimulation
-        pack = build_st_vincent_pack(seed=seed)
+        sim = PackSimulation(build_legacy_pack(seed), mind_type=mind, noise_source=noise)
+    elif engine_mode == "physics":
+        from stranded_physics.packs.st_vincent_2021 import build
+        from stranded_physics.runtime.simulation import PackSimulation
+        pack = build(seed)
         sim = PackSimulation(pack, mind_type=mind, noise_source=noise)
     elif scenario == "titanic":
         sim = TitanicSimulation(seed=seed, mind_type=mind, noise_source=noise)
@@ -152,6 +156,12 @@ def run_live_demo(
     print(f"{BOLD}========================================================================{RESET}\n")
 
 
+def open_builder(app):
+    """The scenario builder, imported only when asked for, so the original scenarios run without the physics packages."""
+    from stranded_physics.builder_screen import BuilderScreen
+    return BuilderScreen(app)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Quantum Cognition Simulation")
     parser.add_argument("--gui", action="store_true", help="Launch interactive 2D Pygame simulation (default)")
@@ -164,7 +174,7 @@ def main():
     parser.add_argument("--mind", type=str, default="quantum",
                         choices=["quantum", "classical_mixture", "classical"], help="Mind engine")
     parser.add_argument("--engine", type=str, default="legacy",
-                        choices=["legacy", "physics"], help="Simulation runtime (legacy or T1 St. Vincent physics pack)")
+                        choices=["legacy", "physics", "legacy_pack"], help="Simulation runtime: legacy, the T1 St. Vincent physics pack, or the fictional island through the pack runtime")
     parser.add_argument("--noise", type=str, default="stub", help="Noise source profile")
     parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano", "titanic", "pompeii", "waterloo"], help="Choose scenario directly")
     parser.add_argument("--speed", type=float, default=0.2, help="Seconds delay per step during live demo")
@@ -195,7 +205,7 @@ def main():
         start_screen = "home" if args.scenario else "event_choice"
         print(f"Launching Quantum Cognition Simulation (Seed={args.seed}, Mind={args.mind})...")
         launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen,
-                   scenario=args.scenario or "volcano")
+                   scenario=args.scenario or "volcano", builder_factory=open_builder)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,39 @@
 # One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+# Column heights and event times are inputs, so they stay unscored. Nothing here validates a prediction.
+
+[[gate]]
+id = "eruption-model"
+title = "Timeline, seed and time rules hold on test data"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/eruption/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/eruption/*.py", "stranded_physics/domains/eruption/params.toml", "stranded_physics/domains/eruption/facts.csv", "stranded_physics/domains/eruption/tests/*.py"]
+required = false
+
+[[gate]]
+id = "eruption-total-mass"
+title = "Modelled mass up to 12 April beside the published whole-eruption fallout (reported, no target)"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.eruption.measure total_mass"
+inputs = ["stranded_physics/domains/eruption/*.py", "stranded_physics/domains/eruption/params.toml", "stranded_physics/domains/eruption/facts.csv"]
+required = false
+expect = "NO_TARGET"
+role = "prediction"
+split = "reference"
+source = "Cole et al.: fallout 35.5 x 10^6 m3 DRE, so 8.9 x 10^10 kg at 2500 kg/m3, for the whole eruption to 22 April. The model stops at 12 April, so the two can't be scored against each other."
+
+[[gate]]
+id = "eruption-plume-scaling"
+title = "Column height rises with mass rate close to Morton-Taylor-Turner's one-quarter power"
+kind = "verification"
+command = "python -m stranded_physics.domains.eruption.measure mastin_slope"
+inputs = ["stranded_physics/domains/eruption/*.py", "stranded_physics/domains/eruption/params.toml"]
+required = false
+target = 0.25
+tolerance = 0.02
+role = "anchor"
+split = "reference"
+source = "Morton, Taylor and Turner 1956, buoyant plume in a stratified fluid. Cited from memory; check the locator in T-104."
 
 [[gate]]
 id = "eruption.records_and_units"
@@ -7,3 +42,54 @@ kind = "verification"
 command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/eruption'); load_datasets(p/'datasets.toml', 'eruption'); load_parameters(p/'params.toml')\""
 inputs = ["stranded_physics/domains/eruption/datasets.toml", "stranded_physics/domains/eruption/params.toml"]
 required = true
+
+# Generated eruptions, sampled from real catalogues. These check statistics, because a made-up eruption has no record of its own.
+
+[[gate]]
+id = "eruption-generator"
+title = "Generated eruptions obey their rules: mass, order, dials, repeatability"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/eruption/tests/test_generator.py -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/eruption/generator.py", "stranded_physics/domains/eruption/params.toml", "stranded_physics/domains/eruption/tests/test_generator.py"]
+required = false
+
+[[gate]]
+id = "eruption-size-holdout"
+title = "Sizes sampled from eruptions before 2000 match the sizes recorded since (total variation distance)"
+kind = "validation"
+scenario = "generated_eruption"
+command = "python -m stranded_physics.domains.eruption.measure size_holdout"
+inputs = ["stranded_physics/domains/eruption/generator.py", "stranded_physics/domains/eruption/measure.py", "stranded_physics/domains/eruption/params.toml", "disaster_data/catalog/eruptions.csv"]
+required = false
+target = 0.0
+tolerance = 0.1
+role = "prediction"
+split = "holdout"
+source = "Smithsonian GVP eruptions in disaster_data/catalog/eruptions.csv: the generator may read only rows with start_year before 2000; this compares with the rest"
+
+[[gate]]
+id = "eruption-lead-time-sampling"
+title = "Sampled warning times follow the catalogue (largest gap between the two distributions)"
+kind = "verification"
+command = "python -m stranded_physics.domains.eruption.measure lead_time_distribution"
+inputs = ["stranded_physics/domains/eruption/generator.py", "stranded_physics/domains/eruption/measure.py", "stranded_physics/domains/eruption/params.toml", "disaster_data/catalog/precursor_lead_times.csv"]
+required = false
+target = 0.0
+tolerance = 0.01  # About three standard errors for 100,000 draws. See workboard/changes/003-lead-time-gate.md for why this replaced a median ratio.
+role = "anchor"
+split = "reference"
+source = "disaster_data/catalog/precursor_lead_times.csv. These are selected cases, so this checks the sampling, not that warnings really look like this"
+
+[[gate]]
+id = "eruption-size-4-mass"
+title = "Typical mass of a generated size 4 eruption (log10 kg)"
+kind = "validation"
+scenario = "generated_eruption"
+command = "python -m stranded_physics.domains.eruption.measure size_4_log_mass"
+inputs = ["stranded_physics/domains/eruption/generator.py", "stranded_physics/domains/eruption/measure.py", "stranded_physics/domains/eruption/params.toml"]
+required = false
+target = 11.5  # 0.1 to 1 km3 of bulk tephra, at about 1000 kg/m3, spans 11 to 12.
+tolerance = 0.5
+role = "anchor"
+split = "reference"
+source = "Newhall and Self (1982) VEI definition, from memory; check in T-104. Size is an input, so this is an anchor, not a prediction"

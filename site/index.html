@@ -372,7 +372,7 @@
       </div>
 
       <div class="inspector-box">
-        <h3>6 Peer-Reviewed Models Evaluated on Current Step State</h3>
+        <h3>6 Published-Paper Models Evaluated on Current Step State</h3>
         <table class="model-table">
           <thead>
             <tr>
@@ -514,7 +514,7 @@
     const blochCanvas = document.getElementById("blochCanvas");
     const blochCtx = blochCanvas.getContext("2d");
 
-    // Mathematical implementations of the 6 peer-reviewed models in JS for live inspection
+    // Mathematical implementations of the 6 published-paper models in JS for live inspection
     function computeSixModels(p, xSigned, qS, qD, lam) {
       const pSafe = Math.max(1e-9, 1 - p);
       const pDanger = Math.max(1e-9, p);

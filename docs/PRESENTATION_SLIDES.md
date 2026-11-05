@@ -12,8 +12,8 @@ description: "Qiskit Fall Fest — Quantum Decision-Making Under Volcanic & Wild
 
 > *"Can quantum probability explain why humans make counterintuitive survival decisions under extreme environmental stress?"*
 
-- **Tech A (`mind/`)**: 2-Qubit Quantum Cognitive Architecture + **6 Peer-Reviewed Quantum Cognition Models**
-- **Tech B (`stranded_physics/`, `disaster_data/`, `contracts.py`)**: 49 Empirical Disaster Datasets, 14 Validated Physics Categories, 9 T1 Solvers, ATUS Priors & Grover Quantum Walk
+- **Tech A (`mind/`)**: 2-Qubit Quantum Cognitive Architecture + **6 Quantum Cognition Models Adapted From Published Papers**
+- **Tech B (`stranded_physics/`, `disaster_data/`, `contracts.py`)**: 49 Empirical Disaster Datasets, 14 Physics Categories, 9 Simplified Stand-In Solvers, ATUS Priors & Grover Quantum Walk
 - **Tech C (`engine/`, `main.py`)**: Dual-Scenario Simulator with **Clash of Clans / Hay Day Village UI** (1600×900)
 - **Product D (`site/index.html`)**: Interactive Web Replay & *"Why Did He Do That?"* Quantum Inspector
 
@@ -97,13 +97,15 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ## Slide 6: Tech B — Empirical Disaster Data & 14-Category Physics Engine
 
-### 100% Verification-First Architecture (`stranded_physics/` & `disaster_data/`)
+> **Status of these solvers:** they are simplified stand-ins, not real St Vincent physics. The terrain is a made-up cone, not the real island or its position; wind speed is a formula; eruption timing is randomised; flows ignore barriers and arrive sooner than the published record. Outputs named here that the code does not write (`terrain.slope`, `tephra.load`, `gas.so2`, `storm.surge`, dynamic pressures) are aspirations. Their gates only check that settings and data files load. The real-data engine is being built separately on `physics/engine`.
+
+### Verification-First Architecture (`stranded_physics/` & `disaster_data/`)
 1. **49 Curated Real-World Datasets (`disaster_data/manifest.json`)**:
    - Registered across all **14 domain categories** (`terrain`, `atmos`, `storm`, `eruption`, `tephra`, `gas`, `pdc`, `lahar`, `lava`, `agent`, `exposure`, `seismic`, `tsunami`, `impact`) with SHA-256 hashes and strict `calibration` vs. `holdout` split enforcement (`open_for_calibration` refuses holdout data).
-2. **9 Concrete `T1` Solvers for April 2021 La Soufrière (`stranded_physics/scenarios.py`)**:
+2. **9 Simplified Stand-In Solvers themed on April 2021 La Soufrière (`stranded_physics/scenarios.py`)**:
    - `StVincentTerrain`, `StVincentAtmos`, `HollandStorm`, `SoufriereEruption` (Mastin 2009 plume law), `SuzukiTephra`, `GaussianGas`, `EnergyConePDC` (Malin & Sheridan 1982), `LaharzLahar`, and `DomeLava`.
    - Builds tamper-evident `.npz` scenario packs (`build_st_vincent_pack`) replayed by `PackSimulation` with Tobler slope/ash locomotion (`--engine physics`).
-3. **Empirical ATUS Priors & Grover DTQW (`data/priors.json`, `contracts.py`)**:
+3. **ATUS Reference Data, Not Yet Used in Decisions, & Grover DTQW (`data/priors.json`, `contracts.py`)**:
    - BLS American Time Use Survey Table A-1 baseline weights + 4-direction **Grover-coined Discrete-Time Quantum Walk** ($G = 2|s\rangle\langle s| - I_4$) in `explore_step(mode="quantum")`.
 
 ---
@@ -165,9 +167,9 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 | Verification Suite | Command | Status |
 |---|---|---|
-| **Full Unified Pytest Suite** | `python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q` | **`155 passed, 3 skipped`** |
+| **Full Unified Pytest Suite** | `python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q` | **`158 passed`** |
 | **Tech A Validation & 6-Paper Cross-Check** | `python -m mind.experiments.validate` | **`PASS` (`any_failed=False`)** |
-| **Tech B 14-Category Verification Gates** | `python -m stranded_physics.gates required` | **`14 / 14 PASS`** |
+| **Tech B 14-Category Verification Gates** | `python -m stranded_physics.gates required` | **`14 / 14` record checks pass (files load; physics not tested)** |
 | **Tech B Provenance & Unit Catalog** | `python -m stranded_physics.catalog` | **49 Datasets, 20 Pint Params** |
 
 ### Key Empirical & Mathematical Findings
@@ -176,7 +178,7 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ---
 
-## Slide 14: Live Demo Guide & Production Commands
+## Slide 14: Live Demo Guide & Commands
 
 ```bash
 # 1. Launch the 1600x900 Clash of Clans / Hay Day Pygame Simulator

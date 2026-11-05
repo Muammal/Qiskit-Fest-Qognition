@@ -1,4 +1,95 @@
 # One [[gate]] per check: id, title, kind, command, inputs, required, then target and tolerance, or rate_low and rate_high.
+# Targets were committed before any real raster was downloaded. All three real-data targets are anchors: they test
+# that the surface was read and placed correctly, not that any hazard model predicts anything.
+
+[[gate]]
+id = "terrain-resampling"
+title = "Resampling keeps heights, positions and classes on synthetic rasters"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/terrain/tests -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/terrain/*.py", "stranded_physics/domains/terrain/params.toml", "stranded_physics/domains/terrain/tests/*.py"]
+required = true
+
+[[gate]]
+id = "terrain-land-drains-to-sea"
+title = "Every land cell drains to the sea on the real surface"
+kind = "verification"
+command = "python -m stranded_physics.domains.terrain.measure drains_to_sea"
+inputs = ["stranded_physics/domains/terrain/model.py", "stranded_physics/domains/terrain/drainage.py", "stranded_physics/domains/terrain/measure.py", "stranded_physics/domains/terrain/params.toml", "stranded_physics/domains/terrain/datasets.toml"]
+required = false
+target = 1.0
+tolerance = 0.0
+role = "anchor"
+split = "reference"
+source = "Definition of a filled drainage surface"
+
+[[gate]]
+id = "terrain-channels-against-bare-earth"
+title = "Share of drainage channels unchanged when routed on FABDEM (reported, no target)"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.terrain.measure channels_vs_bare_earth"
+inputs = ["stranded_physics/domains/terrain/model.py", "stranded_physics/domains/terrain/drainage.py", "stranded_physics/domains/terrain/measure.py", "stranded_physics/domains/terrain/params.toml", "stranded_physics/domains/terrain/datasets.toml"]
+required = false
+expect = "NO_TARGET"
+role = "input"
+split = "reference"
+source = "FABDEM V1-2 is an estimate, so this sizes how much canopy moves the channels. It cannot give a pass or fail."
+
+[[gate]]
+id = "terrain-summit-height"
+title = "Highest land cell matches the catalogued summit height"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.terrain.measure summit_height"
+inputs = ["stranded_physics/domains/terrain/model.py", "stranded_physics/domains/terrain/measure.py", "stranded_physics/domains/terrain/params.toml", "stranded_physics/domains/terrain/datasets.toml"]
+required = false
+target = 1220.0  # metres
+tolerance = 100.0  # Allows for averaging a narrow crater rim into 90 m cells, and for the catalogue's rounding.
+role = "anchor"
+split = "reference"
+source = "Smithsonian GVP volcano 360150, elevation_m in disaster_data/catalog/volcanoes.csv"
+
+[[gate]]
+id = "terrain-summit-location"
+title = "Highest land cell lies near the catalogued summit position"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.terrain.measure summit_location"
+inputs = ["stranded_physics/domains/terrain/model.py", "stranded_physics/domains/terrain/measure.py", "stranded_physics/domains/terrain/params.toml", "stranded_physics/domains/terrain/datasets.toml"]
+required = false
+target = 0.0  # metres from the catalogued position
+tolerance = 1500.0  # The catalogue gives two decimal places, about 1.1 km, and the crater is itself about 1.6 km wide.
+role = "anchor"
+split = "reference"
+source = "Smithsonian GVP volcano 360150, latitude and longitude in disaster_data/catalog/volcanoes.csv"
+
+[[gate]]
+id = "terrain-island-area"
+title = "Land area matches an independent coastline"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.terrain.measure island_area"
+inputs = ["stranded_physics/domains/terrain/model.py", "stranded_physics/domains/terrain/measure.py", "stranded_physics/domains/terrain/params.toml", "stranded_physics/domains/terrain/datasets.toml"]
+required = false
+target = 330.75  # square kilometres
+tolerance = 25.0  # About 7.5%, for coastline generalisation in a 10 m scale vector dataset.
+role = "anchor"
+split = "reference"
+source = "island_area_km2 for volcano 360150 in disaster_data/catalog/volcanoes.csv, computed from Natural Earth 10 m land"
+
+[[gate]]
+id = "terrain-canopy-bias"
+title = "Canopy bias on valley floors, GLO-30 minus FABDEM (reported, no target)"
+kind = "validation"
+scenario = "st_vincent_2021"
+command = "python -m stranded_physics.domains.terrain.measure canopy"
+inputs = ["stranded_physics/domains/terrain/model.py", "stranded_physics/domains/terrain/measure.py", "stranded_physics/domains/terrain/params.toml", "stranded_physics/domains/terrain/datasets.toml"]
+required = false
+expect = "NO_TARGET"
+role = "input"
+split = "reference"
+source = "FABDEM V1-2 is a machine-learned bare-earth estimate, so it cannot give a pass or fail here"
 
 [[gate]]
 id = "terrain.records_and_units"
@@ -7,3 +98,52 @@ kind = "verification"
 command = "python -c \"from pathlib import Path; from stranded_physics.core.records import load_datasets, load_parameters; p=Path('stranded_physics/domains/terrain'); load_datasets(p/'datasets.toml', 'terrain'); load_parameters(p/'params.toml')\""
 inputs = ["stranded_physics/domains/terrain/datasets.toml", "stranded_physics/domains/terrain/params.toml"]
 required = true
+
+# Generated islands. There is no real place to compare with, so these hold them to the same checks as the real surface.
+
+[[gate]]
+id = "terrain-generator"
+title = "Generated islands obey their rules: dials, repeatability, one island, sea all round"
+kind = "verification"
+command = "python -m pytest stranded_physics/domains/terrain/tests/test_generator.py -q -p no:cacheprovider"
+inputs = ["stranded_physics/domains/terrain/generator.py", "stranded_physics/domains/terrain/generator_params.toml", "stranded_physics/domains/terrain/tests/test_generator.py"]
+required = false
+
+[[gate]]
+id = "terrain-generated-drains"
+title = "Every land cell drains to the sea on generated islands (worst of 20)"
+kind = "verification"
+command = "python -m stranded_physics.domains.terrain.generated_measure drains"
+inputs = ["stranded_physics/domains/terrain/generator.py", "stranded_physics/domains/terrain/generated_measure.py", "stranded_physics/domains/terrain/generator_params.toml"]
+required = false
+target = 1.0
+tolerance = 0.0
+role = "anchor"
+split = "reference"
+source = "The same check as terrain-land-drains-to-sea, on islands that aren't real"
+
+[[gate]]
+id = "terrain-generated-area"
+title = "Generated islands have the land area asked for (largest relative error of 20)"
+kind = "verification"
+command = "python -m stranded_physics.domains.terrain.generated_measure area_error"
+inputs = ["stranded_physics/domains/terrain/generator.py", "stranded_physics/domains/terrain/generated_measure.py", "stranded_physics/domains/terrain/generator_params.toml"]
+required = false
+target = 0.0
+tolerance = 0.05
+role = "anchor"
+split = "reference"
+source = "The dial or catalogue value it was asked for"
+
+[[gate]]
+id = "terrain-generated-summit"
+title = "Generated islands have the summit height asked for (largest relative error of 20)"
+kind = "verification"
+command = "python -m stranded_physics.domains.terrain.generated_measure summit_error"
+inputs = ["stranded_physics/domains/terrain/generator.py", "stranded_physics/domains/terrain/generated_measure.py", "stranded_physics/domains/terrain/generator_params.toml"]
+required = false
+target = 0.0
+tolerance = 0.05
+role = "anchor"
+split = "reference"
+source = "The dial or catalogue value it was asked for"

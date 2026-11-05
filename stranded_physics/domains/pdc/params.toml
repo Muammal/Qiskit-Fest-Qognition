@@ -1,21 +1,84 @@
-# One [[parameter]] per value: id, value, unit, valid_min, valid_max, role, status, source, sd.
+# pdc T1 settings, fixed before the model first ran on St Vincent. Do not tune these against the holdout gates.
 
 [[parameter]]
-id = "pdc.heim_coeff"
-value = 0.26
+id = "pdc.height_over_length"  # Middle of the 0.1 to 0.3 usually quoted for column-collapse flows. From memory, so check against Tierz et al. 2016 in T-104.
+value = 0.2
 unit = "dimensionless"
-valid_min = 0.1
-valid_max = 0.6
+valid_min = 0.05
+valid_max = 0.5
 role = "input"
-status = "literature"
-source = "Malin & Sheridan (1982) Science 217:637-640 energy-cone H/L ratio"
+status = "assumption"
 
 [[parameter]]
-id = "pdc.lethal_pressure"
+id = "pdc.collapse_height"  # Middle of the 500 to 1500 m often used for energy cones. From memory, so check in T-104.
+value = 1000.0
+unit = "m"
+valid_min = 100.0
+valid_max = 3000.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "pdc.valley_confinement"  # Dense flows stay within this height of the valley floor. Far above the 20 m deposits Cole et al. report, to allow for flow depth and climbing.
+value = 40.0
+unit = "m"
+valid_min = 5.0
+valid_max = 300.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "pdc.proximal_radius"  # Flows spread freely this close to the vent: about the crater, reported as 1.6 km wide, plus a margin.
+value = 1500.0
+unit = "m"
+valid_min = 500.0
+valid_max = 5000.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "pdc.min_speed"  # Stops travel time blowing up where the energy line nears the ground. Sets arrival times only, not reach.
 value = 5.0
-unit = "kPa"
-valid_min = 1.0
-valid_max = 50.0
+unit = "m/s"
+valid_min = 0.5
+valid_max = 30.0
+role = "convention"
+status = "assumption"
+
+[[parameter]]
+id = "pdc.first_collapse_after_axis_start"  # 21:30 UTC on 10 April, counted from 00:00 UTC on 8 April.
+value = 69.5
+unit = "hour"
+valid_min = 0.0
+valid_max = 200.0
 role = "input"
 status = "literature"
-source = "Valentine (1998) J. Volcanol. Geotherm. Res. 87:117-140"
+source = "Cole et al., accepted manuscript of Geological Society Special Publication 539 (raw/st_vincent_cole_accepted.pdf): 'onset of the first significant PDC activity was associated with U3 activity from 21:30 UTC on 10th April'"
+
+[[parameter]]
+id = "pdc.generated_collapse_delay"  # St Vincent's: first explosion 12:41 UTC on 9 April, first significant flow 21:30 UTC on 10 April. One eruption, so an example and not a distribution.
+value = 32.8
+unit = "hour"
+valid_min = 0.0
+valid_max = 240.0
+role = "input"
+status = "assumption"
+
+[[parameter]]
+id = "pdc.reference_erupted_mass"  # Cole et al.'s whole-eruption fallout mass, the size St Vincent's flows belong to, for scaling a generated eruption.
+value = 8.875e10
+unit = "kg"
+valid_min = 1e9
+valid_max = 1e13
+role = "input"
+status = "derived"
+source = "Cole et al., accepted manuscript of Geological Society Special Publication 539, as held in eruption-total-mass"
+
+[[parameter]]
+id = "pdc.reference_reach"  # Round figure for crater to western sea at St Vincent. The scaling with size is from memory of Iverson et al. 1998 and Hayashi and Self 1992; check in T-104.
+value = 8000.0
+unit = "m"
+valid_min = 1000.0
+valid_max = 30000.0
+role = "input"
+status = "assumption"

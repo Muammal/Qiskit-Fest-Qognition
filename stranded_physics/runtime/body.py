@@ -1,7 +1,9 @@
-"""T0 agent body, and the adapter to the frozen contract. WS6 replaces the placeholder physiology."""
+"""The agent's body, and the adapter to the frozen contract. Water, food and fatigue come from domains/agent/physiology.py."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+
+from stranded_physics.domains.agent.physiology import Body, start_body
 
 STATE_KEYS = {"day", "hour", "pos", "needs", "stress", "injured", "inventory", "recent_events"}
 NEED_KEYS = {"hunger", "thirst", "warmth", "energy", "safety", "morale"}
@@ -9,7 +11,7 @@ NEED_KEYS = {"hunger", "thirst", "warmth", "energy", "safety", "morale"}
 
 @dataclass
 class AgentBody:
-    """Placeholder physiology. The rates are `assumption` values until ISO 7933 and friends arrive."""
+    """Needs a mind can see, plus the hidden balance behind thirst, hunger and energy."""
 
     xy_m: tuple[float, float]
     tile: list[int]
@@ -26,6 +28,27 @@ class AgentBody:
     alive: bool = True
     cause: str | None = None
     inventory: dict[str, int] = field(default_factory=lambda: {"wood": 0, "food": 0, "tools": 0})
+    balance: Body = field(init=False)
+    recent_events: list[str] = field(default_factory=lambda: ["none", "none"])  # For showing only. The mind gets them through to_state.
+
+    def __post_init__(self) -> None:
+        self.balance = start_body(self.thirst, self.hunger, self.energy)
+
+    @property
+    def pos(self) -> list[int]:
+        return self.tile
+
+    @property
+    def needs(self) -> dict[str, float]:
+        return {key: getattr(self, key) for key in NEED_KEYS}
+
+    @property
+    def is_alive(self) -> bool:
+        return self.alive
+
+    @property
+    def cause_of_death(self) -> str | None:
+        return self.cause
 
 
 def to_state(body: AgentBody, recent_events: list[str]) -> dict:

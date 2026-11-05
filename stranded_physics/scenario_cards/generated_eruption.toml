@@ -1,0 +1,48 @@
+# An eruption sampled from the catalogues, on the real island. Size, warning, onset and column come from the seed, and any can be set by hand.
+id = "generated_eruption"
+title = "A sampled eruption on St Vincent's land"
+place = "generated"
+start_utc = "2021-04-08T00:00:00+00:00"
+hours = 96
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "weather"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "eruption"
+source = "catalogue"
+vent_lon = -61.18
+vent_lat = 13.33
+
+[[entity]]
+kind = "ash"
+source = "replay"
+
+[[entity]]
+kind = "flow"
+source = "replay"
+delay_hours = 6.0
+
+[[entity]]
+kind = "person"
+source = "dials"
+name = "Richmond"
+mind = "quantum"
+start_lon = -61.226
+start_lat = 13.317
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "Barrouallie"
+lon = -61.267
+lat = 13.233
