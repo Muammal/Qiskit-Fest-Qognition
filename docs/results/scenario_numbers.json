@@ -1,0 +1,402 @@
+{
+ "generated_utc": "2026-11-06T10:45:35+00:00",
+ "commit": "8eeb526",
+ "seed": 42,
+ "order_effect": {
+  "default_stress": -0.3283200638581567,
+  "lambda_0": -0.3283200638581567,
+  "lambda_1": -0.04300120264225976
+ },
+ "volcano": {
+  "seeds": 200,
+  "survival": {
+   "quantum": 0.995,
+   "classical_mixture": 0.995,
+   "classical": 1.0
+  },
+  "paired_delay_steps": {
+   "mean": 0.55,
+   "se": 0.09085920802787815,
+   "later": 45,
+   "earlier": 5,
+   "same": 90,
+   "n": 140
+  }
+ },
+ "titanic": [
+  {
+   "mapping": "default",
+   "mind": "quantum",
+   "total": 2208,
+   "saved": 578,
+   "dead": 1630
+  },
+  {
+   "mapping": "default",
+   "mind": "classical_mixture",
+   "total": 2208,
+   "saved": 536,
+   "dead": 1672
+  },
+  {
+   "mapping": "default",
+   "mind": "classical",
+   "total": 2208,
+   "saved": 839,
+   "dead": 1369
+  },
+  {
+   "mapping": "ambiguous_rockets",
+   "mind": "quantum",
+   "total": 2208,
+   "saved": 297,
+   "dead": 1911
+  },
+  {
+   "mapping": "ambiguous_rockets",
+   "mind": "classical_mixture",
+   "total": 2208,
+   "saved": 278,
+   "dead": 1930
+  },
+  {
+   "mapping": "ambiguous_rockets",
+   "mind": "classical",
+   "total": 2208,
+   "saved": 839,
+   "dead": 1369
+  },
+  {
+   "mapping": "early_pa_alarm",
+   "mind": "quantum",
+   "total": 2208,
+   "saved": 824,
+   "dead": 1384
+  },
+  {
+   "mapping": "early_pa_alarm",
+   "mind": "classical_mixture",
+   "total": 2208,
+   "saved": 796,
+   "dead": 1412
+  },
+  {
+   "mapping": "early_pa_alarm",
+   "mind": "classical",
+   "total": 2208,
+   "saved": 839,
+   "dead": 1369
+  }
+ ],
+ "pompeii": [
+  {
+   "mapping": "A",
+   "mind": "quantum",
+   "total": 11500,
+   "dead": 0
+  },
+  {
+   "mapping": "A",
+   "mind": "classical_mixture",
+   "total": 11500,
+   "dead": 0
+  },
+  {
+   "mapping": "A",
+   "mind": "classical",
+   "total": 11500,
+   "dead": 0
+  },
+  {
+   "mapping": "B",
+   "mind": "quantum",
+   "total": 11500,
+   "dead": 0
+  },
+  {
+   "mapping": "B",
+   "mind": "classical_mixture",
+   "total": 11500,
+   "dead": 0
+  },
+  {
+   "mapping": "B",
+   "mind": "classical",
+   "total": 11500,
+   "dead": 0
+  },
+  {
+   "mapping": "C",
+   "mind": "quantum",
+   "total": 11500,
+   "dead": 1095
+  },
+  {
+   "mapping": "C",
+   "mind": "classical_mixture",
+   "total": 11500,
+   "dead": 1
+  },
+  {
+   "mapping": "C",
+   "mind": "classical",
+   "total": 11500,
+   "dead": 0
+  },
+  {
+   "mapping": "D",
+   "mind": "quantum",
+   "total": 11500,
+   "dead": 0
+  },
+  {
+   "mapping": "D",
+   "mind": "classical_mixture",
+   "total": 11500,
+   "dead": 0
+  },
+  {
+   "mapping": "D",
+   "mind": "classical",
+   "total": 11500,
+   "dead": 0
+  }
+ ],
+ "waterloo": [
+  {
+   "mapping": "A",
+   "alarm": true,
+   "mind": "quantum",
+   "total": 100,
+   "off_site": 100,
+   "exposure": {
+    "below AEGL-1": 93,
+    "above AEGL-1, discomfort": 6,
+    "above AEGL-2, serious or lasting effects": 1,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "A",
+   "alarm": true,
+   "mind": "classical_mixture",
+   "total": 100,
+   "off_site": 100,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "A",
+   "alarm": true,
+   "mind": "classical",
+   "total": 100,
+   "off_site": 100,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "A",
+   "alarm": false,
+   "mind": "quantum",
+   "total": 100,
+   "off_site": 30,
+   "exposure": {
+    "below AEGL-1": 82,
+    "above AEGL-1, discomfort": 18,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "A",
+   "alarm": false,
+   "mind": "classical_mixture",
+   "total": 100,
+   "off_site": 89,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "A",
+   "alarm": false,
+   "mind": "classical",
+   "total": 100,
+   "off_site": 89,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "B",
+   "alarm": true,
+   "mind": "quantum",
+   "total": 100,
+   "off_site": 100,
+   "exposure": {
+    "below AEGL-1": 99,
+    "above AEGL-1, discomfort": 1,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "B",
+   "alarm": true,
+   "mind": "classical_mixture",
+   "total": 100,
+   "off_site": 100,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "B",
+   "alarm": true,
+   "mind": "classical",
+   "total": 100,
+   "off_site": 100,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "B",
+   "alarm": false,
+   "mind": "quantum",
+   "total": 100,
+   "off_site": 30,
+   "exposure": {
+    "below AEGL-1": 82,
+    "above AEGL-1, discomfort": 18,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "B",
+   "alarm": false,
+   "mind": "classical_mixture",
+   "total": 100,
+   "off_site": 89,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "B",
+   "alarm": false,
+   "mind": "classical",
+   "total": 100,
+   "off_site": 89,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "C",
+   "alarm": true,
+   "mind": "quantum",
+   "total": 100,
+   "off_site": 100,
+   "exposure": {
+    "below AEGL-1": 95,
+    "above AEGL-1, discomfort": 5,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "C",
+   "alarm": true,
+   "mind": "classical_mixture",
+   "total": 100,
+   "off_site": 100,
+   "exposure": {
+    "below AEGL-1": 99,
+    "above AEGL-1, discomfort": 1,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "C",
+   "alarm": true,
+   "mind": "classical",
+   "total": 100,
+   "off_site": 100,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "C",
+   "alarm": false,
+   "mind": "quantum",
+   "total": 100,
+   "off_site": 56,
+   "exposure": {
+    "below AEGL-1": 97,
+    "above AEGL-1, discomfort": 3,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "C",
+   "alarm": false,
+   "mind": "classical_mixture",
+   "total": 100,
+   "off_site": 63,
+   "exposure": {
+    "below AEGL-1": 99,
+    "above AEGL-1, discomfort": 1,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  },
+  {
+   "mapping": "C",
+   "alarm": false,
+   "mind": "classical",
+   "total": 100,
+   "off_site": 89,
+   "exposure": {
+    "below AEGL-1": 100,
+    "above AEGL-1, discomfort": 0,
+    "above AEGL-2, serious or lasting effects": 0,
+    "above AEGL-3, risk to life": 0
+   }
+  }
+ ],
+ "seconds": 346.4
+}
