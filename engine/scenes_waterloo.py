@@ -234,6 +234,6 @@ class WaterlooCutscenes(CutscenePlayer):
         canvas.blit(clock, (28, HEIGHT - BAR + 30))
         title = self.font_title.render(scene["caption"], True, (250, 240, 216))
         canvas.blit(title, ((WIDTH - title.get_width()) // 2, HEIGHT - BAR + 16))
-        hint = self.font_small.render("Click or press any key to skip", True, (150, 142, 130))
+        hint = self.font_small.render(self.hint_text(), True, (150, 142, 130))
         canvas.blit(hint, ((WIDTH - hint.get_width()) // 2, HEIGHT - BAR + 46))
         pygame.draw.rect(canvas, (226, 170, 90), (0, HEIGHT - 4, int(WIDTH * min(1., self.elapsed / DURATION)), 4))

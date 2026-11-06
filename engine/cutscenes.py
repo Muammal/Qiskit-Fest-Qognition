@@ -1,7 +1,8 @@
 """Short diagonal-angle cutscenes for jumps, lifeboats and anything leaving the ship.
 
 Everything is drawn from pygame primitives, like the rest of the GUI. Scenes are
-display only: they pause the simulation and never change its result.
+display only and never change a result. They are recorded silently during a run and
+watched afterward from the end screen, so nothing interrupts the simulation.
 """
 import math
 
@@ -310,11 +311,12 @@ SCENES = {"jump_boat": _scene_jump_boat, "boat_lowered": _scene_boat_lowered,
 
 
 class CutscenePlayer:
-    """Queue and play scenes. The simulation waits while `active` is true."""
+    """Record scenes during a run and replay them at the end. The simulation waits while `active` is true."""
 
     def __init__(self, font_title, font_small):
         self.font_title, self.font_small = font_title, font_small
         self.queue, self.current, self.elapsed = [], None, 0.
+        self.library, self.replaying, self.replay_paused, self.replay_index = [], False, False, 0
         self.enabled = True
         self.last_crowd_scene = {}
         self._backdrop = None
@@ -325,12 +327,49 @@ class CutscenePlayer:
 
     def reset(self):
         self.queue, self.current, self.elapsed = [], None, 0.
+        self.library, self.replaying, self.replay_paused, self.replay_index = [], False, False, 0
         self.last_crowd_scene = {}
 
+    def record(self, scenes):
+        """Keep this step's scenes for the replay at the end, with nothing shown now."""
+        self.library.extend(self._filtered(scenes))
+
+    def start_replay(self, index=0):
+        if self.library:
+            self.replaying, self.replay_paused = True, False
+            self._show(index)
+
+    def stop_replay(self):
+        self.replaying, self.replay_paused, self.current = False, False, None
+
+    def _show(self, index):
+        self.replay_index = max(0, index)
+        if self.replay_index >= len(self.library):
+            self.stop_replay()
+        else:
+            self.current, self.elapsed = self.library[self.replay_index], 0.
+
+    def replay_next(self):
+        self._show(self.replay_index + 1)
+
+    def replay_previous(self):
+        self._show(self.replay_index - 1)
+
+    def hint_text(self):
+        if self.replaying:
+            state = "Paused   " if self.replay_paused else ""
+            return (f"{state}Scene {self.replay_index + 1} of {len(self.library)}     "
+                    "Left / Right change scene     Space pause     Esc close")
+        return "Click or press any key to skip"
+
     def enqueue(self, scenes):
-        """Keep scenes for the followed person and all lowerings; rate-limit repeated crowd jumps."""
         if not self.enabled:
             return
+        self.queue.extend(self._filtered(scenes))
+        self._next_if_idle()
+
+    def _filtered(self, scenes):
+        """Keep scenes for the followed person and all lowerings; rate-limit repeated crowd jumps."""
         kept = []
         for scene in sorted(scenes, key=lambda s: not s.get("focus")):
             kind = scene["kind"]
@@ -340,8 +379,7 @@ class CutscenePlayer:
                     continue
                 self.last_crowd_scene[kind] = scene["t"]
             kept.append(scene)
-        self.queue.extend(kept[:MAX_PER_STEP])
-        self._next_if_idle()
+        return kept[:MAX_PER_STEP]
 
     def _next_if_idle(self):
         if self.current is None and self.queue:
@@ -352,11 +390,14 @@ class CutscenePlayer:
         self._next_if_idle()
 
     def update(self, dt):
-        if self.current is None:
+        if self.current is None or (self.replaying and self.replay_paused):
             return
         self.elapsed += dt
         if self.elapsed >= DURATION:
-            self.skip()
+            if self.replaying:
+                self.replay_next()
+            else:
+                self.skip()
 
     def draw(self, canvas):
         if self.current is None:
@@ -377,7 +418,7 @@ class CutscenePlayer:
         canvas.blit(clock, (28, 30))
         title = self.font_title.render(scene["caption"], True, (250, 244, 224))
         canvas.blit(title, ((WIDTH - title.get_width()) // 2, HEIGHT - bar + 16))
-        hint = self.font_small.render("Click or press any key to skip", True, (150, 158, 176))
+        hint = self.font_small.render(self.hint_text(), True, (150, 158, 176))
         canvas.blit(hint, ((WIDTH - hint.get_width()) // 2, HEIGHT - bar + 46))
         progress = min(1., self.elapsed / DURATION)
         pygame.draw.rect(canvas, (250, 214, 120), (0, HEIGHT - 4, int(WIDTH * progress), 4))

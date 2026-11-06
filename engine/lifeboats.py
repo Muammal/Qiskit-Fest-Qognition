@@ -67,7 +67,8 @@ class Lifeboat:
 
 
 class LifeboatSchedule:
-    def __init__(self, world, crew_seats=CREW_SEATS, allow_all_sides=False):
+    def __init__(self, world, crew_seats=CREW_SEATS, allow_all_sides=False, boarding_rule=True):
+        self.boarding_rule = boarding_rule
         deck_row = world.assembly_points[0][1]
         self.crew_seats = crew_seats
         self.allow_all_sides = allow_all_sides
@@ -97,6 +98,8 @@ class LifeboatSchedule:
             limit = min(MAX_LOAD_PER_STEP, BASE_LOAD_PER_STEP + LOAD_PER_ORGANISER * len(organisers))
             order = sorted((a for a in passengers if boat.eligible(a)),
                            key=lambda a: (a.group == "man", a.id))
+            if not self.boarding_rule:  # assumption: fixed scrambled order, because id order would favour first class
+                order = sorted(passengers, key=lambda a: a.id * 2654435761 % 4294967296)
             # Rowers board only as the boat is about to leave, so organisers keep working.
             if t >= boat.launch_step - 1:
                 seats_left = self.crew_seats - boat.crew_aboard

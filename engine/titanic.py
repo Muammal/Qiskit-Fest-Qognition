@@ -35,6 +35,7 @@ EVENT_MAPPINGS = {
     "ambiguous_rockets": {"distress_rocket": "gas_plume"},  # Rockets treated as ambiguous rotation (tests quantum coherence)
     "early_pa_alarm": {"steward_warning": "eruption", "orders_to_crew": "eruption"},  # Unambiguous PA / alarm policy intervention
 }
+EVENT_MAPPINGS["only_water_certain"] = {"distress_rocket": "gas_plume", "officers_told_ship_will_sink": "gas_plume"}
 DEFAULT_MAPPING = "default"
 STORY_TEXT = {
     "none": "Nothing new", "collision": "A shudder runs through the ship",
@@ -60,7 +61,8 @@ HISTORICAL = dict(aboard=2208, saved=712, source="Wikipedia casualty table citin
 class TitanicSimulation:
     def __init__(self, seed=42, mind_type='quantum', noise_source='stub', decide_fn=None,
                  scenario='titanic', scripted_events=None, event_mapping=DEFAULT_MAPPING,
-                 warned_only_hide=False, crew_seats=3, allow_all_sides=False):
+                 warned_only_hide=False, crew_seats=3, allow_all_sides=False,
+                 inputs='original', crew_told=True, boarding_rule=True):
         self.seed, self.mind_type = seed, mind_type.lower()
         self.noise_source, self.scenario = noise_source, scenario
         self.scripted_events = dict(scripted_events) if scripted_events else {}
@@ -69,6 +71,9 @@ class TitanicSimulation:
         self.warned_only_hide = warned_only_hide
         self.crew_seats = crew_seats
         self.allow_all_sides = allow_all_sides
+        # 'neutral' removes the safety cap by deck and the nudge after hide, and hide then needs a warning.
+        self.inputs, self.crew_told = inputs, crew_told
+        self.neutral_inputs = inputs == 'neutral'
         self.horizon = HORIZON
         self.world = ShipWorld(seed=seed)
         self.initial_world = copy.deepcopy(self.world.export_dict())
@@ -77,8 +82,11 @@ class TitanicSimulation:
         self.event_gen = EventGenerator(seed, horizon=HORIZON)
         self.event_gen.weather = ['calm'] * HORIZON  # Wikipedia: clear, flat calm night
         self.event_gen.world_events = list(self.flood.world_events)
-        self.boats = LifeboatSchedule(self.world, crew_seats=crew_seats, allow_all_sides=allow_all_sides)
+        self.boats = LifeboatSchedule(self.world, crew_seats=crew_seats, allow_all_sides=allow_all_sides,
+                                      boarding_rule=boarding_rule)
         self.people = build_crowd(self.world, seed)
+        for person in self.people:
+            person.neutral_inputs = self.neutral_inputs
         self.agent = self._default_focus()
         if decide_fn:
             self.decide_fn = decide_fn
@@ -134,10 +142,11 @@ class TitanicSimulation:
             forward_below = pos[0] >= 22 and pos[1] >= E
             return "collision" if forward_below or rng.random() < COLLISION_FELT_FAR else "none"
         crew = agent.cabin_class == "crew"
-        if t == UNCOVER_STEP and agent.role in ("captain", "officer", "evac_worker"):
-            return "officers_told_ship_will_sink"
-        if t in (UNCOVER_STEP, LOAD_STEP) and crew:
-            return "orders_to_crew"
+        if self.crew_told:
+            if t == UNCOVER_STEP and agent.role in ("captain", "officer", "evac_worker"):
+                return "officers_told_ship_will_sink"
+            if t in (UNCOVER_STEP, LOAD_STEP) and crew:
+                return "orders_to_crew"
         if t in ROCKET_STEPS:
             on_deck = world.get_tile(*pos) == 1
             if on_deck or (pos[1] < D and rng.random() < ROCKET_SEEN_INDOORS):
@@ -155,7 +164,7 @@ class TitanicSimulation:
         warned = set()
         for person in self.people:
             if person.role == "server" and person.status == "aboard" and person.is_alive \
-                    and person.last_action != "hide" and self.t >= UNCOVER_STEP:
+                    and person.last_action != "hide" and self.t >= UNCOVER_STEP and (self.crew_told or person.knows_danger):
                 x, y = person.pos
                 for dx in range(-WARNING_RADIUS, WARNING_RADIUS + 1):
                     warned.add((x + dx, y))
@@ -212,6 +221,8 @@ class TitanicSimulation:
         story = self._perceive(agent, t, warned)
         event = self.event_names.get(story, "none")
         agent.story_event = story
+        if event != "none":
+            agent.knows_danger = True
         in_shelter = world.is_in_shelter(*agent.pos) and agent.status == "aboard"
         agent.apply_event(event, in_shelter)
         state = agent.get_state()
@@ -236,7 +247,7 @@ class TitanicSimulation:
         at_station = defaultdict(list)
         for agent in self.people:
             if agent.is_alive and agent.status == "aboard" and agent.last_action == "hide" \
-                    and tuple(agent.pos)[1] == BOAT:
+                    and tuple(agent.pos)[1] == BOAT and (agent.knows_danger or not self.neutral_inputs):
                 at_station[tuple(agent.pos)].append(agent)
         boarded = self.boats.load(t, at_station)
         self._scene_boarding(t, boarded)

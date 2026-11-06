@@ -180,7 +180,7 @@ class SiteView:
                 f"Know {counts['knows']}   Alarm {'on' if engine.alarm_step is not None and t >= engine.alarm_step else 'off'}   "
                 f"Highest gas {engine.chlorine.hazard_by_step[t]['peak_ppm']:.1f} ppm")
         canvas.blit(self.font_sub.render(text, True, (246, 240, 226)), (14, 56))
-        line = (f"Following {engine.agent.label}.  Click a person to follow them.  P panels, C cutscenes.  "
+        line = (f"Following {engine.agent.label}.  Click a person to follow them.  P panels.  Scenes replay at the end.  "
                 f"Mapping {engine.event_mapping}.  Green is chlorine, black box is the assumed leak.")
         canvas.blit(self.font.render(line, True, (214, 204, 186)), (14, 78))
 

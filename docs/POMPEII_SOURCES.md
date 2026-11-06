@@ -152,7 +152,7 @@ In code: `engine/gui_city.py`, `engine/scenes_pompeii.py`, and hooks in `engine/
 - **Maps:** city and region, switched with `M`.
 - **Split-screen panels:** up to three people, seeded random across roles, or whoever is clicked. They show what the person heard and in what order, their belief, their probabilities and their action.
 - **Written thoughts:** template sentences built only from those values, labelled as illustration. They add no motives or feelings, and the close-up's face stays neutral.
-- **Cutscenes:** street level (column), aerial (crowds), from the bay, a house cutaway (roof), a close-up on the followed person, and eye level (flow arrival). Under mapping B, flows reach an almost empty town, or the run ends first.
+- **Cutscenes,** replayed from the end screen rather than during the run: street level (column), aerial (crowds), from the bay, a house cutaway (roof), a close-up on the followed person, and eye level (flow arrival). Under mapping B, flows reach an almost empty town, or the run ends first.
 
 ## Event mapping
 

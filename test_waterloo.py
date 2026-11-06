@@ -6,6 +6,7 @@ import pytest
 
 import contracts
 from engine.chlorine import LEAK_SITES, LEAK_START_STEP, ODOUR_PPM, SOURCE_PPM, STEP_SECONDS, ChlorineModel, exposure_level, wind_at
+from engine.cutscenes import DURATION
 from engine.patrons import POPULATION_SETTINGS, Patron, role_counts, smell_chance
 from engine.scenes_waterloo import SCENES, WaterlooCutscenes
 from engine.site import BUILDING, DOORS, POOL, POOL_GATES, PROVENANCE, SITE_M_PER_TILE, SiteWorld
@@ -423,3 +424,95 @@ def test_slow_water_still_lets_people_move(world, monkeypatch):
     for _ in range(6):
         patron.walk(world, field)
     assert tuple(patron.pos) != start
+
+
+# --- Hub screen ---
+
+def test_hub_gives_each_crowd_scenario_its_whole_timeline():
+    from engine.flood import HORIZON as TITANIC
+    from engine.gui import IslandVisualizerApp
+    from engine.pompeii import HORIZON as POMPEII
+    app = IslandVisualizerApp(seed=105, start_screen="event_choice", scenario="volcano")
+    for choose, horizon in ((app._hub_choose_titanic, TITANIC), (app._hub_choose_pompeii, POMPEII), (app._hub_choose_waterloo, 721)):
+        choose()
+        assert app.max_steps == horizon
+    assert app.app_state == "home" and len(app.step_buttons) == 6
+    assert app.step_buttons[0].text == "Mapping: A" and app.btn_launch.text == "LAUNCH WATERLOO SIMULATION"
+
+
+def test_titanic_defaults_stay_as_pulled_and_new_settings_are_opt_in():
+    from engine.titanic import TitanicSimulation
+    sim = TitanicSimulation(seed=1)
+    assert sim.inputs == "original" and sim.crew_told and sim.boats.boarding_rule
+    neutral = TitanicSimulation(seed=1, inputs="neutral")
+    assert all(p.neutral_inputs for p in neutral.people)
+    neutral.run(12)
+    assert not any(p.status == "boat" and not p.knows_danger for p in neutral.people)
+
+
+# --- Replay tool ---
+
+def _finished_app(choose="waterloo", steps=60):
+    from engine.gui import IslandVisualizerApp
+    app = IslandVisualizerApp(seed=3, start_screen="event_choice", scenario="volcano")
+    {"waterloo": app._hub_choose_waterloo, "pompeii": app._hub_choose_pompeii, "titanic": app._hub_choose_titanic}[choose]()
+    app._init_simulation()
+    app.app_state = "sim"
+    return app
+
+
+def _advance(app, steps):
+    for _ in range(steps):
+        app.step_forward()
+        if app._worker is not None:
+            app._worker.join()
+            app._pompeii_poll_step()
+        assert not app.cutscene.active  # nothing pops up during the run
+
+
+def _press(app, key):
+    pygame = pytest.importorskip("pygame")
+    app.handle_event(pygame.event.Event(pygame.KEYDOWN, key=key, mod=0, unicode=""), (5, 5))
+
+
+@pytest.mark.parametrize("scenario,steps", [("waterloo", 60), ("titanic", 30)])
+def test_scenes_are_only_recorded_during_a_run(scenario, steps):
+    app = _finished_app(scenario)
+    _advance(app, steps)
+    assert app.cutscene.library and not app.cutscene.queue
+
+
+def test_replay_tool_runs_every_scene_in_order_and_closes():
+    pygame = pytest.importorskip("pygame")
+    app = _finished_app()
+    _advance(app, 60)
+    app.show_debrief_modal = True
+    app.draw((5, 5))
+    library = app.cutscene.library
+    assert app._scenes_available()
+    app._handle_sim_click(app.btn_modal_scenes.rect.center)
+    assert app.cutscene.replaying and app.cutscene.current is library[0]
+    app.draw((5, 5))
+    _press(app, pygame.K_RIGHT)
+    assert app.cutscene.current is library[1]
+    _press(app, pygame.K_LEFT)
+    assert app.cutscene.current is library[0]
+    _press(app, pygame.K_SPACE)
+    app.cutscene.update(DURATION * 2)
+    assert app.cutscene.current is library[0]
+    _press(app, pygame.K_SPACE)
+    for _ in library:
+        app.cutscene.update(DURATION)
+    assert not app.cutscene.replaying and not app.cutscene.active and app.show_debrief_modal
+    _press(app, pygame.K_c)
+    assert app.cutscene.replaying
+    _press(app, pygame.K_ESCAPE)
+    assert not app.cutscene.replaying
+
+
+def test_a_new_run_starts_with_an_empty_library():
+    app = _finished_app()
+    _advance(app, 20)
+    assert app.cutscene.library
+    app._init_simulation()
+    assert not app.cutscene.library and not app._scenes_available()

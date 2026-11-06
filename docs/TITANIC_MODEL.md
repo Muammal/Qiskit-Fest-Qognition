@@ -10,7 +10,7 @@ python main.py --demo --scenario titanic --seed 105 --speed 0
 python -m pytest test_titanic.py -q
 ```
 
-In the GUI: click a person to follow them, press `F` for the next role, `C` to turn cutscenes on or off, and `Q` to switch mind. Any key or click skips a cutscene.
+In the GUI: click a person to follow them, press `F` for the next role, and `Q` to switch mind. Cutscenes don't interrupt the run: use Replay Scenes or `C` on the end screen to watch them.
 
 ## Files
 

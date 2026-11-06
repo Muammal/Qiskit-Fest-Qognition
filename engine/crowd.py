@@ -66,6 +66,8 @@ class ShipAgent(SurvivalAgent):
         self.inventory["lifebelt"] = 0
         self.status = "aboard"  # aboard, boat, water
         self.boat_id = None
+        self.neutral_inputs = False  # True removes the nudges below; see TitanicSimulation's inputs setting
+        self.knows_danger = False
         self.story_event = "none"
         self.last_action = "rest"
         self.log = []
@@ -134,7 +136,10 @@ class ShipAgent(SurvivalAgent):
             self.injury_cooldown = max(0, self.injury_cooldown - 1)
             self.injured = self.injury_cooldown > 0
         indoors = world.get_tile(*self.pos) == 4
-        if action == "hide":
+        if action == "hide" and self.neutral_inputs:
+            if self.knows_danger:  # same rule as agent.py: with no warning, nobody knows to run
+                self.walk_to_boat(world, fields, crowding)
+        elif action == "hide":
             if not warned_only_hide or bool(self.recent_events):
                 self.walk_to_boat(world, fields, crowding)
                 self.needs["safety"] = min(1, self.needs["safety"] + .05)
@@ -162,7 +167,7 @@ class ShipAgent(SurvivalAgent):
         if action != "rest":
             self.needs["energy"] = max(0, self.needs["energy"] - .025 * STEP_FRACTION)
         zone = world.zones[self.pos[1]][self.pos[0]]
-        if any(e in ("tremor", "gas_plume", "eruption", "ash_fall") for e in self.recent_events):
+        if not self.neutral_inputs and any(e in ("tremor", "gas_plume", "eruption", "ash_fall") for e in self.recent_events):
             self.needs["safety"] = min(self.needs["safety"], (.8, .5, .3)[zone])  # same warning caps as the volcano scenario
 
     def step_decay(self, in_shelter: bool, forest_cover: bool = False):

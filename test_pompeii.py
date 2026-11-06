@@ -719,4 +719,5 @@ def test_other_scenarios_keep_their_length_and_simulation():
     app._handle_mouse_click(app.btn_choice_pompeii.rect.center)
     app.app_state = "event_choice"
     app._handle_mouse_click(app.btn_choice_volcano.rect.center)
+    app._config_on_start()  # the new configuration screen sets the length when a run starts
     assert app.scenario == "volcano" and app.max_steps == 36 and app.split_panels is None
