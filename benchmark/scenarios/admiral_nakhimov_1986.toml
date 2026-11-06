@@ -1,0 +1,110 @@
+# Elinder and Erixson 2012, PNAS 109(33):13220, Table 1: aboard, women share, duration, order.
+# assumption: breach flooding proxy; no list, capsize or mechanical-failure dynamics.
+# assumption: Titanic geometry scaled by cube root of aboard / Titanic headcount;
+# equal compartments and a representative bulkhead height replace its uneven layout.
+# assumption: Titanic crew share and passenger child share, rounded; no class split.
+# assumption: Titanic cohort positions, reach times and deck-crew boat assignment.
+# assumption: boat count scales with aboard; mean seats and launch window follow Titanic.
+# Breach area matches the sinking-time input to this record, not tuning to survival.
+# sink_minutes = 7
+# https://en.wikipedia.org/wiki/SS_Admiral_Nakhimov: "a mere seven minutes after the collision"; "at 11:12 p.m."
+id = "admiral_nakhimov_1986" # Elinder and Erixson Table 1: event identity
+title = "admiral nakhimov 1986" # Elinder and Erixson Table 1: event identity
+place = "real"
+start_utc = "1986-08-31T23:02:00+00:00" # assumption: ship local clock; impact at recorded 23:12; Titanic launch delays
+hours = 1 # assumption: whole-hour horizon extending beyond sinking
+step_minutes = 0.5 # assumption: ship local clock; impact at recorded 23:12; Titanic launch delays
+local_utc_offset = 0 # assumption
+
+[[entity]]
+kind = "ship"
+source = "dials"
+length_m = 214.77960814556752 # assumption: scaled Titanic geometry; equal compartments
+beam_m = 23.304532262129026 # assumption: scaled Titanic geometry; equal compartments
+draught_m = 8.712955755660852 # assumption: scaled Titanic geometry; equal compartments
+displacement_t = 30015.86658178101 # assumption: scaled Titanic geometry; equal compartments
+compartments = 16 # assumption: scaled Titanic geometry; equal compartments
+bulkhead_top_m = 3.719599743902271 # assumption: scaled Titanic geometry; equal compartments
+boat_deck_m = 14.612571580578201 # assumption: scaled Titanic geometry; equal compartments
+
+[[entity]]
+kind = "breach"
+source = "dials"
+first_compartment = 0 # assumption: Titanic-style damage and alarm
+holed = 6 # assumption: Titanic-style damage and alarm
+area_m2 = 18.750625 # assumption: timing-input match only
+impact_minutes = 10 # https://en.wikipedia.org/wiki/SS_Admiral_Nakhimov: "at 11:12 p.m."; ten minutes after start
+alarm_minutes = 11 # assumption: ship local clock; impact at recorded 23:12; Titanic launch delays
+
+[[entity]]
+kind = "lifeboats"
+source = "dials"
+boats = 11 # assumption: scaled Titanic boats and launch window; no port restriction
+seats = 59 # assumption: scaled Titanic boats and launch window; no port restriction
+first_launch_minutes = 74 # assumption: ship local clock; impact at recorded 23:12; Titanic launch delays
+last_launch_minutes = 164 # assumption: ship local clock; impact at recorded 23:12; Titanic launch delays
+women_first = 0 # Elinder and Erixson Table 1: no order
+port_women_only = 0 # assumption: scaled Titanic boats and launch window; no port restriction
+
+[[entity]]
+kind = "sea"
+source = "dials"
+temperature_c = 24 # assumption, typical for the place and month: Black Sea in August
+
+[[entity]]
+kind = "weather"
+source = "dials"
+rain_mm_h = 0.0 # assumption: Titanic calm weather default
+wind_m_s = 0.0 # assumption: Titanic calm weather default
+wind_bearing_deg = 0.0 # assumption: Titanic calm weather default
+temperature_c = 0.0 # assumption: Titanic calm weather default
+upper_wind_m_s = 0.0 # assumption: Titanic calm weather default
+upper_bearing_deg = 0.0 # assumption: Titanic calm weather default
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "passengers"
+men = 325 # assumption: Titanic-derived cohort split or placement
+women = 356 # Elinder and Erixson Table 1: 47.9% of assumed passengers, rounded
+children = 62 # assumption: Titanic-derived cohort split or placement
+deck_from = 0.05 # assumption: Titanic-derived cohort split or placement
+deck_to = 0.95 # assumption: Titanic-derived cohort split or placement
+reach_minutes = 25.0 # assumption: Titanic-derived cohort split or placement
+boat_crew = 0.0 # assumption: Titanic-derived cohort split or placement
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "crew_deck"
+men = 37 # assumption: Titanic-derived cohort split or placement
+women = 0 # assumption: Titanic-derived cohort split or placement
+children = 0 # assumption: Titanic-derived cohort split or placement
+deck_from = 0.25 # assumption: Titanic-derived cohort split or placement
+deck_to = 0.65 # assumption: Titanic-derived cohort split or placement
+reach_minutes = 0.0 # assumption: Titanic-derived cohort split or placement
+boat_crew = 1.0 # assumption: Titanic-derived cohort split or placement
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "crew_engine"
+men = 184 # assumption: Titanic-derived cohort split or placement
+women = 0 # assumption: Titanic-derived cohort split or placement
+children = 0 # assumption: Titanic-derived cohort split or placement
+deck_from = 0.3 # assumption: Titanic-derived cohort split or placement
+deck_to = 0.7 # assumption: Titanic-derived cohort split or placement
+reach_minutes = 30.0 # assumption: Titanic-derived cohort split or placement
+boat_crew = 0.0 # assumption: Titanic-derived cohort split or placement
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "crew_victualling"
+men = 279 # assumption: Titanic-derived cohort split or placement
+women = 0 # assumption: Titanic-derived cohort split or placement
+children = 0 # assumption: Titanic-derived cohort split or placement
+deck_from = 0.2 # assumption: Titanic-derived cohort split or placement
+deck_to = 0.8 # assumption: Titanic-derived cohort split or placement
+reach_minutes = 15.0 # assumption: Titanic-derived cohort split or placement
+boat_crew = 0.0 # assumption: Titanic-derived cohort split or placement
