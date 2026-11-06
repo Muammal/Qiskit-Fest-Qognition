@@ -132,7 +132,7 @@ A bug in the script's first draft was caught by a unit test before the run. It i
 | 4. Scenario panels | Island vitals and actions replaced, using each engine's own action labels. "Not yet recorded." is gone |
 | 5. One debrief | No mid-run cutscenes, `C` key removed. Title follows steps endured. Survival, survivors against deaths, paired result on the same seed, and a footer. |
 | 6. Layout | Hub cards flow, so text cannot collide. Config rows re-spaced. `test_ui_layout.py` checks 1280×720, 1920×1080 and 2560×1440 |
-| 7. 3D coverage | Out of scope on this 2D branch. See `UI/Python3D` |
+| 7. 3D coverage | Dropped. The project is 2D only, and all 3D code was removed from every local branch |
 | 8. Naming | "Qognition" in titles, caption, README and site. Internal `Stranded` strings stay |
 
 **Different from the prompt, or limited:**
@@ -142,9 +142,13 @@ A bug in the script's first draft was caught by a unit test before the run. It i
 - **Item 2:** the control line evaluates the mixture mind on the quantum run's own state at each step, not as a separate run, so both lines share one world.
 - **Verification:** all UI checks and screenshots ran headless with SDL's dummy driver. **Nothing has been seen on a real display or projector**, and frame rate was not measured.
 
+## End-of-event report
+
+`engine/report.py` builds the report from a finished run, and the debrief shows its key events. **Export Report** (or `K` in the debrief) writes an Excel workbook and a folder of CSVs to `exports/reports/`, and `python main.py --report` does the same without the GUI. The tables are Summary, Key events, Timeline, Crowd over time, Groups, Decisions, Paired run and Assumptions.
+
 ## Tests
 
-The standard command gives 413 passed, 3 skipped (the 3 need `qiskit_ibm_runtime`, which is not installed here). `test_ui_layout.py` and `mind/human_tests` add 64 passed. The README had claimed 712, which matched nothing. New files: `mind/tests/test_paper_baseline.py`, `test_cross_check_verdicts.py`, `test_phase1_honesty.py`, `test_readme_numbers.py`, `test_extended_models.py`, `test_synthetic_recovery.py`, `test_time_aware.py`, `test_lead_sweep.py`, and `test_ui_layout.py`.
+The standard command gives 413 passed, 3 skipped (the 3 need `qiskit_ibm_runtime`, which is not installed here). `test_ui_layout.py`, `test_report.py` and `mind/human_tests` add 89 passed. The README had claimed 712, which matched nothing. New files: `mind/tests/test_paper_baseline.py`, `test_cross_check_verdicts.py`, `test_phase1_honesty.py`, `test_readme_numbers.py`, `test_extended_models.py`, `test_synthetic_recovery.py`, `test_time_aware.py`, `test_lead_sweep.py`, and `test_ui_layout.py`.
 
 ## Suggested paper edits
 

@@ -105,6 +105,9 @@ RISKS_AND_FAQ.md
 !/TECH_STACK.md
 !/RISKS_AND_FAQ.md
 
+# --- Generated end-of-event reports ---
+exports/reports/
+
 # --- Operating System & Editor Metadata ---
 .DS_Store
 Thumbs.db

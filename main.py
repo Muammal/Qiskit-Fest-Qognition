@@ -171,6 +171,7 @@ def main():
     parser.add_argument("--curate", action="store_true", help="Curate signature runs into demo-pack/")
     parser.add_argument("--export-data", action="store_true", help="Export evacuation survival rates, critical seeds & policy interventions to exports/")
     parser.add_argument("--export-video", action="store_true", help="Export full simulation run MP4 video to exports/videos/")
+    parser.add_argument("--report", action="store_true", help="Run one event, then write its end-of-event report as Excel and CSV")
     parser.add_argument("--test", action="store_true", help="Execute integration test suite")
     parser.add_argument("--seed", type=int, default=101, help="Event hazard or terrain seed")
     parser.add_argument("--mind", type=str, default="quantum",
@@ -209,6 +210,11 @@ def main():
         print(f"\n{BOLD}{GREEN}=== Exported Full Simulation Video ==={RESET}")
         for k, v in info.items():
             print(f"  {k}: {CYAN}{v}{RESET}")
+    elif args.report:
+        from engine.report import DEFAULT_DIR, run_and_report
+        scen = args.scenario or "volcano"
+        _report, workbook, folder = run_and_report(scen, seed=args.seed, mind=args.mind, out_dir=args.output or DEFAULT_DIR)
+        print(f"Report saved: {workbook}\nCSV tables: {folder}")
     elif args.batch:
         summary = run_batch_comparison(num_seeds=20, max_steps=DEFAULT_STEPS)
         print(f"\n{BOLD}=== Synthetic Heuristic-Stub Results ({summary['num_seeds']} Seeds) ==={RESET}")

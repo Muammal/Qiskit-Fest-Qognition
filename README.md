@@ -173,6 +173,31 @@ start site/index.html
 
 ---
 
+## End-of-Event Report
+
+Every run ends in one debrief with the crucial details: survivors against deaths, key events, the paired run on the same seed, and the assumptions used. **Export Report** (or `K` in the debrief) writes an Excel workbook and a folder of CSVs to `exports/reports/`, with these tables:
+
+| Table | Contents |
+|---|---|
+| Summary | Scenario, seed, mind, cue translation, totals and survival rate |
+| Key events | First sign, first decision to evacuate, hazard onset, margin, seats used, causes of death, exposure |
+| Timeline | Every step, end to end: event, action, needs, stress, P(danger), P(protect), λ, coherence, reason |
+| Crowd over time | Everyone's status at every step (Titanic, Pompeii, Waterloo) |
+| Groups | Outcomes by class or role, with history where a source gives it |
+| Decisions | How often each action was chosen |
+| Paired run | The other mind on the same seed |
+| Assumptions | Cue translation, decision rule, dephasing and scope |
+
+Without the GUI:
+
+```bash
+python main.py --report --scenario titanic --seed 42 --mind quantum
+```
+
+Reports are model output, not predictions.
+
+---
+
 ## Fullscreen & Interactive Controls
 
 | Screen | Control | Action |
@@ -189,6 +214,7 @@ start site/index.html
 | **Simulation View** | `F` | **Follow Next Person / Role** (in crowd scenarios & custom builder packs) |
 | **Simulation View** | `P` / `M` | **Toggle Split Panels** (`P`) or **Region Map** (`M` in Pompeii) |
 | **Quantum panel** | `[Swap cues]` | **Order swap**: swaps the last two cues and shows the change in P(protect) |
+| **Debrief** | `[Export Report]` or `K` | **Write the report** as Excel and CSV to `exports/reports/` |
 | **Configuration Hub** | `A` / `B` / `C` / `D` buttons | **Cue translation** for Titanic, Pompeii and Waterloo. Each one is an assumption, and results move with it |
 | **Simulation View** | `[Speed]` Button | **Cycle Speed** (0.5×, 1×, 2×, 4×) |
 | **Simulation View** | `E` | **Toggle Evacuation Map Overlay** (zones, assembly points, Dijkstra paths) |
@@ -200,7 +226,7 @@ start site/index.html
 
 ## Daily Integration & Verification Testing
 
-Run the unified suite across **Tech A**, **Tech B**, **Tech C**, **Titanic**, **Pompeii**, and **Waterloo** (413 passed, 3 skipped on 6 November 2026; `test_ui_layout.py` and `mind/human_tests` add 64):
+Run the unified suite across **Tech A**, **Tech B**, **Tech C**, **Titanic**, **Pompeii**, and **Waterloo** (413 passed, 3 skipped on 6 November 2026; `test_ui_layout.py`, `test_report.py` and `mind/human_tests` add 89):
 
 ```powershell
 $env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py test_titanic.py test_pompeii.py test_waterloo.py mind/tests stranded_physics/core -q

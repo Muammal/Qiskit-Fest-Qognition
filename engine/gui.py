@@ -90,6 +90,7 @@ from engine.flood import SINK_STEP
 from engine.patrons import ACTION_LABELS as WATERLOO_ACTION_LABELS
 from engine.debrief import MODEL_FOOTER, PairedResult, crowd_line, first_hide, paired_text, run_title
 from engine.gui_quantum import QuantumPanel
+from engine.report import CUE_TRANSLATIONS, DEFAULT_DIR, build_report, export_report, key_lines, paired_rows, report_name
 from engine.hidpi import ScaledFont, UICanvas, compose, setup_dpi_awareness, window_fit
 
 try:
@@ -197,20 +198,6 @@ POMPEII_PRESETS = [
     {"label": "Merchant", "seed": 107, "tag": "Follow a merchant | Random panels", "color": COLOR_GREEN},
     {"label": "Council Member", "seed": 108, "tag": "Follow a council member | Random panels", "color": COLOR_GOLD}
 ]
-# The cue translation is an assumption: which model event a real-world cue reaches the mind as.
-# (button, event_mapping value, what it assumes). Results move with it, so it is chosen on screen.
-CUE_TRANSLATIONS = {
-    "titanic": (("A", "default", "Rockets read as certain danger, steward warnings as ambiguous"),
-                ("B", "ambiguous_rockets", "Rockets read as ambiguous, like steward warnings"),
-                ("C", "early_pa_alarm", "Steward warnings and crew orders read as certain danger")),
-    "pompeii": (("A", "A", "Column and falling pumice both read as certain danger"),
-                ("B", "B", "Column ambiguous, pumice certain (the most literal)"),
-                ("C", "C", "Column and pumice both ambiguous, as a gas plume"),
-                ("D", "D", "Column and pumice both ambiguous, as a tremor")),
-    "waterloo": (("A", "A", "Every cue ambiguous, including the alarm"),
-                 ("B", "B", "Alarm read as certain danger, other cues ambiguous"),
-                 ("C", "C", "A milder reading: smell and talk as tremors, alarm ambiguous")),
-}
 POMPEII_SETTINGS = (  # (key, label, options); each changes results, so each is visible before launch
     # The first option in each row is the default, so B comes first: the user's chosen mapping.
     ("event_mapping", "Mapping", ("B", "C", "D", "A")), ("population", "People", (11_500, 20_000)),
@@ -695,6 +682,8 @@ class IslandVisualizerApp:
         self.last_mouse = (0, 0)
         self.quantum_panel = QuantumPanel()
         self.paired = PairedResult()
+        self.report_dir = DEFAULT_DIR
+        self.report_status, self.report_thread = "", None
         self._worker, self._worker_result = None, None
         self.city_view, self.split_panels, self.show_split_panels = None, None, True
         self.custom_game = None  # A scenario file being played. None means one of the built-in scenarios.
@@ -1007,11 +996,12 @@ class IslandVisualizerApp:
         # Debrief modal buttons
         mx = WINDOW_WIDTH // 2
         my = WINDOW_HEIGHT // 2
-        self.btn_modal_replay = UIButton((mx - 340, my + 175, 150, 46), "Replay Run", self.font_sub, bg_color=(36, 138, 198), active_color=COLOR_CYAN, icon="replay")
-        self.btn_modal_switch = UIButton((mx - 175, my + 175, 175, 46), "Compare Mind", self.font_sub, bg_color=(138, 56, 186), active_color=COLOR_PURPLE, icon="compare")
-        self.btn_modal_scenario = UIButton((mx + 15, my + 175, 175, 46), "Change Scenario", self.font_sub, bg_color=(214, 96, 28), active_color=COLOR_ORANGE, icon="menu")
-        self.btn_modal_home = UIButton((mx + 205, my + 175, 135, 46), "Settings", self.font_sub, bg_color=(112, 74, 38), active_color=COLOR_CARD_HOVER, icon="home")
-        self.btn_modal_close = UIButton((mx + 390, my - 225, 34, 34), "X", self.font_title, bg_color=COLOR_PANEL_BG)
+        self.btn_modal_replay = UIButton((mx - 405, my + 256, 146, 46), "Replay Run", self.font_sub, bg_color=(36, 138, 198), active_color=COLOR_CYAN, icon="replay")
+        self.btn_modal_switch = UIButton((mx - 250, my + 256, 166, 46), "Compare Mind", self.font_sub, bg_color=(138, 56, 186), active_color=COLOR_PURPLE, icon="compare")
+        self.btn_modal_report = UIButton((mx - 75, my + 256, 170, 46), "Export Report", self.font_sub, bg_color=(30, 120, 70), active_color=COLOR_GREEN, icon="log")
+        self.btn_modal_scenario = UIButton((mx + 104, my + 256, 176, 46), "Change Scenario", self.font_sub, bg_color=(214, 96, 28), active_color=COLOR_ORANGE, icon="menu")
+        self.btn_modal_home = UIButton((mx + 289, my + 256, 116, 46), "Settings", self.font_sub, bg_color=(112, 74, 38), active_color=COLOR_CARD_HOVER, icon="home")
+        self.btn_modal_close = UIButton((mx + 390, my - 316, 34, 34), "X", self.font_title, bg_color=COLOR_PANEL_BG)
 
         # History log modal close
         self.btn_hist_close = UIButton((WINDOW_WIDTH // 2 + 500, 45, 34, 34), "X", self.font_title, bg_color=COLOR_PANEL_BG)
@@ -1048,6 +1038,8 @@ class IslandVisualizerApp:
             self.cutscene.enabled = enabled
         self.cutscene.reset()
         self.quantum_panel.reset()
+        self._report_cache = None
+        self.report_status = ""
         self.history: List[Dict[str, Any]] = []
         self.current_decision: Dict[str, Any] = {
             "action": "none",
@@ -1266,6 +1258,8 @@ class IslandVisualizerApp:
                 self._shift_speed(1)
             elif event.key == pygame.K_v and self.app_state == "sim":
                 self._toggle_video_recording()
+            elif event.key == pygame.K_k and self.app_state == "sim" and self.show_debrief_modal:
+                self.export_report()
             elif event.key == pygame.K_k and self.app_state == "sim":
                 self._export_current_data()
             elif event.key == pygame.K_q and self.app_state in ("sim", "home"):
@@ -1434,7 +1428,7 @@ class IslandVisualizerApp:
 
         elif self.app_state == "sim":
             if self.show_debrief_modal:
-                return (self.btn_modal_replay.check_hover(pos) or self.btn_modal_switch.check_hover(pos) or
+                return (self.btn_modal_replay.check_hover(pos) or self.btn_modal_switch.check_hover(pos) or self.btn_modal_report.check_hover(pos) or
                         self.btn_modal_scenario.check_hover(pos) or self.btn_modal_home.check_hover(pos) or
                         self.btn_modal_close.check_hover(pos))
             if self.show_history_overlay:
@@ -1638,7 +1632,10 @@ class IslandVisualizerApp:
 
     def _handle_sim_click(self, pos: Tuple[int, int]):
         if self.show_debrief_modal:
-            if self.btn_modal_replay.check_hover(pos):
+            if self.btn_modal_report.check_hover(pos):
+                self.export_report()
+                self.btn_modal_report.trigger_click()
+            elif self.btn_modal_replay.check_hover(pos):
                 self._init_simulation()
                 self.show_debrief_modal = False
             elif self.btn_modal_switch.check_hover(pos):
@@ -2700,7 +2697,7 @@ class IslandVisualizerApp:
         dim_surf.fill((10, 15, 26, 215))
         self.canvas.blit(dim_surf, (0, 0))
 
-        mw, mh = 860, 520
+        mw, mh = 860, 680
         mx, my = (WINDOW_WIDTH - mw) // 2, (WINDOW_HEIGHT - mh) // 2
         m_rect = pygame.Rect(mx, my, mw, mh)
         survived = self.agent.is_alive
@@ -2760,12 +2757,14 @@ class IslandVisualizerApp:
 
         self.btn_modal_replay.check_hover(mouse_pos)
         self.btn_modal_switch.check_hover(mouse_pos)
+        self.btn_modal_report.check_hover(mouse_pos)
         self.btn_modal_scenario.check_hover(mouse_pos)
         self.btn_modal_home.check_hover(mouse_pos)
         self.btn_modal_close.check_hover(mouse_pos)
 
         self.btn_modal_replay.draw(self.canvas)
         self.btn_modal_switch.draw(self.canvas)
+        self.btn_modal_report.draw(self.canvas)
         self.btn_modal_scenario.draw(self.canvas)
         self.btn_modal_home.draw(self.canvas)
         self.btn_modal_close.draw(self.canvas)
@@ -2773,6 +2772,41 @@ class IslandVisualizerApp:
     # -------------------------------------------------------------------------
     # Render Full Action History Overlay (Tab / Log Key)
     # -------------------------------------------------------------------------
+    def _report_title(self):
+        return self.custom_game.title if self.custom_game is not None else None
+
+    def _cached_report(self):
+        """The report for this finished run, built once however many frames the debrief is open."""
+        key = (id(self.engine), self.step_idx)
+        if self._report_cache is None or self._report_cache[0] != key:
+            report = build_report(self.scenario, self.engine, self.mind_type, self.seed, title=self._report_title(), horizon=self.max_steps)
+            self._report_cache = (key, report)
+        return self._report_cache[1]
+
+    def export_report(self):
+        """Writes the Excel workbook and the CSVs. Waits for the paired run on a thread, so the window keeps drawing."""
+        if self.report_thread is not None and self.report_thread.is_alive():
+            return
+        report = dict(self._cached_report())
+        name = report_name(self.scenario, self.seed, self.mind_type, self.engine)
+        pending = self.paired.thread if self.custom_game is None else None
+        out_dir = self.report_dir
+        self.report_status = "Saving the report..."
+
+        def work():
+            if pending is not None:
+                pending.join()
+            report["Paired run"] = paired_rows(self.paired.value if pending is not None else None)
+            try:
+                workbook, folder = export_report(report, name, out_dir)
+            except OSError as error:  # for example the workbook is open in Excel
+                self.report_status = f"Report not saved: {error}"
+                return
+            self.report_status = f"Saved {os.path.basename(workbook)} and CSVs in {os.path.basename(str(out_dir))}/"
+
+        self.report_thread = threading.Thread(target=work, daemon=True)
+        self.report_thread.start()
+
     def _debrief_settings(self):
         if self.scenario == "titanic":
             return dict(event_mapping=self.titanic_mapping)
@@ -2800,11 +2834,15 @@ class IslandVisualizerApp:
             batch = saved_volcano_batch() if self.scenario == "volcano" else None
             if batch:
                 lines.append(batch)
-        y = my + mh - 160
+        lines += key_lines(self._cached_report())
+        y = my + 372
         for line in lines:
             surface = self.font_small.render(line, True, COLOR_TEXT_MAIN)
             self.canvas.blit(surface, (mx + (mw - surface.get_width()) // 2, y))
-            y += 20
+            y += 22
+        if self.report_status:
+            status = self.font_small.render(self.report_status, True, COLOR_GREEN_DARK)
+            self.canvas.blit(status, (mx + (mw - status.get_width()) // 2, my + mh - 122))
         footer = self.font_small.render(MODEL_FOOTER, True, COLOR_TEXT_HINT)
         self.canvas.blit(footer, (mx + (mw - footer.get_width()) // 2, my + mh - 24))
 
@@ -2836,7 +2874,7 @@ class IslandVisualizerApp:
                                                 True, COLOR_TEXT_HINT), (box.x + 22, y + 34))
         self.canvas.blit(self.font_small.render("A hypothetical at a real site, not a reconstruction. The real head-count, leak and injuries are unknown; see docs/WATERLOO_SOURCES.md.",
                                                 True, COLOR_TEXT_HINT), (box.x + 22, y + 54))
-        for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_scenario, self.btn_modal_home):
+        for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_report, self.btn_modal_scenario, self.btn_modal_home):
             button.check_hover(mouse_pos)
             button.draw(self.canvas)
         self.btn_modal_close.check_hover(mouse_pos)
@@ -2868,7 +2906,7 @@ class IslandVisualizerApp:
                                                 True, COLOR_TEXT_HINT), (box.x + 22, y + 32))
         self.canvas.blit(self.font_small.render("A demonstration, not a reconstruction. The default settings overstate escape; see docs/POMPEII_SOURCES.md.",
                                                 True, COLOR_TEXT_HINT), (box.x + 22, y + 52))
-        for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_scenario, self.btn_modal_home):
+        for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_report, self.btn_modal_scenario, self.btn_modal_home):
             button.check_hover(mouse_pos)
             button.draw(self.canvas)
         self.btn_modal_close.check_hover(mouse_pos)
@@ -2905,7 +2943,7 @@ class IslandVisualizerApp:
         self.canvas.blit(self.font_mono.render(note, True, COLOR_TEXT_MUTED), (box.x + 22, box.y + 180))
         hint = "A compressed demonstration, not a reconstruction. Compare Mind reruns this night with another mind."
         self.canvas.blit(self.font_small.render(hint, True, COLOR_TEXT_HINT), (box.x + 22, box.y + 212))
-        for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_scenario, self.btn_modal_home):
+        for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_report, self.btn_modal_scenario, self.btn_modal_home):
             button.check_hover(mouse_pos)
             button.draw(self.canvas)
         self.btn_modal_close.check_hover(mouse_pos)
