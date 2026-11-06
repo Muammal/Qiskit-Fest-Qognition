@@ -189,7 +189,7 @@ def main():
     if args.test:
         import pytest
         print("[Tech C] Running integration test suite...")
-        sys.exit(pytest.main(["-v", "test_contracts_and_engine.py"]))
+        sys.exit(pytest.main(["-v", "test_contracts_and_engine.py", "test_gui_hayday.py", "test_gui3d.py"]))
     elif args.export_data:
         from engine.exporter import export_evacuation_datasets
         out_dir = args.output or "exports"
