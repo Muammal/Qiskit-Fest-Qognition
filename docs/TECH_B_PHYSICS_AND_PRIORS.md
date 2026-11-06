@@ -3,7 +3,7 @@
 > **Track Scope**: Tech B anchors the simulation in real-world geophysical, meteorological, and behavioral data. It provides:
 > 1. **Empirical Disaster & Human-Response Datasets (`disaster_data/`)** — 49 curated datasets across 6 historical eruptions (anchored on the April 2021 La Soufrière eruption on St. Vincent).
 > 2. **Verification-First Multi-Domain Physics Engine (`stranded_physics/` & `stranded_physics/scenarios.py`)** — A 14-domain unit-checked (`pint`) physical modeling framework, 9 simplified **stand-in solvers** for the April 2021 La Soufrière eruption (`build_st_vincent_pack`), pre-registered validation gates (`gates.py`), and strict anti-future-leakage perception (`perceive()`).
-> 3. **Empirical ATUS Priors (`data/priors.json`), Classical Rational Baseline & Grover DTQW (`contracts.py`)** — Physiological utility weighting grounded in Bureau of Labor Statistics American Time Use Survey (ATUS) Table A-1 activity weights and a 4-direction **Grover-coined Discrete-Time Quantum Walk (DTQW)** in `explore_step()`.
+> 3. **Empirical ATUS Priors (`data/priors.json`), Classical Rational Baseline & Grover DTQW (`contracts.py`)** — Hand-set physiological urgency weights, ATUS reference hours that are stored but **not used in decisions**, and a 4-direction **Grover-coined Discrete-Time Quantum Walk (DTQW)** in `explore_step()`, which is off unless a run opts in with `explore_walk="grover"`.
 
 ---
 
@@ -85,7 +85,7 @@ Calling `build_st_vincent_pack(seed=1)` executes all 9 `T1` solvers in topologic
 > **Status:** `contracts.get_prior` does not use these ATUS numbers. It loads the file, but decisions use flat weights plus hand-set urgency boosts.
 
 
-1. **Empirical BLS ATUS Priors (`data/priors.json` & `contracts.get_prior`)**:
+1. **Hand-Set Priors and ATUS Reference Hours (`data/priors.json` & `contracts.get_prior`)**:
    - [`data/priors.json`](../data/priors.json) stores Bureau of Labor Statistics (BLS) American Time Use Survey (ATUS) Summary Table A-1 baseline human activity weights and physiological urgency multipliers, loaded automatically into `contracts.ATUS_PRIORS_META`.
 2. **Deterministic Utility Maximization (`contracts.classical_decide`)**:
    - Evaluates the normalized prior distribution $P_{\text{prior}}(a|\text{state})$ and selects $a^* = \arg\max_{a \in \text{ACTIONS}} P_{\text{prior}}(a \mid \text{state})$.

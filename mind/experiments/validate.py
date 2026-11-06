@@ -20,6 +20,12 @@ from mind.cognition_models import (
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+# Pass criteria for library_cross_check, fixed here and not derived from the result.
+HUANG_PUBLISHED_DB = -0.942  # Huang, Yang & Jiang (2019), Shafir & Tversky prisoner's dilemma row
+HUANG_TOLERANCE = 0.01
+QQ_TOLERANCE = 1e-12
+UNITARITY_TOLERANCE = 1e-10
+
 STAGE_TEST_FILES = [
     ("Stage 1 - deliberation unitary", "mind/tests/test_model.py"),
     ("Stage 2 - belief, events, collapse", "mind/tests/test_belief.py"),
@@ -128,6 +134,10 @@ def survival_rate(records, mind):
     return sum(1 for s in records if records[s][mind]["survived"]) / n
 
 
+def _verdict(passed):
+    return "PASS" if passed else "FAIL"
+
+
 def library_cross_check():
     """Cross-checks against both external packages (if installed) and the built-in
     implementations of published GitHub quantum cognition formulations:
@@ -142,22 +152,32 @@ def library_cross_check():
             __import__(module_name)
             found[module_name] = "importable"
         except ImportError as e:
-            found[module_name] = f"not available ({e.__class__.__name__}); verified via built-in mind.cognition_models"
+            found[module_name] = (f"not available ({e.__class__.__name__}); this package was not "
+                                  "run, only the reimplementation in mind.cognition_models")
 
     qq_gap, order_eff = wang_busemeyer_qq_gap(0.2 * math.pi, 0.55 * math.pi, 0.15 * math.pi)
+    qq_ok = abs(qq_gap) < QQ_TOLERANCE and abs(order_eff) > 1e-6
     found["Wang-Busemeyer QQ Equality (WileQ/QCog)"] = (
-        f"PASS (qq_gap={qq_gap:.2e}, order_effect={order_eff:+.4f})"
+        f"{_verdict(qq_ok)} (qq_gap={qq_gap:.2e}, order_effect={order_eff:+.4f}; "
+        f"needs |qq_gap| < {QQ_TOLERANCE:g} with a real order effect)"
     )
-    rep_ok = verify_2d_representability(0.62, 0.48, 0.75)
-    found["2D Luders Representability (ProfessorBrunner)"] = f"PASS (realizable={rep_ok})"
+    realizable = verify_2d_representability(0.62, 0.48, 0.75)
+    impossible = verify_2d_representability(0.95, 0.05, 0.5)
+    found["2D Luders Representability (ProfessorBrunner)"] = (
+        f"{_verdict(realizable and not impossible)} (realizable case={realizable}, "
+        f"impossible case={impossible}; needs True then False)"
+    )
     db_pd = belief_degree_huang(0.5, 0.84, 0.63)
+    huang_ok = abs(db_pd - HUANG_PUBLISHED_DB) <= HUANG_TOLERANCE
     found["Huang QLBN Belief Entropy (Insight137/insight137-eap)"] = (
-        f"PASS (D_b={db_pd:.4f} vs published -0.9420)"
+        f"{_verdict(huang_ok)} (D_b={db_pd:.4f} vs published {HUANG_PUBLISHED_DB:.4f}, "
+        f"ratio {HUANG_PUBLISHED_DB / db_pd:.2f}; needs agreement within {HUANG_TOLERANCE})"
     )
     U_bus = busemeyer_hamiltonian_U(0.69, 0.59, gamma=0.65, t=1.0)
     unitary_err = float(np.max(np.abs(U_bus.conj().T @ U_bus - np.eye(4))))
     found["Busemeyer 2-Qubit Hamiltonian (jbusemey/ChoiceModeling)"] = (
-        f"PASS (max|U^dagger U - I|={unitary_err:.2e})"
+        f"{_verdict(unitary_err < UNITARITY_TOLERANCE)} (max|U^dagger U - I|={unitary_err:.2e}; "
+        f"needs < {UNITARITY_TOLERANCE:g}; checks unitarity only, not the published values)"
     )
     return found
 
@@ -279,6 +299,16 @@ def generate_report(seeds=range(200), prototype_seeds=40, out_path="docs/tech-a/
     cross_check = library_cross_check()
     for name, result in cross_check.items():
         lines.append(f"- `{name}`: {result}")
+    lines.append("")
+    lines.append("These are checks of this repo's reimplementations. Neither external package "
+                 "above was run.")
+    lines.append("")
+    lines.append("**Open issue:** `belief_degree_huang` gives D_b about 1.94 times smaller in size "
+                 "than the published value for the same inputs. The cause is not known. It may be "
+                 "a difference in the published formula's convention or a bug here. "
+                 "`qlbn_entropy` is opt-in and the default mind does not use it, so no paper "
+                 "number depends on it, but it should not be described as reproducing Huang et al. "
+                 "until this is resolved.")
     lines.append("")
 
     # Figures

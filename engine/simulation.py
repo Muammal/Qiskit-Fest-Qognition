@@ -22,7 +22,7 @@ DEFAULT_STEPS = 36  # assumption: 72 hours, two hours per step
 
 class SimulationEngine:
     def __init__(self, seed=42, mind_type='quantum', noise_source='stub', decide_fn=None,
-                 scenario='volcano', scripted_events=None):
+                 scenario='volcano', scripted_events=None, explore_walk='random'):
         self.seed, self.mind_type = seed, mind_type.lower()
         self.noise_source = noise_source
         self.scenario = scenario
@@ -58,6 +58,7 @@ class SimulationEngine:
             self.event_gen.prepare(self.volcano)
 
         self.agent.scenario = scenario
+        self.agent.explore_walk = explore_walk  # 'grover' opts in to contracts.explore_step
 
         if decide_fn:
             self.decide_fn = decide_fn

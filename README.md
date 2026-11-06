@@ -15,13 +15,15 @@
 
 ## Five Evacuation & Survival Scenarios + Custom Scenario Builder
 
+Results are in the generated table [`docs/results/SCENARIO_NUMBERS.md`](docs/results/SCENARIO_NUMBERS.md), written by `python tools/make_readme_numbers.py`. Numbers are kept there rather than typed here so they cannot go stale. They are model runs, not predictions.
+
 | # | Scenario | Scale & Horizon | Physical Hazard Engine | Real-Life Evacuation & Cognitive Insight |
 |---|---|---|---|---|
-| **1** | **Island Wilderness (`island`)** | 1 agent, 36 steps (72 h) | 40×40 DEM, Markov storms, exposure & dehydration | Grover DTQW spatial exploration & shelter timing before storm hypothermia |
-| **2** | **Volcano Evacuation (`volcano`)** | 1 agent (or multi-agent builder), 36 steps | Caldera DEM, active PDCs, surges, lahars, downwind ash & Tobler Dijkstra paths | Cue order effects (`Tremor → Gas` vs `Gas → Tremor` shifts $P(\text{protect})$ by $\pm 15.6\%$) |
-| **3** | **RMS Titanic 1912 (`titanic`)** | **2,208 agents** across 10 decks, 44 steps (5 min/step) | Progressive compartment flooding (`engine/flood.py`) & 20 lifeboats (`1,178` seats, Wormstedt schedule) | Captures below-deck normalcy bias; unambiguous PA alarm + open both-side boarding increases survival from **849** (`38.5%`) to **913+** (`41.3%`) |
-| **4** | **Pompeii AD 79 (`pompeii`)** | **11,500 citizens** across households, 128 steps (15 min/step) | Plinian column, pumice accumulation, roof collapses & pyroclastic surges (`engine/eruption.py`) | Under ambiguous warning mappings (`C`/`D`), quantum disjunction interference causes **644–981 fatalities** vs **287–679** in classical mixture |
-| **5** | **Waterloo Pool Chlorine Leak (`waterloo`)** | **100 swimmers & staff**, 721 steps (10 sec/step) | 2D chlorine gas advection-diffusion plume (`engine/chlorine.py`) & EPA AEGL-1/2/3 thresholds | Quantum hesitation under faint chlorine odour causes **32 AEGL-2 exposures** without alarm vs **23** when staff trigger an unambiguous alarm |
+| **1** | **Island Wilderness (`island`)** | 1 agent, 36 steps (72 h) | 40×40 DEM, Markov storms, exposure & dehydration | Shelter timing before storm hypothermia (a Grover walk for `explore` is available but off by default; default runs use a random walk) |
+| **2** | **Volcano Evacuation (`volcano`)** | 1 agent (or multi-agent builder), 36 steps | Caldera DEM, active PDCs, surges, lahars, downwind ash & Tobler Dijkstra paths | Cue order effects: `Tremor → Gas` and `Gas → Tremor` give different $P(\text{protect})$ |
+| **3** | **RMS Titanic 1912 (`titanic`)** | **2,208 agents** across 10 decks, 44 steps (5 min/step) | Progressive compartment flooding (`engine/flood.py`) & 20 lifeboats (`1,178` seats, Wormstedt schedule) | Models below-deck normalcy bias, and how the result moves with the cue translation |
+| **4** | **Pompeii AD 79 (`pompeii`)** | **11,500 citizens** across households, 128 steps (15 min/step) | Plinian column, pumice accumulation, roof collapses & pyroclastic surges (`engine/eruption.py`) | Deaths depend strongly on the cue translation, so all four are reported |
+| **5** | **Waterloo Pool Chlorine Leak (`waterloo`)** | **100 swimmers & staff**, 721 steps (10 sec/step) | 2D chlorine gas advection-diffusion plume (`engine/chlorine.py`) & EPA AEGL-1/2/3 thresholds | Compares exposure with and without a staff alarm, under each cue translation |
 | **6** | **Scenario Builder (`engine/builder.py`)** | Custom multi-person packs | Interactive terrain, hazard, and multi-agent placement editor | Build, save, and replay custom evacuation packs directly in the GUI (`[B]`) |
 
 ---
@@ -34,8 +36,8 @@ Detailed technical documentation explaining how **Tech A**, **Tech B**, **Tech C
 - **[Full System Presentation Slide Deck (`docs/PRESENTATION_SLIDES.md`)](docs/PRESENTATION_SLIDES.md)** — 14-slide presentation deck with Mermaid diagrams, equations, screenshots, and live demo guide.
 - **[New Implementations & Published Quantum Cognition Models Report (`docs/NEW_IMPLEMENTATIONS_REPORT.md`)](docs/NEW_IMPLEMENTATIONS_REPORT.md)** — Complete report of all newly implemented features and the **6 quantum cognition models adapted from published papers** (`jbusemey/ChoiceModeling`, `Insight137/insight137-eap`, `hwilner/open-system-decision-dynamics`, `ljaustc/QRL`, `WileQ/QCog`, `robertcprice/nQPU`).
 - **[How Tech A, Tech B, Tech C, and Product D Work Together & Separately (`docs/TECH_A_B_C_INTEGRATION.md`)](docs/TECH_A_B_C_INTEGRATION.md)** — Complete end-to-end architecture, frozen `contracts.py` boundary, step-by-step turn lifecycle, causal isolation guarantees, and 3-way cognitive benchmarking.
-- **[Tech A: 2-Qubit Quantum Cognitive Architecture (`docs/TECH_A_QUANTUM_MIND.md`)](docs/TECH_A_QUANTUM_MIND.md)** — Density-matrix belief tracking, non-commuting $R_y(\theta)R_z(\phi)$ event gates, projective collapse, Kraus & Lindblad decoherence under stress, deliberation unitary $U(q_S, q_D, \eta)$, 6 published cognition models (`mind/cognition_models.py`), and Qiskit circuits (`mind/`).
-- **[Tech B: Empirical Disaster Calibration, Classical Priors & Physics Framework (`docs/TECH_B_PHYSICS_AND_PRIORS.md`)](docs/TECH_B_PHYSICS_AND_PRIORS.md)** — 49 empirical disaster datasets (anchored on the April 2021 La Soufrière eruption on St. Vincent), 9 simplified stand-in solvers (`stranded_physics/scenarios.py`), BLS ATUS priors (`data/priors.json`), and 4-direction Grover-coined Discrete-Time Quantum Walk (`contracts.explore_step`).
+- **[Tech A: 2-Qubit Quantum Cognitive Architecture (`docs/TECH_A_QUANTUM_MIND.md`)](docs/TECH_A_QUANTUM_MIND.md)** — Density-matrix belief tracking, non-commuting $R_y$ and $R_x$ event gates, projective collapse, Kraus & Lindblad decoherence under stress, deliberation unitary $U(q_S, q_D, \eta)$, 6 published cognition models (`mind/cognition_models.py`), and Qiskit circuits (`mind/`).
+- **[Tech B: Empirical Disaster Calibration, Classical Priors & Physics Framework (`docs/TECH_B_PHYSICS_AND_PRIORS.md`)](docs/TECH_B_PHYSICS_AND_PRIORS.md)** — 49 empirical disaster datasets (anchored on the April 2021 La Soufrière eruption on St. Vincent), 9 simplified stand-in solvers (`stranded_physics/scenarios.py`), ATUS reference hours that decisions do not use (`data/priors.json`), and 4-direction Grover-coined Discrete-Time Quantum Walk (`contracts.explore_step`, opt-in with `explore_walk="grover"`, off by default).
 - **[Tech C: World Generation, Volcanic Hazard Engine, Physiological Agent & GUI (`docs/TECH_C_ENGINE_WORLD_AND_GUI.md`)](docs/TECH_C_ENGINE_WORLD_AND_GUI.md)** — Dual-scenario $40 \times 40$ world generator, priority-flood drainage, Tobler hiking Dijkstra routing, active vs. deposited PDC/lahar/surge hazards, counterfactual `scripted_events`, 1600×900 Pygame visualizer (`engine/gui.py`), and Product D Web Replay Inspector (`site/index.html`).
 
 ---
@@ -83,7 +85,7 @@ End-of-event telemetry modal summarizing the agent's survival outcome, cause of 
 
 ```
 QWC/
-├── contracts.py                  # Frozen interfaces, Grover DTQW explore_step & rule-based classical baseline
+├── contracts.py                  # Frozen interfaces, opt-in Grover explore_step & rule-based classical baseline
 ├── data/priors.json              # ATUS reference hours, loaded but not used in decisions, & hand-set urgency boosts
 ├── requirements.txt              # Core dependencies (pygame-ce, qiskit, qiskit-aer, numpy, pytest)
 ├── requirements-physics.txt      # Physics track dependencies (pint, numpy, pytest)
@@ -92,7 +94,7 @@ QWC/
 ├── mind/                         # Tech A: 2-Qubit Quantum Cognitive Architecture
 │   ├── model.py                  # Deliberation unitary U(q_S, q_D, eta) & Tversky-Shafir calibration
 │   ├── cognition_models.py       # 6 quantum cognition models adapted from published papers from GitHub
-│   ├── belief.py                 # Density-matrix belief state, Ry*Rz event gates & collapse
+│   ├── belief.py                 # Density-matrix belief state, Ry and Rx event gates & collapse
 │   ├── decoherence.py            # Stress -> Kraus phase-damping & GKSL Lindblad master equation
 │   ├── quantum_mind.py           # quantum_decide (with selectable cognition_model) & classical_mixture
 │   ├── circuits.py               # Gate-level Qiskit circuits (with mid-circuit collapse & Lüders)

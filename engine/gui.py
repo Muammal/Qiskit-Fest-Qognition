@@ -91,6 +91,18 @@ except ImportError:
         return min(1.0, max(0.0, (stress - 0.4) / 0.5))
 
 
+def order_effect_hint():
+    """The order-effect line for the config screen, computed from the mind, never typed in."""
+    try:
+        from mind.quantum_mind import order_gap_at_lambda
+    except ImportError:
+        return "  * Order Effect: unavailable without the mind package."
+    state = SurvivalAgent().get_state()
+    coherent, control = (abs(order_gap_at_lambda(state, lam=lam)) for lam in (0.0, 1.0))
+    return (f"  * Order Effect: From the default start, [Tremor -> Gas] and [Gas -> Tremor] differ in "
+            f"P(protect) by {coherent:.2f} at λ=0, against {control:.2f} at λ=1.")
+
+
 # -----------------------------------------------------------------------------
 # Configuration & High-Resolution Display Constants
 # -----------------------------------------------------------------------------
@@ -2004,7 +2016,7 @@ class IslandVisualizerApp:
 
         bullet_lines = [
             "  * Quantum Mind: Belief states represented as 2-qubit amplitudes with non-commuting projection angles.",
-            "  * Order Effect: From the same state, [Tremor -> Gas] and [Gas -> Tremor] shift P(protect) by .33, against .04 in the control.",
+            order_effect_hint(),
             "  * Stress Model: Physiological stress maps to a simulated dephasing channel (stress model); no hardware decoherence is driven live.",
             "  * Survival: Without water, death comes at about 58 h. All rates are assumed. Maintain shelter to reduce exposure."
         ]
@@ -2667,7 +2679,7 @@ class IslandVisualizerApp:
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, box_rect, 1, border_radius=4)
 
         if self.mind_type == "quantum":
-            engine_name, engine_col = "2-Qubit Quantum Deliberation (Checked Against Qiskit)", COLOR_PURPLE
+            engine_name, engine_col = "NumPy closed form; verified offline against Qiskit Aer", COLOR_PURPLE
         elif self.mind_type == "classical_mixture":
             engine_name, engine_col = "Classical Mixture Control (λ=1, Zero Coherence)", COLOR_CYAN
         else:

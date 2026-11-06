@@ -2,6 +2,8 @@
 
 A demonstration of evacuation behaviour using the existing mind. It is not a reconstruction of the sinking and does not make claims about real individuals. A tile is about 7 m, a step is five minutes, and the run covers 23:30 to 03:30 ship's time, or ends once nobody is left on the ship or in the water.
 
+> **Two different Titanics.** This page describes `engine/titanic.py`, the crowd simulation the paper uses, which saves far more people; see [SCENARIO_NUMBERS.md](results/SCENARIO_NUMBERS.md) for its numbers under each cue translation. `workboard/ENGINE_STATUS.md` reports a different program, the physics-engine scenario `scenario_cards/titanic_1912.toml`, which saves 3.4% and fails every people gate. They differ in step size (5 against 10 minutes), boarding rules and how people are sent to the boats. Neither result should be quoted as the other's.
+
 ## Running it
 
 ```

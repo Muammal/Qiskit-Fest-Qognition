@@ -48,6 +48,7 @@ __all__ = [
     "quantum_decide",
     "classical_mixture_decide",
     "decoherence_strength",
+    "order_gap_at_lambda",
 ]
 
 
@@ -230,6 +231,13 @@ def _decide(
     }
     contracts.validate_decision(decision)
     return decision
+
+
+def order_gap_at_lambda(state, first="tremor", second="gas_plume", lam=0.0):
+    """P(protect) for (first, second) minus (second, first), from `state`, at a fixed lam."""
+    forward = _decide(dict(state, recent_events=[first, second]), force_lam=lam, suppress_order_gap=True)
+    reverse = _decide(dict(state, recent_events=[second, first]), force_lam=lam, suppress_order_gap=True)
+    return forward["quantum"]["p_protect"] - reverse["quantum"]["p_protect"]
 
 
 def quantum_decide(state, cognition_model="default"):

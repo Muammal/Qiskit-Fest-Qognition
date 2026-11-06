@@ -4,6 +4,10 @@ Everyone aboard runs the same decide_fn, unedited. The mind only understands its
 frozen event names, so ship events reach it under existing names (EVENT_NAMES);
 the screen and timeline carry the real wording in `story`.
 The historical numbers are context for the result, not targets it is fitted to.
+
+This is the Titanic the paper uses. It is not the physics-engine scenario
+(scenario_cards/titanic_1912.toml) reported in workboard/ENGINE_STATUS.md,
+which is a different program with different results.
 """
 import copy
 import json

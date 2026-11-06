@@ -48,7 +48,7 @@ flowchart LR
     end
 
     subgraph TA_TRACK["Tech A: Quantum Mind (mind/)"]
-        U2Q["2-Qubit Deliberation Unitary\n& Non-Commuting Ry(θ)Rz(φ)"]
+        U2Q["2-Qubit Deliberation Unitary\n& Non-Commuting Ry(θ), Rx(θ)"]
         M6["6 Published Models\n(Busemeyer H, Huang QLBN, Lindblad,\nGrover QRL, QQ Equality, Givens)"]
         QK["Qiskit 2.x Circuits\n(FakeTorino 2-CZ Transpilation)"]
     end
@@ -74,7 +74,7 @@ flowchart LR
 - **Qubit 1 (Action Pool)**: $|0\rangle = |\text{carry-on}\rangle$ (`forage`, `drink`, `rest`, `explore`, `craft`), $|1\rangle = |\text{protect}\rangle$ (`hide`, `build_shelter`).
 
 ### Non-Commuting Hazard Gates & Phase-Damping Decoherence
-Each perceived cue $e \in \text{recent\_events}$ applies $U_e = R_y(\theta_e)R_z(\phi_e)$ followed by Kraus dephasing $\mathcal{E}_\lambda(\rho)$:
+Each perceived cue $e \in \text{recent\_events}$ applies one rotation, $U_e = R_y(\theta_e)$ or $R_x(\theta_e)$, followed by Kraus dephasing $\mathcal{E}_\lambda(\rho)$:
 $$\mathcal{E}_\lambda\begin{pmatrix}\rho_{00} & \rho_{01}\\ \rho_{10} & \rho_{11}\end{pmatrix} = \begin{pmatrix}\rho_{00} & (1-\lambda)\rho_{01}\\ (1-\lambda)\rho_{10} & \rho_{11}\end{pmatrix}, \qquad \lambda = 1 - \exp(-2.5\,\text{stress}^2)$$
 
 ### Deliberation Unitary & Interference Equation

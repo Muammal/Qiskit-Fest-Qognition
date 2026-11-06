@@ -13,10 +13,10 @@ Tech A operates as a standalone, mathematically self-contained cognitive module.
 
 ```mermaid
 flowchart LR
-    S["Input State\n(safety, recent_events, stress, needs)"] --> R{"Critical Reflex Check\nthirst < 0.30 or\nwarmth < 0.35 (safe)"}
+    S["Input State\n(safety, recent_events, stress, needs)"] --> R{"Critical Reflex Check\nthirst < 0.30 or\nwarmth < 0.40"}
     R -- "Triggered" --> REF["Deterministic Reflex Override\n(drink / build_shelter)"]
     R -- "No Reflex" --> B0["1. Prepare Initial Belief ρ₀\nfrom safety ∈ [0, 1]"]
-    B0 --> EV["2. Apply Recent Events\nUnitary R_y(θ)R_z(φ) or Collapse"]
+    B0 --> EV["2. Apply Recent Events\nUnitary R_y(θ) or R_x(θ), or Collapse"]
     EV --> DEC["3. Decoherence\nKraus E_λ(ρ) or GKSL Lindblad"]
     DEC --> DEL["4. Selectable Cognition Model\n(SO(4) Unitary / Busemeyer H / QLBN / Lindblad)"]
     DEL --> POOL["5. Measure Action Qubit P(protect)\n& Split Across 7 Actions via Priors"]
@@ -30,7 +30,7 @@ flowchart LR
 |---|---|
 | [`mind/model.py`](../mind/model.py) | Defines the 2-qubit Hilbert space ($\mathcal{H}_{\text{belief}} \otimes \mathcal{H}_{\text{action}}$), the deliberation unitary $U(q_S, q_D, \eta)$, closed-form $P(\text{protect})$ equations, Bloch vector extraction, and least-squares calibration to Tversky & Shafir (1992). Re-exports Busemeyer Hamiltonian and Huang QLBN models. |
 | [`mind/cognition_models.py`](../mind/cognition_models.py) | Implements **6 quantum cognition models adapted from published papers** backed by published papers and GitHub repositories (`jbusemey/ChoiceModeling`, `Insight137/insight137-eap`, `hwilner/open-system-decision-dynamics`, `ljaustc/QRL`, `WileQ/QCog`, `robertcprice/nQPU`). |
-| [`mind/belief.py`](../mind/belief.py) | Prepares initial belief density matrix $\rho_0$ from `safety`, defines the event parameter table (`EVENT_PARAMS`), applies non-commuting $R_y(\theta) R_z(\phi)$ unitary gates or projective measurement collapse, and runs sequential event histories. |
+| [`mind/belief.py`](../mind/belief.py) | Prepares initial belief density matrix $\rho_0$ from `safety`, applies the non-commuting $R_y$ and $R_x$ gates listed in `EVENT_GATES` (`mind/config.py`) or projective measurement collapse, and runs sequential event histories. |
 | [`mind/decoherence.py`](../mind/decoherence.py) | Maps physiological `stress` to phase-damping strength $\lambda \in [0, 1]$ via a piecewise-linear ramp, implements the Kraus phase-damping channel $\mathcal{E}_\lambda(\rho)$, and re-exports open-system GKSL Lindblad evolution (`lindblad_rhs`, `evolve_lindblad`). |
 | [`mind/quantum_mind.py`](../mind/quantum_mind.py) | Main entrypoint exposing `quantum_decide(state, cognition_model=...)` and the zero-coherence control model `classical_mixture_decide(state)`, including reflex overrides and prior-weighted action pool splitting. |
 | [`mind/circuits.py`](../mind/circuits.py) | Builds gate-level Qiskit `QuantumCircuit` objects (`build_decision_circuit` with `allow_collapse=True` mid-circuit `reset+x`, `build_coherence_probe_circuit`, `build_busemeyer_hamiltonian_circuit`, `build_luders_sequence_circuit`) that transpile to IBM Heron processors (`FakeTorino`). |
@@ -60,16 +60,14 @@ yielding initial danger probability $p_0 = \langle 1|\rho_0|1\rangle = 1 - s$ an
 Each event $e \in \text{recent\_events}$ (excluding `"none"`) transforms the $2 \times 2$ belief density matrix $\rho$ via one of two physical mechanisms:
 
 1. **Unitary Threat/Relief Rotation (`kind = "unitary"`)**:
-   Applies $U_e = R_y(\theta_e) R_z(\phi_e)$ followed immediately by the stress phase-damping channel $\mathcal{E}_\lambda$:
-   - `tremor`: $(\theta = +0.45\pi, \phi = +0.35\pi)$
-   - `gas_plume`: $(\theta = +0.35\pi, \phi = -0.40\pi)$
-   - `storm`: $(\theta = +0.30\pi, \phi = +0.25\pi)$
-   - `animal`: $(\theta = +0.35\pi, \phi = -0.30\pi)$
-   - `injury`: $(\theta = +0.30\pi, \phi = -0.35\pi)$
-   - `cold_night`: $(\theta = +0.20\pi, \phi = +0.20\pi)$
-   - `find_food`: $(\theta = -0.15\pi, \phi = 0.00)$ (shifts belief back toward $|\text{safe}\rangle$)
+   Applies a single rotation $U_e$ about the Bloch $y$ or $x$ axis (`EVENT_GATES` in [`mind/config.py`](../mind/config.py)), followed immediately by the stress phase-damping channel $\mathcal{E}_\lambda$:
+   - `tremor`, `storm`, `animal`: $R_y(\pi/3)$
+   - `gas_plume`: $R_x(3\pi/5)$
+   - `injury`: $R_x(2\pi/3)$
+   - `cold_night`: $R_x(\pi/6)$
+   - `find_food`: $R_y(-\pi/4)$ (shifts belief back toward $|\text{safe}\rangle$)
 
-   Because $\phi_e \neq 0$, sequential hazard gates do not commute ($[U_{\text{tremor}}, U_{\text{gas\_plume}}] \neq 0$). Receiving `["tremor", "gas_plume"]` versus `["gas_plume", "tremor"]` rotates the belief state along different trajectories on the Bloch sphere, producing a measurable **order effect** ($|P(\text{protect}|A,B) - P(\text{protect}|B,A)| \approx 0.168$ at $\lambda = 0$).
+   Because $R_y$ and $R_x$ rotate about different axes, cues on different axes do not commute ($[R_y(\pi/3), R_x(3\pi/5)] \neq 0$). Receiving `["tremor", "gas_plume"]` versus `["gas_plume", "tremor"]` rotates the belief state along different trajectories on the Bloch sphere, producing a measurable **order effect**. Current values are in [`docs/results/SCENARIO_NUMBERS.md`](results/SCENARIO_NUMBERS.md).
 
 2. **Projective Collapse (`kind = "collapse"`)**:
    Unambiguous volcanic onset events (`eruption`, `ash_fall`) perform a projective measurement onto the danger basis state:

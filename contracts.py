@@ -89,8 +89,11 @@ def validate_decision(decision: Dict[str, Any]) -> bool:
 # -----------------------------------------------------------------------------
 
 def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
-    """Tech B responsibility: priors from published ATUS tables (`data/priors.json`)
-    adjusted for homeostatic urgency."""
+    """Tech B responsibility: flat weights plus hand-set homeostatic urgency boosts.
+
+    The ATUS hours in `data/priors.json` are loaded into ATUS_PRIORS_META as
+    reference only. They do not enter this function, so no decision uses them.
+    """
     validate_state(state)
     needs = state["needs"]
     hour = state["hour"]
@@ -144,7 +147,7 @@ def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
 
 
 def classical_decide(state: Dict[str, Any]) -> Dict[str, Any]:
-    """Tech B responsibility: classical baseline. Deterministic utility argmax over ATUS priors."""
+    """Tech B responsibility: classical baseline. Deterministic argmax over get_prior (hand-set weights, not ATUS data)."""
     validate_state(state)
     priors = get_prior(state)
     chosen_action = max(priors.items(), key=lambda item: item[1])[0]

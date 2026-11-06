@@ -16,6 +16,7 @@ class SurvivalAgent:
 
     def __init__(self, start_pos: Optional[List[int]] = None):
         self.scenario = "volcano"
+        self.explore_walk = "random"  # "grover" opts in to contracts.explore_step on the island
         self.day: int = 1
         self.hour: int = 8  # Start at 08:00 AM on Day 1
         self.pos: List[int] = list(start_pos) if start_pos else [20, 20]
@@ -212,6 +213,13 @@ class SurvivalAgent:
             self.needs["energy"] = min(1, self.needs["energy"] + .3)
             self.needs["warmth"] = min(1, self.needs["warmth"] + (.12 if world.is_in_shelter(*self.pos) else .015))
             self.needs["safety"] = min(1, self.needs["safety"] + .05)
+        elif action == "explore" and world.scenario == "island" and self.explore_walk == "grover":
+            # Opt-in. Each call moves one or two tiles, so walk until the budget is spent.
+            budget = self.movement_budget(world)
+            while budget > 0:
+                before = list(self.pos)
+                self.pos = contracts.explore_step(self.pos, world, mode="quantum")
+                budget -= abs(self.pos[0] - before[0]) + abs(self.pos[1] - before[1]) or 1
         elif action == "explore" and world.scenario == "island":
             import random
             budget = self.movement_budget(world)
