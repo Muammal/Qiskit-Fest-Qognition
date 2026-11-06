@@ -1,6 +1,6 @@
 # New Implementations & Published Quantum Cognition Models Report
 
-This report documents all newly implemented features, architectural completions, and **6 peer-reviewed, GitHub-sourced Quantum Cognition models** integrated across **Tech A (`mind/`)**, **Tech B (`stranded_physics/`, `contracts.py`, `data/priors.json`)**, **Tech C (`engine/`, `main.py`)**, and **Product D (`site/index.html`)**.
+This report documents all newly implemented features, architectural completions, and **6 quantum cognition models adapted from published papers and open-source code** integrated across **Tech A (`mind/`)**, **Tech B (`stranded_physics/`, `contracts.py`, `data/priors.json`)**, **Tech C (`engine/`, `main.py`)**, and **Product D (`site/index.html`)**.
 
 ---
 
@@ -67,7 +67,7 @@ All six published mathematical models are implemented in [`mind/cognition_models
 ### Model 4: Quantum Reinforcement Learning via Generalized Grover Reflections (`QuantumSequenceLearner`)
 - **GitHub Source Repository**: [`ljaustc/QRL`](https://github.com/ljaustc/QRL) (`QRL_bandit`)
 - **Peer-Reviewed Paper**:
-  - Li, J.-A., Dong, D., Wei, Z., Liu, Y., Pan, Y., Nori, F., & Busemeyer, J. R. (2020). Quantum reinforcement learning during human decision-making. *Nature Human Behaviour*, 4, 294–307.
+  - Li, J.-A., Dong, D., Wei, Z., Liu, Y., Pan, Y., Nori, F., & Zhang, X. (2020). Quantum reinforcement learning during human decision-making. *Nature Human Behaviour*, 4, 294–307.
 - **Mathematical Formulation**:
   Superposition over the 7 survival actions $|\psi\rangle = \sum_{a=0}^{6} c_a |a\rangle$ is updated after experiencing action $|a\rangle$ with Prospect-Theory utility $u(x)$ via two generalized Grover reflections:
   $$U_{\text{oracle}}(a, \phi_1) = I - (1 - e^{i\phi_1})|a\rangle\langle a|, \qquad U_{\text{diff}}(\psi, \phi_2) = (1 - e^{i\phi_2})|\psi\rangle\langle\psi| - I$$
@@ -103,9 +103,11 @@ All six published mathematical models are implemented in [`mind/cognition_models
 ## 3. Tech B, Tech C & Product D Implementations
 
 ### 3.1 Tech B: `st_vincent_2021` T1 Physics Solvers (`stranded_physics/scenarios.py`)
-Implemented 9 Pint-unit-checked `T1` domain solvers in [`stranded_physics/scenarios.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py) driven by [`disaster_data/scenarios/st_vincent_2021.json`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/disaster_data/scenarios/st_vincent_2021.json):
+> **Status of these solvers:** they are simplified stand-ins, not real St Vincent physics. The terrain is a made-up cone, not the real island or its position; wind speed is a formula; eruption timing is randomised; flows ignore barriers and arrive sooner than the published record. Outputs named here that the code does not write (`terrain.slope`, `tephra.load`, `gas.so2`, `storm.surge`, dynamic pressures) are aspirations. Their gates only check that settings and data files load. The real-data engine is being built separately on `physics/engine`.
+
+Implemented 9 simplified stand-in solvers, not real St Vincent physics, in [`stranded_physics/scenarios.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py) driven by [`disaster_data/scenarios/st_vincent_2021.json`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/disaster_data/scenarios/st_vincent_2021.json):
 1. [`StVincentTerrain`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py#L62-L130): Somma-wall and Rabacca/Wallibou drainage topography + high-hazard exclusion zones.
-2. [`StVincentAtmos`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py#L133-L185): 36-step empirical ERA5/Open-Meteo wind speed, bearing, temperature, and precipitation fields.
+2. [`StVincentAtmos`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py#L133-L185): 36-step wind bearing and temperature from ERA5/Open-Meteo; wind speed and rain rate are formula stand-ins fields.
 3. [`HollandStorm`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py#L188-L216): Tropical squall wind amplification and storm-surge footprint.
 4. [`SoufriereEruption`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py#L219-L261): Eruptive phase transitions (`unrest -> escalating -> erupting -> fading`), Mastin (2009) plume height $H = 2.0 \, \text{MER}^{0.241}$, and RSAM tremor amplitude.
 5. [`SuzukiTephra`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/stranded_physics/scenarios.py#L264-L296): Anisotropic downwind advective-diffusive tephra fallout accumulation ($\text{kg/m}^2$).
@@ -123,17 +125,34 @@ Implemented 9 Pint-unit-checked `T1` domain solvers in [`stranded_physics/scenar
 - Added 3-mind cycling (`quantum` $\to$ `classical_mixture` $\to$ `classical`) and live quantum telemetry (`|x|`, `λ`, `ΔP`) in [`engine/gui.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/gui.py) and `--mind {quantum,classical_mixture,classical}` + `--engine {legacy,physics}` in [`main.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/main.py).
 
 ### 3.4 Product D: Web Replay Viewer & Quantum Cognition Inspector (`site/index.html`)
-- Created [`site/index.html`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/site/index.html) providing a client-side 40×40 field replay canvas, live Bloch circle visualization, interactive stress/coherence deliberation sandbox, and real-time evaluation of all 6 peer-reviewed quantum cognition models on every simulation step.
+- Created [`site/index.html`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/site/index.html) providing a client-side 40×40 field replay canvas, live Bloch circle visualization, interactive stress/coherence deliberation sandbox, and real-time evaluation of all 6 quantum cognition models adapted from published papers on every simulation step.
+
+### 3.5 Tech C: Multi-Scenario Evacuation Architecture & Interactive Builder (`engine/`)
+- **RMS Titanic 1912 Evacuation ([`engine/titanic.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/titanic.py))**: 2,208 agents across 10 decks, compartment flooding solver (`engine/flood.py`), 20 lifeboats with launch schedule (`engine/lifeboats.py`), and counterfactual policy comparison (`compare_titanic_policies`).
+- **Pompeii AD 79 Evacuation ([`engine/pompeii.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/pompeii.py))**: 11,500 citizens across 9 Roman regions, Plinian column eruption (`engine/eruption.py`), pumice tephra roof collapse physics, and event-translation mappings A–D.
+- **Waterloo Pool Chlorine Leak ([`engine/waterloo.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/waterloo.py))**: 100–300 swimmers and staff, 2D advection-diffusion chemical plume (`engine/chlorine.py`), and EPA AEGL-1/2/3 exposure integration.
+- **Interactive Scenario Builder ([`engine/builder.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/builder.py))**: In-GUI tactical level editor allowing custom terrain, hazard placement, and multi-agent pack simulation.
+
+### 3.6 Tech C: Dynamic Speed Controls, MP4 Video Exporter & Data Exporter
+- **Slow-Motion & Fast-Forward Engine**: Interactive speed toggles (`1x`, `2x`, `5x`, `10x`, plus `[` for Slow-Mo down to 0.25x and `]` for Fast-Forward up to 10x) allowing high-resolution inspection of cognitive choice points.
+- **MP4 Video Exporter ([`engine/video_exporter.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/video_exporter.py))**: Headless Pygame frame recorder that exports high-definition MP4 simulation videos across all scenarios (`python main.py --export-video`).
+- **Evacuation Data & Seed Exporter ([`engine/data_exporter.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/data_exporter.py))**: Generates comprehensive CSV survival matrices (`exports/evacuation_survival_comparison.csv`), JSON seed packs (`exports/evacuation_data_bundle.json`), and policy analysis (`exports/EVACUATION_INSIGHTS_REPORT.md`).
+
+### 3.7 Tech B: Data-v1 Release Import & Physics Gates
+- Imported 19 raw physics datasets from GitHub Release `data-v1` via [`tools/fetch_artifacts.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/tools/fetch_artifacts.py).
+- Passed **22 / 22** required physics verification gates (`python -m stranded_physics.gates required`).
 
 ---
 
 ## 4. Automated Test & Validation Results
 
-Running the full test suite across all tracks:
+Running the full unified test suite across all tracks:
 
 ```powershell
-$env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q
+$env:SDL_VIDEODRIVER="dummy"; python -m pytest -q
 ```
 
-- **Result**: **`155 passed, 3 skipped`** (100% pass rate across all unit, contract, physics, GUI, and quantum cognition model tests).
+- **Result**: **`816 passed, 3 skipped`** (100% pass rate across the full codebase in 13m 19s; the 3 skipped tests are third-party copyright paper references omitted by design).
+- **Physical Verification Gates**: **`22 / 22 PASS`** (`python -m stranded_physics.gates required`).
+- **Tech A Validation**: **`any_failed = False`** (`python -m mind.experiments.validate`).
 

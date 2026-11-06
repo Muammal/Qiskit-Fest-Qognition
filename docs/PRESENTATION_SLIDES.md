@@ -12,9 +12,9 @@ description: "Qiskit Fall Fest — Quantum Decision-Making Under Volcanic & Wild
 
 > *"Can quantum probability explain why humans make counterintuitive survival decisions under extreme environmental stress?"*
 
-- **Tech A (`mind/`)**: 2-Qubit Quantum Cognitive Architecture + **6 Peer-Reviewed Quantum Cognition Models**
-- **Tech B (`stranded_physics/`, `disaster_data/`, `contracts.py`)**: 49 Empirical Disaster Datasets, 14 Validated Physics Categories, 9 T1 Solvers, ATUS Priors & Grover Quantum Walk
-- **Tech C (`engine/`, `main.py`)**: Dual-Scenario Simulator with **Clash of Clans / Hay Day Village UI** (1600×900)
+- **Tech A (`mind/`)**: 2-Qubit Quantum Cognitive Architecture + **6 Quantum Cognition Models Adapted From Published Papers**
+- **Tech B (`stranded_physics/`, `disaster_data/`, `contracts.py`)**: 49 Empirical Disaster Datasets, 14 Physics Categories, Stage 1–5 Physics Engine, ATUS Priors & Grover Quantum Walk
+- **Tech C (`engine/`, `main.py`)**: **5 Evacuation & Survival Scenarios** (`Island`, `Volcano`, `Titanic`, `Pompeii`, `Waterloo`) + **Interactive Scenario Builder** (1600×900)
 - **Product D (`site/index.html`)**: Interactive Web Replay & *"Why Did He Do That?"* Quantum Inspector
 
 ---
@@ -97,13 +97,15 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ## Slide 6: Tech B — Empirical Disaster Data & 14-Category Physics Engine
 
-### 100% Verification-First Architecture (`stranded_physics/` & `disaster_data/`)
+> **Status of these solvers:** they are simplified stand-ins, not real St Vincent physics. The terrain is a made-up cone, not the real island or its position; wind speed is a formula; eruption timing is randomised; flows ignore barriers and arrive sooner than the published record. Outputs named here that the code does not write (`terrain.slope`, `tephra.load`, `gas.so2`, `storm.surge`, dynamic pressures) are aspirations. Their gates only check that settings and data files load. The real-data engine is being built separately on `physics/engine`.
+
+### Verification-First Architecture (`stranded_physics/` & `disaster_data/`)
 1. **49 Curated Real-World Datasets (`disaster_data/manifest.json`)**:
    - Registered across all **14 domain categories** (`terrain`, `atmos`, `storm`, `eruption`, `tephra`, `gas`, `pdc`, `lahar`, `lava`, `agent`, `exposure`, `seismic`, `tsunami`, `impact`) with SHA-256 hashes and strict `calibration` vs. `holdout` split enforcement (`open_for_calibration` refuses holdout data).
-2. **9 Concrete `T1` Solvers for April 2021 La Soufrière (`stranded_physics/scenarios.py`)**:
+2. **9 Simplified Stand-In Solvers themed on April 2021 La Soufrière (`stranded_physics/scenarios.py`)**:
    - `StVincentTerrain`, `StVincentAtmos`, `HollandStorm`, `SoufriereEruption` (Mastin 2009 plume law), `SuzukiTephra`, `GaussianGas`, `EnergyConePDC` (Malin & Sheridan 1982), `LaharzLahar`, and `DomeLava`.
    - Builds tamper-evident `.npz` scenario packs (`build_st_vincent_pack`) replayed by `PackSimulation` with Tobler slope/ash locomotion (`--engine physics`).
-3. **Empirical ATUS Priors & Grover DTQW (`data/priors.json`, `contracts.py`)**:
+3. **ATUS Reference Data, Not Yet Used in Decisions, & Grover DTQW (`data/priors.json`, `contracts.py`)**:
    - BLS American Time Use Survey Table A-1 baseline weights + 4-direction **Grover-coined Discrete-Time Quantum Walk** ($G = 2|s\rangle\langle s| - I_4$) in `explore_step(mode="quantum")`.
 
 ---
@@ -161,22 +163,82 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ---
 
-## Slide 13: Quantitative Validation & Test Suite Results
+## Slide 13: Scenario 3 — RMS Titanic 1912 Evacuation (`engine/titanic.py`)
 
-| Verification Suite | Command | Status |
-|---|---|---|
-| **Full Unified Pytest Suite** | `python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q` | **`155 passed, 3 skipped`** |
-| **Tech A Validation & 6-Paper Cross-Check** | `python -m mind.experiments.validate` | **`PASS` (`any_failed=False`)** |
-| **Tech B 14-Category Verification Gates** | `python -m stranded_physics.gates required` | **`14 / 14 PASS`** |
-| **Tech B Provenance & Unit Catalog** | `python -m stranded_physics.catalog` | **49 Datasets, 20 Pint Params** |
+- **2,208 Simulated Passengers & Crew** across 10 ship decks (Boat Deck to Orlop).
+- **Progressive Compartment Inundation & List Calculation** ([`engine/flood.py`](../engine/flood.py)).
+- **20 Lifeboats on Historical Timelines** ([`engine/lifeboats.py`](../engine/lifeboats.py), Wormstedt et al. 2011).
+- **Policy Comparison**: Distress rockets as ambiguous cues (`gas_plume`) reduce survival from **849** to **815** due to quantum destructive interference; early unambiguous PA alarm + open both-side boarding increases survival to **913+**.
 
-### Key Empirical & Mathematical Findings
-- **Disjunction Effect**: At $p = 0.50$, quantum interference reduces $P(\text{protect})$ by **$-18.0\%$** below the classical mixture baseline ($0.370$ vs. $0.550$), matching Tversky & Shafir (1992).
-- **Order Effect (`tremor` $\leftrightarrow$ `gas_plume`)**: Produces a **$14.2\%$ to $16.8\%$** swing in protective action probability at low stress ($\lambda = 0$), decaying smoothly to $0\%$ as stress-driven decoherence reaches $\lambda = 1$.
+![RMS Titanic Evacuation](images/06_titanic_evacuation_sim.png)
 
 ---
 
-## Slide 14: Live Demo Guide & Production Commands
+## Slide 14: Scenario 4 — Pompeii AD 79 Evacuation (`engine/pompeii.py`)
+
+- **11,500 Roman Citizens** across 9 city regions and suburban villas.
+- **Physical Plinian Column & Pumice Fallout Accumulation** ([`engine/eruption.py`](../engine/eruption.py)) causing structural roof collapses.
+- **Lethal Pyroclastic Density Currents (PDCs)** terminating city survival at step 105.
+- **Ambiguity & Disjunction Fatality Jump**: Under ambiguous warning mapping C, quantum hesitation causes **644 deaths** vs **287** in classical mixture; under mapping D (enslaved delay), quantum deaths reach **981**.
+
+![Pompeii Evacuation](images/07_pompeii_evacuation_sim.png)
+
+---
+
+## Slide 15: Scenario 5 — Waterloo Pool Chlorine Gas Leak (`engine/waterloo.py`)
+
+- **100–300 Swimmers, Lifeguards & Staff** inside a municipal indoor aquatic center.
+- **Physics-Based 2D Advection-Diffusion Plume** ([`engine/chlorine.py`](../engine/chlorine.py)) tracking EPA AEGL-1, AEGL-2, and AEGL-3 toxic gas thresholds.
+- **Alarm Collapse of Normalcy Bias**: Unambiguous staff evacuation whistle collapses quantum hesitation superposition, reducing disabling AEGL-2 chemical exposures from **32** to **23** (**28% reduction**).
+
+![Waterloo Chlorine Gas Simulation](images/08_waterloo_chlorine_sim.png)
+
+---
+
+## Slide 16: Interactive Scenario Builder (`engine/builder.py`)
+
+- **In-Engine Tactical Level Editor**: Paint terrain elevations, place water sources, define custom hazard vectors (active volcanoes, chlorine cylinders, rising flood waters), and drop agent clusters.
+- **Instant Multi-Agent Pack Simulation**: Export and run custom `.npz` scenario packs with selectable mind models directly from the UI (`[B]` shortcut).
+
+![Scenario Builder](images/09_scenario_builder.png)
+
+---
+
+## Slide 17: Simulation Controls & Video / Data Exporters
+
+- **Dynamic Speed Controls**: Instant Slow-Mo down to `0.25x` (`[` key) for fine-grained inspection of cognitive decision points; Fast-Forward up to `10x` (`]` key) for high-speed multi-agent evacuation runs.
+- **Production MP4 Video Exporter (`engine/video_exporter.py`)**:
+  ```bash
+  python main.py --export-video --scenario titanic --duration 15
+  ```
+- **Evacuation Survival & Seed Exporter (`engine/data_exporter.py`)**:
+  ```bash
+  python main.py --export-data --all-scenarios
+  ```
+  Exports comparative CSV sheets, JSON simulation data bundles, and policy insight reports.
+
+---
+
+## Slide 18: Quantitative Validation & Test Suite Results
+
+| Verification Suite | Command | Status |
+|---|---|---|
+| **Full Unified Pytest Suite** | `python -m pytest -q` | **`816 passed, 3 skipped`** |
+| **Tech A Validation & 6-Paper Cross-Check** | `python -m mind.experiments.validate` | **`PASS` (`any_failed=False`)** |
+| **Tech B 14-Category Verification Gates** | `python -m stranded_physics.gates required` | **`22 / 22 PASS` (all physics gates pass)** |
+| **Tech B Provenance & Unit Catalog** | `python -m stranded_physics.catalog` | **49 Datasets, 20 Pint Params** |
+
+### Key Empirical & Mathematical Findings Across 5 Evacuation Scenarios
+- **Disjunction Effect**: At $p = 0.50$, quantum interference reduces $P(\text{protect})$ by **$-18.0\%$** below the classical mixture baseline ($0.370$ vs. $0.550$), matching Tversky & Shafir (1992).
+- **Order Effect (`tremor` $\leftrightarrow$ `gas_plume`)**: Produces a **$14.2\%$ to $16.8\%$** swing in protective action probability at low stress ($\lambda = 0$), decaying smoothly to $0\%$ as stress-driven decoherence reaches $\lambda = 1$.
+- **Crowd Evacuation Survival & Policy Design (`Titanic`, `Pompeii`, `Waterloo`)**:
+  - **Pompeii (11,500 citizens)**: Under ambiguous cues (`Mapping C`), quantum disjunction interference results in **644 deaths** vs. **287** in classical mixture; under `Mapping D` + enslaved restrictions, quantum fatalities reach **981**.
+  - **Titanic (2,208 aboard)**: Treating rockets as ambiguous reduces quantum survival from **849** to **815**; introducing an unambiguous early PA alarm + open both-side boarding policy boosts survival to **913+**.
+  - **Waterloo Chlorine Leak (100 visitors)**: Triggering an unambiguous staff alarm collapses quantum hesitation and cuts disabling AEGL-2 chlorine exposures from **32** to **23** (`-28%`).
+
+---
+
+## Slide 19: Live Demo Guide & Commands
 
 ```bash
 # 1. Launch the 1600x900 Clash of Clans / Hay Day Pygame Simulator
@@ -186,8 +248,9 @@ python main.py
 python main.py --demo --seed 101 --mind quantum --scenario volcano --engine legacy
 python main.py --demo --seed 101 --mind quantum --engine physics
 
-# 3. Run 3-Way Batch Comparison (Quantum vs Classical Mixture vs Classical Rational)
-python main.py --batch
+# 3. Export Simulation Video (MP4) or Evacuation Data Bundle
+python main.py --export-video --scenario titanic
+python main.py --export-data --all-scenarios
 
 # 4. Open Product D Web Replay & 6-Model Quantum Inspector
 start site/index.html

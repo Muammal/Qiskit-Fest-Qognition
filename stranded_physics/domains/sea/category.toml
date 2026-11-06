@@ -1,0 +1,9 @@
+id = "sea"
+title = "The sea and immersion in it"
+status = "model"
+owner = ""
+first_model = "temperature and time to incapacitation"
+owns = "water temperature, survival in the water"
+must_not_own = "the ship"
+outputs = []
+wanted = ["Published immersion survival data near 0 C"]

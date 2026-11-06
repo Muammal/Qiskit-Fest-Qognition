@@ -1,6 +1,6 @@
 # Tech A: 2-Qubit Quantum Cognitive Architecture (`mind/`)
 
-> **Track Scope**: Tech A implements the quantum cognitive decision engine (`mind/`), modeling how human belief states evolve under ambiguous sequential hazards, how non-commuting mental rotations produce **order effects** and **disjunction (interference) effects**, and how acute physiological stress induces **phase-damping decoherence** or **open-system Lindblad relaxation**. It also includes **6 published, peer-reviewed Quantum Cognition models** ported from open-source research repositories.
+> **Track Scope**: Tech A implements the quantum cognitive decision engine (`mind/`), modeling how human belief states evolve under ambiguous sequential hazards, how non-commuting mental rotations produce **order effects** and **disjunction (interference) effects**, and how acute physiological stress induces **phase-damping decoherence** or **open-system Lindblad relaxation**. It also includes **6 quantum cognition models adapted from published papers** ported from open-source research repositories.
 
 ---
 
@@ -29,7 +29,7 @@ flowchart LR
 | File | Responsibility |
 |---|---|
 | [`mind/model.py`](../mind/model.py) | Defines the 2-qubit Hilbert space ($\mathcal{H}_{\text{belief}} \otimes \mathcal{H}_{\text{action}}$), the deliberation unitary $U(q_S, q_D, \eta)$, closed-form $P(\text{protect})$ equations, Bloch vector extraction, and least-squares calibration to Tversky & Shafir (1992). Re-exports Busemeyer Hamiltonian and Huang QLBN models. |
-| [`mind/cognition_models.py`](../mind/cognition_models.py) | Implements **6 peer-reviewed Quantum Cognition models** backed by published papers and GitHub repositories (`jbusemey/ChoiceModeling`, `Insight137/insight137-eap`, `hwilner/open-system-decision-dynamics`, `ljaustc/QRL`, `WileQ/QCog`, `robertcprice/nQPU`). |
+| [`mind/cognition_models.py`](../mind/cognition_models.py) | Implements **6 quantum cognition models adapted from published papers** backed by published papers and GitHub repositories (`jbusemey/ChoiceModeling`, `Insight137/insight137-eap`, `hwilner/open-system-decision-dynamics`, `ljaustc/QRL`, `WileQ/QCog`, `robertcprice/nQPU`). |
 | [`mind/belief.py`](../mind/belief.py) | Prepares initial belief density matrix $\rho_0$ from `safety`, defines the event parameter table (`EVENT_PARAMS`), applies non-commuting $R_y(\theta) R_z(\phi)$ unitary gates or projective measurement collapse, and runs sequential event histories. |
 | [`mind/decoherence.py`](../mind/decoherence.py) | Maps physiological `stress` to phase-damping strength $\lambda \in [0, 1]$ via a piecewise-linear ramp, implements the Kraus phase-damping channel $\mathcal{E}_\lambda(\rho)$, and re-exports open-system GKSL Lindblad evolution (`lindblad_rhs`, `evolve_lindblad`). |
 | [`mind/quantum_mind.py`](../mind/quantum_mind.py) | Main entrypoint exposing `quantum_decide(state, cognition_model=...)` and the zero-coherence control model `classical_mixture_decide(state)`, including reflex overrides and prior-weighted action pool splitting. |

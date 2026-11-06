@@ -1,6 +1,34 @@
 {
+  "agent-days-without-water": {
+    "hash": "03bcc9869a8956f538364aae3ab0611985a12f4a958a7e6ff705e852eb966c0a",
+    "value": 2.152775343657806,
+    "verdict": "PASS"
+  },
+  "agent-end-to-end": {
+    "failed": [],
+    "hash": "0ab837bacca053433ee00cc06ea56f7d13d23d59916611d7a15cd5bdcf3dd29d",
+    "verdict": "PASS"
+  },
+  "agent-evacuation-route": {
+    "hash": "79a635a10f4b5099c65def3e06b8ebedb3b91a3da8dd1406022b29069667dabc",
+    "value": 3.558160464984465,
+    "verdict": "NO_TARGET"
+  },
+  "agent-physiology": {
+    "hash": "20276f24f13496ab1aa3c8539544f3c936516a61463a1fedc8a5f1e0214a2d21",
+    "verdict": "PASS"
+  },
+  "agent-walking": {
+    "hash": "41a851f5749367c0ec53893a62c4f8aa62eddeb4313c40117b18e9b9fb0a0e4a",
+    "verdict": "PASS"
+  },
+  "agent-water-need-walking": {
+    "hash": "b1dabbdfe60b9e735f6eb2283239e0e325e5207ff510543faf509caf1a7f97ee",
+    "value": 3.414197408779092,
+    "verdict": "PASS"
+  },
   "agent.records_and_units": {
-    "hash": "cd8b430457d9c26f9d89bee086b75be894a4d6b924f0b5fc87d14ca26451369d",
+    "hash": "e909c0c488e33397ae6be4ccdcce55148f72b0c6b2a8053f1bd37f34801c2591",
     "verdict": "PASS"
   }
 }

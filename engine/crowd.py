@@ -128,16 +128,19 @@ class ShipAgent(SurvivalAgent):
             return abs(station - self.pos[0]) + STATION_QUEUE_WEIGHT * waiting / (free_seats + 1)
         return min(stations, key=score)
 
-    def execute_ship_action(self, action, world, fields, crowding, rng):
+    def execute_ship_action(self, action, world, fields, crowding, rng, warned_only_hide=False):
         """What each of the seven contract actions means on the ship."""
         if self.injury_cooldown:
             self.injury_cooldown = max(0, self.injury_cooldown - 1)
             self.injured = self.injury_cooldown > 0
         indoors = world.get_tile(*self.pos) == 4
         if action == "hide":
-            self.walk_to_boat(world, fields, crowding)
-            self.needs["safety"] = min(1, self.needs["safety"] + .05)
-            self.stress = max(0, self.stress - .02)
+            if not warned_only_hide or bool(self.recent_events):
+                self.walk_to_boat(world, fields, crowding)
+                self.needs["safety"] = min(1, self.needs["safety"] + .05)
+                self.stress = max(0, self.stress - .02)
+            else:
+                self.needs["energy"] = min(1, self.needs["energy"] + .02)
         elif action == "forage":
             if not self.inventory["lifebelt"]:
                 if indoors:

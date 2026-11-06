@@ -5,19 +5,21 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 | Category | Status | Owner | Datasets | Parameters | First model |
 |---|---|---|---|---|---|
-| agent | model | unclaimed | 0 | 2 | Tobler walking, ISO 7933 heat strain, load carriage |
-| atmos | model | unclaimed | 0 | 2 | reanalysis forcing replayed per event |
-| eruption | model | unclaimed | 9 | 2 | source timeline and plume rise |
-| exposure | model | unclaimed | 28 | 1 | fragility curves |
-| gas | model | unclaimed | 0 | 1 | Gaussian plume |
+| agent | model | unclaimed | 0 | 17 | Tobler walking, ISO 7933 heat strain, load carriage |
+| atmos | model | unclaimed | 12 | 1 | reanalysis forcing replayed per event |
+| eruption | model | unclaimed | 12 | 92 | source timeline and plume rise |
+| exposure | model | unclaimed | 28 | 7 | fragility curves |
+| gas | model | unclaimed | 0 | 12 | Gaussian plume |
 | impact | data_only | unclaimed | 1 | 1 | none yet |
-| lahar | model | unclaimed | 0 | 1 | LAHARZ, then shallow water |
-| lava | model | unclaimed | 3 | 1 | dome footprint |
-| pdc | model | unclaimed | 3 | 2 | energy cone, then depth-averaged flow |
+| lahar | model | unclaimed | 0 | 5 | LAHARZ, then shallow water |
+| lava | model | unclaimed | 3 | 8 | dome footprint |
+| pdc | model | unclaimed | 3 | 9 | energy cone, then depth-averaged flow |
+| sea | model | unclaimed | 0 | 8 | temperature and time to incapacitation |
 | seismic | data_only | unclaimed | 2 | 1 | none yet |
-| storm | model | unclaimed | 1 | 2 | Holland 1980 wind profile |
-| tephra | model | unclaimed | 0 | 2 | Suzuki source with Gaussian fallout |
-| terrain | model | unclaimed | 1 | 2 | hydrological routing on the real DEM |
+| ship | model | unclaimed | 6 | 107 | compartment flooding on a box hull |
+| storm | model | unclaimed | 2 | 25 | Holland 1980 wind profile |
+| tephra | model | unclaimed | 0 | 27 | Suzuki source with Gaussian fallout |
+| terrain | model | unclaimed | 4 | 11 | hydrological routing on the real DEM |
 | tsunami | data_only | unclaimed | 1 | 1 | none yet |
 
 ## agent: Human body and movement
@@ -37,6 +39,21 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 **Must not own:** ash, storms as events
 
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| upper_wind_st_vincent | wind by pressure level | reference | no | A model forecast from a coarse grid cell, not an observation. |
+| weather_st_vincent | surface weather | reference | no | ERA5-based values from a coarse grid cell, not a station. Island rain is likely understated. |
+| surface_decade_st_vincent | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_st_vincent | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
+| surface_decade_la_palma | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_la_palma | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
+| surface_decade_miyakejima | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_miyakejima | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
+| surface_decade_montserrat | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_montserrat | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
+| surface_decade_stromboli | surface weather | reference | no | Hourly, 2015 to 2024. ERA5-based values from a coarse grid cell, not a station. Copied from the data loop's download. |
+| upper_wind_2023_stromboli | wind by pressure level | reference | no | Hourly, all of 2023. A model forecast from a coarse grid cell, not an observation. |
+
 **Still wanted:**
 - ERA5 pressure levels before 2021 (needs a free CDS account)
 - Local rain gauges around La Soufriere
@@ -49,6 +66,9 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 | Dataset | Kind | Split | Licence confirmed | Notes |
 |---|---|---|---|---|
+| st_vincent_plumes | research paper text | reference | no | Text extracted from the HTML article. |
+| st_vincent_ipgp | observatory summary | reference | no | Text extracted from the web page, in French. |
+| st_vincent_cole_accepted | research paper | reference | no | Plain text for reading sits beside it as st_vincent_cole_accepted.txt. |
 | gvp_eruptions | catalogue | calibration | no | file: raw/gvp_eruptions.json |
 | gvp_volcanoes | catalogue | reference | no | file: raw/gvp_volcanoes.json |
 | st_vincent_cole_accepted | case_study | calibration | no | file: raw/st_vincent_cole_accepted.pdf |
@@ -170,6 +190,15 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 - Primary paper on the first flow timing
 - FlowDat or similar runout statistics
 
+## sea: The sea and immersion in it
+
+**Owns:** water temperature, survival in the water
+
+**Must not own:** the ship
+
+**Still wanted:**
+- Published immersion survival data near 0 C
+
 ## seismic: Earthquakes
 
 **Owns:** earthquake catalogues near volcanoes, felt reports
@@ -184,6 +213,25 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 **Still wanted:**
 - Local seismic network catalogue (UWI SRC); global catalogues miss small local swarms
 
+## ship: Ships, hull flooding and lifeboats
+
+**Owns:** hull, compartments, flooding, sinking, lifeboat seats and launch times
+
+**Must not own:** people and their decisions
+
+| Dataset | Kind | Split | Licence confirmed | Notes |
+|---|---|---|---|---|
+| british_report_gutenberg | official inquiry report | reference | no | file: artifacts/physics/raw/titanic/british_report_gutenberg_39415.html |
+| wilding_day19 | inquiry testimony | reference | no | file: artifacts/physics/raw/titanic/wilding_day19_03.html |
+| wilding_day20 | inquiry testimony | reference | no | file: artifacts/physics/raw/titanic/wilding_day20_03.html |
+| bot_report_saved | official inquiry report | reference | no | file: artifacts/physics/raw/titanic/bot_report_saved.html. Agrees with the Gutenberg copy on the saved figures |
+| wormstedt_revised | revised launch times | reference | no | file: artifacts/physics/raw/titanic/wormstedt_revised.html. All times are approximate, as the page says. Boats A and B floated off rather than being lowered |
+| wikipedia_sinking | encyclopedia article | reference | no | file: artifacts/physics/raw/titanic/wikipedia_sinking.html. Secondary, for cross-checks only: water at -2 C, and modern counts of 712 saved of 2,208 |
+
+**Still wanted:**
+- Boat-by-boat occupancy
+- Wreck survey of the actual damage
+
 ## storm: Tropical storms and cyclones
 
 **Owns:** cyclone tracks and rates, storm wind and rain as forcing
@@ -192,6 +240,7 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 | Dataset | Kind | Split | Licence confirmed | Notes |
 |---|---|---|---|---|
+| ibtracs_beryl_2024 | storm best track | reference | no | beryl_2024.csv holds only Beryl 2024's rows and a few columns, cut from the full file, whose sha256 is 70a0191dfa495e49a4dd49d1c38e0451d48467bbcb789bdaf2dc01e8cc8744dc. The URL is the archive's usual path, and its exact match to the file held should be confirmed in T-104. |
 | ibtracs | tracks | calibration | no | file: raw/ibtracs_since1980.csv |
 
 **Still wanted:**
@@ -216,6 +265,9 @@ To add data: add a record to that category's `datasets.toml`, then rerun.
 
 | Dataset | Kind | Split | Licence confirmed | Notes |
 |---|---|---|---|---|
+| copernicus_glo30_n13w062 | digital surface model | reference | no | Tile N13 W062 covers all of St Vincent, so the W061 tile named in the original proposal is not needed. A surface model: heights include canopy and buildings. |
+| esa_worldcover_2021_n12w063 | land cover | reference | no | Mapped from 2021 imagery, so it may already include some effects of the April 2021 eruption on the northern slopes. Check before using it as pre-eruption cover. |
+| fabdem_v1_2_n10w070 | bare-earth estimate | reference | no | Machine-learned correction of GLO-30, so not independent of it and not a survey. Used only to size canopy bias; no model reads it. Non-commercial terms: keep it out of the repo and out of any pack. |
 | natural_earth_land | vector | reference | yes | file: raw/ne_10m_land.zip |
 
 **Still wanted:**

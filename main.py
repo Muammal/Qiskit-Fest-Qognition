@@ -90,10 +90,14 @@ def run_live_demo(
     print(f"  Configuration: Engine={engine_mode.upper()} | Scenario={scenario.upper()} | Seed={seed} | Mind={mind.upper()} | Noise={noise}")
     print(f"  Legend: {BLUE}~{RESET} Water  {YELLOW}.{RESET} Plains  {GREEN}^{RESET} Forest  M Mountain  {MAGENTA}S{RESET} Shelter  {BOLD}{RED}@{RESET} Agent\n")
 
-    if engine_mode == "physics":
-        from stranded_physics.scenarios import build_st_vincent_pack
+    if engine_mode == "legacy_pack":
+        from stranded_physics.packs.legacy import build_legacy_pack
         from stranded_physics.runtime.simulation import PackSimulation
-        pack = build_st_vincent_pack(seed=seed)
+        sim = PackSimulation(build_legacy_pack(seed), mind_type=mind, noise_source=noise)
+    elif engine_mode == "physics":
+        from stranded_physics.packs.st_vincent_2021 import build
+        from stranded_physics.runtime.simulation import PackSimulation
+        pack = build(seed)
         sim = PackSimulation(pack, mind_type=mind, noise_source=noise)
     elif scenario == "titanic":
         sim = TitanicSimulation(seed=seed, mind_type=mind, noise_source=noise)
@@ -152,6 +156,12 @@ def run_live_demo(
     print(f"{BOLD}========================================================================{RESET}\n")
 
 
+def open_builder(app):
+    """The scenario builder, imported only when asked for, so the original scenarios run without the physics packages."""
+    from stranded_physics.builder_screen import BuilderScreen
+    return BuilderScreen(app)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Quantum Cognition Simulation")
     parser.add_argument("--gui", action="store_true", help="Launch interactive 2D Pygame simulation (default)")
@@ -159,22 +169,46 @@ def main():
     parser.add_argument("--terminal", action="store_true", help="Run interactive terminal ASCII survival run")
     parser.add_argument("--batch", action="store_true", help="Compare Quantum vs Classical Mixture vs Classical Rational")
     parser.add_argument("--curate", action="store_true", help="Curate signature runs into demo-pack/")
+    parser.add_argument("--export-data", action="store_true", help="Export evacuation survival rates, critical seeds & policy interventions to exports/")
+    parser.add_argument("--export-video", action="store_true", help="Export full simulation run MP4 video to exports/videos/")
     parser.add_argument("--test", action="store_true", help="Execute integration test suite")
     parser.add_argument("--seed", type=int, default=101, help="Event hazard or terrain seed")
     parser.add_argument("--mind", type=str, default="quantum",
                         choices=["quantum", "classical_mixture", "classical"], help="Mind engine")
     parser.add_argument("--engine", type=str, default="legacy",
-                        choices=["legacy", "physics"], help="Simulation runtime (legacy or T1 St. Vincent physics pack)")
+                        choices=["legacy", "physics", "legacy_pack"], help="Simulation runtime: legacy, the T1 St. Vincent physics pack, or the fictional island through the pack runtime")
     parser.add_argument("--noise", type=str, default="stub", help="Noise source profile")
     parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano", "titanic", "pompeii", "waterloo"], help="Choose scenario directly")
     parser.add_argument("--speed", type=float, default=0.2, help="Seconds delay per step during live demo")
+    parser.add_argument("--video-speed", type=float, default=1.0, help="Playback speed multiplier (e.g. 0.25 for Slow-Mo, 2.0 for Fast-Forward) when exporting video")
+    parser.add_argument("--output", type=str, default=None, help="Optional output file or directory path for exports")
 
     args = parser.parse_args()
 
     if args.test:
         import pytest
         print("[Tech C] Running integration test suite...")
-        sys.exit(pytest.main(["-v", "test_contracts_and_engine.py"]))
+        sys.exit(pytest.main(["-v", "test_contracts_and_engine.py", "test_gui_hayday.py"]))
+    elif args.export_data:
+        from engine.exporter import export_evacuation_datasets
+        out_dir = args.output or "exports"
+        info = export_evacuation_datasets(output_dir=out_dir, num_seeds=12)
+        print(f"\n{BOLD}{GREEN}=== Exported Evacuation Survival & Policy Datasets ==={RESET}")
+        for k, v in info.items():
+            print(f"  {k}: {CYAN}{v}{RESET}")
+    elif args.export_video:
+        from engine.exporter import export_simulation_video
+        scen = args.scenario or "volcano"
+        info = export_simulation_video(
+            scenario=scen,
+            seed=args.seed,
+            mind=args.mind,
+            output_path=args.output,
+            speed_multiplier=args.video_speed,
+        )
+        print(f"\n{BOLD}{GREEN}=== Exported Full Simulation Video ==={RESET}")
+        for k, v in info.items():
+            print(f"  {k}: {CYAN}{v}{RESET}")
     elif args.batch:
         summary = run_batch_comparison(num_seeds=20, max_steps=DEFAULT_STEPS)
         print(f"\n{BOLD}=== Synthetic Heuristic-Stub Results ({summary['num_seeds']} Seeds) ==={RESET}")
@@ -195,7 +229,7 @@ def main():
         start_screen = "home" if args.scenario else "event_choice"
         print(f"Launching Quantum Cognition Simulation (Seed={args.seed}, Mind={args.mind})...")
         launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen,
-                   scenario=args.scenario or "volcano")
+                   scenario=args.scenario or "volcano", builder_factory=open_builder)
 
 
 if __name__ == "__main__":

@@ -1026,3 +1026,29 @@ def test_quantum_mind_alternative_cognition_models():
         assert 'p_protect_busemeyer' in d['quantum']
         assert 'd_b_huang' in d['quantum']
         assert 'order_gap' in d['quantum']
+
+
+def test_slow_mo_fast_forward_and_exports(tmp_path):
+    from engine.gui import IslandVisualizerApp
+    from engine.exporter import export_evacuation_datasets, export_simulation_video
+    app = IslandVisualizerApp(seed=101, start_screen="sim", scenario="volcano")
+    assert app.speed_choices == [0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
+    assert app.speed_multiplier == 1.0
+    app._shift_speed(-1)
+    assert app.speed_multiplier == 0.5
+    app._shift_speed(-1)
+    assert app.speed_multiplier == 0.25
+    app._shift_speed(-1)
+    assert app.speed_multiplier == 0.1
+    app._shift_speed(4)
+    assert app.speed_multiplier == 2.0
+
+    vid_path = tmp_path / "test_sim.mp4"
+    vid_info = export_simulation_video(
+        scenario="volcano", seed=101, mind="quantum",
+        output_path=str(vid_path), fps=12, frames_per_step=2,
+        speed_multiplier=2.0, max_steps=4, include_debrief_frames=2
+    )
+    assert vid_path.exists() and vid_path.stat().st_size > 1000
+    assert vid_info["steps_rendered"] == 4
+

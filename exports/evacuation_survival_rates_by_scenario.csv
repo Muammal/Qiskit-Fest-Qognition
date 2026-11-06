@@ -1,0 +1,16 @@
+scenario,mind,SampleSize,survived_or_safe_pct,notes
+volcano,quantum,12 seeds,100.0,Evaluated across seeds 100..111
+volcano,classical_mixture,12 seeds,100.0,Evaluated across seeds 100..111
+volcano,classical,12 seeds,100.0,Evaluated across seeds 100..111
+island,quantum,12 seeds,100.0,Evaluated across seeds 100..111
+island,classical_mixture,12 seeds,100.0,Evaluated across seeds 100..111
+island,classical,12 seeds,100.0,Evaluated across seeds 100..111
+titanic (historical_baseline),quantum,2208 agents (seed 42),26.18,"Historical baseline: steward knocks ambiguous (gas_plume), rockets collapse (ash_fall), port side women/children only"
+titanic (historical_baseline),classical_mixture,2208 agents (seed 42),24.28,"Historical baseline: steward knocks ambiguous (gas_plume), rockets collapse (ash_fall), port side women/children only"
+titanic (historical_baseline),classical,2208 agents (seed 42),38.0,"Historical baseline: steward knocks ambiguous (gas_plume), rockets collapse (ash_fall), port side women/children only"
+pompeii (mapping_C_ambiguous_cues),quantum,500 agents (seed 42),93.6,Ambiguous cues: both column and pumice treated as non-collapsing gas_plume rotations (quantum disjunction delay)
+pompeii (mapping_C_ambiguous_cues),classical_mixture,500 agents (seed 42),100.0,Ambiguous cues: both column and pumice treated as non-collapsing gas_plume rotations (quantum disjunction delay)
+pompeii (mapping_C_ambiguous_cues),classical,500 agents (seed 42),100.0,Ambiguous cues: both column and pumice treated as non-collapsing gas_plume rotations (quantum disjunction delay)
+waterloo (alarm_on_unambiguous_mapping_B),quantum,100 agents (seed 42),100.0,Unambiguous staff alarm (mapped to projective collapse): eliminates quantum hesitation & minimizes AEGL-2 exposure
+waterloo (alarm_on_unambiguous_mapping_B),classical_mixture,100 agents (seed 42),100.0,Unambiguous staff alarm (mapped to projective collapse): eliminates quantum hesitation & minimizes AEGL-2 exposure
+waterloo (alarm_on_unambiguous_mapping_B),classical,100 agents (seed 42),100.0,Unambiguous staff alarm (mapped to projective collapse): eliminates quantum hesitation & minimizes AEGL-2 exposure

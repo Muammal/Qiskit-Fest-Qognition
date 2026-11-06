@@ -9,3 +9,63 @@ valid_max = 1000.0
 role = "input"
 status = "literature"
 source = "Spence et al. (2005) Bull. Volcanol. 67:589-602 Table 3"
+
+# Unfitted lognormal spread; not fitted to casualty data.
+[[parameter]]
+id = "exposure.roof_fragility_beta"
+value = 0.6
+unit = "dimensionless"
+valid_min = 0.05
+valid_max = 3.0
+role = "input"
+status = "assumption"
+
+# Severe flow exposure assumption; not fitted to casualty data.
+[[parameter]]
+id = "exposure.flow_death_outdoors"
+value = 0.95
+unit = "dimensionless"
+valid_min = 0.0
+valid_max = 1.0
+role = "input"
+status = "assumption"
+
+# Shelter protection assumption; not fitted to casualty data.
+[[parameter]]
+id = "exposure.flow_death_sheltered"
+value = 0.5
+unit = "dimensionless"
+valid_min = 0.0
+valid_max = 0.94
+role = "input"
+status = "assumption"
+
+# Gameplay fatigue scale; not fitted to casualty data.
+[[parameter]]
+id = "exposure.ash_fatigue_per_hour"
+value = 0.1
+unit = "1/hour"
+valid_min = 0.0
+valid_max = 10.0
+role = "input"
+status = "assumption"
+
+# Fatigue saturation load is unmeasured; not fitted to casualty data.
+[[parameter]]
+id = "exposure.ash_fatigue_load"
+value = 10.0
+unit = "kg/m**2"
+valid_min = 0.01
+valid_max = 1000.0
+role = "input"
+status = "assumption"
+
+# Unmeasured shelter attenuation; not fitted to casualty data.
+[[parameter]]
+id = "exposure.shelter_ash_factor"
+value = 0.2
+unit = "dimensionless"
+valid_min = 0.0
+valid_max = 1.0
+role = "input"
+status = "assumption"

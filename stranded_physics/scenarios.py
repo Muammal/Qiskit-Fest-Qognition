@@ -1,4 +1,4 @@
-"""T1 Empirical Scenario Builders for `stranded_physics` (`st_vincent_2021` & `la_palma_2021`).
+"""Simplified stand-in scenario builders for `stranded_physics`. Not real St Vincent physics; see `physics/engine`.
 
 Loads empirical 36-step meteorology, wind bearing, temperature, and eruptive
 onset timelines from `disaster_data/scenarios/st_vincent_2021.json` (April 2021
@@ -69,7 +69,7 @@ class _T1Base:
 
 
 class StVincentTerrain(_T1Base):
-    """T1 volcanic edifice DEM with radial drainage valleys (Rabacca & Wallibou channels)."""
+    """A made-up cone with four radial valleys. Not a real elevation model, and not at St Vincent's position."""
 
     id = "terrain"
     outputs = (
@@ -90,10 +90,10 @@ class StVincentTerrain(_T1Base):
         ex, ey, dist = _xy_offsets(self.grid, self.vent)
         theta = np.arctan2(ey, ex)
 
-        # Somma-crater edifice peaking at ~1178m (La Soufriere summit) with 4 radial valleys
+        # A made-up edifice with 4 radial valleys. Its height is not taken from any elevation data
         valley_carve = 85.0 * np.cos(4.0 * theta) * np.exp(-((dist - 1800.0) ** 2) / (2.0 * 1400.0 ** 2))
         coast_harmonic = 320.0 * (0.6 * np.cos(2.0 * theta - 0.4) + 0.4 * np.sin(3.0 * theta))
-        eff_dist = dist + coast_harmonic
+        eff_dist = np.maximum(0.0, dist + coast_harmonic)
         elevation = np.maximum(0.0, 1080.0 * np.exp(-((eff_dist / 3100.0) ** 1.35)) - 60.0 - valley_carve)
         land_mask = (elevation > 5.0).astype(float)
         elevation = np.where(land_mask > 0.0, elevation, 0.0)
@@ -111,7 +111,7 @@ class StVincentTerrain(_T1Base):
 
 
 class StVincentAtmos(_T1Base):
-    """T1 meteorological forcing replaying April 2021 St. Vincent ERA5 / 500hPa series."""
+    """Replays wind bearing and temperature from the scenario file. Wind speed and rain rate are formula stand-ins."""
 
     id = "atmos"
     outputs = (
@@ -159,7 +159,7 @@ class HollandStorm(_T1Base):
 
 
 class SoufriereEruption(_T1Base):
-    """T1 source timeline calibrated to April 8-11, 2021 La Soufriere eruption."""
+    """A randomised stand-in timeline around the 2021 onset step, with a constant mass rate. Not the published event sequence."""
 
     id = "eruption"
     outputs = (

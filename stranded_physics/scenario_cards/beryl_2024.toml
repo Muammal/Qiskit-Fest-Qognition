@@ -1,0 +1,39 @@
+# A second real scenario from the same parts: only the storm is new. Someone in Chateaubelair, with Barrouallie as shelter.
+id = "beryl_2024"
+title = "Hurricane Beryl near St Vincent, July 2024"
+place = "real"
+start_utc = "2024-06-30T00:00:00+00:00"
+hours = 72
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "weather"
+source = "replay"
+event = "st_vincent"
+
+[[entity]]
+kind = "storm"
+source = "replay"
+event = "beryl_2024"
+site_lon = -61.227
+site_lat = 13.158
+
+[[entity]]
+kind = "person"
+source = "dials"
+name = "Chateaubelair"
+start_lon = -61.243
+start_lat = 13.283
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "Barrouallie"
+lon = -61.267
+lat = 13.233

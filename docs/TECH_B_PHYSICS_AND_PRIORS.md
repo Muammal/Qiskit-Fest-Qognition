@@ -2,7 +2,7 @@
 
 > **Track Scope**: Tech B anchors the simulation in real-world geophysical, meteorological, and behavioral data. It provides:
 > 1. **Empirical Disaster & Human-Response Datasets (`disaster_data/`)** — 49 curated datasets across 6 historical eruptions (anchored on the April 2021 La Soufrière eruption on St. Vincent).
-> 2. **Verification-First Multi-Domain Physics Engine (`stranded_physics/` & `stranded_physics/scenarios.py`)** — A 14-domain unit-checked (`pint`) physical modeling framework, 9 concrete **T1 physical domain solvers** for the April 2021 La Soufrière eruption (`build_st_vincent_pack`), pre-registered validation gates (`gates.py`), and strict anti-future-leakage perception (`perceive()`).
+> 2. **Verification-First Multi-Domain Physics Engine (`stranded_physics/` & `stranded_physics/scenarios.py`)** — A 14-domain unit-checked (`pint`) physical modeling framework, 9 simplified **stand-in solvers** for the April 2021 La Soufrière eruption (`build_st_vincent_pack`), pre-registered validation gates (`gates.py`), and strict anti-future-leakage perception (`perceive()`).
 > 3. **Empirical ATUS Priors (`data/priors.json`), Classical Rational Baseline & Grover DTQW (`contracts.py`)** — Physiological utility weighting grounded in Bureau of Labor Statistics American Time Use Survey (ATUS) Table A-1 activity weights and a 4-direction **Grover-coined Discrete-Time Quantum Walk (DTQW)** in `explore_step()`.
 
 ---
@@ -55,14 +55,16 @@ Located in [`disaster_data/`](../disaster_data/) and documented in [`disaster_da
 - **[`fields.py`](../stranded_physics/core/fields.py)**: `FieldStore` and `ScopedFields` manage 1D time-series (`TimeAxis`), 2D spatial grids (`GridSpec` with CRS checking and automatic regridding), and 3D spatiotemporal arrays.
 
 ### 3.2 Concrete T1 Physical Solvers for La Soufrière 2021 (`stranded_physics/scenarios.py`)
-[`stranded_physics/scenarios.py`](../stranded_physics/scenarios.py) implements 9 concrete `T1` physical domain solvers driven by [`disaster_data/scenarios/st_vincent_2021.json`](../disaster_data/scenarios/st_vincent_2021.json):
+> **Status of these solvers:** they are simplified stand-ins, not real St Vincent physics. The terrain is a made-up cone, not the real island or its position; wind speed is a formula; eruption timing is randomised; flows ignore barriers and arrive sooner than the published record. Outputs named here that the code does not write (`terrain.slope`, `tephra.load`, `gas.so2`, `storm.surge`, dynamic pressures) are aspirations. Their gates only check that settings and data files load. The real-data engine is being built separately on `physics/engine`.
+
+[`stranded_physics/scenarios.py`](../stranded_physics/scenarios.py) implements 9 simplified stand-in solvers driven by [`disaster_data/scenarios/st_vincent_2021.json`](../disaster_data/scenarios/st_vincent_2021.json):
 
 | Solver Class | Domain | Physical Model & Primary Outputs |
 |---|---|---|
 | [`StVincentTerrain`](../stranded_physics/scenarios.py) | `terrain` | Somma caldera rim, Rabacca/Wallibou radial drainage channels, land mask, slope ($\text{deg}$), and NEMO hazard zones (`terrain.zone`). |
-| [`StVincentAtmos`](../stranded_physics/scenarios.py) | `atmos` | 36-step empirical ERA5/Open-Meteo wind speed ($\text{m/s}$), bearing ($\text{deg}$), temperature ($\text{degC}$), and precipitation ($\text{mm/h}$). |
+| [`StVincentAtmos`](../stranded_physics/scenarios.py) | `atmos` | 36-step wind bearing and temperature from ERA5/Open-Meteo; wind speed and rain rate are formula stand-ins. |
 | [`HollandStorm`](../stranded_physics/scenarios.py) | `storm` | Tropical squall wind amplification (`storm.wind_speed`) and coastal surge footprint (`storm.surge`). |
-| [`SoufriereEruption`](../stranded_physics/scenarios.py) | `eruption` | Eruptive phase progression, Mastin (2009) plume height $H = 2.0\,\text{MER}^{0.241}$, RSAM seismic tremor, and explosion acoustics. |
+| [`SoufriereEruption`](../stranded_physics/scenarios.py) | `eruption` | Eruptive phase progression, column heights not computed by this stand-in; Mastin (2009) relates height to volume rate, $H = 2.0\,V^{0.241}$, RSAM seismic tremor, and explosion acoustics. |
 | [`SuzukiTephra`](../stranded_physics/scenarios.py) | `tephra` | Anisotropic downwind advective-diffusive tephra fallout accumulation (`tephra.load` in $\text{kg/m}^2$). |
 | [`GaussianGas`](../stranded_physics/scenarios.py) | `gas` | Downwind $\text{SO}_2$ gas plume concentration (`gas.so2` in $\text{mg/m}^3$). |
 | [`EnergyConePDC`](../stranded_physics/scenarios.py) | `pdc` | Malin & Sheridan (1982) energy-cone pyroclastic density current dynamic pressure ($\text{kPa}$) channelized down drainage valleys. |
@@ -78,7 +80,10 @@ Calling `build_st_vincent_pack(seed=1)` executes all 9 `T1` solvers in topologic
 
 ---
 
-## 4. Empirical ATUS Priors (`data/priors.json`), Classical Baseline & Grover DTQW (`contracts.py`)
+## 4. ATUS Reference Data (`data/priors.json`), Classical Baseline & Grover DTQW (`contracts.py`)
+
+> **Status:** `contracts.get_prior` does not use these ATUS numbers. It loads the file, but decisions use flat weights plus hand-set urgency boosts.
+
 
 1. **Empirical BLS ATUS Priors (`data/priors.json` & `contracts.get_prior`)**:
    - [`data/priors.json`](../data/priors.json) stores Bureau of Labor Statistics (BLS) American Time Use Survey (ATUS) Summary Table A-1 baseline human activity weights and physiological urgency multipliers, loaded automatically into `contracts.ATUS_PRIORS_META`.

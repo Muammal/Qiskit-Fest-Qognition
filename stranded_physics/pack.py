@@ -1,6 +1,6 @@
-"""Build a scenario pack offline. Only the fake scenario exists until real categories arrive.
+"""Build a scenario pack offline.
 
-    python -m stranded_physics.pack build --scenario fake --seed 1
+    python -m stranded_physics.pack build --scenario st_vincent_2021 --seed 1
 """
 from __future__ import annotations
 
@@ -11,7 +11,14 @@ from pathlib import Path
 from stranded_physics.core.fakes import fake_scenario
 from stranded_physics.packs.builder import build_pack, save_pack
 
-SCENARIOS = {"fake": fake_scenario}
+
+
+def st_vincent_scenario(spawn: str = "chateaubelair"):
+    from stranded_physics.packs.st_vincent_2021 import scenario  # Needs the raw data, so it loads only when asked for.
+    return scenario(spawn)
+
+
+SCENARIOS = {"fake": fake_scenario, "st_vincent_2021": st_vincent_scenario, "st_vincent_2021_richmond": lambda: st_vincent_scenario("richmond")}
 PACK_DIR = Path(__file__).resolve().parents[1] / "artifacts" / "physics" / "packs"
 
 
