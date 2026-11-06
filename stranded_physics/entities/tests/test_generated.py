@@ -1,4 +1,5 @@
 """Generated eruptions and storms through the entity layer: seeds, dials, refusals and evidence."""
+
 from dataclasses import replace
 from pathlib import Path
 
@@ -40,7 +41,7 @@ def test_a_catalogue_eruption_depends_on_the_seed_and_repeats():
 @needs_raw
 def test_a_flow_follows_a_generated_eruption_not_the_published_date():
     built = domains("generated_eruption", 1)
-    assert built["pdc"].first_collapse_s == pytest.approx(built["eruption"].generated.onset_s + 6 * 3600.)
+    assert built["pdc"].first_collapse_s == pytest.approx(built["eruption"].generated.onset_s + 6 * 3600.0)
 
 
 @needs_raw
@@ -70,40 +71,54 @@ def test_the_depth_averaged_model_can_be_chosen():
 def test_dials_override_sampling():
     check_entity(eruption(size=3))
     scenario = load_scenario(CARDS / "generated_eruption.toml")
-    entities = tuple(replace(e, settings={**e.settings, "size": 2, "lead_hours": 5., "onset_hours": 30., "column_m": 4000.}) if e.kind == "eruption" else e for e in scenario.entities)
+    entities = tuple(
+        replace(e, settings={**e.settings, "size": 2, "lead_hours": 5.0, "onset_hours": 30.0, "column_m": 4000.0}) if e.kind == "eruption" else e
+        for e in scenario.entities
+    )
     made = next(d for d in to_spec(replace(scenario, entities=entities), 4).domains if d.id == "eruption").generated
-    assert (made.size, made.lead_s, made.onset_s) == (2, 5 * 3600., 30 * 3600.)
-    assert {event.height_m for event in made.events} == {4000.}
+    assert (made.size, made.lead_s, made.onset_s) == (2, 5 * 3600.0, 30 * 3600.0)
+    assert {event.height_m for event in made.events} == {4000.0}
 
 
-@pytest.mark.parametrize("entity, message", [
-    (eruption(size=9), "size"),
-    (eruption(size=2.5), "whole"),
-    (EntitySpec("eruption", "catalogue", settings={"size": 3}), "vent_lon"),
-    (EntitySpec("eruption", "dials", settings=VENT), "column_m"),
-    (EntitySpec("eruption", "catalogue", "st_vincent_2021", settings=VENT), "event"),
-    (EntitySpec("storm", "dials", settings=SITE), "max_wind_m_s"),
-    (EntitySpec("storm", "catalogue", settings={**SITE, "speed_m_s": 99.}), "speed_m_s"),
-])
+@pytest.mark.parametrize(
+    "entity, message",
+    [
+        (eruption(size=9), "size"),
+        (eruption(size=2.5), "whole"),
+        (EntitySpec("eruption", "catalogue", settings={"size": 3}), "vent_lon"),
+        (EntitySpec("eruption", "dials", settings=VENT), "column_m"),
+        (EntitySpec("eruption", "catalogue", "st_vincent_2021", settings=VENT), "event"),
+        (EntitySpec("storm", "dials", settings=SITE), "max_wind_m_s"),
+        (EntitySpec("storm", "catalogue", settings={**SITE, "speed_m_s": 99.0}), "speed_m_s"),
+    ],
+)
 def test_bad_settings_are_refused(entity, message):
     with pytest.raises(InterfaceError, match=message):
         check_entity(entity)
 
 
 def scenario_with(*entities, hours=96):
-    table = {"id": "t", "title": "t", "place": "generated", "start_utc": "2021-04-08T00:00:00+00:00", "hours": hours, "step_hours": 2, "local_utc_offset": -4,
-             "entity": [{"kind": "terrain", "source": "replay", "event": "st_vincent"}, *entities]}
+    table = {
+        "id": "t",
+        "title": "t",
+        "place": "generated",
+        "start_utc": "2021-04-08T00:00:00+00:00",
+        "hours": hours,
+        "step_hours": 2,
+        "local_utc_offset": -4,
+        "entity": [{"kind": "terrain", "source": "replay", "event": "st_vincent"}, *entities],
+    }
     return parse_scenario(table)
 
 
 def test_an_eruption_after_the_scenario_ends_is_refused():
     with pytest.raises(InterfaceError, match="after this 96-hour"):
-        check_scenario(scenario_with({"kind": "eruption", "source": "catalogue", **VENT, "onset_hours": 200.}))
+        check_scenario(scenario_with({"kind": "eruption", "source": "catalogue", **VENT, "onset_hours": 200.0}))
 
 
 def test_a_warning_before_the_scenario_starts_is_refused():
     with pytest.raises(InterfaceError, match="before the scenario"):
-        check_scenario(scenario_with({"kind": "eruption", "source": "catalogue", **VENT, "onset_hours": 10., "lead_hours": 20.}))
+        check_scenario(scenario_with({"kind": "eruption", "source": "catalogue", **VENT, "onset_hours": 10.0, "lead_hours": 20.0}))
 
 
 def test_a_vent_off_the_map_is_refused():
@@ -113,14 +128,17 @@ def test_a_vent_off_the_map_is_refused():
 
 def test_a_delay_on_a_recorded_eruption_is_refused():
     with pytest.raises(InterfaceError, match="delay_hours"):
-        check_scenario(scenario_with({"kind": "eruption", "source": "replay", "event": "st_vincent_2021"}, {"kind": "flow", "source": "replay", "delay_hours": 3.}))
+        check_scenario(
+            scenario_with({"kind": "eruption", "source": "replay", "event": "st_vincent_2021"}, {"kind": "flow", "source": "replay", "delay_hours": 3.0})
+        )
 
 
 def test_a_long_catalogue_warning_cannot_break_a_short_scenario():
     from stranded_physics.domains.eruption.generator import from_dials
+
     for seed in range(200):
-        made = from_dials(np.random.default_rng(seed), 40 * 3600.)
-        assert made.lead_s <= .75 * 40 * 3600.
+        made = from_dials(np.random.default_rng(seed), 40 * 3600.0)
+        assert made.lead_s <= 0.75 * 40 * 3600.0
 
 
 @needs_raw
@@ -134,6 +152,7 @@ def test_each_generated_card_builds_a_pack_and_someone_can_play_it():
     from stranded_physics.entities.build import check_events_happen
     from stranded_physics.packs.builder import build_pack
     from stranded_physics.runtime.simulation import PackSimulation
+
     for card, seed in (("generated_eruption", 1), ("generated_storm", 1)):
         pack = build_pack(to_spec(load_scenario(CARDS / f"{card}.toml"), seed), seed)
         check_events_happen(pack)
@@ -142,7 +161,7 @@ def test_each_generated_card_builds_a_pack_and_someone_can_play_it():
 
 
 def test_the_vent_moves_the_hazard_zones():
-    scenario = scenario_with({"kind": "eruption", "source": "catalogue", "vent_lon": -61.2, "vent_lat": 13.3, "onset_hours": 40.})
+    scenario = scenario_with({"kind": "eruption", "source": "catalogue", "vent_lon": -61.2, "vent_lat": 13.3, "onset_hours": 40.0})
     terrain = next(d for d in to_spec(scenario).domains if d.id == "terrain")
     assert terrain.vent == to_utm((-61.2, 13.3))
 
@@ -193,21 +212,25 @@ def test_a_models_results_count_only_for_that_model():
 
 def test_a_small_eruption_makes_small_flows():
     from stranded_physics.domains.pdc.model import size_scale
-    assert size_scale(PDC_SETTINGS["reference_erupted_mass"]) == pytest.approx(1.)
-    assert size_scale(PDC_SETTINGS["reference_erupted_mass"] / 1000.) == pytest.approx(.1)
+
+    assert size_scale(PDC_SETTINGS["reference_erupted_mass"]) == pytest.approx(1.0)
+    assert size_scale(PDC_SETTINGS["reference_erupted_mass"] / 1000.0) == pytest.approx(0.1)
 
 
 @needs_raw
 def test_flows_stay_within_their_reach_limit():
     from stranded_physics.domains.pdc.model import distance_from
     from stranded_physics.packs.builder import build_pack
+
     scenario = load_scenario(CARDS / "generated_eruption.toml")
-    entities = tuple(replace(e, settings={**e.settings, "size": 1, "onset_hours": 30., "lead_hours": 2.}) if e.kind == "eruption" else e for e in scenario.entities)
+    entities = tuple(
+        replace(e, settings={**e.settings, "size": 1, "onset_hours": 30.0, "lead_hours": 2.0}) if e.kind == "eruption" else e for e in scenario.entities
+    )
     spec = to_spec(replace(scenario, entities=entities), 3)
     flow = next(d for d in spec.domains if d.id == "pdc")
     pack = build_pack(spec, 3)
     reached = np.isfinite(pack.frame("pdc.arrival"))
-    assert flow.reach_limit_m < 3000.
+    assert flow.reach_limit_m < 3000.0
     assert reached.any() and distance_from(spec.grid, flow.vent)[reached].max() <= flow.reach_limit_m
 
 
@@ -215,10 +238,11 @@ def test_flows_stay_within_their_reach_limit():
 def test_gas_and_lava_build_from_a_scenario_and_someone_can_play_it():
     from stranded_physics.packs.builder import build_pack
     from stranded_physics.runtime.group import play_people
+
     scenario = load_scenario(CARDS / "st_vincent_2021_full.toml")
     pack = build_pack(to_spec(scenario, 1), 1)
     assert pack.has("gas.so2_concentration") and pack.has("lava.footprint") and pack.has("exposure.roof_failure")
-    assert pack.frame("lava.footprint", 0.).sum() > 0
-    assert pack.frame("lava.footprint", 47 * 7200.).sum() == 0  # The explosions destroyed the dome.
+    assert pack.frame("lava.footprint", 0.0).sum() > 0
+    assert pack.frame("lava.footprint", 47 * 7200.0).sum() == 0  # The explosions destroyed the dome.
     assert play_people(pack, ["classical"])[0]["steps"]
     assert {"gas", "lava", "exposure"} <= set(scenario.uses())

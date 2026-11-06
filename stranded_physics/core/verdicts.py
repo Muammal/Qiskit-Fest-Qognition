@@ -1,4 +1,5 @@
 """Honest verdicts. PASS needs a target committed before the run, and NO_TARGET is never a pass."""
+
 from __future__ import annotations
 
 import math
@@ -12,12 +13,12 @@ Z_95 = 1.959964  # Two-sided 95% normal quantile.
 def wilson_interval(successes: int, trials: int, z: float = Z_95) -> tuple[float, float]:
     """Wilson score interval for a proportion. Holds up for rare events, unlike the normal approximation."""
     if trials <= 0:
-        return 0., 1.
+        return 0.0, 1.0
     p = successes / trials
     denominator = 1 + z * z / trials
     centre = (p + z * z / (2 * trials)) / denominator
     half = z * math.sqrt(p * (1 - p) / trials + z * z / (4 * trials * trials)) / denominator
-    return max(0., centre - half), min(1., centre + half)
+    return max(0.0, centre - half), min(1.0, centre + half)
 
 
 def judge_value(value: float | None, target: float | None, tolerance: float | None) -> Verdict:
@@ -36,7 +37,7 @@ def judge_rate(successes: int, trials: int, low: float | None, high: float | Non
     if trials <= 0:
         return "NOT_RUN"
     ci_low, ci_high = wilson_interval(successes, trials)
-    floor, ceiling = (0. if low is None else low), (1. if high is None else high)
+    floor, ceiling = (0.0 if low is None else low), (1.0 if high is None else high)
     if floor <= ci_low and ci_high <= ceiling:
         return "PASS"
     if ci_high < floor or ci_low > ceiling:

@@ -13,6 +13,7 @@ eta, drawn identically in every arm, so arms are paired on seed and replicate.
 
 Outputs go to mind/results/lead_time/.
 """
+
 import argparse
 import csv
 import json
@@ -80,9 +81,14 @@ def start_tiles():
 
 def run_once(seed, replicate, arm, lead_hours, start):
     stress_offset, eta = person(seed, replicate)
-    sim = SimulationEngine(seed=seed, mind_type="classical", decide_fn=make_decider(arm, stress_offset, eta),
-                           warning_lead_override_hours=lead_hours, spawn_override=start,
-                           decision_seed=seed * 1009 + replicate)
+    sim = SimulationEngine(
+        seed=seed,
+        mind_type="classical",
+        decide_fn=make_decider(arm, stress_offset, eta),
+        warning_lead_override_hours=lead_hours,
+        spawn_override=start,
+        decision_seed=seed * 1009 + replicate,
+    )
     alive_after_flow = None
     flow = sim.volcano.first_pdc_step
     while len(sim.steps) < DEFAULT_STEPS:
@@ -95,8 +101,9 @@ def run_once(seed, replicate, arm, lead_hours, start):
         alive_after_flow = False
     sign = next((s["t"] for s in sim.steps if s["event"] in VOLCANIC), None)
     hide = next((s["t"] for s in sim.steps if s["action"] == "hide" and sign is not None and s["t"] >= sign), None)
-    return dict(survived=sim.agent.is_alive, survived_first_flow=alive_after_flow,
-                delay_steps=None if hide is None else hide - sign, cause=sim.agent.cause_of_death)
+    return dict(
+        survived=sim.agent.is_alive, survived_first_flow=alive_after_flow, delay_steps=None if hide is None else hide - sign, cause=sim.agent.cause_of_death
+    )
 
 
 def _seed_cell(args):
@@ -104,18 +111,29 @@ def _seed_cell(args):
     seed, arm, lead, distance, start, replicates = args
     rows = [run_once(seed, r, arm, lead, start) for r in range(replicates)]
     delays = [r["delay_steps"] for r in rows if r["delay_steps"] is not None]
-    return dict(seed=seed, arm=arm, lead_hours=lead, distance_tiles=distance, replicates=replicates,
-                survived=float(np.mean([r["survived"] for r in rows])),
-                survived_first_flow=float(np.mean([r["survived_first_flow"] for r in rows])),
-                delay_steps=float(np.mean(delays)) if delays else float("nan"),
-                never_hid=float(np.mean([r["delay_steps"] is None for r in rows])))
+    return dict(
+        seed=seed,
+        arm=arm,
+        lead_hours=lead,
+        distance_tiles=distance,
+        replicates=replicates,
+        survived=float(np.mean([r["survived"] for r in rows])),
+        survived_first_flow=float(np.mean([r["survived_first_flow"] for r in rows])),
+        delay_steps=float(np.mean(delays)) if delays else float("nan"),
+        never_hid=float(np.mean([r["delay_steps"] is None for r in rows])),
+    )
 
 
 def catalog_quartiles():
     with CATALOG.open(encoding="utf-8", newline="") as stream:
         values = [float(r["lead_hours"]) for r in csv.DictReader(stream) if r["lead_hours"]]
-    return dict(n=len(values), q25=float(np.percentile(values, 25)), median=float(np.median(values)),
-                q75=float(np.percentile(values, 75)), q90=float(np.percentile(values, 90)))
+    return dict(
+        n=len(values),
+        q25=float(np.percentile(values, 25)),
+        median=float(np.median(values)),
+        q75=float(np.percentile(values, 75)),
+        q90=float(np.percentile(values, 90)),
+    )
 
 
 def bootstrap_ci(by_seed, rng):
@@ -214,11 +232,22 @@ def run(seeds=SEEDS, replicates=REPLICATES, arms=ARMS, leads=LEADS_HOURS, worker
     write_csv(out_dir / "cells.csv", cells)
     write_csv(out_dir / "curves.csv", curves)
     write_csv(out_dir / "contrasts.csv", contrasts)
-    meta = dict(seeds=[seeds[0], seeds[-1]], replicates=replicates, arms=list(arms), leads_hours=list(leads),
-                distances_tiles=list(DISTANCES_TILES), start_tiles={str(k): list(v) for k, v in starts.items()},
-                stress_offset_sd=STRESS_OFFSET_SD, eta_sd=ETA_SD, eta_mean=ETA, markov_hesitation=MARKOV_HESITATION,
-                ts_hesitation=TS_HESITATION, catalog=catalog_quartiles(), runs=len(jobs) * replicates,
-                seconds=round(time.time() - began, 1))
+    meta = dict(
+        seeds=[seeds[0], seeds[-1]],
+        replicates=replicates,
+        arms=list(arms),
+        leads_hours=list(leads),
+        distances_tiles=list(DISTANCES_TILES),
+        start_tiles={str(k): list(v) for k, v in starts.items()},
+        stress_offset_sd=STRESS_OFFSET_SD,
+        eta_sd=ETA_SD,
+        eta_mean=ETA,
+        markov_hesitation=MARKOV_HESITATION,
+        ts_hesitation=TS_HESITATION,
+        catalog=catalog_quartiles(),
+        runs=len(jobs) * replicates,
+        seconds=round(time.time() - began, 1),
+    )
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=1), encoding="utf-8")
     return cells, curves, contrasts, meta
 

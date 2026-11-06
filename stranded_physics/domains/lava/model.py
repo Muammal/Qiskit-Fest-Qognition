@@ -27,7 +27,7 @@ def huppert_radius_m(flux_m3_s, viscosity_m2_s, t_s, g=9.80665):
     _nonnegative(g, "gravity")
     if np.any(nu <= 0) or np.any(np.asarray(g) <= 0):
         raise InterfaceError("positive viscosity and gravity required")
-    return SETTINGS["huppert_coefficient"] * (g*q**3/(3*nu))**(1/8) * np.sqrt(t)
+    return SETTINGS["huppert_coefficient"] * (g * q**3 / (3 * nu)) ** (1 / 8) * np.sqrt(t)
 
 
 def dome_volume_m3(flux_m3_s, t_s):
@@ -60,16 +60,16 @@ class Lava:
         return []
 
     def run(self, fields, rng):
-        x = self.grid.x0_m + (np.arange(self.grid.nx)+.5)*self.grid.dx_m-self.vent[0]
-        y = self.grid.y0_m - (np.arange(self.grid.ny)+.5)*self.grid.dx_m-self.vent[1]
+        x = self.grid.x0_m + (np.arange(self.grid.nx) + 0.5) * self.grid.dx_m - self.vent[0]
+        y = self.grid.y0_m - (np.arange(self.grid.ny) + 0.5) * self.grid.dx_m - self.vent[1]
         distance = np.hypot(*np.meshgrid(x, y))
         frames = np.zeros((self.time.n, self.grid.ny, self.grid.nx))
         destroyed = False
         for k in range(self.time.n):
-            explosion = _nonnegative(fields.get("eruption.explosion", "dimensionless", t_s=k*self.time.dt_s), "explosion")
+            explosion = _nonnegative(fields.get("eruption.explosion", "dimensionless", t_s=k * self.time.dt_s), "explosion")
             destroyed = destroyed or bool(np.any(explosion > 0))
             if not destroyed:
-                radius = dome_radius_m(SETTINGS["flux"], SETTINGS["viscosity"], self.grown_before_s+k*self.time.dt_s)
+                radius = dome_radius_m(SETTINGS["flux"], SETTINGS["viscosity"], self.grown_before_s + k * self.time.dt_s)
                 frames[k] = (distance <= radius) & (radius > 0)
         fields.put("lava.footprint", frames, "dimensionless", self.grid, self.time)
         return {}

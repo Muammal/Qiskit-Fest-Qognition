@@ -8,6 +8,7 @@ equals exactly (1-lam), so lam is a clean per-slot linear decay rate.
 Also exports continuous-time GKSL Lindblad open-system evolution
 (`lindblad_rhs`, `evolve_lindblad`) from `mind.cognition_models`.
 """
+
 import numpy as np
 
 from mind.cognition_models import evolve_lindblad, lindblad_rhs

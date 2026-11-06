@@ -1,4 +1,5 @@
 """Scenario files must refuse what they can't honour, and must reproduce the hard-coded St Vincent scenario exactly."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -16,7 +17,16 @@ HAS_RAW = (ROOT / "artifacts/physics/raw/atmos/weather_st_vincent.json").exists(
 
 
 def table(*entities, **changes):
-    base = {"id": "x", "title": "x", "place": "real", "start_utc": "2021-04-08T00:00:00+00:00", "hours": 96, "step_hours": 2, "local_utc_offset": -4, "entity": list(entities)}
+    base = {
+        "id": "x",
+        "title": "x",
+        "place": "real",
+        "start_utc": "2021-04-08T00:00:00+00:00",
+        "hours": 96,
+        "step_hours": 2,
+        "local_utc_offset": -4,
+        "entity": list(entities),
+    }
     return {**base, **changes}
 
 
@@ -35,11 +45,14 @@ def test_a_complete_scenario_passes():
     checked(TERRAIN, WEATHER, ERUPTION, PERSON, SHELTER)
 
 
-@pytest.mark.parametrize("entity, message", [
-    ({"kind": "dragon", "source": "dials"}, "dragon"),
-    ({"kind": "storm", "source": "wishes"}, "wishes"),
-    ({"source": "dials"}, "kind and a source"),
-])
+@pytest.mark.parametrize(
+    "entity, message",
+    [
+        ({"kind": "dragon", "source": "dials"}, "dragon"),
+        ({"kind": "storm", "source": "wishes"}, "wishes"),
+        ({"source": "dials"}, "kind and a source"),
+    ],
+)
 def test_unknown_kinds_and_sources_are_refused(entity, message):
     with pytest.raises(InterfaceError, match=message):
         checked(entity)
@@ -57,17 +70,17 @@ def test_an_unknown_recorded_event_is_refused():
 
 def test_a_typo_in_a_setting_is_refused_rather_than_ignored():
     with pytest.raises(InterfaceError, match="start_latt"):
-        checked(TERRAIN, WEATHER, ERUPTION, {"kind": "person", "source": "dials", "start_lon": 0., "start_latt": 0.}, SHELTER)
+        checked(TERRAIN, WEATHER, ERUPTION, {"kind": "person", "source": "dials", "start_lon": 0.0, "start_latt": 0.0}, SHELTER)
 
 
 def test_a_missing_setting_is_refused():
     with pytest.raises(InterfaceError, match="start_lat"):
-        checked(TERRAIN, WEATHER, ERUPTION, {"kind": "person", "source": "dials", "start_lon": 0.}, SHELTER)
+        checked(TERRAIN, WEATHER, ERUPTION, {"kind": "person", "source": "dials", "start_lon": 0.0}, SHELTER)
 
 
 def test_a_setting_out_of_range_is_refused_not_clamped():
     with pytest.raises(InterfaceError, match="outside"):
-        checked(TERRAIN, WEATHER, ERUPTION, {**PERSON, "start_lat": 123.}, SHELTER)
+        checked(TERRAIN, WEATHER, ERUPTION, {**PERSON, "start_lat": 123.0}, SHELTER)
 
 
 def test_an_entity_missing_what_it_depends_on_is_refused():
@@ -80,7 +93,9 @@ def test_a_person_needs_a_shelter():
         checked(TERRAIN, WEATHER, ERUPTION, PERSON)
 
 
-@pytest.mark.parametrize("changes, message", [({"place": "mars"}, "place"), ({"hours": 7}, "multiple"), ({"start_utc": "2021-04-08T00:00:00"}, "timezone"), ({"extra": 1}, "extra")])
+@pytest.mark.parametrize(
+    "changes, message", [({"place": "mars"}, "place"), ({"hours": 7}, "multiple"), ({"start_utc": "2021-04-08T00:00:00"}, "timezone"), ({"extra": 1}, "extra")]
+)
 def test_a_badly_formed_file_is_refused(changes, message):
     with pytest.raises(InterfaceError, match=message):
         parse_scenario(table(TERRAIN, **changes))
@@ -103,6 +118,7 @@ def test_st_vincent_from_a_file_matches_the_hard_coded_scenario_exactly():
     from stranded_physics.entities.build import to_spec
     from stranded_physics.packs.builder import build_pack
     from stranded_physics.packs.st_vincent_2021 import scenario as hard_coded
+
     from_file = build_pack(to_spec(load_scenario(CARDS / "st_vincent_2021.toml")), 3)
     original = build_pack(hard_coded("richmond"), 3)
     assert sorted(from_file.header["fields"]) == sorted(original.header["fields"])

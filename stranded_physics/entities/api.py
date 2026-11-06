@@ -1,4 +1,5 @@
 """What an entity is, and what a scenario file holds. Light enough for the checker and a builder screen to import."""
+
 from __future__ import annotations
 
 import tomllib
@@ -16,9 +17,26 @@ STEP_KEYS = {"step_hours", "step_minutes"}  # A scenario gives exactly one. A si
 ENTITY_KEYS = {"kind", "source", "event", "name", "mind", "what"}
 MINDS = ("quantum", "classical_mixture", "classical")
 RESOURCES = ("water", "food", "wood")
-CATEGORY_OF = {"terrain": "terrain", "weather": "atmos", "eruption": "eruption", "ash": "tephra", "flow": "pdc", "mudflow": "lahar", "gas": "gas", "lava": "lava",
-               "ship": "ship", "breach": "ship", "lifeboats": "ship", "sea": "sea", "passengers": "agent",
-               "storm": "storm", "person": "agent", "group": "agent", "shelter": "agent", "resource": "agent"}
+CATEGORY_OF = {
+    "terrain": "terrain",
+    "weather": "atmos",
+    "eruption": "eruption",
+    "ash": "tephra",
+    "flow": "pdc",
+    "mudflow": "lahar",
+    "gas": "gas",
+    "lava": "lava",
+    "ship": "ship",
+    "breach": "ship",
+    "lifeboats": "ship",
+    "sea": "sea",
+    "passengers": "agent",
+    "storm": "storm",
+    "person": "agent",
+    "group": "agent",
+    "shelter": "agent",
+    "resource": "agent",
+}
 
 
 ALSO_USES = {"ash": ("exposure",), "person": ("exposure",), "group": ("exposure",)}  # Ash builds roof failure, and people are exposed to hazards.
@@ -63,7 +81,7 @@ class ScenarioFile:
 
     @property
     def step_s(self) -> float:
-        return self.step_hours * 3600. if self.step_hours is not None else self.step_minutes * 60.
+        return self.step_hours * 3600.0 if self.step_hours is not None else self.step_minutes * 60.0
 
     def evidence_ids(self) -> frozenset[str]:
         """Which gate scenarios speak about this scenario: its own id, plus the generators it samples from."""
@@ -72,7 +90,7 @@ class ScenarioFile:
 
     def variants(self) -> dict[str, str]:
         """Categories using a model other than their first one, so each model's evidence stays with that model."""
-        return {"pdc": "t2" for e in self.entities if e.kind == "flow" and e.event == "depth_averaged"}
+        return {"pdc": "t2"} if any(e.kind == "flow" and e.event == "depth_averaged" for e in self.entities) else {}
 
     def uses(self) -> tuple[str, ...]:
         """The engine categories this scenario relies on, in order, for the checker."""
@@ -115,8 +133,17 @@ def parse_scenario(table: dict, where: str = "scenario") -> ScenarioFile:
     step_minutes = table["step_minutes"] if "step_minutes" in table else table["step_hours"] * 60
     if table["hours"] <= 0 or step_minutes <= 0 or (table["hours"] * 60) % step_minutes:
         raise InterfaceError(f"{where}: hours must be a positive multiple of the step")
-    return ScenarioFile(table["id"], table["title"], table["place"], start, table["hours"], table.get("step_hours"), table["local_utc_offset"],
-                        tuple(_entity(entry, f"{where}: entity {i + 1}") for i, entry in enumerate(table["entity"])), table.get("step_minutes"))
+    return ScenarioFile(
+        table["id"],
+        table["title"],
+        table["place"],
+        start,
+        table["hours"],
+        table.get("step_hours"),
+        table["local_utc_offset"],
+        tuple(_entity(entry, f"{where}: entity {i + 1}") for i, entry in enumerate(table["entity"])),
+        table.get("step_minutes"),
+    )
 
 
 def load_scenario(path: Path) -> ScenarioFile:
@@ -131,9 +158,15 @@ def _value(value: object) -> str:
 
 def dump_scenario(scenario: ScenarioFile) -> str:
     """The file form of a scenario. The builder screen saves through this, so screen and file can't drift apart."""
-    lines = [f"id = {_value(scenario.id)}", f"title = {_value(scenario.title)}", f"place = {_value(scenario.place)}",
-             f"start_utc = {_value(scenario.start_utc.isoformat())}", f"hours = {scenario.hours}", f"step_hours = {scenario.step_hours}" if scenario.step_hours is not None else f"step_minutes = {scenario.step_minutes}",
-             f"local_utc_offset = {scenario.local_utc_offset}"]
+    lines = [
+        f"id = {_value(scenario.id)}",
+        f"title = {_value(scenario.title)}",
+        f"place = {_value(scenario.place)}",
+        f"start_utc = {_value(scenario.start_utc.isoformat())}",
+        f"hours = {scenario.hours}",
+        f"step_hours = {scenario.step_hours}" if scenario.step_hours is not None else f"step_minutes = {scenario.step_minutes}",
+        f"local_utc_offset = {scenario.local_utc_offset}",
+    ]
     for entity in scenario.entities:
         lines += ["", "[[entity]]", f"kind = {_value(entity.kind)}", f"source = {_value(entity.source)}"]
         if entity.event is not None:

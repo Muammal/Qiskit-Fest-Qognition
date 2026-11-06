@@ -1,4 +1,5 @@
 """Sim files come from strangers on the internet, so these tests are mostly about what is refused."""
+
 import importlib.util
 import json
 from pathlib import Path
@@ -47,6 +48,7 @@ def scenario_text(draft):
 
 
 # Templates --------------------------------------------------------------------
+
 
 @pytest.mark.parametrize("name", [row[0] for row in edit.TEMPLATES])
 def test_every_template_is_valid(name):
@@ -98,6 +100,7 @@ def test_an_unplaced_person_gets_a_plain_message():
 
 # Round trip -------------------------------------------------------------------
 
+
 def test_a_sim_survives_the_round_trip():
     draft = template()
     sim = simfile.read_sim(simfile.to_bytes(draft, 7, "Ada", "An eruption"))
@@ -129,13 +132,18 @@ def test_the_file_holds_nothing_from_this_computer():
 
 # Refused ----------------------------------------------------------------------
 
-@pytest.mark.parametrize("data, reason", [
-    (b"\xff\xfe not text", "can't be read"),
-    (b"[1, 2]", "isn't a Qognition"),
-    (b'{"format": "other"}', "isn't a Qognition"),
-    (b"[" * 200_000, "can't be read"),
-    (b" " * (simfile.MAX_BYTES + 1), "too big"),
-], ids=["not text", "a list", "another format", "deep nesting", "oversized"])
+
+@pytest.mark.parametrize(
+    "data, reason",
+    [
+        (b"\xff\xfe not text", "can't be read"),
+        (b"[1, 2]", "isn't a Qognition"),
+        (b'{"format": "other"}', "isn't a Qognition"),
+        (b"[" * 200_000, "can't be read"),
+        (b" " * (simfile.MAX_BYTES + 1), "too big"),
+    ],
+    ids=["not text", "a list", "another format", "deep nesting", "oversized"],
+)
 def test_junk_is_refused(data, reason):
     with pytest.raises(InterfaceError, match=reason):
         simfile.read_sim(data)
@@ -144,6 +152,16 @@ def test_junk_is_refused(data, reason):
 def test_a_newer_file_asks_for_an_update():
     with pytest.raises(InterfaceError, match="newer version"):
         simfile.read_sim(as_bytes(envelope(version=simfile.VERSION + 1)))
+
+
+def test_new_files_carry_the_licence():
+    assert simfile.read_sim(simfile.to_bytes(template(), 7)).licence == "CC-BY-4.0"
+
+
+def test_files_from_before_licences_still_open():
+    table = envelope()
+    del table["licence"]
+    assert simfile.read_sim(as_bytes(table)).licence == ""
 
 
 def test_extra_fields_are_refused():
@@ -158,7 +176,7 @@ def test_a_changed_scenario_fails_the_hash():
         simfile.read_sim(as_bytes(table))
 
 
-@pytest.mark.parametrize("seed", [-1, 2 ** 40, "7", True, None])
+@pytest.mark.parametrize("seed", [-1, 2**40, "7", True, None])
 def test_bad_seeds_are_refused(seed):
     with pytest.raises(InterfaceError, match="seed"):
         simfile.read_sim(as_bytes(envelope(seed=seed)))
@@ -189,8 +207,9 @@ def test_an_id_cant_become_a_path():
 
 
 def test_too_many_people_is_refused():
-    draft = edit.Draft(template("mind_contest").header, tuple(
-        {**entry, "count": 300} if entry["kind"] == "group" else entry for entry in template("mind_contest").entries))
+    draft = edit.Draft(
+        template("mind_contest").header, tuple({**entry, "count": 300} if entry["kind"] == "group" else entry for entry in template("mind_contest").entries)
+    )
     with pytest.raises(InterfaceError, match="people"):
         simfile.read_sim(with_scenario(scenario_text(draft)))
 
@@ -228,6 +247,7 @@ def test_only_qsim_files_open_from_a_path(tmp_path):
 
 
 # Links ------------------------------------------------------------------------
+
 
 @pytest.mark.parametrize("url", ["http://example.com/a.qsim", "file:///C:/Windows/win.ini", "ftp://example.com/a", "https://"])
 def test_only_https_links_open(url):
@@ -272,6 +292,7 @@ def test_a_gallery_sim_must_match_the_list(monkeypatch):
 
 
 # The screen -------------------------------------------------------------------
+
 
 @pytest.fixture
 def app(tmp_path):
@@ -445,6 +466,7 @@ def test_community_rows_open_on_a_click(app, monkeypatch):
 def test_a_failed_download_is_shown_not_raised(app, monkeypatch):
     def fail():
         raise InterfaceError("Couldn't download that: no network")
+
     monkeypatch.setattr(simfile, "fetch_gallery", fail)
     click(app, "Open a file or community sim")
     click(app, "Community")
@@ -460,6 +482,7 @@ def test_the_builder_screen_text_fits_at_1080p(app):
 
 
 # Headless and the gallery ------------------------------------------------------
+
 
 def test_a_sim_file_runs_headless_and_writes_a_report(tmp_path):
     path = simfile.export_sim(template(), 4, "Ada", folder=tmp_path)
@@ -491,14 +514,47 @@ def test_the_page_cant_be_broken_by_a_title():
 
 
 def test_a_second_sim_cant_replace_a_published_one(gallery):
-    publish.add(simfile.export_sim(template(), 7, folder=gallery / "out"))
-    other = simfile.export_sim(template(), 8, folder=gallery / "out2")
+    publish.add(simfile.export_sim(template(), 7, "Ada", "An eruption", gallery / "out"))
+    other = simfile.export_sim(template(), 8, "Ada", "An eruption", gallery / "out2")
     with pytest.raises(InterfaceError, match="already in the gallery"):
         publish.add(other)
 
 
+def test_the_gallery_needs_a_description(gallery):
+    with pytest.raises(InterfaceError, match="description"):
+        publish.add(simfile.export_sim(template(), 7, "Ada", "", gallery / "out"))
+
+
+def test_the_gallery_needs_the_licence(gallery):
+    table = envelope()
+    del table["licence"]
+    path = gallery / "my_volcano_island.qsim"
+    path.write_bytes(as_bytes(table))
+    with pytest.raises(InterfaceError, match="licensed"):
+        publish.add(path)
+
+
+def test_real_places_are_flagged_for_a_closer_look():
+    real = edit.Draft({**template().header, "place": "real"}, template().entries)
+    sim = simfile.Sim(real, 1, "", "", "", False, "", "CC-BY-4.0")
+    assert publish.closer_look([(Path("a.qsim"), sim), (Path("b.qsim"), simfile.read_sim(simfile.to_bytes(template(), 1)))]) == ["a.qsim"]
+
+
+def test_removing_a_sim_and_rebuilding_keeps_the_list_right(gallery):
+    publish.add(simfile.export_sim(template(), 7, "Ada", "An eruption", gallery / "out"))
+    (publish.SIMS / "my_volcano_island.qsim").unlink()
+    assert publish.rebuild() == [] and publish.check() == []
+
+
+def test_the_licence_and_review_files_exist():
+    for name in ("LICENSE", "NOTICE", "AUTHORS", "CONTRIBUTING.md", "SECURITY.md", "community/LICENSE.txt", "community/REVIEW.md", ".github/CODEOWNERS"):
+        assert (ROOT / name).exists(), name
+    assert "Apache License" in (ROOT / "LICENSE").read_text(encoding="utf-8")
+    assert "Attribution 4.0 International" in (ROOT / "community" / "LICENSE.txt").read_text(encoding="utf-8")
+
+
 def test_check_finds_a_bad_file_and_a_stale_list(gallery):
-    publish.add(simfile.export_sim(template(), 7, folder=gallery / "out"))
+    publish.add(simfile.export_sim(template(), 7, "Ada", "An eruption", gallery / "out"))
     (publish.SIMS / "bad.qsim").write_bytes(b"nope")
     assert any("bad.qsim" in problem for problem in publish.check())
     (publish.SIMS / "bad.qsim").unlink()

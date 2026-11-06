@@ -8,6 +8,7 @@
 Numbers come from the mind, never from this file. The control line is the mixture mind
 evaluated on the same state at each step, so the two lines share one world.
 """
+
 import math
 
 import pygame

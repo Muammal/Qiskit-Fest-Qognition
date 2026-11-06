@@ -3,9 +3,11 @@
 Every figure is generated from this repo's own mind/ code at the time it
 runs - no numbers are hand-entered.
 """
+
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -80,8 +82,7 @@ def fig_bloch_paths_tremor_gas_plume(out_dir):
     fig, ax = plt.subplots(figsize=(5, 5))
     theta = np.linspace(0, 2 * np.pi, 200)
     ax.plot(np.cos(theta), np.sin(theta), color="#dddddd", linewidth=1, zorder=0)
-    for pts, color, label in [(path_a, "#6929C4", "tremor, gas_plume"),
-                               (path_b, "#D12771", "gas_plume, tremor")]:
+    for pts, color, label in [(path_a, "#6929C4", "tremor, gas_plume"), (path_b, "#D12771", "gas_plume, tremor")]:
         xs = [pt[0] for pt in pts]
         zs = [pt[2] for pt in pts]
         ax.plot(xs, zs, "-o", color=color, label=label)
@@ -98,6 +99,7 @@ def fig_bloch_paths_tremor_gas_plume(out_dir):
 
 def fig_delay_decay(out_dir, delay_json_path="mind/results/delay_experiment.json"):
     import json
+
     with open(delay_json_path, encoding="utf-8") as f:
         data = json.load(f)
 

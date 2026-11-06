@@ -1,4 +1,6 @@
-# Risks and Judge FAQ
+# Risks and FAQ
+
+_Written for the hackathon judging, and corrected since. The numbers are current._
 
 ## Risks and mitigations
 
@@ -20,7 +22,7 @@
 
 ---
 
-## Judge FAQ (prepared answers)
+## FAQ
 
 ### "Why Qiskit instead of NumPy?"
 > At this size a classical computer runs our model easily, since quantum cognition models are linear algebra. We used Qiskit because (1) the model is naturally quantum: beliefs are states, decisions are measurements, and order effects come from measurements that don't commute; (2) the same circuits could be sent to IBM hardware, although we have not done that: only `FakeTorino` simulation was run, so no part of the model's stress comes from physical decoherence; (3) richer minds scale exponentially, since many interacting beliefs need 2ⁿ amplitudes, which is where quantum hardware becomes the natural home for models like this. We don't claim a speedup today.

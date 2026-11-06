@@ -4,9 +4,10 @@
  "title": "Quantum against control",
  "author": "Qognition team",
  "description": "Two groups with different minds face the same eruption.",
- "created_utc": "2026-11-06T12:39:32+00:00",
+ "created_utc": "2026-11-06T13:22:29+00:00",
  "seed": 3,
  "needs_data_pack": false,
  "scenario": "id = \"quantum_against_control\"\ntitle = \"Quantum against control\"\nplace = \"generated\"\nstart_utc = \"2023-06-01T00:00:00+00:00\"\nhours = 96\nstep_hours = 2\nlocal_utc_offset = -4\n\n[[entity]]\nkind = \"terrain\"\nsource = \"dials\"\nsummit_m = 900.0\narea_km2 = 200.0\n\n[[entity]]\nkind = \"weather\"\nsource = \"dials\"\nrain_mm_h = 1.0\nwind_m_s = 6.0\nwind_bearing_deg = 270.0\ntemperature_c = 27.0\nupper_wind_m_s = 20.0\nupper_bearing_deg = 90.0\n\n[[entity]]\nkind = \"eruption\"\nsource = \"catalogue\"\nvent_lon = -61.1814\nvent_lat = 13.2997\n\n[[entity]]\nkind = \"ash\"\nsource = \"replay\"\n\n[[entity]]\nkind = \"flow\"\nsource = \"replay\"\ndelay_hours = 6.0\n\n[[entity]]\nkind = \"group\"\nsource = \"dials\"\nname = \"Quantum\"\nmind = \"quantum\"\ncount = 4\nradius_km = 1.0\nstart_lon = -61.2276\nstart_lat = 13.3\n\n[[entity]]\nkind = \"group\"\nsource = \"dials\"\nname = \"Control\"\nmind = \"classical_mixture\"\ncount = 4\nradius_km = 1.0\nstart_lon = -61.2276\nstart_lat = 13.3\n\n[[entity]]\nkind = \"shelter\"\nsource = \"dials\"\nname = \"The far coast\"\nlon = -61.237\nlat = 13.2676\n",
- "sha256": "3d73e1c2a1e59524ed56717f7974e58e7b58c8a3639920a2f4d2ab0ba1a59f75"
+ "sha256": "3d73e1c2a1e59524ed56717f7974e58e7b58c8a3639920a2f4d2ab0ba1a59f75",
+ "licence": "CC-BY-4.0"
 }

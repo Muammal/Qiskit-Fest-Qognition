@@ -6,6 +6,7 @@ Writes mind/human_tests/extended_results.json and docs/HUMAN_DATA_RESULTS.md.
 PRE_REGISTERED.md and contest.py are not changed: Tests 1 to 3 stand as they were
 scored. Everything here is additional, and every row is reported.
 """
+
 from __future__ import annotations
 
 import itertools
@@ -16,7 +17,7 @@ from pathlib import Path
 import numpy as np
 
 from mind.config import ETA, MARKOV_HESITATION, SUPERPOSED_PHI
-from mind.human_tests.contest import CELLS, _rows, first_order_angles, first_order_table, question_order, report
+from mind.human_tests.contest import CELLS, _rows, first_order_angles, first_order_table, report
 from mind.model import kappa_max, p_protect_closed_form, p_protect_superposed
 
 HERE = Path(__file__).resolve().parent
@@ -25,8 +26,10 @@ PHI_GRID = np.linspace(-np.pi, np.pi, 721)
 
 
 def known_rows():
-    return [dict(study=r["study"], a=float(r["known_a"]), b=float(r["known_b"]), seen=float(r["unknown"]),
-                 scored=r["scored"] == "yes") for r in _rows("disjunction.csv")]
+    return [
+        dict(study=r["study"], a=float(r["known_a"]), b=float(r["known_b"]), seen=float(r["unknown"]), scored=r["scored"] == "yes")
+        for r in _rows("disjunction.csv")
+    ]
 
 
 def markov_prediction(row, hesitation):
@@ -51,8 +54,14 @@ def markov_split_half(rows):
             errors.append(float(np.mean([abs(markov_prediction(r, hesitation) - r["seen"]) for r in held])))
             for r in held:
                 per_row[r["study"]].append(markov_prediction(r, hesitation))
-    return dict(splits=len(fits), h_median=float(np.median(fits)), h_min=min(fits), h_max=max(fits),
-                held_out_error=float(np.mean(errors)), prediction={k: float(np.mean(v)) for k, v in per_row.items()})
+    return dict(
+        splits=len(fits),
+        h_median=float(np.median(fits)),
+        h_min=min(fits),
+        h_max=max(fits),
+        held_out_error=float(np.mean(errors)),
+        prediction={k: float(np.mean(v)) for k, v in per_row.items()},
+    )
 
 
 def study_eta(row):
@@ -63,7 +72,7 @@ def study_eta(row):
 
 
 def predict_eta(row, eta):
-    return float(p_protect_closed_form(.5, 1., row["a"], row["b"], eta))
+    return float(p_protect_closed_form(0.5, 1.0, row["a"], row["b"], eta))
 
 
 def eta_leave_one_out(rows):
@@ -72,13 +81,22 @@ def eta_leave_one_out(rows):
         others = [study_eta(r)[1] for j, r in enumerate(rows) if j != i]
         eta = float(np.mean(others))
         raw, clipped = study_eta(row)
-        out.append(dict(study=row["study"], eta_exact=raw, eta_usable=clipped, blocked=abs(raw) > 1,
-                        own_eta_prediction=predict_eta(row, clipped), eta_from_others=eta, loo_prediction=predict_eta(row, eta)))
+        out.append(
+            dict(
+                study=row["study"],
+                eta_exact=raw,
+                eta_usable=clipped,
+                blocked=abs(raw) > 1,
+                own_eta_prediction=predict_eta(row, clipped),
+                eta_from_others=eta,
+                loo_prediction=predict_eta(row, eta),
+            )
+        )
     return out
 
 
 def fit_phi(rows):
-    errors = [np.mean([abs(p_protect_superposed(.5, 1., r["a"], r["b"], ETA, phi) - r["seen"]) for r in rows]) for phi in PHI_GRID]
+    errors = [np.mean([abs(p_protect_superposed(0.5, 1.0, r["a"], r["b"], ETA, phi) - r["seen"]) for r in rows]) for phi in PHI_GRID]
     return float(PHI_GRID[int(np.argmin(errors))])
 
 
@@ -86,10 +104,17 @@ def phi_leave_one_out(rows):
     out = []
     for i, row in enumerate(rows):
         phi = fit_phi([r for j, r in enumerate(rows) if j != i])
-        reach = [p_protect_superposed(.5, 1., row["a"], row["b"], ETA, value) for value in PHI_GRID]
-        out.append(dict(study=row["study"], phi_from_others=phi, loo_prediction=float(p_protect_superposed(.5, 1., row["a"], row["b"], ETA, phi)),
-                        reach_low=float(min(reach)), reach_high=float(max(reach)),
-                        bound_low=float((row["a"] + row["b"]) / 2 - np.sqrt((1 - row["a"]) * (1 - row["b"])))))
+        reach = [p_protect_superposed(0.5, 1.0, row["a"], row["b"], ETA, value) for value in PHI_GRID]
+        out.append(
+            dict(
+                study=row["study"],
+                phi_from_others=phi,
+                loo_prediction=float(p_protect_superposed(0.5, 1.0, row["a"], row["b"], ETA, phi)),
+                reach_low=float(min(reach)),
+                reach_high=float(max(reach)),
+                bound_low=float((row["a"] + row["b"]) / 2 - np.sqrt((1 - row["a"]) * (1 - row["b"]))),
+            )
+        )
     return out
 
 
@@ -99,7 +124,7 @@ def first_order_fit():
     for row in _rows("question_order.csv"):
         ab = np.array([float(row["ab_" + cell]) for cell in CELLS])
         a, b = first_order_angles(ab)
-        fit_gap = .5 * float(np.abs(first_order_table(a, b) - ab).sum())
+        fit_gap = 0.5 * float(np.abs(first_order_table(a, b) - ab).sum())
         out[row["study"]] = dict(fit_tvd=fit_gap, p_b_given_a=float(ab[0] / (ab[0] + ab[1])), p_notb_given_nota=float(ab[3] / (ab[2] + ab[3])))
     return out
 
@@ -121,10 +146,23 @@ def analyse():
     rows = []
     for row, eta, phi in zip(scored, etas, phis):
         base = by_study[row["study"]]
-        rows.append(dict(study=row["study"], a=row["a"], b=row["b"], observed=row["seen"], quantum_fixed=base["quantum"],
-                         classical_average=base["classical_average"], classical_best=base["classical_best"],
-                         markov_held_out=markov["prediction"][row["study"]], **{k: eta[k] for k in ("eta_exact", "blocked", "own_eta_prediction", "eta_from_others", "loo_prediction")},
-                         superposed_loo=phi["loo_prediction"], superposed_reach_low=phi["reach_low"], superposed_reach_high=phi["reach_high"], unitary_bound_low=phi["bound_low"]))
+        rows.append(
+            dict(
+                study=row["study"],
+                a=row["a"],
+                b=row["b"],
+                observed=row["seen"],
+                quantum_fixed=base["quantum"],
+                classical_average=base["classical_average"],
+                classical_best=base["classical_best"],
+                markov_held_out=markov["prediction"][row["study"]],
+                **{k: eta[k] for k in ("eta_exact", "blocked", "own_eta_prediction", "eta_from_others", "loo_prediction")},
+                superposed_loo=phi["loo_prediction"],
+                superposed_reach_low=phi["reach_low"],
+                superposed_reach_high=phi["reach_high"],
+                unitary_bound_low=phi["bound_low"],
+            )
+        )
     scores = dict(
         quantum_fixed_eta=mae((r["quantum_fixed"], r["observed"]) for r in rows),
         classical_average=mae((r["classical_average"], r["observed"]) for r in rows),
@@ -134,8 +172,19 @@ def analyse():
         per_study_eta_loo=mae((r["loo_prediction"], r["observed"]) for r in rows),
         superposed_loo=mae((r["superposed_loo"], r["observed"]) for r in rows),
     )
-    return dict(eta=ETA, rows=rows, markov=markov, scores=scores, final_phi=final_phi, config_phi=SUPERPOSED_PHI, config_markov=MARKOV_HESITATION,
-                test2=two, first_order_fit=fit, summary=summary, not_scored=[r for r in one if not r["scored"]])
+    return dict(
+        eta=ETA,
+        rows=rows,
+        markov=markov,
+        scores=scores,
+        final_phi=final_phi,
+        config_phi=SUPERPOSED_PHI,
+        config_markov=MARKOV_HESITATION,
+        test2=two,
+        first_order_fit=fit,
+        summary=summary,
+        not_scored=[r for r in one if not r["scored"]],
+    )
 
 
 def render(result):
@@ -157,8 +206,10 @@ def render(result):
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for r in result["rows"]:
-        lines.append(f"| {r['study']} | {r['observed']:.2f} | {r['quantum_fixed']:.3f} | {r['classical_average']:.3f} | {r['classical_best']:.3f} | "
-                     f"{r['markov_held_out']:.3f} | {r['loo_prediction']:.3f} | {r['superposed_loo']:.3f} |")
+        lines.append(
+            f"| {r['study']} | {r['observed']:.2f} | {r['quantum_fixed']:.3f} | {r['classical_average']:.3f} | {r['classical_best']:.3f} | "
+            f"{r['markov_held_out']:.3f} | {r['loo_prediction']:.3f} | {r['superposed_loo']:.3f} |"
+        )
     lines += [
         f"| **Mean absolute error** | | **{s['quantum_fixed_eta']:.3f}** | **{s['classical_average']:.3f}** | **{s['classical_best']:.3f}** | "
         f"**{s['markov_held_out']:.3f}** | **{s['per_study_eta_loo']:.3f}** | **{s['superposed_loo']:.3f}** |",
@@ -186,7 +237,9 @@ def render(result):
         "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for r in result["rows"]:
-        lines.append(f"| {r['study']} | {r['eta_exact']:+.2f} | {'yes' if r['blocked'] else 'no'} | {r['own_eta_prediction']:.3f} | {r['eta_from_others']:+.3f} | {r['loo_prediction']:.3f} | {r['observed']:.2f} |")
+        lines.append(
+            f"| {r['study']} | {r['eta_exact']:+.2f} | {'yes' if r['blocked'] else 'no'} | {r['own_eta_prediction']:.3f} | {r['eta_from_others']:+.3f} | {r['loo_prediction']:.3f} | {r['observed']:.2f} |"
+        )
     blocked = sum(r["blocked"] for r in result["rows"])
     lines += [
         "",
@@ -202,7 +255,9 @@ def render(result):
         "| --- | --- | --- | --- | --- |",
     ]
     for r in result["rows"]:
-        lines.append(f"| {r['study']} | {r['observed']:.2f} | {r['unitary_bound_low']:.3f} | {r['superposed_reach_low']:.3f} | {r['superposed_reach_high']:.3f} |")
+        lines.append(
+            f"| {r['study']} | {r['observed']:.2f} | {r['unitary_bound_low']:.3f} | {r['superposed_reach_low']:.3f} | {r['superposed_reach_high']:.3f} |"
+        )
     lines += [
         "",
         f"The one φ fitted on all seven rows is {result['final_phi']:+.3f} rad, stored as `SUPERPOSED_PHI`.",
@@ -222,7 +277,9 @@ def render(result):
     ]
     for r in test2:
         f = fit[r["study"]]
-        lines.append(f"| {r['study']} | {r['tvd_classical']:.3f} | {r['tvd_quantum_mean']:.3f} | {r['tvd_quantum_better']:.3f} | {f['fit_tvd']:.3f} | {f['p_b_given_a']:.2f} | {f['p_notb_given_nota']:.2f} |")
+        lines.append(
+            f"| {r['study']} | {r['tvd_classical']:.3f} | {r['tvd_quantum_mean']:.3f} | {r['tvd_quantum_better']:.3f} | {f['fit_tvd']:.3f} | {f['p_b_given_a']:.2f} | {f['p_notb_given_nota']:.2f} |"
+        )
     two = result["summary"]["test2"]
     three = result["summary"]["test3"]
     lines += [
@@ -236,9 +293,16 @@ def render(result):
         "| Study | q | z | QQ equality holds | No order effect holds |",
         "| --- | --- | --- | --- | --- |",
     ]
-    lines += [f"| {r['study']} | {r['q']:+.3f} | {r['z']:+.2f} | {'yes' if r['qq_survives'] else 'no'} | {'yes' if r['no_order_effect_survives'] else 'no'} |" for r in test2]
-    lines += ["", f"QQ equality survives {three['qq_survives']} of {three['rows']}. No order effect survives {three['no_order_effect_survives']} of {three['rows']}. "
-              "No order effect implies q = 0, so the classical claim is the stronger bet, and these are not the same size of bet.", ""]
+    lines += [
+        f"| {r['study']} | {r['q']:+.3f} | {r['z']:+.2f} | {'yes' if r['qq_survives'] else 'no'} | {'yes' if r['no_order_effect_survives'] else 'no'} |"
+        for r in test2
+    ]
+    lines += [
+        "",
+        f"QQ equality survives {three['qq_survives']} of {three['rows']}. No order effect survives {three['no_order_effect_survives']} of {three['rows']}. "
+        "No order effect implies q = 0, so the classical claim is the stronger bet, and these are not the same size of bet.",
+        "",
+    ]
     return "\n".join(lines)
 
 

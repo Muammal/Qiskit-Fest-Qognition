@@ -5,9 +5,9 @@
 Writes mind/results/time_aware.json. The crowd scenarios decide every step, or every
 `decision_seconds` at Waterloo, so one slot is 2 h, 5 min, 15 min or 1 min.
 """
+
 import json
 from concurrent.futures import ProcessPoolExecutor
-from functools import partial
 from pathlib import Path
 
 import contracts  # noqa: F401  (must load before mind; see conftest.py)
@@ -54,8 +54,9 @@ def volcano_seed(seed):
     out = {}
     for mode, fn in deciders().items():
         timeline = SimulationEngine(seed=seed, decide_fn=fn).run()
-        out[mode] = dict(survived=timeline["outcome"] == "survived", delay=evacuation_delay(timeline["steps"], VOLCANIC),
-                         actions=[s["action"] for s in timeline["steps"]])
+        out[mode] = dict(
+            survived=timeline["outcome"] == "survived", delay=evacuation_delay(timeline["steps"], VOLCANIC), actions=[s["action"] for s in timeline["steps"]]
+        )
     return out
 
 
@@ -69,9 +70,9 @@ def main():
         volcano = list(pool.map(volcano_seed, range(200), chunksize=4))
         scenario_rows = list(pool.map(_job, [(n, m) for n in ("titanic", "pompeii", "waterloo") for m in deciders()]))
     identical = all(r["per_slot"]["actions"] == r["per_time"]["actions"] for r in volcano)
-    result = dict(volcano=dict(seeds=200, identical_actions=identical,
-                               survival={m: sum(r[m]["survived"] for r in volcano) / 200 for m in deciders()}),
-                  scenarios={})
+    result = dict(
+        volcano=dict(seeds=200, identical_actions=identical, survival={m: sum(r[m]["survived"] for r in volcano) / 200 for m in deciders()}), scenarios={}
+    )
     for name, mode, row in scenario_rows:
         result["scenarios"].setdefault(name, {})[mode] = row
     OUT.write_text(json.dumps(result, indent=1), encoding="utf-8")

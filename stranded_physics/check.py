@@ -5,6 +5,7 @@
 Exits nonzero when a part has no model, or a model has not passed its own tests. A passing check doesn't mean a scenario is true:
 it says which claims have evidence. Agreement with reality counts only for the place a gate measured, and never carries over.
 """
+
 from __future__ import annotations
 
 import sys
@@ -108,8 +109,17 @@ def assess(category: str, card_id: str | frozenset[str], variant: str | None = N
     rows = [(gate, gates.current_verdict(category, gate)) for gate in gates.load_gates(category)]
     filed = sort_gates(rows, card_id, variant)
     parameters = load_parameters(gates.DOMAINS / category / "params.toml")
-    return PartReport(category, has_model(category), verification_status(filed["verification"]), tuple(filed["agrees"]), tuple(filed["disagrees"]),
-                      tuple(filed["anchors_failing"]), tuple(filed["unscored"]), sum(p.status == "assumption" for p in parameters), len(parameters))
+    return PartReport(
+        category,
+        has_model(category),
+        verification_status(filed["verification"]),
+        tuple(filed["agrees"]),
+        tuple(filed["disagrees"]),
+        tuple(filed["anchors_failing"]),
+        tuple(filed["unscored"]),
+        sum(p.status == "assumption" for p in parameters),
+        len(parameters),
+    )
 
 
 def overall(parts: list[PartReport]) -> str:
@@ -126,12 +136,22 @@ def overall(parts: list[PartReport]) -> str:
 
 
 def report(card: Card, parts: list[PartReport]) -> str:
-    lines = [f"Scenario: {card.title} ({card.id}), {card.place} place", "",
-             f"{'Part':<10}{'Model':<7}{'Own tests':<11}{'Agrees':<8}{'Disagrees':<11}Assumed values"]
+    lines = [
+        f"Scenario: {card.title} ({card.id}), {card.place} place",
+        "",
+        f"{'Part':<10}{'Model':<7}{'Own tests':<11}{'Agrees':<8}{'Disagrees':<11}Assumed values",
+    ]
     for part in parts:
-        lines.append(f"{part.category:<10}{'yes' if part.has_model else 'NO':<7}{part.verification:<11}{len(part.agrees):<8}{len(part.disagrees):<11}{part.assumptions} of {part.parameters}")
+        lines.append(
+            f"{part.category:<10}{'yes' if part.has_model else 'NO':<7}{part.verification:<11}{len(part.agrees):<8}{len(part.disagrees):<11}{part.assumptions} of {part.parameters}"
+        )
     lines += ["", f"Result: {overall(parts)}"]
-    for label, attribute in (("Agrees with reality", "agrees"), ("Disagrees with reality", "disagrees"), ("Reference checks failing", "anchors_failing"), ("Reported, not scored", "unscored")):
+    for label, attribute in (
+        ("Agrees with reality", "agrees"),
+        ("Disagrees with reality", "disagrees"),
+        ("Reference checks failing", "anchors_failing"),
+        ("Reported, not scored", "unscored"),
+    ):
         items = [f"  {part.category}: {item}" for part in parts for item in getattr(part, attribute)]
         if items:
             lines += ["", f"{label}:", *items]

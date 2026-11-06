@@ -4,6 +4,7 @@ Consolidates everything that was previously local to mind/belief.py and
 mind/decoherence.py, per the Stage 4 goal. Those modules re-export the
 names tests already import from them (see mind/tests/test_belief.py).
 """
+
 import numpy as np
 
 from contracts import ACTIONS
@@ -14,8 +15,14 @@ CARRY_ON = [a for a in ACTIONS if a not in PROTECT]
 
 # Threat events stripped out of cf_safe / folded into cf_danger (Section 4.2).
 THREAT_EVENTS = {
-    "storm", "animal", "injury", "cold_night",
-    "tremor", "gas_plume", "eruption", "ash_fall",
+    "storm",
+    "animal",
+    "injury",
+    "cold_night",
+    "tremor",
+    "gas_plume",
+    "eruption",
+    "ash_fall",
 }
 
 # Section 4.4: event -> (rotation axis, angle). No angle is +-pi/2.

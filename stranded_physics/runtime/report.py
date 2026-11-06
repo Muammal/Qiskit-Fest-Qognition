@@ -1,4 +1,5 @@
 """Runs a sim file without a window and writes its end-of-event report."""
+
 from __future__ import annotations
 
 from engine.report import build_report, export_report, report_name
@@ -19,6 +20,10 @@ def report_sim(source: str, mind: str | None = None, out_dir=None) -> tuple:
     engine = game.simulation(mind)
     engine.run()
     report = build_report("volcano", engine, mind, sim.seed, title=sim.title, horizon=game.pack.time.n)
-    report["Summary"] = report["Summary"] + [dict(field="Sim file hash", value=sim.sha256), dict(field="Made by", value=sim.author or "Anonymous"),
-                                             dict(field="Checked by", value="Nobody. Community sims are not validated")]
+    report["Summary"] = report["Summary"] + [
+        dict(field="Sim file hash", value=sim.sha256),
+        dict(field="Made by", value=sim.author or "Anonymous"),
+        dict(field="Licence", value=sim.licence or "Not stated"),
+        dict(field="Checked by", value="Nobody. Community sims are not validated"),
+    ]
     return export_report(report, report_name(str(sim.draft.header["id"]), sim.seed, mind), out_dir)

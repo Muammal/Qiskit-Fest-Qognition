@@ -1,5 +1,5 @@
 """
-contracts.py - Frozen Interfaces and Stubs for Stranded
+contracts.py - Frozen interfaces and stubs for Qognition
 Owned by Tech C (Integration, Contracts, Engine).
 
 Agreed Tuesday. All team members code against these contracts.
@@ -7,7 +7,7 @@ Nobody waits on anybody; use stubs until actual modules are plugged in.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 import json
 import math
 import random
@@ -15,33 +15,11 @@ import random
 # -----------------------------------------------------------------------------
 # Constants & Enums
 # -----------------------------------------------------------------------------
-ACTIONS: List[str] = [
-    "forage",
-    "drink",
-    "build_shelter",
-    "rest",
-    "explore",
-    "craft",
-    "hide"
-]
+ACTIONS: List[str] = ["forage", "drink", "build_shelter", "rest", "explore", "craft", "hide"]
 
-EVENTS: List[str] = [
-    "storm",
-    "injury",
-    "find_food",
-    "animal",
-    "cold_night",
-    "none",
-    "tremor", "gas_plume", "eruption", "ash_fall"
-]
+EVENTS: List[str] = ["storm", "injury", "find_food", "animal", "cold_night", "none", "tremor", "gas_plume", "eruption", "ash_fall"]
 
-TILE_TYPES: Dict[int, str] = {
-    0: "water",
-    1: "plains",
-    2: "forest",
-    3: "mountain",
-    4: "shelter"
-}
+TILE_TYPES: Dict[int, str] = {0: "water", 1: "plains", 2: "forest", 3: "mountain", 4: "shelter"}
 
 PRIORS_PATH = Path(__file__).resolve().parent / "data" / "priors.json"
 try:
@@ -87,6 +65,7 @@ def validate_decision(decision: Dict[str, Any]) -> bool:
 # -----------------------------------------------------------------------------
 # Function Implementations & Fallbacks (Tech A and Tech B)
 # -----------------------------------------------------------------------------
+
 
 def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
     """Tech B responsibility: flat weights plus hand-set homeostatic urgency boosts.
@@ -140,7 +119,7 @@ def get_prior(state: Dict[str, Any]) -> Dict[str, float]:
     if any(e in ("tremor", "gas_plume", "eruption", "ash_fall") for e in state["recent_events"]):
         raw_priors["hide"] += 6.0
 
-    if needs["energy"] < .3:
+    if needs["energy"] < 0.3:
         raw_priors["rest"] += 15.0
     total = sum(raw_priors.values())
     return {k: round(v / total, 4) for k, v in raw_priors.items()}
@@ -155,7 +134,7 @@ def classical_decide(state: Dict[str, Any]) -> Dict[str, Any]:
     decision = {
         "action": chosen_action,
         "probs": priors,
-        "reason": f"Classical stub choice: highest prior utility for {chosen_action} (p={priors[chosen_action]:.2f})"
+        "reason": f"Classical stub choice: highest prior utility for {chosen_action} (p={priors[chosen_action]:.2f})",
     }
     validate_decision(decision)
     return decision
@@ -176,10 +155,10 @@ def _quantum_decide_stub(state: Dict[str, Any]) -> Dict[str, Any]:
         prior_event = recent[-2] if len(recent) > 1 else "none"
 
         if last_event == "gas_plume" and prior_event == "tremor":
-            probs["hide"] += .45
+            probs["hide"] += 0.45
             reason = "Stub Order effect: tremor then gas plume strengthens evacuation preference"
         elif last_event == "tremor" and prior_event == "gas_plume":
-            probs["rest"] += .3
+            probs["rest"] += 0.3
             reason = "Stub Order effect: gas plume then tremor favours recovery"
         elif last_event == "storm" and prior_event == "injury":
             probs["hide"] = round(probs.get("hide", 0.1) + 0.45, 4)
@@ -210,19 +189,15 @@ def _quantum_decide_stub(state: Dict[str, Any]) -> Dict[str, Any]:
         reason += f" [Decoherence: stress {stress:.2f} washes out {pct_decay}% quantum interference]"
 
     chosen_action = max(norm_probs, key=norm_probs.get)
-    if state["needs"]["thirst"] < .3:
+    if state["needs"]["thirst"] < 0.3:
         chosen_action = "drink"
-    elif state["needs"]["warmth"] < .4:
+    elif state["needs"]["warmth"] < 0.4:
         if state.get("inventory", {}).get("wood", 0) >= 2:
             chosen_action = "build_shelter"
         else:
             chosen_action = "forage"
 
-    decision = {
-        "action": chosen_action,
-        "probs": norm_probs,
-        "reason": "Stub: " + reason
-    }
+    decision = {"action": chosen_action, "probs": norm_probs, "reason": "Stub: " + reason}
     validate_decision(decision)
     return decision
 
@@ -243,6 +218,7 @@ def quantum_decide(state: Dict[str, Any]) -> Dict[str, Any]:
     if _quantum_decide_impl is None:
         try:
             from mind.quantum_mind import quantum_decide as _impl
+
             _quantum_decide_impl = _impl
         except ImportError:
             pass

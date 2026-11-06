@@ -15,6 +15,7 @@ A report is a set of named tables built from the finished run:
 
 Nothing here feeds back into a run. All of it is model output, not a prediction.
 """
+
 import csv
 import re
 import subprocess
@@ -29,35 +30,60 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DIR = ROOT / "exports" / "reports"
 CROWD = ("titanic", "pompeii", "waterloo")
 MIND_NAMES = {"quantum": "2-qubit quantum mind", "classical_mixture": "Mixture control (λ=1)", "classical": "Classical argmax"}
-SCENARIO_NAMES = dict(island="Island wilderness", volcano="Volcano evacuation", titanic="Titanic evacuation, April 1912",
-                      pompeii="Pompeii evacuation, AD 79", waterloo="Waterloo chlorine leak (hypothetical)")
+SCENARIO_NAMES = dict(
+    island="Island wilderness",
+    volcano="Volcano evacuation",
+    titanic="Titanic evacuation, April 1912",
+    pompeii="Pompeii evacuation, AD 79",
+    waterloo="Waterloo chlorine leak (hypothetical)",
+)
 SHEET_ORDER = ("Summary", "Key events", "Timeline", "Crowd over time", "Groups", "Decisions", "Paired run", "Assumptions")
 
 # The cue translation is an assumption: which model event a real-world cue reaches the mind as.
 # (button, event_mapping value, what it assumes).
 CUE_TRANSLATIONS = {
-    "titanic": (("A", "default", "Rockets read as certain danger, steward warnings as ambiguous"),
-                ("B", "ambiguous_rockets", "Rockets read as ambiguous, like steward warnings"),
-                ("C", "early_pa_alarm", "Steward warnings and crew orders read as certain danger")),
-    "pompeii": (("A", "A", "Column and falling pumice both read as certain danger"),
-                ("B", "B", "Column ambiguous, pumice certain (the most literal)"),
-                ("C", "C", "Column and pumice both ambiguous, as a gas plume"),
-                ("D", "D", "Column and pumice both ambiguous, as a tremor")),
-    "waterloo": (("A", "A", "Every cue ambiguous, including the alarm"),
-                 ("B", "B", "Alarm read as certain danger, other cues ambiguous"),
-                 ("C", "C", "A milder reading: smell and talk as tremors, alarm ambiguous")),
+    "titanic": (
+        ("A", "default", "Rockets read as certain danger, steward warnings as ambiguous"),
+        ("B", "ambiguous_rockets", "Rockets read as ambiguous, like steward warnings"),
+        ("C", "early_pa_alarm", "Steward warnings and crew orders read as certain danger"),
+    ),
+    "pompeii": (
+        ("A", "A", "Column and falling pumice both read as certain danger"),
+        ("B", "B", "Column ambiguous, pumice certain (the most literal)"),
+        ("C", "C", "Column and pumice both ambiguous, as a gas plume"),
+        ("D", "D", "Column and pumice both ambiguous, as a tremor"),
+    ),
+    "waterloo": (
+        ("A", "A", "Every cue ambiguous, including the alarm"),
+        ("B", "B", "Alarm read as certain danger, other cues ambiguous"),
+        ("C", "C", "A milder reading: smell and talk as tremors, alarm ambiguous"),
+    ),
 }
 TITANIC_HISTORY = dict(first=201, second=118, third=181)  # saved; Wikipedia casualty table, as shown in the debrief
 TITANIC_CREW_HISTORY = 212
 TITANIC_GROUPS = dict(first="First-class passengers", second="Second-class passengers", third="Third-class passengers")
 EVENT_LABELS = dict(
-    first_sign_step="First sign reached the person", first_evacuating_step="Person first chose to evacuate", left_danger_step="Left the danger zone",
-    reached_safe_step="Reached the safe zone", reached_assembly_step="Reached an assembly point", boarded_step="Boarded a lifeboat",
-    left_town_step="Left the town", onset_step="Hazard onset", first_pdc_step="First pyroclastic flow", sink_step="Ship gone from view",
-    first_city_flow_step="First flow in the town")
-VALUE_LABELS = dict(warning_lead_hours=("Warning lead", "h"), margin_hours=("Margin before the first flow", "h"), first_knew=("First person knew, after the leak", "s"),
-                    alarm=("Alarm, after the leak", "s"), first_off_site=("First person off site, after the leak", "s"),
-                    half_off_site=("Half off site, after the leak", "s"), all_off_site=("Everyone off site, after the leak", "s"))
+    first_sign_step="First sign reached the person",
+    first_evacuating_step="Person first chose to evacuate",
+    left_danger_step="Left the danger zone",
+    reached_safe_step="Reached the safe zone",
+    reached_assembly_step="Reached an assembly point",
+    boarded_step="Boarded a lifeboat",
+    left_town_step="Left the town",
+    onset_step="Hazard onset",
+    first_pdc_step="First pyroclastic flow",
+    sink_step="Ship gone from view",
+    first_city_flow_step="First flow in the town",
+)
+VALUE_LABELS = dict(
+    warning_lead_hours=("Warning lead", "h"),
+    margin_hours=("Margin before the first flow", "h"),
+    first_knew=("First person knew, after the leak", "s"),
+    alarm=("Alarm, after the leak", "s"),
+    first_off_site=("First person off site, after the leak", "s"),
+    half_off_site=("Half off site, after the leak", "s"),
+    all_off_site=("Everyone off site, after the leak", "s"),
+)
 
 
 def clock_at(scenario, t, state=None):
@@ -67,9 +93,11 @@ def clock_at(scenario, t, state=None):
         return f"{minutes // 60 % 24:02d}:{minutes % 60:02d}"
     if scenario == "pompeii":
         from engine.gui_city import clock_text
+
         return clock_text(t)
     if scenario == "waterloo":
         from engine.gui_site import clock_text
+
         return clock_text(t)
     hours = 8 + t * 2
     return f"Day {hours // 24 + 1} {hours % 24:02d}:00"
@@ -87,14 +115,34 @@ def _timeline_rows(scenario, steps):
         needs = state.get("needs") or {}
         quantum = record.get("quantum") or {}
         position = record.get("pos_after") or [None, None]
-        row = dict(step=record["t"], clock=clock_at(scenario, record["t"]), phase=record.get("phase"), event=record.get("event"),
-                   story=record.get("story", ""), action=record.get("action"), action_label=record.get("action_label", ""),
-                   status=record.get("status", ""), x=position[0], y=position[1],
-                   stress=state.get("stress"), injured=state.get("injured"), recent_cues=" > ".join(state.get("recent_events", [])))
+        row = dict(
+            step=record["t"],
+            clock=clock_at(scenario, record["t"]),
+            phase=record.get("phase"),
+            event=record.get("event"),
+            story=record.get("story", ""),
+            action=record.get("action"),
+            action_label=record.get("action_label", ""),
+            status=record.get("status", ""),
+            x=position[0],
+            y=position[1],
+            stress=state.get("stress"),
+            injured=state.get("injured"),
+            recent_cues=" > ".join(state.get("recent_events", [])),
+        )
         for need in ("hunger", "thirst", "warmth", "energy", "safety", "morale"):
             row[need] = needs.get(need)
-        for key, name in (("p_danger", "p_danger"), ("p_protect", "p_protect"), ("p_classical", "p_classical"), ("coherence", "coherence_x"),
-                          ("lam", "lambda"), ("q_safe", "q_safe"), ("q_danger", "q_danger"), ("order_gap", "order_gap"), ("reflex", "reflex")):
+        for key, name in (
+            ("p_danger", "p_danger"),
+            ("p_protect", "p_protect"),
+            ("p_classical", "p_classical"),
+            ("coherence", "coherence_x"),
+            ("lam", "lambda"),
+            ("q_safe", "q_safe"),
+            ("q_danger", "q_danger"),
+            ("order_gap", "order_gap"),
+            ("reflex", "reflex"),
+        ):
             row[name] = quantum.get(key)
         row["p_hide"] = (record.get("probs") or {}).get("hide")
         row["reason"] = record.get("reason", "")
@@ -119,8 +167,7 @@ def _decision_rows(steps):
         if record.get("action_label"):
             labels.setdefault(record["action"], record["action_label"])
     total = sum(tally.values()) or 1
-    return [dict(action=action, label=labels.get(action, action), times_chosen=count, share=round(count / total, 4))
-            for action, count in tally.most_common()]
+    return [dict(action=action, label=labels.get(action, action), times_chosen=count, share=round(count / total, 4)) for action, count in tally.most_common()]
 
 
 def _group_rows(scenario, engine):
@@ -129,17 +176,42 @@ def _group_rows(scenario, engine):
         rows = []
         for key, name in TITANIC_GROUPS.items():
             row = table.get(key, dict(aboard=0, saved=0))
-            rows.append(dict(group=name, people=row["aboard"], survived=row["saved"], survival_rate=round(row["saved"] / max(1, row["aboard"]), 4), history_saved=TITANIC_HISTORY[key]))
+            rows.append(
+                dict(
+                    group=name,
+                    people=row["aboard"],
+                    survived=row["saved"],
+                    survival_rate=round(row["saved"] / max(1, row["aboard"]), 4),
+                    history_saved=TITANIC_HISTORY[key],
+                )
+            )
         crew = [row for key, row in table.items() if key not in TITANIC_GROUPS]
         aboard, saved = sum(r["aboard"] for r in crew), sum(r["saved"] for r in crew)
         rows.append(dict(group="Crew", people=aboard, survived=saved, survival_rate=round(saved / max(1, aboard), 4), history_saved=TITANIC_CREW_HISTORY))
         return rows
     if scenario == "pompeii":
-        return [dict(group=role.replace("_", " ").capitalize(), people=row["total"], survived=row["survived"],
-                     survival_rate=round(row["survived"] / max(1, row["total"]), 4)) for role, row in engine.outcome_table().items()]
+        return [
+            dict(
+                group=role.replace("_", " ").capitalize(),
+                people=row["total"],
+                survived=row["survived"],
+                survival_rate=round(row["survived"] / max(1, row["total"]), 4),
+            )
+            for role, row in engine.outcome_table().items()
+        ]
     if scenario == "waterloo":
-        return [dict(group=role.capitalize(), people=row["total"], off_site=row["off_site"], off_site_rate=round(row["off_site"] / max(1, row["total"]), 4),
-                     reached_aegl1=row["levels"]["1"], reached_aegl2=row["levels"]["2"], reached_aegl3=row["levels"]["3"]) for role, row in engine.outcome_table().items()]
+        return [
+            dict(
+                group=role.capitalize(),
+                people=row["total"],
+                off_site=row["off_site"],
+                off_site_rate=round(row["off_site"] / max(1, row["total"]), 4),
+                reached_aegl1=row["levels"]["1"],
+                reached_aegl2=row["levels"]["2"],
+                reached_aegl3=row["levels"]["3"],
+            )
+            for role, row in engine.outcome_table().items()
+        ]
     return []
 
 
@@ -148,7 +220,14 @@ def _key_event_rows(scenario, engine, timeline):
     evacuation = timeline.get("evacuation") or {}
     for key, value in evacuation.items():
         if key in EVENT_LABELS:
-            rows.append(dict(event=EVENT_LABELS[key], step=value, when=None if value is None else clock_at(scenario, value), detail="" if value is not None else "Did not happen"))
+            rows.append(
+                dict(
+                    event=EVENT_LABELS[key],
+                    step=value,
+                    when=None if value is None else clock_at(scenario, value),
+                    detail="" if value is not None else "Did not happen",
+                )
+            )
         elif key in VALUE_LABELS:
             label, unit = VALUE_LABELS[key]
             rows.append(dict(event=label, step=None, when=None, detail="Did not happen" if value is None else f"{value} {unit}"))
@@ -193,15 +272,22 @@ def _summary_rows(scenario, engine, mind, seed, title, steps_run, horizon):
 def _assumption_rows(scenario, engine):
     from mind.config import DECISION_RULE, DEPHASING_MODE, ETA
 
-    rows = [("Decision rule", DECISION_RULE, "mind/config.py"), ("Dephasing", DEPHASING_MODE, "mind/config.py"), ("ETA", ETA, "Solved from Tversky & Shafir 1992"),
-            ("Length of one decision", elapsed_text(scenario, 1), "Engine step"), ("Hazard timing and rates", "Assumed unless a source is cited", "See the scenario's document in docs/")]
+    rows = [
+        ("Decision rule", DECISION_RULE, "mind/config.py"),
+        ("Dephasing", DEPHASING_MODE, "mind/config.py"),
+        ("ETA", ETA, "Solved from Tversky & Shafir 1992"),
+        ("Length of one decision", elapsed_text(scenario, 1), "Engine step"),
+        ("Hazard timing and rates", "Assumed unless a source is cited", "See the scenario's document in docs/"),
+    ]
     mapping = _mapping_row(scenario, engine)
     if mapping:
         rows.insert(0, ("Cue translation", f"{mapping[0]} ({mapping[1]}): {mapping[2]}", "An assumption. Results move with it"))
-    notes = dict(titanic="A compressed demonstration, not a reconstruction. See docs/TITANIC_MODEL.md",
-                 pompeii="A demonstration, not a reconstruction. The default settings overstate escape. See docs/POMPEII_SOURCES.md",
-                 waterloo="A hypothetical at a real site. The leak, head-count and inside are assumed. See docs/WATERLOO_SOURCES.md",
-                 volcano="A fictional volcano with assumed rates. See docs/VOLCANO_MODEL.md")
+    notes = dict(
+        titanic="A compressed demonstration, not a reconstruction. See docs/TITANIC_MODEL.md",
+        pompeii="A demonstration, not a reconstruction. The default settings overstate escape. See docs/POMPEII_SOURCES.md",
+        waterloo="A hypothetical at a real site. The leak, head-count and inside are assumed. See docs/WATERLOO_SOURCES.md",
+        volcano="A fictional volcano with assumed rates. See docs/VOLCANO_MODEL.md",
+    )
     if scenario in notes:
         rows.append(("Scope", notes[scenario], "Scenario document"))
     return [dict(item=item, value=value, source=source) for item, value, source in rows]
@@ -212,7 +298,9 @@ def paired_rows(paired):
     if paired is None:
         return [dict(field="Paired run", value="Not available")]
     rows = [dict(field="Mind", value=MIND_NAMES.get(paired["mind"], paired["mind"]))]
-    labels = dict(survived="Survived", steps="Steps run", hide_after_sign="Steps from first sign to first hide", survivors="Survivors", deaths="Deaths", total="People")
+    labels = dict(
+        survived="Survived", steps="Steps run", hide_after_sign="Steps from first sign to first hide", survivors="Survivors", deaths="Deaths", total="People"
+    )
     rows += [dict(field=label, value=paired[key]) for key, label in labels.items() if key in paired]
     return rows
 
@@ -317,7 +405,10 @@ def export_report(report, name, out_dir=DEFAULT_DIR):
     """Writes <name>.xlsx and a <name>/ folder of CSVs. Returns (xlsx path, csv folder)."""
     out_dir = Path(out_dir)
     stamped = dict(report)
-    stamped["Summary"] = report["Summary"] + [dict(field="Generated", value=datetime.now().isoformat(timespec="seconds")), dict(field="Code version", value=_commit())]
+    stamped["Summary"] = report["Summary"] + [
+        dict(field="Generated", value=datetime.now().isoformat(timespec="seconds")),
+        dict(field="Code version", value=_commit()),
+    ]
     workbook = write_xlsx(stamped, out_dir / f"{name}.xlsx")
     write_csv(stamped, out_dir / name)
     return workbook, out_dir / name
@@ -332,6 +423,7 @@ def _simulation(scenario, seed, mind, settings):
         from engine.waterloo import WaterlooSimulation as Simulation
     else:
         from engine.simulation import SimulationEngine as Simulation
+
         return Simulation(seed=seed, mind_type=mind, scenario=scenario)
     return Simulation(seed=seed, mind_type=mind, **settings)
 

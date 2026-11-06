@@ -4,9 +4,10 @@
  "title": "Eruption on a made-up island",
  "author": "Qognition team",
  "description": "One person, a sampled eruption, and a far coast to reach.",
- "created_utc": "2026-11-06T12:39:32+00:00",
+ "created_utc": "2026-11-06T13:22:29+00:00",
  "seed": 1,
  "needs_data_pack": false,
  "scenario": "id = \"made_up_island_eruption\"\ntitle = \"Eruption on a made-up island\"\nplace = \"generated\"\nstart_utc = \"2023-06-01T00:00:00+00:00\"\nhours = 96\nstep_hours = 2\nlocal_utc_offset = -4\n\n[[entity]]\nkind = \"terrain\"\nsource = \"dials\"\nsummit_m = 900.0\narea_km2 = 200.0\n\n[[entity]]\nkind = \"weather\"\nsource = \"dials\"\nrain_mm_h = 1.0\nwind_m_s = 6.0\nwind_bearing_deg = 270.0\ntemperature_c = 27.0\nupper_wind_m_s = 20.0\nupper_bearing_deg = 90.0\n\n[[entity]]\nkind = \"eruption\"\nsource = \"catalogue\"\nvent_lon = -61.1814\nvent_lat = 13.2997\n\n[[entity]]\nkind = \"ash\"\nsource = \"replay\"\n\n[[entity]]\nkind = \"flow\"\nsource = \"replay\"\ndelay_hours = 6.0\n\n[[entity]]\nkind = \"person\"\nsource = \"dials\"\nname = \"A villager\"\nmind = \"quantum\"\nstart_lon = -61.2276\nstart_lat = 13.3\n\n[[entity]]\nkind = \"shelter\"\nsource = \"dials\"\nname = \"The far coast\"\nlon = -61.237\nlat = 13.2676\n",
- "sha256": "6686aee416780316c19993162a46d9b7f62ed04b1e3a46600be3d72ea1f92c17"
+ "sha256": "6686aee416780316c19993162a46d9b7f62ed04b1e3a46600be3d72ea1f92c17",
+ "licence": "CC-BY-4.0"
 }

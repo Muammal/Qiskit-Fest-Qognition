@@ -6,6 +6,7 @@ La Soufriere eruption on St. Vincent) and executes unit-checked T1 physical
 domain solvers across `terrain`, `atmos`, `storm`, `eruption`, `tephra`, `gas`,
 `pdc`, `lahar`, and `lava`.
 """
+
 from __future__ import annotations
 
 import json
@@ -91,7 +92,7 @@ class StVincentTerrain(_T1Base):
         theta = np.arctan2(ey, ex)
 
         # A made-up edifice with 4 radial valleys. Its height is not taken from any elevation data
-        valley_carve = 85.0 * np.cos(4.0 * theta) * np.exp(-((dist - 1800.0) ** 2) / (2.0 * 1400.0 ** 2))
+        valley_carve = 85.0 * np.cos(4.0 * theta) * np.exp(-((dist - 1800.0) ** 2) / (2.0 * 1400.0**2))
         coast_harmonic = 320.0 * (0.6 * np.cos(2.0 * theta - 0.4) + 0.4 * np.sin(3.0 * theta))
         eff_dist = np.maximum(0.0, dist + coast_harmonic)
         elevation = np.maximum(0.0, 1080.0 * np.exp(-((eff_dist / 3100.0) ** 1.35)) - 60.0 - valley_carve)
@@ -236,7 +237,7 @@ class SuzukiTephra(_T1Base):
                 along = np.maximum(0.0, ex * ux + ey * uy)
                 cross = np.abs(ex * uy - ey * ux)
                 sigma = 650.0 + 0.22 * along
-                plume_kernel = np.exp(-(cross ** 2) / (2.0 * sigma ** 2)) * np.exp(-dist / (2200.0 + 90.0 * wind_u[t]))
+                plume_kernel = np.exp(-(cross**2) / (2.0 * sigma**2)) * np.exp(-dist / (2200.0 + 90.0 * wind_u[t]))
                 proximal = np.exp(-((dist / 950.0) ** 2))
                 step_load = (mer[t] / 1.5e6) * (3.8 * plume_kernel + 2.2 * proximal)
                 cumulative = cumulative + step_load
@@ -275,7 +276,7 @@ class GaussianGas(_T1Base):
                 along = np.maximum(0.0, ex * ux + ey * uy)
                 cross = np.abs(ex * uy - ey * ux)
                 sigma = 500.0 + 0.25 * along
-                frames[t] = source_strength * np.exp(-(cross ** 2) / (2.0 * sigma ** 2)) * np.exp(-dist / 3200.0)
+                frames[t] = source_strength * np.exp(-(cross**2) / (2.0 * sigma**2)) * np.exp(-dist / 3200.0)
 
         fields.put("gas.so2_concentration", frames, "ug/m**3", self.grid, self.time)
         return {"max_so2_ug_m3": float(frames.max())}
@@ -427,4 +428,3 @@ def st_vincent_scenario(erupts: bool | None = True) -> ScenarioSpec:
 def build_st_vincent_pack(seed: int = 1, erupts: bool | None = True) -> ScenarioPack:
     """Builds and returns a SHA-256 content-hashed ScenarioPack for St. Vincent 2021."""
     return build_pack(st_vincent_scenario(erupts=erupts), seed=seed)
-

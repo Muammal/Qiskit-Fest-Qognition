@@ -1,7 +1,8 @@
 """Measurements behind the terrain gates. Each prints a final JSON line that the gate runner reads.
 
-    python -m stranded_physics.domains.terrain.measure summit_height|summit_location|island_area|canopy|drains_to_sea|channels_vs_bare_earth
+python -m stranded_physics.domains.terrain.measure summit_height|summit_location|island_area|canopy|drains_to_sea|channels_vs_bare_earth
 """
+
 from __future__ import annotations
 
 import json
@@ -54,11 +55,19 @@ def canopy_bias(surface: np.ndarray, bare: np.ndarray, cover: np.ndarray, land: 
         values = difference[cells]
         if values.size == 0:
             return {f"{name}_cells": 0}
-        return {f"{name}_cells": int(values.size), f"{name}_mean_m": float(values.mean()), f"{name}_median_m": float(np.median(values)),
-                f"{name}_p90_m": float(np.percentile(values, 90))}
+        return {
+            f"{name}_cells": int(values.size),
+            f"{name}_mean_m": float(values.mean()),
+            f"{name}_median_m": float(np.median(values)),
+            f"{name}_p90_m": float(np.percentile(values, 90)),
+        }
 
-    return {**summarise("forest_valley", floor & forest), **summarise("open_valley", floor & ~forest),
-            **summarise("forest_all", usable & forest), **summarise("open_all", usable & ~forest)}
+    return {
+        **summarise("forest_valley", floor & forest),
+        **summarise("open_valley", floor & ~forest),
+        **summarise("forest_all", usable & forest),
+        **summarise("open_all", usable & ~forest),
+    }
 
 
 def read_bare_earth() -> np.ndarray:
@@ -77,16 +86,26 @@ def channels_vs_bare_earth(store: FieldStore) -> dict[str, float]:
     land = store.get("terrain.land_mask", "dimensionless") > 0
     threshold, dx = SETTINGS["channel_area"], ST_VINCENT_GRID.dx_m
     surface = store.get("terrain.flow_accumulation", "m**2") >= threshold
-    bare = flow_accumulation(route(np.where(land, read_bare_earth(), 0.), land, dx), land, dx) >= threshold
+    bare = flow_accumulation(route(np.where(land, read_bare_earth(), 0.0), land, dx), land, dx) >= threshold
     shared = surface & binary_dilation(bare, structure=np.ones((3, 3)))
-    return {"surface_channel_cells": int(surface.sum()), "bare_earth_channel_cells": int(bare.sum()), "shared_share": float(shared.sum() / max(surface.sum(), 1))}
+    return {
+        "surface_channel_cells": int(surface.sum()),
+        "bare_earth_channel_cells": int(bare.sum()),
+        "shared_share": float(shared.sum() / max(surface.sum(), 1)),
+    }
 
 
 def measure_canopy(store: FieldStore) -> dict[str, float]:
     """FABDEM is a published machine-learned estimate of bare earth, not a survey, so this sizes the bias only roughly."""
     bare = read_bare_earth()
-    return canopy_bias(store.get("terrain.elevation", "m"), bare, store.get("terrain.land_cover", "dimensionless"),
-                       store.get("terrain.land_mask", "dimensionless") > 0, int(SETTINGS["valley_window"]), SETTINGS["valley_depth"])
+    return canopy_bias(
+        store.get("terrain.elevation", "m"),
+        bare,
+        store.get("terrain.land_cover", "dimensionless"),
+        store.get("terrain.land_mask", "dimensionless") > 0,
+        int(SETTINGS["valley_window"]),
+        SETTINGS["valley_depth"],
+    )
 
 
 def main(argv: list[str]) -> int:

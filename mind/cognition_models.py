@@ -35,6 +35,7 @@ repositories:
    - Repo: `robertcprice/nQPU` (`sdk/python/nqpu/games/decision.py`)
    - Paper: Trueblood & Busemeyer (2011) *Cognitive Science* 35(8), 1518-1552.
 """
+
 from __future__ import annotations
 
 import math
@@ -48,6 +49,7 @@ from scipy.linalg import expm
 # 1. Busemeyer 2-Qubit Dynamic Decision & Cognitive Dissonance Hamiltonian
 #    Ref: jbusemey/ChoiceModeling (Lquant.m); Pothos & Busemeyer (2009)
 # =============================================================================
+
 
 def busemeyer_hamiltonian(
     mu_safe: float,
@@ -84,7 +86,7 @@ def busemeyer_hamiltonian(
     c_prot = np.array([[-1.0, 1.0], [1.0, 1.0]], dtype=complex)
     H_c = np.zeros((4, 4), dtype=complex)
     H_c[0:2, 0:2] = -gamma / math.sqrt(2.0) * c_carry
-    H_c[2:4, 0:4 - 2] = 0.0
+    H_c[2:4, 0 : 4 - 2] = 0.0
     H_c[2:4, 2:4] = -gamma / math.sqrt(2.0) * c_prot
 
     return H_a + H_c
@@ -144,6 +146,7 @@ def p_protect_busemeyer(
 #         Moreira & Wichert (2016)
 # =============================================================================
 
+
 def belief_distance_huang(alpha: float, beta: float) -> float:
     """Computes Huang et al. (2019) Eq. 18 belief distance B_d(b) for branch amplitudes.
 
@@ -184,11 +187,8 @@ def belief_degree_huang(
     bd_prot = max(1e-12, belief_distance_huang(alpha_prot, beta_prot))
     bd_carry = max(1e-12, belief_distance_huang(alpha_carry, beta_carry))
 
-    scale = float((2 ** cardinality) - 1)
-    d_b = (
-        bd_prot * math.log2(bd_prot / scale)
-        + bd_carry * math.log2(bd_carry / scale)
-    )
+    scale = float((2**cardinality) - 1)
+    d_b = bd_prot * math.log2(bd_prot / scale) + bd_carry * math.log2(bd_carry / scale)
     return float(np.clip(d_b, -1.0, 1.0))
 
 
@@ -281,6 +281,7 @@ def evolve_lindblad(
 #         Nature Human Behaviour 4, 294-307
 # =============================================================================
 
+
 def prospect_utility(
     payoff: float,
     alpha: float = 0.5,
@@ -352,6 +353,7 @@ class QuantumSequenceLearner:
 #         Wang, Solloway, Shiffrin & Busemeyer (2014) PNAS 111(26), 9431-9436
 # =============================================================================
 
+
 def projector_from_angle(theta: float) -> np.ndarray:
     """Rank-1 projector Pi(theta) = R_y(theta)|0><0|R_y^dagger(theta)."""
     ket = np.array([math.cos(theta / 2.0), math.sin(theta / 2.0)], dtype=complex)
@@ -414,6 +416,7 @@ def verify_2d_representability(q: float, r: float, c: float) -> bool:
 #    Ref: robertcprice/nQPU (sdk/python/nqpu/games/decision.py);
 #         Trueblood & Busemeyer (2011) Cognitive Science 35(8), 1518-1552
 # =============================================================================
+
 
 def quantum_bayesian_evidence_gate(
     likelihood_safe: float,

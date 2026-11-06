@@ -3,6 +3,7 @@
 GLO-30 is a surface model, so forest canopy raises narrow valley floors. `measure.canopy_bias` sizes that error;
 this model does not correct it.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -24,8 +25,7 @@ HERE = Path(__file__).resolve().parent
 RAW = HERE.parents[2] / "artifacts" / "physics" / "raw" / "terrain"
 PARAMETERS = load_parameters(HERE / "params.toml")
 SETTINGS = {p.id.split(".", 1)[1]: p.value.magnitude for p in PARAMETERS}
-ST_VINCENT_GRID = GridSpec("EPSG:32620", SETTINGS["grid_x0"], SETTINGS["grid_y0"], SETTINGS["grid_dx"],
-                           int(SETTINGS["grid_nx"]), int(SETTINGS["grid_ny"]))
+ST_VINCENT_GRID = GridSpec("EPSG:32620", SETTINGS["grid_x0"], SETTINGS["grid_y0"], SETTINGS["grid_dx"], int(SETTINGS["grid_nx"]), int(SETTINGS["grid_ny"]))
 FILE_ROLES = {"dem": "copernicus_glo30_n13w062", "cover": "esa_worldcover_2021_n12w063"}
 
 
@@ -40,9 +40,18 @@ def default_files() -> dict[str, tuple[Path, str]]:
 
 def _warp(source, source_transform, source_crs, source_nodata, grid: GridSpec, resampling: Resampling) -> np.ndarray:
     target = np.full((grid.ny, grid.nx), np.nan, dtype="float64")
-    reproject(source, target, src_transform=source_transform, src_crs=source_crs, src_nodata=source_nodata,
-              dst_transform=from_origin(grid.x0_m, grid.y0_m, grid.dx_m, grid.dx_m), dst_crs=grid.crs, dst_nodata=np.nan,
-              resampling=resampling, init_dest_nodata=True)
+    reproject(
+        source,
+        target,
+        src_transform=source_transform,
+        src_crs=source_crs,
+        src_nodata=source_nodata,
+        dst_transform=from_origin(grid.x0_m, grid.y0_m, grid.dx_m, grid.dx_m),
+        dst_crs=grid.crs,
+        dst_nodata=np.nan,
+        resampling=resampling,
+        init_dest_nodata=True,
+    )
     if np.isnan(target).any():
         raise InterfaceError(f"{int(np.isnan(target).sum())} grid cells fall outside the source raster")
     return target
@@ -69,15 +78,15 @@ def read_land_cover(path: Path, grid: GridSpec) -> np.ndarray:
 
 
 def land_area_km2(mask: np.ndarray, grid: GridSpec) -> float:
-    return float(mask.sum()) * grid.dx_m ** 2 / 1e6
+    return float(mask.sum()) * grid.dx_m**2 / 1e6
 
 
 def static_zones(grid: GridSpec, vent: XY) -> np.ndarray:
     """0 safe, 1 caution, 2 danger, by distance from the vent alone, so zones can never use a future hazard."""
-    xs = grid.x0_m + (np.arange(grid.nx) + .5) * grid.dx_m - vent[0]
-    ys = grid.y0_m - (np.arange(grid.ny) + .5) * grid.dx_m - vent[1]
+    xs = grid.x0_m + (np.arange(grid.nx) + 0.5) * grid.dx_m - vent[0]
+    ys = grid.y0_m - (np.arange(grid.ny) + 0.5) * grid.dx_m - vent[1]
     distance = np.hypot(*np.meshgrid(xs, ys))
-    return np.select([distance <= SETTINGS["zone_danger"], distance <= SETTINGS["zone_caution"]], [2., 1.], 0.)
+    return np.select([distance <= SETTINGS["zone_danger"], distance <= SETTINGS["zone_caution"]], [2.0, 1.0], 0.0)
 
 
 class Terrain:
@@ -86,8 +95,14 @@ class Terrain:
     id = "terrain"
     tier = "T1"
     inputs = ()
-    outputs = (spec("terrain.elevation"), spec("terrain.land_mask"), spec("terrain.land_cover"), spec("terrain.zone"),
-               spec("terrain.flow_accumulation"), spec("terrain.height_above_drainage"))
+    outputs = (
+        spec("terrain.elevation"),
+        spec("terrain.land_mask"),
+        spec("terrain.land_cover"),
+        spec("terrain.zone"),
+        spec("terrain.flow_accumulation"),
+        spec("terrain.height_above_drainage"),
+    )
     parameters: tuple[Parameter, ...] = PARAMETERS
 
     def __init__(self, grid: GridSpec = ST_VINCENT_GRID, files: dict[str, tuple[Path, str]] | None = None, vent: XY = VENT_XY) -> None:

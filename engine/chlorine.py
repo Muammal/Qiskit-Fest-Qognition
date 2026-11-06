@@ -4,6 +4,7 @@ A demonstration, not a validated dispersion model. Gas moves tile to tile, is bl
 drifts with the wind outdoors and thins out over time. The leak's place, size and length are unknown,
 so each is a setting. See docs/WATERLOO_SOURCES.md.
 """
+
 from collections import OrderedDict
 
 import numpy as np
@@ -14,8 +15,8 @@ STEP_SECONDS = 10  # user's decision
 HORIZON = 2 * 3600 // STEP_SECONDS + 1  # user's decision: 2 hours, about Edmonton's closure
 SUBSTEPS = 8  # numerical: keeps the wind and spread calculation stable
 LEAK_START_STEP = 6  # assumption: one minute in, so the run opens before the leak
-LEAK_MINUTES = 15.  # assumption: length unknown; a setting
-SOURCE_PPM = 22.  # Edmonton 2018, Global News; where it was measured is not stated
+LEAK_MINUTES = 15.0  # assumption: length unknown; a setting
+SOURCE_PPM = 22.0  # Edmonton 2018, Global News; where it was measured is not stated
 START_HOUR = 14  # assumption: time of day unknown
 LEAK_SITES = {  # assumption: no source gives the place or the chlorine storage
     "pool_side": (20, 21),
@@ -23,27 +24,42 @@ LEAK_SITES = {  # assumption: no source gives the place or the chlorine storage
     "deck": (20, 23),
 }
 DEFAULT_LEAK_SITE = "pool_side"
-INDOOR_SPREAD_M2_S = .25  # assumption
-OUTDOOR_SPREAD_M2_S = 2.  # assumption
+INDOOR_SPREAD_M2_S = 0.25  # assumption
+OUTDOOR_SPREAD_M2_S = 2.0  # assumption
 INDOOR_LOSS_PER_S = 4 / 3600  # assumption: 4 air changes per hour
-OUTDOOR_LOSS_PER_S = .02  # assumption: mixing upward into open air
+OUTDOOR_LOSS_PER_S = 0.02  # assumption: mixing upward into open air
 
 # Modelled weather, Open-Meteo archive for 43.47, -80.51, 30 July 2012: hour: (km/h, degrees wind comes from).
-WIND_BY_HOUR = {9: (5.1, 278), 10: (6.3, 283), 11: (6.2, 277), 12: (5.2, 254), 13: (5.7, 235), 14: (6.4, 223), 15: (7.4, 219),
-                16: (8.2, 221), 17: (9.9, 224), 18: (12.4, 216), 19: (11.9, 215), 20: (9.7, 211), 21: (8.3, 198)}
-ODOUR_PPM = .31  # EPA technical support document, section 1, citing Amoore and Hautala 1983
+WIND_BY_HOUR = {
+    9: (5.1, 278),
+    10: (6.3, 283),
+    11: (6.2, 277),
+    12: (5.2, 254),
+    13: (5.7, 235),
+    14: (6.4, 223),
+    15: (7.4, 219),
+    16: (8.2, 221),
+    17: (9.9, 224),
+    18: (12.4, 216),
+    19: (11.9, 215),
+    20: (9.7, 211),
+    21: (8.3, 198),
+}
+ODOUR_PPM = 0.31  # EPA technical support document, section 1, citing Amoore and Hautala 1983
 AEGL_PPM = {  # EPA, final values, ppm
-    1: {10: .5, 30: .5, 60: .5},
+    1: {10: 0.5, 30: 0.5, 60: 0.5},
     2: {10: 2.8, 30: 2.8, 60: 2.0},
-    3: {10: 50., 30: 28., 60: 20.},
+    3: {10: 50.0, 30: 28.0, 60: 20.0},
 }
 AEGL_MEANING = {0: "below AEGL-1", 1: "above AEGL-1, discomfort", 2: "above AEGL-2, serious or lasting effects", 3: "above AEGL-3, risk to life"}
 
 EPA_AEGL = "https://www.epa.gov/aegl/chlorine-results-aegl-program"
 EPA_TSD = "https://www.epa.gov/sites/default/files/2014-11/documents/tsd56.pdf"
 GLOBAL = "https://globalnews.ca/news/4060660/chlorine-leak-forces-evacuation-of-edmonton-rec-centre"
-WEATHER = ("https://archive-api.open-meteo.com/v1/archive?latitude=43.47&longitude=-80.51&start_date=2012-07-30"
-           "&end_date=2012-07-30&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,precipitation&timezone=America%2FToronto")
+WEATHER = (
+    "https://archive-api.open-meteo.com/v1/archive?latitude=43.47&longitude=-80.51&start_date=2012-07-30"
+    "&end_date=2012-07-30&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,precipitation&timezone=America%2FToronto"
+)
 PROVENANCE = {
     "aegl_values": dict(value="see AEGL_PPM", status="sourced", url=EPA_AEGL, note="final values; planning limits, not predictions"),
     "odour": dict(value="0.31 ppm", status="sourced", url=EPA_TSD, note="range 0.2-0.4; people differ and it fades"),
@@ -65,7 +81,7 @@ def wind_at(seconds, start_hour=START_HOUR):
     hour = start_hour + seconds / 3600
     low = min(max(WIND_BY_HOUR), max(min(WIND_BY_HOUR), int(hour)))
     high = min(max(WIND_BY_HOUR), low + 1)
-    share = min(1., max(0., hour - low))
+    share = min(1.0, max(0.0, hour - low))
     speed = WIND_BY_HOUR[low][0] + (WIND_BY_HOUR[high][0] - WIND_BY_HOUR[low][0]) * share
     degrees = WIND_BY_HOUR[low][1] + (WIND_BY_HOUR[high][1] - WIND_BY_HOUR[low][1]) * share
     return speed / 3.6, degrees
@@ -76,7 +92,7 @@ def exposure_level(ppm_series, step_seconds=STEP_SECONDS):
     series = np.asarray(ppm_series, dtype=float)
     if not len(series):
         return 0
-    totals = np.concatenate(([0.], np.cumsum(series)))
+    totals = np.concatenate(([0.0], np.cumsum(series)))
     level = 0
     for candidate, limits in AEGL_PPM.items():
         for minutes, limit in limits.items():
@@ -89,8 +105,7 @@ def exposure_level(ppm_series, step_seconds=STEP_SECONDS):
 
 
 class ChlorineModel:
-    def __init__(self, seed, world, horizon=HORIZON, leak_site=DEFAULT_LEAK_SITE, source_ppm=SOURCE_PPM,
-                 leak_minutes=LEAK_MINUTES, start_hour=START_HOUR):
+    def __init__(self, seed, world, horizon=HORIZON, leak_site=DEFAULT_LEAK_SITE, source_ppm=SOURCE_PPM, leak_minutes=LEAK_MINUTES, start_hour=START_HOUR):
         key = (horizon, leak_site, source_ppm, leak_minutes, start_hour)
         if key not in _CACHE:
             _CACHE[key] = self._generate(world, horizon, leak_site, source_ppm, leak_minutes, start_hour)
@@ -103,8 +118,14 @@ class ChlorineModel:
         self.leak_end_step = LEAK_START_STEP + round(leak_minutes * 60 / STEP_SECONDS)
         self.phases = [self._phase(t) for t in range(horizon)]
         self.world_events = ["chlorine_leak" if t == LEAK_START_STEP else "none" for t in range(horizon)]
-        self.hazard_by_step = [dict(peak_ppm=round(float(self.ppm[t].max()), 3), wind_m_s=round(wind_at(t * STEP_SECONDS, start_hour)[0], 2),
-                                    wind_deg=round(wind_at(t * STEP_SECONDS, start_hour)[1], 1)) for t in range(horizon)]
+        self.hazard_by_step = [
+            dict(
+                peak_ppm=round(float(self.ppm[t].max()), 3),
+                wind_m_s=round(wind_at(t * STEP_SECONDS, start_hour)[0], 2),
+                wind_deg=round(wind_at(t * STEP_SECONDS, start_hour)[1], 1),
+            )
+            for t in range(horizon)
+        ]
 
     def _phase(self, t):
         if t < LEAK_START_STEP:
@@ -128,11 +149,11 @@ class ChlorineModel:
             solid[y, x], indoors[y, x] = False, True
         outdoors = ~solid & ~indoors
         spread = np.where(indoors, INDOOR_SPREAD_M2_S, OUTDOOR_SPREAD_M2_S)
-        spread[solid] = 0.
+        spread[solid] = 0.0
         delta = STEP_SECONDS / SUBSTEPS
         loss = 1 - delta * np.where(indoors, INDOOR_LOSS_PER_S, OUTDOOR_LOSS_PER_S)
-        east_rate = np.minimum(spread[:, :-1], spread[:, 1:]) * delta / SITE_M_PER_TILE ** 2
-        south_rate = np.minimum(spread[:-1, :], spread[1:, :]) * delta / SITE_M_PER_TILE ** 2
+        east_rate = np.minimum(spread[:, :-1], spread[:, 1:]) * delta / SITE_M_PER_TILE**2
+        south_rate = np.minimum(spread[:-1, :], spread[1:, :]) * delta / SITE_M_PER_TILE**2
         source = LEAK_SITES[leak_site]
         leak_end = LEAK_START_STEP + round(leak_minutes * 60 / STEP_SECONDS)
         grid = np.zeros((height, width))
@@ -152,18 +173,29 @@ class ChlorineModel:
                 change[:-1, :] += south_flux
                 change[1:, :] -= south_flux
                 change += _drift(grid, outdoors, east * delta / SITE_M_PER_TILE, south * delta / SITE_M_PER_TILE)
-                grid = np.clip((grid + change) * loss, 0., None)
-                grid[solid] = 0.
+                grid = np.clip((grid + change) * loss, 0.0, None)
+                grid[solid] = 0.0
             result[t] = grid
         result.setflags(write=False)
         return result
 
     def export_dict(self):
         minutes = range(0, self.horizon, 6)
-        return dict(leak_site=self.leak_site, source=list(self.source), source_ppm=self.source_ppm, leak_minutes=self.leak_minutes,
-                    start_hour=self.start_hour, leak_start_step=LEAK_START_STEP, leak_end_step=self.leak_end_step,
-                    step_seconds=STEP_SECONDS, phases=self.phases, world_events=self.world_events, hazard_by_step=self.hazard_by_step,
-                    ppm_by_minute=[np.round(self.ppm[t], 3).tolist() for t in minutes], provenance=PROVENANCE)
+        return dict(
+            leak_site=self.leak_site,
+            source=list(self.source),
+            source_ppm=self.source_ppm,
+            leak_minutes=self.leak_minutes,
+            start_hour=self.start_hour,
+            leak_start_step=LEAK_START_STEP,
+            leak_end_step=self.leak_end_step,
+            step_seconds=STEP_SECONDS,
+            phases=self.phases,
+            world_events=self.world_events,
+            hazard_by_step=self.hazard_by_step,
+            ppm_by_minute=[np.round(self.ppm[t], 3).tolist() for t in minutes],
+            provenance=PROVENANCE,
+        )
 
 
 def _drift(grid, outdoors, east, south):

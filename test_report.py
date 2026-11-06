@@ -1,4 +1,5 @@
 """The end-of-event report and its CSV and Excel export."""
+
 import csv
 import threading
 
@@ -9,8 +10,7 @@ from openpyxl import load_workbook
 
 from engine.gui import IslandVisualizerApp
 from engine.pompeii import PompeiiSimulation
-from engine.report import (CUE_TRANSLATIONS, SHEET_ORDER, build_report, export_report, key_lines, paired_rows, report_name, run_and_report, write_csv,
-                           write_xlsx)
+from engine.report import CUE_TRANSLATIONS, SHEET_ORDER, build_report, export_report, key_lines, paired_rows, report_name, run_and_report, write_csv, write_xlsx
 from engine.simulation import SimulationEngine
 from engine.titanic import TitanicSimulation
 from engine.waterloo import WaterlooSimulation
@@ -102,8 +102,13 @@ def test_events_that_never_happened_say_so(volcano):
 
 
 def test_key_lines_are_short_and_skip_what_did_not_happen():
-    report = {"Key events": [dict(event="A", step=1, when="Day 1 10:00", detail=""), dict(event="B", step=None, when=None, detail="Did not happen"),
-                             dict(event="C", step=None, when=None, detail="4 h")]}
+    report = {
+        "Key events": [
+            dict(event="A", step=1, when="Day 1 10:00", detail=""),
+            dict(event="B", step=None, when=None, detail="Did not happen"),
+            dict(event="C", step=None, when=None, detail="4 h"),
+        ]
+    }
     assert key_lines(report) == ["A: Day 1 10:00   |   C: 4 h"]
 
 
@@ -184,6 +189,7 @@ def test_headless_run_writes_both_formats(tmp_path):
 
 
 # The debrief ------------------------------------------------------------------
+
 
 def make_app(scenario, tmp_path=None):
     app = IslandVisualizerApp(seed=42, mind_type="quantum", start_screen="sim", scenario=scenario)

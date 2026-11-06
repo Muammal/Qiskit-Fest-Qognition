@@ -1,7 +1,8 @@
 """Saves the screenshots in docs/images/ from the real GUI, without opening a window.
 
-    SDL_VIDEODRIVER=dummy python tools/capture_screens.py [--width 1920 --height 1080] [--out docs/images]
+SDL_VIDEODRIVER=dummy python tools/capture_screens.py [--width 1920 --height 1080] [--out docs/images]
 """
+
 import argparse
 import os
 import sys
@@ -66,8 +67,13 @@ def main():
         shot(make_app(args.width, args.height, "volcano", "home"), out / "02_home_configuration.png")
         shot(make_app(args.width, args.height, "titanic", "home"), out / "02b_titanic_configuration.png")
 
-    names = dict(island="03_island_survival_sim.png", volcano="04_volcano_evacuation_sim.png", titanic="06_titanic_evacuation_sim.png",
-                 pompeii="07_pompeii_evacuation_sim.png", waterloo="08_waterloo_chlorine_sim.png")
+    names = dict(
+        island="03_island_survival_sim.png",
+        volcano="04_volcano_evacuation_sim.png",
+        titanic="06_titanic_evacuation_sim.png",
+        pompeii="07_pompeii_evacuation_sim.png",
+        waterloo="08_waterloo_chlorine_sim.png",
+    )
     for scenario, name in names.items():
         if only and scenario not in only:
             continue

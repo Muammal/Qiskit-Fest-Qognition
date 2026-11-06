@@ -10,20 +10,17 @@ Usage:
   python main.py --test                 -> Executes test suite
 """
 
-import os
 import sys
 import time
 import argparse
 from typing import Dict, Any
 
 from engine.world import IslandWorld
-from engine.agent import SurvivalAgent
 from engine.simulation import SimulationEngine, DEFAULT_STEPS
 from engine.batch_runner import run_batch_comparison, curate_demo_pack
 from engine.titanic import TitanicSimulation
 from engine.pompeii import PompeiiSimulation
 from engine.waterloo import WaterlooSimulation
-import contracts
 
 # Terminal ANSI formatting
 BOLD = "\033[1m"
@@ -36,13 +33,7 @@ MAGENTA = "\033[95m"
 BLUE = "\033[94m"
 RESET = "\033[0m"
 
-TILE_CHARS = {
-    0: f"{BLUE}~{RESET}",
-    1: f"{YELLOW}.{RESET}",
-    2: f"{GREEN}^{RESET}",
-    3: f"{RESET}M{RESET}",
-    4: f"{MAGENTA}S{RESET}"
-}
+TILE_CHARS = {0: f"{BLUE}~{RESET}", 1: f"{YELLOW}.{RESET}", 2: f"{GREEN}^{RESET}", 3: f"{RESET}M{RESET}", 4: f"{MAGENTA}S{RESET}"}
 
 
 def render_ascii_map(world: IslandWorld, agent_pos: list, radius: int = 5) -> str:
@@ -88,15 +79,19 @@ def run_live_demo(
     print(f"{BOLD}{CYAN}   QOGNITION (TERMINAL LIVE RUN)                                        {RESET}")
     print(f"{BOLD}{CYAN}========================================================================{RESET}")
     print(f"  Configuration: Engine={engine_mode.upper()} | Scenario={scenario.upper()} | Seed={seed} | Mind={mind.upper()} | Noise={noise}")
-    print(f"  Legend: {BLUE}~{RESET} Water  {YELLOW}.{RESET} Plains  {GREEN}^{RESET} Forest  M Mountain  {MAGENTA}S{RESET} Shelter  {BOLD}{RED}@{RESET} Agent\n")
+    print(
+        f"  Legend: {BLUE}~{RESET} Water  {YELLOW}.{RESET} Plains  {GREEN}^{RESET} Forest  M Mountain  {MAGENTA}S{RESET} Shelter  {BOLD}{RED}@{RESET} Agent\n"
+    )
 
     if engine_mode == "legacy_pack":
         from stranded_physics.packs.legacy import build_legacy_pack
         from stranded_physics.runtime.simulation import PackSimulation
+
         sim = PackSimulation(build_legacy_pack(seed), mind_type=mind, noise_source=noise)
     elif engine_mode == "physics":
         from stranded_physics.packs.st_vincent_2021 import build
         from stranded_physics.runtime.simulation import PackSimulation
+
         pack = build(seed)
         sim = PackSimulation(pack, mind_type=mind, noise_source=noise)
     elif scenario == "titanic":
@@ -147,9 +142,11 @@ def run_live_demo(
 
     print(f"\n{BOLD}========================================================================{RESET}")
     if timeline["outcome"] == "survived":
-        span = {"titanic": f"{len(timeline['steps']) * 5} minutes",
-                "pompeii": f"{len(timeline['steps']) * 15 / 60:.1f} hours",
-                "waterloo": f"{len(timeline['steps']) * 10 / 60:.1f} minutes"}.get(scenario, f"{len(timeline['steps']) * 2} hours")
+        span = {
+            "titanic": f"{len(timeline['steps']) * 5} minutes",
+            "pompeii": f"{len(timeline['steps']) * 15 / 60:.1f} hours",
+            "waterloo": f"{len(timeline['steps']) * 10 / 60:.1f} minutes",
+        }.get(scenario, f"{len(timeline['steps']) * 2} hours")
         print(f"{BOLD}{GREEN}  >>> MISSION OUTCOME: SURVIVED! Successfully endured {span}. <<<{RESET}")
     else:
         print(f"{BOLD}{RED}  >>> MISSION OUTCOME: DIED ({str(timeline['cause']).upper()}) at Step {len(timeline['steps'])}. <<<{RESET}")
@@ -159,6 +156,7 @@ def run_live_demo(
 def open_builder(app):
     """The scenario builder, imported only when asked for, so the original scenarios run without the physics packages."""
     from stranded_physics.builder_screen import BuilderScreen
+
     return BuilderScreen(app, start_open=True)
 
 
@@ -171,28 +169,42 @@ def main():
     parser.add_argument("--curate", action="store_true", help="Curate signature runs into demo-pack/")
     parser.add_argument("--export-data", action="store_true", help="Export evacuation survival rates, critical seeds & policy interventions to exports/")
     parser.add_argument("--export-video", action="store_true", help="Export full simulation run MP4 video to exports/videos/")
-    parser.add_argument("--open", dest="open_sim", type=str, default=None, help="Open a .qsim file or https link in the scenario builder. With --report, run it and write the report")
+    parser.add_argument(
+        "--open",
+        dest="open_sim",
+        type=str,
+        default=None,
+        help="Open a .qsim file or https link in the scenario builder. With --report, run it and write the report",
+    )
     parser.add_argument("--report", action="store_true", help="Run one event, then write its end-of-event report as Excel and CSV")
     parser.add_argument("--test", action="store_true", help="Execute integration test suite")
     parser.add_argument("--seed", type=int, default=101, help="Event hazard or terrain seed")
-    parser.add_argument("--mind", type=str, default="quantum",
-                        choices=["quantum", "classical_mixture", "classical"], help="Mind engine")
-    parser.add_argument("--engine", type=str, default="legacy",
-                        choices=["legacy", "physics", "legacy_pack"], help="Simulation runtime: legacy, the T1 St. Vincent physics pack, or the fictional island through the pack runtime")
+    parser.add_argument("--mind", type=str, default="quantum", choices=["quantum", "classical_mixture", "classical"], help="Mind engine")
+    parser.add_argument(
+        "--engine",
+        type=str,
+        default="legacy",
+        choices=["legacy", "physics", "legacy_pack"],
+        help="Simulation runtime: legacy, the T1 St. Vincent physics pack, or the fictional island through the pack runtime",
+    )
     parser.add_argument("--noise", type=str, default="stub", help="Noise source profile")
     parser.add_argument("--scenario", type=str, default=None, choices=["island", "volcano", "titanic", "pompeii", "waterloo"], help="Choose scenario directly")
     parser.add_argument("--speed", type=float, default=0.2, help="Seconds delay per step during live demo")
-    parser.add_argument("--video-speed", type=float, default=1.0, help="Playback speed multiplier (e.g. 0.25 for Slow-Mo, 2.0 for Fast-Forward) when exporting video")
+    parser.add_argument(
+        "--video-speed", type=float, default=1.0, help="Playback speed multiplier (e.g. 0.25 for Slow-Mo, 2.0 for Fast-Forward) when exporting video"
+    )
     parser.add_argument("--output", type=str, default=None, help="Optional output file or directory path for exports")
 
     args = parser.parse_args()
 
     if args.test:
         import pytest
+
         print("[Tech C] Running integration test suite...")
         sys.exit(pytest.main(["-v", "test_contracts_and_engine.py"]))
     elif args.export_data:
         from engine.exporter import export_evacuation_datasets
+
         out_dir = args.output or "exports"
         info = export_evacuation_datasets(output_dir=out_dir, num_seeds=12)
         print(f"\n{BOLD}{GREEN}=== Exported Evacuation Survival & Policy Datasets ==={RESET}")
@@ -200,6 +212,7 @@ def main():
             print(f"  {k}: {CYAN}{v}{RESET}")
     elif args.export_video:
         from engine.exporter import export_simulation_video
+
         scen = args.scenario or "volcano"
         info = export_simulation_video(
             scenario=scen,
@@ -214,10 +227,12 @@ def main():
     elif args.report and args.open_sim:
         from engine.report import DEFAULT_DIR
         from stranded_physics.runtime.report import report_sim
+
         workbook, folder = report_sim(args.open_sim, mind=args.mind, out_dir=args.output or DEFAULT_DIR)
         print(f"Report saved: {workbook}\nCSV tables: {folder}")
     elif args.report:
         from engine.report import DEFAULT_DIR, run_and_report
+
         scen = args.scenario or "volcano"
         _report, workbook, folder = run_and_report(scen, seed=args.seed, mind=args.mind, out_dir=args.output or DEFAULT_DIR)
         print(f"Report saved: {workbook}\nCSV tables: {folder}")
@@ -234,14 +249,21 @@ def main():
         curate_demo_pack("demo-pack")
     elif args.demo or args.terminal:
         scen = args.scenario or "volcano"
-        run_live_demo(seed=args.seed, mind=args.mind, noise=args.noise,
-                      scenario=scen, speed=args.speed, engine_mode=args.engine)
+        run_live_demo(seed=args.seed, mind=args.mind, noise=args.noise, scenario=scen, speed=args.speed, engine_mode=args.engine)
     else:
         from engine.gui import launch_gui
+
         start_screen = "home" if args.scenario else "event_choice"
         print(f"Launching Quantum Cognition Simulation (Seed={args.seed}, Mind={args.mind})...")
-        launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen,
-                   scenario=args.scenario or "volcano", builder_factory=open_builder, open_sim=args.open_sim)
+        launch_gui(
+            seed=args.seed,
+            mind=args.mind,
+            noise=args.noise,
+            start_screen=start_screen,
+            scenario=args.scenario or "volcano",
+            builder_factory=open_builder,
+            open_sim=args.open_sim,
+        )
 
 
 if __name__ == "__main__":

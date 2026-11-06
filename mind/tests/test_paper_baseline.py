@@ -4,6 +4,7 @@ Everything added after this file is opt-in. If any assertion here moves, a
 "new" feature changed default behaviour and that feature is wrong, not this
 test. Do not relax a tolerance to make a later change pass.
 """
+
 import pytest
 
 from engine.agent import SurvivalAgent

@@ -1,5 +1,7 @@
 # Plan
 
+_The original week-long hackathon plan, kept for the record. It describes intentions, not what exists now._
+
 Lean scope for a week-long hackathon. Catch the big risks early (Tuesday/Wednesday) and always have something presentable.
 
 ## Scope

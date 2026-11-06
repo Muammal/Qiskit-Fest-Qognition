@@ -16,7 +16,7 @@ def run(axis, seed):
 
 
 def test_arbitrary_axis_event_and_phase_boundaries():
-    axis = TimeAxis(datetime(2021, 4, 9, 12, 40, tzinfo=timezone.utc), 60., 4)
+    axis = TimeAxis(datetime(2021, 4, 9, 12, 40, tzinfo=timezone.utc), 60.0, 4)
     result = run(axis, 1)
     np.testing.assert_array_equal(result["eruption.explosion"], [0, 1, 0, 0])
     np.testing.assert_array_equal(result["eruption.phase"], [1, 2, 2, 2])
@@ -28,8 +28,8 @@ def test_arbitrary_axis_event_and_phase_boundaries():
 
 def test_96_hour_axis_and_prefix_are_honoured():
     start = datetime(2021, 4, 8, tzinfo=timezone.utc)
-    long = run(TimeAxis(start, 3600., 97), 1)
-    short = run(TimeAxis(start, 3600., 20), 1)
+    long = run(TimeAxis(start, 3600.0, 97), 1)
+    short = run(TimeAxis(start, 3600.0, 20), 1)
     for name in ("phase", "column_height", "explosion", "mass_rate", "gas", "tremor"):
         np.testing.assert_array_equal(short["eruption." + name], long["eruption." + name][:20])
     for epoch, _, _ in read_events():
@@ -39,7 +39,7 @@ def test_96_hour_axis_and_prefix_are_honoured():
 
 
 def test_seed_changes_only_precursors():
-    axis = TimeAxis(datetime(2021, 4, 8, tzinfo=timezone.utc), 3600., 96)
+    axis = TimeAxis(datetime(2021, 4, 8, tzinfo=timezone.utc), 3600.0, 96)
     one, two = run(axis, 1), run(axis, 20)
     for name in ("phase", "column_height", "explosion", "mass_rate"):
         np.testing.assert_array_equal(one["eruption." + name], two["eruption." + name])
@@ -50,42 +50,39 @@ def test_seed_changes_only_precursors():
 
 
 def test_physical_scalings_and_invalid_inputs():
-    assert mastin_mass_rate_kg_s(2000.) == pytest.approx(2500.)
-    assert mastin_mass_rate_kg_s(0.) == 0
-    assert mtt_height_m(16., 1.) == pytest.approx(10.)
+    assert mastin_mass_rate_kg_s(2000.0) == pytest.approx(2500.0)
+    assert mastin_mass_rate_kg_s(0.0) == 0
+    assert mtt_height_m(16.0, 1.0) == pytest.approx(10.0)
     with pytest.raises(InterfaceError):
-        mastin_mass_rate_kg_s(-1.)
+        mastin_mass_rate_kg_s(-1.0)
     with pytest.raises(InterfaceError):
-        mtt_height_m(1., 0.)
+        mtt_height_m(1.0, 0.0)
 
 
-@pytest.mark.parametrize("step", [37., 300., 7200., 12713.])
+@pytest.mark.parametrize("step", [37.0, 300.0, 7200.0, 12713.0])
 def test_interval_mass_is_independent_of_frame_alignment(step):
     start = datetime(2021, 4, 8, tzinfo=timezone.utc)
     n = int(np.ceil(96 * 3600 / step)) + 1
     axis = TimeAxis(start, step, n)
     result = run(axis, 1)
     end = start.timestamp() + (n - 1) * step
-    expected = sum(mastin_mass_rate_kg_s(h) * max(0., min(t + duration, end) - max(t, start.timestamp()))
-                   for t, h, duration in read_events())
+    expected = sum(mastin_mass_rate_kg_s(h) * max(0.0, min(t + duration, end) - max(t, start.timestamp())) for t, h, duration in read_events())
     assert result["eruption.mass_rate"][0] == 0
     assert result["eruption.mass_rate"].sum() * step == pytest.approx(expected, rel=1e-12)
     moments = start.timestamp() + np.arange(n) * step
     for k in range(1, n):
-        heights = [h for t, h, duration in read_events()
-                   if min(t + duration, moments[k]) > max(t, moments[k-1])]
-        assert result["eruption.column_height"][k] == max(heights, default=0.)
+        heights = [h for t, h, duration in read_events() if min(t + duration, moments[k]) > max(t, moments[k - 1])]
+        assert result["eruption.column_height"][k] == max(heights, default=0.0)
 
 
 def test_short_and_overlapping_events_add_mass(monkeypatch):
     import stranded_physics.domains.eruption.model as model
+
     start = datetime(2021, 4, 9, tzinfo=timezone.utc)
     epoch = start.timestamp()
-    monkeypatch.setattr(model, "read_events", lambda: [(epoch + 100, 8000., 1800.),
-                                                     (epoch + 200, 12000., 1800.)])
-    result = run(TimeAxis(start, 7200., 2), 1)
+    monkeypatch.setattr(model, "read_events", lambda: [(epoch + 100, 8000.0, 1800.0), (epoch + 200, 12000.0, 1800.0)])
+    result = run(TimeAxis(start, 7200.0, 2), 1)
     assert result["eruption.explosion"][1] == 1
     assert result["eruption.mass_rate"][1] > 0
     assert result["eruption.column_height"][1] == 12000
-    assert result["eruption.mass_rate"].sum() * 7200 == pytest.approx(
-        1800 * (mastin_mass_rate_kg_s(8000) + mastin_mass_rate_kg_s(12000)))
+    assert result["eruption.mass_rate"].sum() * 7200 == pytest.approx(1800 * (mastin_mass_rate_kg_s(8000) + mastin_mass_rate_kg_s(12000)))

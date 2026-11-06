@@ -1,9 +1,7 @@
 # Qognition: Decision-Making & Multi-Scenario Evacuation Survival
 
-[![Integration Tests](https://img.shields.io/badge/tests-413%20passed-brightgreen.svg)](#daily-integration--verification-testing)
-[![Qiskit](https://img.shields.io/badge/Qiskit-2.x-6929C4.svg)](https://qiskit.org/)
-[![Status](https://img.shields.io/badge/Tech%20A%20%2B%20B%20%2B%20C%20%2B%20D-Unified-success.svg)](#unified-track-documentation-tech-a--tech-b--tech-c--product-d)
-[![Resolution](https://img.shields.io/badge/Resolution-1600%C3%97900%20(Fullscreen%20Scaled)-blueviolet.svg)](#fullscreen--interactive-controls)
+[![CI](https://github.com/Muammal/Qiskit-Fest-Qognition/actions/workflows/ci.yml/badge.svg)](https://github.com/Muammal/Qiskit-Fest-Qognition/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
 > **"Can quantum probability explain why humans make counterintuitive evacuation and survival decisions under extreme environmental stress — and how can we use it to improve real-life evacuation survival rates?"**
 
@@ -39,7 +37,7 @@ Results are in the generated table [`docs/results/SCENARIO_NUMBERS.md`](docs/res
 
 Detailed technical documentation explaining how **Tech A**, **Tech B**, **Tech C**, and **Product D** work both **separately** and **together**:
 
-- **[Full System Report (`docs/FULL_SYSTEM_REPORT.md`)](docs/FULL_SYSTEM_REPORT.md)** — Master technical report covering end-to-end architecture, complete Tech B status audit (14/14 record checks pass (settings and data files load; the physics is not tested against reality)), Clash of Clans / Hay Day UI design, and production verification.
+- **[Full System Report (`docs/FULL_SYSTEM_REPORT.md`)](docs/FULL_SYSTEM_REPORT.md)** — Master technical report covering end-to-end architecture, complete Tech B status audit (14/14 record checks pass (settings and data files load; the physics is not tested against reality)), wood-and-parchment UI design, and production verification.
 - **[Full System Presentation Slide Deck (`docs/PRESENTATION_SLIDES.md`)](docs/PRESENTATION_SLIDES.md)** — 14-slide presentation deck with Mermaid diagrams, equations, screenshots, and live demo guide.
 - **[New Implementations & Published Quantum Cognition Models Report (`docs/NEW_IMPLEMENTATIONS_REPORT.md`)](docs/NEW_IMPLEMENTATIONS_REPORT.md)** — Complete report of all newly implemented features and the **6 quantum cognition models adapted from published papers** (`jbusemey/ChoiceModeling`, `Insight137/insight137-eap`, `hwilner/open-system-decision-dynamics`, `ljaustc/QRL`, `WileQ/QCog`, `robertcprice/nQPU`).
 - **[How Tech A, Tech B, Tech C, and Product D Work Together & Separately (`docs/TECH_A_B_C_INTEGRATION.md`)](docs/TECH_A_B_C_INTEGRATION.md)** — Complete end-to-end architecture, frozen `contracts.py` boundary, step-by-step turn lifecycle, causal isolation guarantees, and 3-way cognitive benchmarking.
@@ -144,6 +142,21 @@ QWC/
 
 ---
 
+## Install
+
+You need Python 3.11 or newer.
+
+```bash
+git clone https://github.com/Muammal/Qiskit-Fest-Qognition.git
+cd Qiskit-Fest-Qognition
+python -m pip install -r requirements.txt -r requirements-physics.txt
+python main.py
+```
+
+The gallery sims and the builder's starting points run straight away. Scenarios built on real records also need the 230 MB data pack: `python tools/fetch_artifacts.py`.
+
+---
+
 ## Quickstart & Launch Commands
 
 ### 1. Interactive Graphical Visualizer (Recommended)
@@ -236,13 +249,24 @@ Reports are model output, not predictions.
 
 ---
 
-## Daily Integration & Verification Testing
+## Testing
 
 Run the unified suite across **Tech A**, **Tech B**, **Tech C**, **Titanic**, **Pompeii**, and **Waterloo** (413 passed, 3 skipped on 6 November 2026; `test_ui_layout.py`, `test_report.py`, `test_simfile.py` and `mind/human_tests` add more):
 
 ```powershell
 $env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py test_titanic.py test_pompeii.py test_waterloo.py mind/tests stranded_physics/core -q
 ```
+
+---
+
+## Contributing, Security and Licence
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) covers setup, checks and the rules for the science.
+- [SECURITY.md](SECURITY.md) says how to report a problem.
+- [community/REVIEW.md](community/REVIEW.md) says how published sims are reviewed.
+- Code is licensed under [Apache-2.0](LICENSE). Community sims are licensed under [CC BY 4.0](community/LICENSE.txt). Third-party data in `disaster_data/` keeps its own terms, which aren't all confirmed. See [NOTICE](NOTICE).
+
+Qognition is a research model. Its results are not predictions, and it must not be used to plan or make decisions in a real emergency.
 
 ---
 

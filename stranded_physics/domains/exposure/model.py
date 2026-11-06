@@ -25,7 +25,7 @@ def roof_failure_fraction(load_kg_m2):
     load = _nonnegative(load_kg_m2, "ash load")
     result = np.zeros(load.shape)
     positive = load > 0
-    result[positive] = ndtr(np.log(load[positive]/SETTINGS["roof_collapse_load"])/SETTINGS["roof_fragility_beta"])
+    result[positive] = ndtr(np.log(load[positive] / SETTINGS["roof_collapse_load"]) / SETTINGS["roof_fragility_beta"])
     return result.item() if result.ndim == 0 else result
 
 
@@ -35,8 +35,8 @@ def flow_death_probability(sheltered: bool) -> float:
 
 def ash_energy_cost_per_hour(load_kg_m2, sheltered: bool) -> float:
     load = _nonnegative(load_kg_m2, "ash load")
-    result = SETTINGS["ash_fatigue_per_hour"] * np.minimum(1., load/SETTINGS["ash_fatigue_load"])
-    return result * (SETTINGS["shelter_ash_factor"] if sheltered else 1.)
+    result = SETTINGS["ash_fatigue_per_hour"] * np.minimum(1.0, load / SETTINGS["ash_fatigue_load"])
+    return result * (SETTINGS["shelter_ash_factor"] if sheltered else 1.0)
 
 
 class Exposure:
@@ -57,7 +57,6 @@ class Exposure:
         return []
 
     def run(self, fields, rng):
-        frames = [roof_failure_fraction(fields.get("tephra.deposit_load", "kg/m**2", self.grid, k*self.time.dt_s))
-                  for k in range(self.time.n)]
+        frames = [roof_failure_fraction(fields.get("tephra.deposit_load", "kg/m**2", self.grid, k * self.time.dt_s)) for k in range(self.time.n)]
         fields.put("exposure.roof_failure", np.asarray(frames), "dimensionless", self.grid, self.time)
         return {}

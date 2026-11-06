@@ -1,4 +1,5 @@
 """The T2 domain releases only on land and preserves the PDC time contract."""
+
 from datetime import datetime, timezone
 
 import numpy as np
@@ -12,8 +13,8 @@ from stranded_physics.solvers.depth_averaged import FlowResult
 
 
 def setup_domain(frames=48, land=True, vent=None):
-    grid = GridSpec("EPSG:32620", 0., 5100., 100., 51, 51)
-    axis = TimeAxis(datetime(2021, 4, 8, tzinfo=timezone.utc), 7200., frames)
+    grid = GridSpec("EPSG:32620", 0.0, 5100.0, 100.0, 51, 51)
+    axis = TimeAxis(datetime(2021, 4, 8, tzinfo=timezone.utc), 7200.0, frames)
     store = FieldStore()
     store.put("terrain.elevation", np.zeros((51, 51)), "m", grid)
     store.put("terrain.land_mask", np.full((51, 51), land), "dimensionless", grid)
@@ -32,15 +33,15 @@ def test_release_settings_and_time_contract(monkeypatch):
 
     def capture(elevation, h0, dx, t_end, **kwargs):
         release = domain._release(np.ones_like(h0, bool))
-        assert h0.sum()*dx**2 == pytest.approx(SETTINGS["pulse_volume"])
+        assert h0.sum() * dx**2 == pytest.approx(SETTINGS["pulse_volume"])
         assert np.all(h0[~release] == 0)
         assert np.ptp(h0[release]) == 0
         assert t_end == SETTINGS["duration"]
         assert kwargs["mu"] == SETTINGS["coulomb_friction"]
         assert kwargs["xi"] == SETTINGS["turbulent_friction"]
         assert kwargs["arrival_depth"] == SETTINGS["arrival_depth"]
-        arrival = np.where(release, 0., np.inf)
-        return FlowResult(h0, h0*0, h0*0, arrival, h0, h0*0, t_end, h0.sum()*dx**2, 0., 1)
+        arrival = np.where(release, 0.0, np.inf)
+        return FlowResult(h0, h0 * 0, h0 * 0, arrival, h0, h0 * 0, t_end, h0.sum() * dx**2, 0.0, 1)
 
     monkeypatch.setattr(model_t2, "simulate", capture)
     assert domain.check_validity(fields) == []
@@ -60,7 +61,7 @@ def test_real_solver_budget_and_short_axis():
     assert np.isinf(store.stored("pdc.arrival").data).all()
 
 
-@pytest.mark.parametrize("land,vent", [(False, None), (True, (-1., 0.))])
+@pytest.mark.parametrize("land,vent", [(False, None), (True, (-1.0, 0.0))])
 def test_invalid_release_or_vent(land, vent):
     _, domain, fields = setup_domain(land=land, vent=vent)
     assert domain.check_validity(fields)

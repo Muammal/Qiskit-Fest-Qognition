@@ -1,5 +1,5 @@
 """
-engine - Stranded Procedural World & Survival Simulation Engine
+engine - Procedural worlds and evacuation simulations for Qognition
 Owned by Tech C (Integration, Engine, Contracts).
 """
 
@@ -33,6 +33,8 @@ __all__ = [
     "CityWorld",
     "RegionWorld",
     "EruptionModel",
-    "PompeiiSimulation"
+    "PompeiiSimulation",
+    "SiteWorld",
+    "ChlorineModel",
+    "WaterlooSimulation",
 ]
-

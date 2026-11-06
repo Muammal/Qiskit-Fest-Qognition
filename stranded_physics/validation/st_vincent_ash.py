@@ -1,4 +1,5 @@
 """Reproducible St Vincent ash measurements on the shared scenario axis."""
+
 from __future__ import annotations
 
 import json
@@ -53,16 +54,14 @@ def main(argv):
             doubled = float(refined.get("tephra.deposit_load", "kg/m**2")[-1][land].mean())
             if baseline == 0 and doubled != 0:
                 raise InterfaceError("relative grain change is undefined for zero baseline load")
-            value = abs(doubled - baseline) / baseline if baseline else 0.
+            value = abs(doubled - baseline) / baseline if baseline else 0.0
         elif argv[0] == "island_cover":
             final = store.get("tephra.deposit_load", "kg/m**2")[-1]
             value = float(np.mean(final[land] >= SETTINGS["island_threshold"]))
         else:
             loads = [ash.load_at(BARBADOS_XY, k * TIME.dt_s) for k in range(TIME.n)]
-            value = next((k * TIME.dt_s / 3600 for k, load in enumerate(loads)
-                          if load >= SETTINGS["barbados_threshold"]), None)
-            print(json.dumps({"value": 999.0 if value is None else value, "reached": value is not None,
-                              "max_load_kg_m2": max(loads)}))
+            value = next((k * TIME.dt_s / 3600 for k, load in enumerate(loads) if load >= SETTINGS["barbados_threshold"]), None)
+            print(json.dumps({"value": 999.0 if value is None else value, "reached": value is not None, "max_load_kg_m2": max(loads)}))
             return 0
         print(json.dumps({"value": value}))
     except (InterfaceError, OSError) as error:

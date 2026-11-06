@@ -1,4 +1,5 @@
 """The in-game scenario builder. It draws a Draft and turns clicks into Draft changes. Every rule lives in entities/draft.py. main.py hands this to the game window, because engine/ never imports the physics engine."""
+
 from __future__ import annotations
 
 import re
@@ -11,24 +12,60 @@ from typing import Callable, NamedTuple
 import pygame
 
 from engine.gui import (
-    COLOR_BG, COLOR_BLUE, COLOR_CARD_BORDER, COLOR_CYAN, COLOR_GOLD, COLOR_GREEN, COLOR_GREEN_DARK, COLOR_ORANGE, COLOR_PANEL_ALT, COLOR_PANEL_BG, COLOR_PURPLE,
-    COLOR_RED, COLOR_TEXT_HINT, COLOR_TEXT_MAIN, COLOR_TEXT_MUTED, WINDOW_HEIGHT, WINDOW_WIDTH, wrap_text,
+    COLOR_BG,
+    COLOR_BLUE,
+    COLOR_CARD_BORDER,
+    COLOR_CYAN,
+    COLOR_GOLD,
+    COLOR_GREEN,
+    COLOR_GREEN_DARK,
+    COLOR_ORANGE,
+    COLOR_PANEL_ALT,
+    COLOR_PANEL_BG,
+    COLOR_PURPLE,
+    COLOR_RED,
+    COLOR_TEXT_HINT,
+    COLOR_TEXT_MAIN,
+    COLOR_TEXT_MUTED,
+    WINDOW_HEIGHT,
+    WINDOW_WIDTH,
+    wrap_text,
 )
 from stranded_physics import check
 from stranded_physics.core.api import InterfaceError
 from stranded_physics.entities import draft as edit
 from stranded_physics.entities import simfile
-from stranded_physics.entities.api import MINDS, PLACES, RESOURCES, SOURCES
+from stranded_physics.entities.api import PLACES, SOURCES
 from stranded_physics.entities.api import EntitySpec
-from stranded_physics.entities.kinds import ERUPTION_EVENTS, KINDS, NOT_BUILT, terrain_domain
+from stranded_physics.entities.kinds import ERUPTION_EVENTS, NOT_BUILT, terrain_domain
 from stranded_physics.runtime.game import SEA, build_game, lonlat_to_map, map_to_lonlat, terrain_picture
 
-KIND_TEXT = {"terrain": "The land", "weather": "Wind, rain, temperature", "eruption": "Timeline, column, mass", "ash": "Fallout from an eruption",
-             "flow": "Hot flows from an eruption", "mudflow": "Rain on ash", "gas": "SO2 downwind", "lava": "A growing dome", "storm": "Wind from a cyclone", "person": "A body and a mind",
-             "group": "Many people, one mind", "shelter": "Somewhere to evacuate to", "resource": "Food, water or wood",
-             "ship": "Hull and compartments", "breach": "Where it's holed", "lifeboats": "Seats, launch times", "sea": "Water temperature", "passengers": "People aboard"}
-KIND_GROUPS = (("WORLD", ("terrain", "weather")), ("HAZARDS", ("eruption", "ash", "flow", "mudflow", "gas", "lava", "storm")),
-               ("AT SEA", ("ship", "breach", "lifeboats", "sea", "passengers")), ("PEOPLE AND PLACES", ("person", "group", "shelter", "resource")))
+KIND_TEXT = {
+    "terrain": "The land",
+    "weather": "Wind, rain, temperature",
+    "eruption": "Timeline, column, mass",
+    "ash": "Fallout from an eruption",
+    "flow": "Hot flows from an eruption",
+    "mudflow": "Rain on ash",
+    "gas": "SO2 downwind",
+    "lava": "A growing dome",
+    "storm": "Wind from a cyclone",
+    "person": "A body and a mind",
+    "group": "Many people, one mind",
+    "shelter": "Somewhere to evacuate to",
+    "resource": "Food, water or wood",
+    "ship": "Hull and compartments",
+    "breach": "Where it's holed",
+    "lifeboats": "Seats, launch times",
+    "sea": "Water temperature",
+    "passengers": "People aboard",
+}
+KIND_GROUPS = (
+    ("WORLD", ("terrain", "weather")),
+    ("HAZARDS", ("eruption", "ash", "flow", "mudflow", "gas", "lava", "storm")),
+    ("AT SEA", ("ship", "breach", "lifeboats", "sea", "passengers")),
+    ("PEOPLE AND PLACES", ("person", "group", "shelter", "resource")),
+)
 KIND_COLORS = {"person": COLOR_PURPLE, "group": COLOR_PURPLE, "shelter": COLOR_GREEN, "resource": COLOR_CYAN, "storm": COLOR_BLUE}
 MODEL_KINDS = ("ash", "flow", "mudflow", "gas", "lava")
 BUILT_IN = "Built-in model"
@@ -40,13 +77,14 @@ OPEN_ROWS = 12
 DETAIL_BOTTOM = 824
 CHOICES_PER_ROW = 3
 MAP_RECT = pygame.Rect(286, 112, 520, 520)
-MAP_KM = 20.
+MAP_KM = 20.0
 PIN_REACH_PX = 10
-LONLAT_STEP = .005  # About 500 m, one tile of the game's map.
+LONLAT_STEP = 0.005  # About 500 m, one tile of the game's map.
 STEPS_ACROSS_RANGE = 40
 ON_LAND_KINDS = ("person", "group", "shelter", "resource")
 EDIT_LIMIT = 300
 UNDO_LIMIT = 100
+GALLERY_ORIGIN = "the community gallery"
 SHADE = (214, 192, 150)
 FIELD_BG = (255, 250, 236)
 
@@ -88,7 +126,7 @@ class BuilderScreen:
         self.seed = app.seed
         self.builder_thread: threading.Thread | None = None
         self.build_result: object = None
-        self.build_started = 0.
+        self.build_started = 0.0
         self.hot: list[Hot] = []
         self.click_pos = (0, 0)
         self.mouse = (0, 0)
@@ -123,7 +161,9 @@ class BuilderScreen:
             land = edit.terrain_entry(self.draft)
             domain = None
             if land is not None and land["source"] != "replay":
-                domain = terrain_domain(EntitySpec("terrain", str(land["source"]), settings={k: float(land[k]) for k in ("summit_m", "area_km2") if k in land}), self.seed)
+                domain = terrain_domain(
+                    EntitySpec("terrain", str(land["source"]), settings={k: float(land[k]) for k in ("summit_m", "area_km2") if k in land}), self.seed
+                )
             picture = terrain_picture(domain=domain, seed=self.seed)
             if key == self.picture_for:  # A newer choice replaces a slower, older one.
                 self.picture = picture
@@ -149,11 +189,13 @@ class BuilderScreen:
 
     def _in_background(self, work: Callable[[], object], finish: Callable[[object], None]) -> None:
         """Network work on a thread, so the window keeps drawing. `finish` runs on the window's thread."""
+
         def run() -> None:
             try:
                 self.net_result = work()
             except InterfaceError as error:
                 self.net_result = error
+
         self.net_finish = finish
         self.net_thread = threading.Thread(target=run, daemon=True)
         self.net_thread.start()
@@ -178,7 +220,7 @@ class BuilderScreen:
         self.message, self.message_bad = text, bad
 
     def _remember(self) -> None:
-        self.undo_stack = [*self.undo_stack[-(UNDO_LIMIT - 1):], self.draft]
+        self.undo_stack = [*self.undo_stack[-(UNDO_LIMIT - 1) :], self.draft]
 
     def _undo(self) -> None:
         if not self.undo_stack:
@@ -196,7 +238,7 @@ class BuilderScreen:
             self._say(f"Refused: {error}", bad=True)
             return False
         if self.draft is not before:
-            self.undo_stack = [*self.undo_stack[-(UNDO_LIMIT - 1):], before]
+            self.undo_stack = [*self.undo_stack[-(UNDO_LIMIT - 1) :], before]
         self._say("")
         return True
 
@@ -283,7 +325,7 @@ class BuilderScreen:
         self.seed, self.selected, self.scroll, self.undo_stack = sim.seed, None, 0, []
         self.start_open, self.open_rows, self.gallery = False, None, None
         self.author, self.description = sim.author, sim.description
-        self.sim_note = f"\"{sim.title}\" by {sim.author or 'someone anonymous'}, from {origin}. Nobody has checked it. Treat it as a model, not as advice."
+        self.sim_note = f'"{sim.title}" by {sim.author or "someone anonymous"}, from {origin}. {"Reviewed before listing, but not validated" if origin == GALLERY_ORIGIN else "Nobody has checked it"}. Treat it as a model, not as advice.'
         self._say(simfile.DATA_PACK_HELP, bad=True) if sim.needs_data_pack and not simfile.data_pack_present() else self._say("Opened. Press PLAY to run it.")
 
     def open_source(self, source: str) -> None:
@@ -302,7 +344,7 @@ class BuilderScreen:
         self._in_background(simfile.fetch_gallery, lambda rows: setattr(self, "gallery", rows))
 
     def _open_gallery_row(self, row: dict) -> None:
-        self._in_background(lambda: simfile.fetch_gallery_sim(row), lambda sim: self._take_sim(sim, "the community gallery"))
+        self._in_background(lambda: simfile.fetch_gallery_sim(row), lambda sim: self._take_sim(sim, GALLERY_ORIGIN))
 
     def _set_link(self, text: str) -> edit.Draft:
         self.link = text
@@ -329,12 +371,15 @@ class BuilderScreen:
         """Nothing is uploaded from here. The person sees GitHub's own page and chooses to submit."""
         if self.was_armed != "Publish":
             self.armed = "Publish"
-            self._say("Your file, title, name and description will be public, for anyone to download. Click Publish online again to go ahead.", bad=True)
+            self._say(
+                f"Your file, title, name and description will be public, shared under {simfile.LICENCE}. Click Publish online again to agree and go ahead.",
+                bad=True,
+            )
             return
         path = self._export()
         if path is not None:
             webbrowser.open(simfile.UPLOAD_PAGE)
-            self._say(f"Opened GitHub in your browser. Drop {path} on that page, then submit it. It goes live once it is reviewed.")
+            self._say(f"Opened GitHub in your browser. Drop {path} on that page, then submit it. It goes live after a review.")
 
     def _list_files(self) -> None:
         rows = []
@@ -465,7 +510,9 @@ class BuilderScreen:
             text = text[:-1]
         return text + "..."
 
-    def _button(self, rect, label: str, action: Callable[[], None], active: bool = False, enabled: bool = True, color=COLOR_PANEL_ALT, ink=COLOR_TEXT_MAIN, font=None) -> None:
+    def _button(
+        self, rect, label: str, action: Callable[[], None], active: bool = False, enabled: bool = True, color=COLOR_PANEL_ALT, ink=COLOR_TEXT_MAIN, font=None
+    ) -> None:
         rect = pygame.Rect(rect)
         font = font or self.app.font_sub
         if enabled:
@@ -523,7 +570,10 @@ class BuilderScreen:
             return
         if edit.borrows_evidence(self.draft):
             self._claims_for = None
-            self.claims = [("Result: none yet.", COLOR_TEXT_MAIN), (f"{scenario.id} is a shipped scenario, and this has been changed from it. Its results don't apply here. Give this a new id.", COLOR_RED)]
+            self.claims = [
+                ("Result: none yet.", COLOR_TEXT_MAIN),
+                (f"{scenario.id} is a shipped scenario, and this has been changed from it. Its results don't apply here. Give this a new id.", COLOR_RED),
+            ]
             return
         wanted = (scenario.id, scenario.place, scenario.uses())
         if wanted == self._claims_for:
@@ -577,15 +627,33 @@ class BuilderScreen:
             self._field((696, 36, 80, 30), "hours", header["hours"], lambda text: edit.set_header(self.draft, "hours", text))
             self._button((1420, 26, 150, 34), "Advanced", lambda: setattr(self, "guided", False))
             return
-        fields = (("Title", "title", 118, 380), ("Id (results belong to this)", "id", 510, 200), ("Start, with timezone", "start_utc", 834, 260), ("Hours", "hours", 1106, 70), ("UTC offset", "local_utc_offset", 1188, 70))
+        fields = (
+            ("Title", "title", 118, 380),
+            ("Id (results belong to this)", "id", 510, 200),
+            ("Start, with timezone", "start_utc", 834, 260),
+            ("Hours", "hours", 1106, 70),
+            ("UTC offset", "local_utc_offset", 1188, 70),
+        )
         for label, key, x, width in fields:
             self._text(label, x, 18, self.app.font_small, COLOR_TEXT_MUTED)
             self._field((x, 36, width, 30), key, header[key], lambda text, k=key: edit.set_header(self.draft, k, text))
         self._text("Place", 722, 18, self.app.font_small, COLOR_TEXT_MUTED)
         following = PLACES[(PLACES.index(header["place"]) + 1) % len(PLACES)]
         self._button((722, 36, 100, 30), str(header["place"]).capitalize(), lambda: self._apply(lambda: edit.set_header(self.draft, "place", following)))
-        self._text(f"{header['step_hours']} h steps" if "step_hours" in header else f"{header['step_minutes']} min steps", 1272, 42, self.app.font_small, COLOR_TEXT_MUTED)
-        self._text(f"{int(header['hours']) * 60 // (int(header['step_hours']) * 60 if 'step_hours' in header else int(header['step_minutes']))} steps", 1272, 24, self.app.font_small, COLOR_TEXT_MUTED)
+        self._text(
+            f"{header['step_hours']} h steps" if "step_hours" in header else f"{header['step_minutes']} min steps",
+            1272,
+            42,
+            self.app.font_small,
+            COLOR_TEXT_MUTED,
+        )
+        self._text(
+            f"{int(header['hours']) * 60 // (int(header['step_hours']) * 60 if 'step_hours' in header else int(header['step_minutes']))} steps",
+            1272,
+            24,
+            self.app.font_small,
+            COLOR_TEXT_MUTED,
+        )
         self._button((1490, 26, 84, 34), "Simple", lambda: setattr(self, "guided", True))
 
     def _draw_palette(self) -> None:
@@ -638,7 +706,7 @@ class BuilderScreen:
             entry = self.draft.entries[index]
             color = KIND_COLORS.get(str(entry["kind"]), COLOR_ORANGE)
             if entry["kind"] == "group":
-                radius = int(float(entry.get("radius_km", 0.)) / MAP_KM * MAP_RECT.width)
+                radius = int(float(entry.get("radius_km", 0.0)) / MAP_KM * MAP_RECT.width)
                 if radius > 1:
                     pygame.draw.circle(self.canvas, color, (x, y), radius, 1)
             if index == self.selected:
@@ -679,7 +747,9 @@ class BuilderScreen:
         """The checklist: what's done, and one click to add what isn't."""
         for number, (label, done, kinds) in enumerate(edit.next_steps(self.draft)):
             rect = (x + number * 104, y, 98, 26)
-            self._button(rect, f"{'OK' if done else '+'} {label}", (lambda: None) if done else (lambda k=kinds: self._add_step(k)), active=done, font=self.app.font_small)
+            self._button(
+                rect, f"{'OK' if done else '+'} {label}", (lambda: None) if done else (lambda k=kinds: self._add_step(k)), active=done, font=self.app.font_small
+            )
             self.hot[-1] = Hot(self.hot[-1].rect, self.hot[-1].action, f"step:{label}")
         return y + 32
 
@@ -689,10 +759,13 @@ class BuilderScreen:
 
     def _entry_summary(self, entry) -> str:
         kind = str(entry["kind"])
-        name = f" \"{entry['name']}\"" if entry.get("name") else ""
+        name = f' "{entry["name"]}"' if entry.get("name") else ""
         count = entry.get("count")
-        detail = {"person": MIND_TEXT.get(str(entry.get("mind")), ""), "group": f"{count} {'person' if count == 1 else 'people'}, {MIND_TEXT.get(str(entry.get('mind')), '')}",
-                  "resource": WHAT_TEXT.get(str(entry.get("what")), "")}.get(kind, str(entry.get("event") or ""))
+        detail = {
+            "person": MIND_TEXT.get(str(entry.get("mind")), ""),
+            "group": f"{count} {'person' if count == 1 else 'people'}, {MIND_TEXT.get(str(entry.get('mind')), '')}",
+            "resource": WHAT_TEXT.get(str(entry.get("what")), ""),
+        }.get(kind, str(entry.get("event") or ""))
         return f"{kind.capitalize()}{name}" + (f": {detail}" if detail else "")
 
     def _draw_list(self) -> None:
@@ -700,7 +773,13 @@ class BuilderScreen:
         entries = self.draft.entries
         self._text(f"IN THIS SCENARIO ({len(entries)})", 844, 94, self.app.font_sub, COLOR_GOLD)
         if len(entries) > VISIBLE_ROWS:
-            self._text(f"Scroll to see more: showing {self.scroll + 1} to {min(len(entries), self.scroll + VISIBLE_ROWS)}", 1250, 96, self.app.font_small, COLOR_TEXT_MUTED)
+            self._text(
+                f"Scroll to see more: showing {self.scroll + 1} to {min(len(entries), self.scroll + VISIBLE_ROWS)}",
+                1250,
+                96,
+                self.app.font_small,
+                COLOR_TEXT_MUTED,
+            )
         for row, index in enumerate(range(self.scroll, min(len(entries), self.scroll + VISIBLE_ROWS))):
             self._draw_row(index, 120 + row * ROW_H)
 
@@ -735,7 +814,11 @@ class BuilderScreen:
         self._text(f"{kind.upper()} SETTINGS", 844, 402, self.app.font_sub, COLOR_GOLD)
         self._text(KIND_TEXT[kind], 844, 420, self.app.font_small, COLOR_TEXT_MUTED)
         y = self._draw_sources(index, entry, 442)
-        for key, label, names in (("event", "Model" if kind == "flow" else "Recorded event", None), ("mind", "Mind", MIND_TEXT), ("what", "Island" if kind == "weather" else "What it is", WHAT_TEXT)):
+        for key, label, names in (
+            ("event", "Model" if kind == "flow" else "Recorded event", None),
+            ("mind", "Mind", MIND_TEXT),
+            ("what", "Island" if kind == "weather" else "What it is", WHAT_TEXT),
+        ):
             options = edit.choices(entry, key)
             if options:
                 y = self._draw_choice(index, entry, key, label, options, names, y)
@@ -754,8 +837,14 @@ class BuilderScreen:
             available = source in edit.choices(entry, "source")
             stage = NOT_BUILT.get((entry["kind"], source))
             label = (BUILT_IN if kind_is_model(entry, source) else SOURCE_TEXT[source]) + (f" (stage {stage})" if stage and not available else "")
-            self._button((1000 + number * 190, y + 2, 182, 30), label, lambda s=source: self._apply(lambda: edit.set_choice(self.draft, index, "source", s)),
-                         active=entry["source"] == source, enabled=available, font=self.app.font_small)
+            self._button(
+                (1000 + number * 190, y + 2, 182, 30),
+                label,
+                lambda s=source: self._apply(lambda: edit.set_choice(self.draft, index, "source", s)),
+                active=entry["source"] == source,
+                enabled=available,
+                font=self.app.font_small,
+            )
         return y + 38
 
     def _draw_choice(self, index: int, entry, key: str, label: str, options: tuple[str, ...], names, y: int) -> int:
@@ -763,8 +852,13 @@ class BuilderScreen:
         for number, option in enumerate(options):
             text = names.get(option, option) if names else option
             row, column = divmod(number, CHOICES_PER_ROW)  # Five islands don't fit on one row.
-            self._button((1000 + column * 190, y + 2 + row * 38, 182, 30), text, lambda o=option: self._apply(lambda: edit.set_choice(self.draft, index, key, o)),
-                         active=entry.get(key) == option, font=self.app.font_small)
+            self._button(
+                (1000 + column * 190, y + 2 + row * 38, 182, 30),
+                text,
+                lambda o=option: self._apply(lambda: edit.set_choice(self.draft, index, key, o)),
+                active=entry.get(key) == option,
+                font=self.app.font_small,
+            )
         return y + 38 * (1 + (len(options) - 1) // CHOICES_PER_ROW)
 
     def _draw_dial(self, index: int, entry, dial, y: int) -> None:
@@ -787,7 +881,9 @@ class BuilderScreen:
         self._text("Seed", 538, y + 16, self.app.font_sub, COLOR_PANEL_BG)
         self._field((582, y + 10, 90, 30), "seed", self.seed, self._set_seed)
         self._text("Same file and seed, same world. In play, one person is followed at a time.", 690, y + 16, self.app.font_small, COLOR_PANEL_ALT)
-        self._button((1340, y, 248, 50), "PLAY THIS SCENARIO", self._play, color=COLOR_GREEN, ink=COLOR_PANEL_BG, font=self.app.font_title, enabled=not self.problem)
+        self._button(
+            (1340, y, 248, 50), "PLAY THIS SCENARIO", self._play, color=COLOR_GREEN, ink=COLOR_PANEL_BG, font=self.app.font_title, enabled=not self.problem
+        )
 
     def _draw_modal(self, width: int, height: int) -> pygame.Rect:
         self.hot = []
@@ -802,10 +898,19 @@ class BuilderScreen:
         rect = self._draw_modal(760, 680)
         community = self.gallery is not None
         self._text("COMMUNITY SIMS" if community else "OPEN A SCENARIO", rect.x + 20, rect.y + 16, self.app.font_title, COLOR_GOLD)
-        self._button((rect.right - 104, rect.y + 12, 90, 30), "Back" if community else "Close",
-                     (lambda: setattr(self, "gallery", None)) if community else (lambda: setattr(self, "open_rows", None)))
+        self._button(
+            (rect.right - 104, rect.y + 12, 90, 30),
+            "Back" if community else "Close",
+            (lambda: setattr(self, "gallery", None)) if community else (lambda: setattr(self, "open_rows", None)),
+        )
         if community:
-            self._text("Made by the public, and not checked by anyone. Each one is a model, not advice.", rect.x + 20, rect.y + 52, self.app.font_body, COLOR_TEXT_MUTED)
+            self._text(
+                "Made by the public, and not checked by anyone. Each one is a model, not advice.",
+                rect.x + 20,
+                rect.y + 52,
+                self.app.font_body,
+                COLOR_TEXT_MUTED,
+            )
         else:
             self._text("Paste a link to a .qsim file, or drop a file on this window", rect.x + 20, rect.y + 48, self.app.font_small, COLOR_TEXT_MUTED)
             self._field((rect.x + 20, rect.y + 68, 460, 32), "link", self.link, self._set_link, empty="https://")
@@ -813,16 +918,32 @@ class BuilderScreen:
             self._button((rect.x + 606, rect.y + 68, 134, 32), "Community", self._open_gallery, color=COLOR_BLUE, ink=COLOR_PANEL_BG)
         rows = self.gallery if community else self.open_rows
         if len(rows) > OPEN_ROWS:
-            self._text(f"Scroll to see more: showing {self.open_scroll + 1} to {min(len(rows), self.open_scroll + OPEN_ROWS)} of {len(rows)}", rect.x + 240, rect.y + 22, self.app.font_small, COLOR_TEXT_MUTED)
+            self._text(
+                f"Scroll to see more: showing {self.open_scroll + 1} to {min(len(rows), self.open_scroll + OPEN_ROWS)} of {len(rows)}",
+                rect.x + 240,
+                rect.y + 22,
+                self.app.font_small,
+                COLOR_TEXT_MUTED,
+            )
         y = rect.y + 112
-        for row in rows[self.open_scroll:self.open_scroll + OPEN_ROWS]:
+        for row in rows[self.open_scroll : self.open_scroll + OPEN_ROWS]:
             if community:
                 suffix = ", needs the data pack" if row["needs_data_pack"] else ""
-                self._button((rect.x + 20, y, rect.width - 40, 40), f"{row['title']}  (by {row['author'] or 'anonymous'}{suffix})", lambda r=row: self._open_gallery_row(r), font=self.app.font_body)
+                self._button(
+                    (rect.x + 20, y, rect.width - 40, 40),
+                    f"{row['title']}  (by {row['author'] or 'anonymous'}{suffix})",
+                    lambda r=row: self._open_gallery_row(r),
+                    font=self.app.font_body,
+                )
                 self.hot[-1] = Hot(self.hot[-1].rect, self.hot[-1].action, f"community:{row['file']}")
             else:
                 path, title = row
-                self._button((rect.x + 20, y, rect.width - 40, 40), f"{title}  ({path.name if path.suffix == simfile.SUFFIX else path.stem})", lambda p=path: self._open(p), font=self.app.font_body)
+                self._button(
+                    (rect.x + 20, y, rect.width - 40, 40),
+                    f"{title}  ({path.name if path.suffix == simfile.SUFFIX else path.stem})",
+                    lambda p=path: self._open(p),
+                    font=self.app.font_body,
+                )
                 self.hot[-1] = Hot(self.hot[-1].rect, self.hot[-1].action, f"open:{path.stem}")
             y += 46
         if self.message:
@@ -831,7 +952,9 @@ class BuilderScreen:
     def _draw_start(self) -> None:
         rect = self._draw_modal(820, 560)
         self._text("WHAT DO YOU WANT TO SIMULATE?", rect.x + 24, rect.y + 18, self.app.font_title, COLOR_GOLD)
-        self._text("Pick a starting point. It plays straight away, and you can change anything in it.", rect.x + 24, rect.y + 50, self.app.font_body, COLOR_TEXT_MUTED)
+        self._text(
+            "Pick a starting point. It plays straight away, and you can change anything in it.", rect.x + 24, rect.y + 50, self.app.font_body, COLOR_TEXT_MUTED
+        )
         y = rect.y + 84
         for name, title, text, needs_pack in edit.TEMPLATES:
             box = pygame.Rect(rect.x + 24, y, rect.width - 48, 66)
@@ -858,8 +981,17 @@ class BuilderScreen:
         elif simfile.needs_data_pack(scenario):
             y = self._wrapped("This needs the 230 MB data pack, so it won't open on every copy of the app.", rect.x + 24, y, rect.width - 48, COLOR_RED, 2)
         else:
-            y = self._wrapped("Runs anywhere: it needs nothing but the app. Same file and seed give the same world.", rect.x + 24, y, rect.width - 48, COLOR_GREEN_DARK, 2)
-        self._wrapped("The file holds your scenario, seed, name and description, and nothing else from this computer.", rect.x + 24, y + 6, rect.width - 48, COLOR_TEXT_MUTED, 2)
+            y = self._wrapped(
+                "Runs anywhere: it needs nothing but the app. Same file and seed give the same world.", rect.x + 24, y, rect.width - 48, COLOR_GREEN_DARK, 2
+            )
+        self._wrapped(
+            f"The file holds your scenario, seed, name and description, and nothing else from this computer. Publishing shares it under {simfile.LICENCE}, with credit to you.",
+            rect.x + 24,
+            y + 6,
+            rect.width - 48,
+            COLOR_TEXT_MUTED,
+            2,
+        )
         if self.message:
             self._wrapped(self.message, rect.x + 24, rect.bottom - 142, rect.width - 48, COLOR_RED if self.message_bad else COLOR_BLUE, 3)
         ready = scenario is not None
@@ -870,4 +1002,10 @@ class BuilderScreen:
     def _draw_building(self) -> None:
         rect = self._draw_modal(520, 130)
         self._text("Building this scenario...", rect.x + 24, rect.y + 24, self.app.font_title, COLOR_GOLD)
-        self._text(f"{time.time() - self.build_started:.0f} s so far. A full eruption takes about 20 s.", rect.x + 24, rect.y + 64, self.app.font_body, COLOR_TEXT_MUTED)
+        self._text(
+            f"{time.time() - self.build_started:.0f} s so far. A full eruption takes about 20 s.",
+            rect.x + 24,
+            rect.y + 64,
+            self.app.font_body,
+            COLOR_TEXT_MUTED,
+        )

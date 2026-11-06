@@ -8,6 +8,7 @@ Both are labelled schematics for an evacuation demonstration, not surveys. The
 layout follows the sources in PROVENANCE; individual blocks are simplified.
 Numerical choices are assumptions unless a source is cited.
 """
+
 import copy
 import math
 from functools import lru_cache
@@ -49,18 +50,26 @@ PROVENANCE = {
     "forum": dict(value="near Porta Marina", status="sourced", url=POMPEIONLINE, note=""),
     "amphitheatre": dict(value="southeast", status="inferred", url=GUIDE, note="Region II with Porta Nocera, pp. 34, 38; one school page says southwest"),
     "palaestra": dict(value="next to the amphitheatre", status="school", url=NARRABEEN, note=""),
-    "block_size": dict(value="850-5,500 sq m", status="school", url=NARRABEEN,
-                       note="drawn blocks of 18,000 sq m stand for several real blocks; a 30 m tile cannot show a 6 m lane"),
+    "block_size": dict(
+        value="850-5,500 sq m",
+        status="school",
+        url=NARRABEEN,
+        note="drawn blocks of 18,000 sq m stand for several real blocks; a 30 m tile cannot show a 6 m lane",
+    ),
     "vesuvius_distance": dict(value="8 km", status="sourced", url=ROMAN_PORTS, note="northwest bearing from memory"),
     "vesuvius_height": dict(value="1,200 m", status="assumption", url=None, note="height in 79 CE is unknown"),
-    "coast_and_sarno": dict(value="coast west of town; Sarno to the south", status="assumption", url=ROMAN_PORTS,
-                            note="town bordered the Sarno; ancient coast and port position are uncertain"),
+    "coast_and_sarno": dict(
+        value="coast west of town; Sarno to the south",
+        status="assumption",
+        url=ROMAN_PORTS,
+        note="town bordered the Sarno; ancient coast and port position are uncertain",
+    ),
 }
 
-CITY_CENTER = (20., 20.)
+CITY_CENTER = (20.0, 20.0)
 CITY_SEMI_AXES = (17.5, 13.3)  # assumption: oval of 66 ha at 30 m per tile
 BLOCK_X, BLOCK_Y, LANE_OFFSET = 6, 5, 3  # assumption: lanes every 180 x 150 m, so streets do not swamp the town
-ELEVATION_LOW, ELEVATION_HIGH = 10., 40.  # metres; rising north is an assumption
+ELEVATION_LOW, ELEVATION_HIGH = 10.0, 40.0  # metres; rising north is an assumption
 
 ABBONDANZA_Y, NOLA_Y, MARINA_Y = 23, 13, 21  # assumption: schematic street lines
 STABIANA_X, NOCERA_X, ERCOLANO_X = 21, 31, 9  # assumption: schematic street lines
@@ -71,19 +80,24 @@ LANDMARKS = {"forum": FORUM, "amphitheatre": AMPHITHEATRE, "palaestra": PALAESTR
 
 REGION_CITY_CENTER = (30, 30)  # assumption: places Vesuvius 8 km to the northwest
 VESUVIUS = (7, 7)  # 8 km at 250 m per tile, about 22.6 tiles along each axis
-VESUVIUS_HEIGHT = 1200.
+VESUVIUS_HEIGHT = 1200.0
 GATE_TO_REGION = {  # city gate -> region tile just outside the town
-    "ercolano": (28, 28), "vesuvio": (30, 28), "nola": (32, 28), "sarno": (33, 30),
-    "nocera": (32, 32), "stabia": (30, 32), "marina": (27, 30),
+    "ercolano": (28, 28),
+    "vesuvio": (30, 28),
+    "nola": (32, 28),
+    "sarno": (33, 30),
+    "nocera": (32, 32),
+    "stabia": (30, 32),
+    "marina": (27, 30),
 }
 REGION_ROADS = {  # gate -> where its road leaves the region map
     "ercolano": (0, 17),  # toward Naples, along the shore below the mountain
-    "vesuvio": (17, 0),   # assumption: farm tracks north
-    "nola": (39, 8),      # toward Nola
-    "sarno": (39, 28),    # assumption: along the river plain
-    "nocera": (39, 37),   # toward Nocera
-    "stabia": (33, 39),   # assumption: south to Stabiae
-    "marina": (24, 30),   # to the shore
+    "vesuvio": (17, 0),  # assumption: farm tracks north
+    "nola": (39, 8),  # toward Nola
+    "sarno": (39, 28),  # assumption: along the river plain
+    "nocera": (39, 37),  # toward Nocera
+    "stabia": (33, 39),  # assumption: south to Stabiae
+    "marina": (24, 30),  # to the shore
 }
 ROAD_WAYPOINTS = {"ercolano": [(9, 21), (3, 18)]}  # assumption: the coast road stays on the low shore
 SARNO_COURSE = ((39, 35), (34, 34), (26, 34))  # assumption: the town borders the river; its ancient course is uncertain
@@ -108,8 +122,12 @@ class CityWorld(IslandWorld):
 
     def export_dict(self):
         exported = super().export_dict()
-        exported.update(scale_m_per_tile=CITY_M_PER_TILE, gates={k: list(v) for k, v in self.gates.items()},
-                        landmarks={k: list(v) for k, v in LANDMARKS.items()}, provenance=PROVENANCE)
+        exported.update(
+            scale_m_per_tile=CITY_M_PER_TILE,
+            gates={k: list(v) for k, v in self.gates.items()},
+            landmarks={k: list(v) for k, v in LANDMARKS.items()},
+            provenance=PROVENANCE,
+        )
         return exported
 
 
@@ -123,15 +141,19 @@ class RegionWorld(IslandWorld):
 
     def export_dict(self):
         exported = super().export_dict()
-        exported.update(scale_m_per_tile=REGION_M_PER_TILE, road_ends={k: list(v) for k, v in self.road_ends.items()},
-                        gate_to_region={k: list(v) for k, v in GATE_TO_REGION.items()}, provenance=PROVENANCE)
+        exported.update(
+            scale_m_per_tile=REGION_M_PER_TILE,
+            road_ends={k: list(v) for k, v in self.road_ends.items()},
+            gate_to_region={k: list(v) for k, v in GATE_TO_REGION.items()},
+            provenance=PROVENANCE,
+        )
         return exported
 
 
 def _init_hazards(world):
     world.lava, world.pdc, world.lahar = set(), set(), set()
     world.active_pdc, world.active_lahar, world.surge = set(), set(), set()
-    world.ash, world.ash_grid = 0., None
+    world.ash, world.ash_grid = 0.0, None
     world.volcanic_sign_seen = False
     world.shelter_tiles = []
     world.depleted_food = set()
@@ -155,9 +177,24 @@ def _carve_line(tiles, start, end, value=1):
 
 
 def _base(width, height, tiles, elevation, zones, spawn, assembly, extra):
-    result = dict(width=width, height=height, seed=0, elevation=elevation, drainage={}, tiles=tiles, zones=zones,
-                  valleys=[], stream_tiles=[], clean_springs=[], food_tiles=[], spawn_pos=list(spawn),
-                  assembly_points=assembly, pdc_footprint=set(), lahar_footprint=set(), **extra)
+    result = dict(
+        width=width,
+        height=height,
+        seed=0,
+        elevation=elevation,
+        drainage={},
+        tiles=tiles,
+        zones=zones,
+        valleys=[],
+        stream_tiles=[],
+        clean_springs=[],
+        food_tiles=[],
+        spawn_pos=list(spawn),
+        assembly_points=assembly,
+        pdc_footprint=set(),
+        lahar_footprint=set(),
+        **extra,
+    )
     return result
 
 
@@ -174,8 +211,7 @@ def _add_routes(cls, result):
 @lru_cache(maxsize=4)
 def _city_terrain(width, height):
     inside = {(x, y) for y in range(height) for x in range(width) if _inside_city(x, y)}
-    walls = {p for p in inside if any((p[0] + dx, p[1] + dy) not in inside
-                                      for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))}
+    walls = {p for p in inside if any((p[0] + dx, p[1] + dy) not in inside for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))}
     tiles = [[0] * width for _ in range(height)]
     for x, y in inside - walls:
         tiles[y][x] = 4  # buildings until a street or open space is cut through them
@@ -194,9 +230,12 @@ def _city_terrain(width, height):
         return x, y
 
     gates = {
-        "marina": wall_on_line(10, MARINA_Y, -1, 0), "sarno": wall_on_line(30, ABBONDANZA_Y, 1, 0),
-        "nola": wall_on_line(30, NOLA_Y, 1, 0), "vesuvio": wall_on_line(STABIANA_X, 15, 0, -1),
-        "stabia": wall_on_line(STABIANA_X, 25, 0, 1), "nocera": wall_on_line(NOCERA_X, 25, 0, 1),
+        "marina": wall_on_line(10, MARINA_Y, -1, 0),
+        "sarno": wall_on_line(30, ABBONDANZA_Y, 1, 0),
+        "nola": wall_on_line(30, NOLA_Y, 1, 0),
+        "vesuvio": wall_on_line(STABIANA_X, 15, 0, -1),
+        "stabia": wall_on_line(STABIANA_X, 25, 0, 1),
+        "nocera": wall_on_line(NOCERA_X, 25, 0, 1),
         "ercolano": wall_on_line(ERCOLANO_X, 15, 0, -1),
     }
     streets = {
@@ -221,7 +260,7 @@ def _city_terrain(width, height):
     exit_roads = set()
     for name, (x, y) in gates.items():
         dx, dy = (x - CITY_CENTER[0]), (y - CITY_CENTER[1])
-        edge = (0 if dx < 0 else width - 1, y) if abs(dx) * .76 > abs(dy) else (x, 0 if dy < 0 else height - 1)
+        edge = (0 if dx < 0 else width - 1, y) if abs(dx) * 0.76 > abs(dy) else (x, 0 if dy < 0 else height - 1)
         _carve_line(tiles, (x, y), edge)
         exits[name] = edge
         step_x = (edge[0] > x) - (edge[0] < x)
@@ -232,16 +271,33 @@ def _city_terrain(width, height):
             px, py = px + step_x, py + step_y
         exit_roads.add(edge)
 
-    elevation = [[round(ELEVATION_HIGH - (ELEVATION_HIGH - ELEVATION_LOW) * y / (height - 1), 1)
-                  for _ in range(width)] for y in range(height)]
+    elevation = [[round(ELEVATION_HIGH - (ELEVATION_HIGH - ELEVATION_LOW) * y / (height - 1), 1) for _ in range(width)] for y in range(height)]
     # Every zone is 0: a person's perceived risk is not set by where the map says they live.
     zones = [[0] * width for _ in range(height)]
-    fountains = [(x, y) for y in range(height) for x in range(width)
-                 if tiles[y][x] == 1 and (x, y) in interior and x % (BLOCK_X * 2) == LANE_OFFSET and y % (BLOCK_Y * 2) == LANE_OFFSET]  # assumption
-    result = _base(width, height, tiles, elevation, zones, (STABIANA_X, ABBONDANZA_Y), list(exits.values()), dict(
-        vent=(0, 0),  # Vesuvius lies off this map to the northwest; see RegionWorld.vent
-        freshwater_tiles=fountains, gates=gates, exits=exits, exit_road_tiles=exit_roads, wall_tiles=walls, street_lines=streets,
-    ))
+    fountains = [
+        (x, y)
+        for y in range(height)
+        for x in range(width)
+        if tiles[y][x] == 1 and (x, y) in interior and x % (BLOCK_X * 2) == LANE_OFFSET and y % (BLOCK_Y * 2) == LANE_OFFSET
+    ]  # assumption
+    result = _base(
+        width,
+        height,
+        tiles,
+        elevation,
+        zones,
+        (STABIANA_X, ABBONDANZA_Y),
+        list(exits.values()),
+        dict(
+            vent=(0, 0),  # Vesuvius lies off this map to the northwest; see RegionWorld.vent
+            freshwater_tiles=fountains,
+            gates=gates,
+            exits=exits,
+            exit_road_tiles=exit_roads,
+            wall_tiles=walls,
+            street_lines=streets,
+        ),
+    )
     return _add_routes(CityWorld, result)
 
 
@@ -252,10 +308,10 @@ def _region_terrain(width, height):
         tile_row, height_row = [], []
         for x in range(width):
             distance = math.dist((x, y), VESUVIUS)
-            metres = VESUVIUS_HEIGHT * math.exp(-(distance / 7) ** 2) + 15  # assumption: smooth cone on a low plain
+            metres = VESUVIUS_HEIGHT * math.exp(-((distance / 7) ** 2)) + 15  # assumption: smooth cone on a low plain
             if x < coast_x(y):
                 tile_row.append(0)
-                height_row.append(-5.)
+                height_row.append(-5.0)
             else:
                 tile_row.append(3 if metres > 400 else 2 if metres > 60 or (x + y) % 3 == 0 else 1)  # assumption
                 height_row.append(round(metres, 1))
@@ -264,8 +320,7 @@ def _region_terrain(width, height):
     # The Sarno runs west to the sea south of the town, crossed only where roads meet it.
     for start, stop in zip(SARNO_COURSE, SARNO_COURSE[1:]):
         _carve_line(tiles, start, stop, value=0)
-    river = [(x, y) for y in range(33, 37) for x in range(width)
-             if tiles[y][x] == 0 and x >= coast_x(y)]
+    river = [(x, y) for y in range(33, 37) for x in range(width) if tiles[y][x] == 0 and x >= coast_x(y)]
     for name, end in REGION_ROADS.items():
         stops = [GATE_TO_REGION[name], *ROAD_WAYPOINTS.get(name, []), end]
         for start, stop in zip(stops, stops[1:]):
@@ -273,11 +328,23 @@ def _region_terrain(width, height):
     for y in range(29, 32):  # the town, about 1,050 x 800 m at 250 m per tile
         for x in range(28, 33):
             tiles[y][x] = 4
-    for name, tile in GATE_TO_REGION.items():
+    for tile in GATE_TO_REGION.values():
         tiles[tile[1]][tile[0]] = 1
     river = [p for p in river if tiles[p[1]][p[0]] == 0]  # bridges are road, not river
     zones = [[0] * width for _ in range(height)]
-    result = _base(width, height, tiles, elevation, zones, REGION_CITY_CENTER, list(REGION_ROADS.values()), dict(
-        vent=VESUVIUS, freshwater_tiles=river, river_tiles=river, road_ends=dict(REGION_ROADS),
-    ))
+    result = _base(
+        width,
+        height,
+        tiles,
+        elevation,
+        zones,
+        REGION_CITY_CENTER,
+        list(REGION_ROADS.values()),
+        dict(
+            vent=VESUVIUS,
+            freshwater_tiles=river,
+            river_tiles=river,
+            road_ends=dict(REGION_ROADS),
+        ),
+    )
     return _add_routes(RegionWorld, result)

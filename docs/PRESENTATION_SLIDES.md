@@ -55,7 +55,7 @@ flowchart LR
 
     subgraph TC_TRACK["Tech C & Product D: Simulator & UI"]
         ENG["SimulationEngine & PackSimulation\n(Tobler Dijkstra + Active PDC/Lahar)"]
-        GUI["1600x900 Clash / Hay Day UI\n(engine/gui.py)"]
+        GUI["1600x900 Wood-and-Parchment UI\n(engine/gui.py)"]
         WEB["Product D Web Inspector\n(site/index.html)"]
     end
 
@@ -122,7 +122,7 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ---
 
-## Slide 8: Clash of Clans / Hay Day Simulator UI — Event Choice Hub (`Screen 0`)
+## Slide 8: Simulator UI — Event Choice Hub (`Screen 0`)
 
 - **Warm Carved Timber & Sunlit Parchment Aesthetic**: Royal gold ribbon banner, carved oak frames with brass corner rivets, and chunky 3D beveled emerald/terracotta launch buttons.
 
@@ -130,7 +130,7 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ---
 
-## Slide 9: Clash of Clans / Hay Day Simulator UI — Mission Configuration (`Screen 1`)
+## Slide 9: Simulator UI — Mission Configuration (`Screen 1`)
 
 - **Live 300×300 Topographic Minimap**, **3-Mind Selector** (`Quantum` / `Classical Mixture` / `Classical Rational`), scenario presets, seed steppers, and glossy emerald launch bar.
 
@@ -138,7 +138,7 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ---
 
-## Slide 10: Clash of Clans / Hay Day Simulator UI — Island Wilderness Survival (`Screen 2A`)
+## Slide 10: Simulator UI — Island Wilderness Survival (`Screen 2A`)
 
 - **Checkerboard Emerald Village Lawn**, puffy 2.5D orchard trees with ruby/gold berries, sparkling turquoise lagoon water, straw-hat villager avatar, and glossy Elixir/Gold vital bars.
 
@@ -146,7 +146,7 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ---
 
-## Slide 11: Clash of Clans / Hay Day Simulator UI — Volcano Evacuation (`Screen 2B`)
+## Slide 11: Simulator UI — Volcano Evacuation (`Screen 2B`)
 
 - **Caldera Magma Rim**, hazard zone overlays (`Safe` / `Caution` / `Danger`), golden Tobler evacuation route to coastal assembly shelters, and live quantum telemetry (`P(danger)`, `P(prot)`, `|x|`, `Decoherence`).
 
@@ -185,7 +185,7 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 ## Slide 14: Live Demo Guide & Commands
 
 ```bash
-# 1. Launch the 1600x900 Clash of Clans / Hay Day Pygame Simulator
+# 1. Launch the 1600x900 Pygame Simulator
 python main.py
 
 # 2. Run Live Terminal Survival Demo (Legacy Engine or T1 St. Vincent Physics Pack)

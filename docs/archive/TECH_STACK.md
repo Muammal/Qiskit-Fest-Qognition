@@ -1,5 +1,7 @@
 # Tech Stack
 
+_The original plan, kept for the record. It describes intentions, not what exists now._
+
 ## Tools
 
 | Area | Tool |
@@ -89,6 +91,8 @@ Plan: Tech A installs both in a throwaway environment Tuesday and keeps whicheve
 **Reading:** "Quantum cognition and decision theories: A tutorial" (order effects + QQ equality, written for beginners).
 
 ## IBM hardware workflow (Tech B)
+
+**This was planned and never run. No IBM hardware job was submitted. Only `FakeTorino` simulation exists.**
 
 **The sim never calls hardware live.** We run a batch ahead of time and the sim loads the saved results.
 

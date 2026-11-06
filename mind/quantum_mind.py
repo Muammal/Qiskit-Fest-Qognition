@@ -25,6 +25,7 @@ Supports selectable research-paper-backed quantum cognition models via
 Opt-in comparison arms, none used by default: `classical_no_interference_decide`
 and `markov_hesitation_decide`.
 """
+
 import copy
 import random
 
@@ -170,10 +171,8 @@ def _order_gap(state, lam, q_S, q_D, cognition_model="default", eta=ETA):
     swapped = list(events)
     swapped[i_a], swapped[i_b] = swapped[i_b], swapped[i_a]
 
-    _p, _x, p_protect_original, _b1, _r1 = _p_protect_for_events(
-        state["needs"]["safety"], events, lam, q_S, q_D, cognition_model=cognition_model, eta=eta)
-    _p2, _x2, p_protect_swapped, _b2, _r2 = _p_protect_for_events(
-        state["needs"]["safety"], swapped, lam, q_S, q_D, cognition_model=cognition_model, eta=eta)
+    _p, _x, p_protect_original, _b1, _r1 = _p_protect_for_events(state["needs"]["safety"], events, lam, q_S, q_D, cognition_model=cognition_model, eta=eta)
+    _p2, _x2, p_protect_swapped, _b2, _r2 = _p_protect_for_events(state["needs"]["safety"], swapped, lam, q_S, q_D, cognition_model=cognition_model, eta=eta)
 
     gap = p_protect_original - p_protect_swapped
     return gap, events[i_a], events[i_b]
@@ -224,20 +223,14 @@ def _decide(
     rule_action = _choose_action(probs, decision_rule)
     action, reflex = _apply_reflex(state, rule_action)
 
-    reason = (
-        f"Quantum deliberation: q_safe={q_S:.3f}, q_danger={q_D:.3f}, "
-        f"p_danger={p:.3f}, P(protect)={p_protect:.3f} (classical={p_classical:.3f})"
-    )
+    reason = f"Quantum deliberation: q_safe={q_S:.3f}, q_danger={q_D:.3f}, p_danger={p:.3f}, P(protect)={p_protect:.3f} (classical={p_classical:.3f})"
 
     gap = None
     if not suppress_order_gap:
         gap, event_a, event_b = _order_gap(state, lam, q_S, q_D, cognition_model=cognition_model, eta=eta)
         if gap is not None and abs(gap) > ORDER_GAP_REPORT_THRESHOLD:
             pct = gap * 100
-            reason += (
-                f" Order effect: {event_a} then {event_b} shifts "
-                f"P(protect) by {pct:+.1f}%"
-            )
+            reason += f" Order effect: {event_a} then {event_b} shifts P(protect) by {pct:+.1f}%"
 
     if lam > 0:
         reason += f" Decoherence: stress {stress:.2f}, dephasing {lam * 100:.0f}% per step"

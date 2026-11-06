@@ -1,4 +1,5 @@
 """Where water goes on the surface: pit filling (Barnes et al. 2014, priority flood), steepest-descent routing, and height above drainage."""
+
 from __future__ import annotations
 
 import heapq
@@ -46,9 +47,13 @@ def route(elevation: np.ndarray, land: np.ndarray, dx_m: float) -> Drainage:
     receivers = np.full(filled.size, OUTLET, dtype=int)
     best = np.zeros(filled.shape)
     for d_row, d_col in NEIGHBOURS:
-        distance = dx_m * (2 ** .5 if d_row and d_col else 1.)
-        source_rows, target_rows = (slice(1, ny), slice(0, ny - 1)) if d_row < 0 else (slice(0, ny - 1), slice(1, ny)) if d_row > 0 else (slice(None), slice(None))
-        source_cols, target_cols = (slice(1, nx), slice(0, nx - 1)) if d_col < 0 else (slice(0, nx - 1), slice(1, nx)) if d_col > 0 else (slice(None), slice(None))
+        distance = dx_m * (2**0.5 if d_row and d_col else 1.0)
+        source_rows, target_rows = (
+            (slice(1, ny), slice(0, ny - 1)) if d_row < 0 else (slice(0, ny - 1), slice(1, ny)) if d_row > 0 else (slice(None), slice(None))
+        )
+        source_cols, target_cols = (
+            (slice(1, nx), slice(0, nx - 1)) if d_col < 0 else (slice(0, nx - 1), slice(1, nx)) if d_col > 0 else (slice(None), slice(None))
+        )
         slope = np.zeros(filled.shape)
         slope[source_rows, source_cols] = (filled[source_rows, source_cols] - filled[target_rows, target_cols]) / distance
         steeper = slope > best
@@ -64,7 +69,7 @@ def route(elevation: np.ndarray, land: np.ndarray, dx_m: float) -> Drainage:
 
 def flow_accumulation(drainage: Drainage, land: np.ndarray, dx_m: float) -> np.ndarray:
     """Upslope area of each land cell, itself included. Visits high ground first, so every upstream share has arrived."""
-    area = (land.astype(float) * dx_m ** 2).ravel()
+    area = (land.astype(float) * dx_m**2).ravel()
     for index in np.argsort(-drainage.filled, axis=None):
         target = drainage.receivers[index]
         if target != OUTLET:
@@ -81,7 +86,7 @@ def height_above_drainage(elevation: np.ndarray, drainage: Drainage, accumulatio
         target = drainage.receivers[index]
         if not channel[index] and target != OUTLET:
             base[index] = base[target]
-    return np.clip(flat - base, 0., None).reshape(elevation.shape)
+    return np.clip(flat - base, 0.0, None).reshape(elevation.shape)
 
 
 def share_draining_out(drainage: Drainage, land: np.ndarray) -> float:

@@ -66,9 +66,8 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 import contracts
-from engine.world import IslandWorld, MAP_SEED
+from engine.world import IslandWorld
 from engine.agent import SurvivalAgent
-from engine.events import EventGenerator, VOLCANIC
 from engine.simulation import SimulationEngine, DEFAULT_STEPS
 from engine.ship import DECK_ROWS, ShipWorld
 from engine.titanic import TitanicSimulation, STORY_TEXT
@@ -96,6 +95,7 @@ from engine.hidpi import ScaledFont, UICanvas, compose, setup_dpi_awareness, win
 try:
     from mind.decoherence import decoherence_strength
 except ImportError:
+
     def decoherence_strength(stress):
         return min(1.0, max(0.0, (stress - 0.4) / 0.5))
 
@@ -109,8 +109,10 @@ def saved_volcano_batch():
     except (OSError, ValueError, KeyError):
         return None
     survival, delay = volcano["survival"], volcano["paired_delay_steps"]
-    return (f"Across {volcano['seeds']} seeds: survival {survival['quantum'] * 100:.1f}% quantum, {survival['classical_mixture'] * 100:.1f}% control. "
-            f"Paired delay {delay['mean']:+.2f} steps (SE {delay['se']:.2f}).")
+    return (
+        f"Across {volcano['seeds']} seeds: survival {survival['quantum'] * 100:.1f}% quantum, {survival['classical_mixture'] * 100:.1f}% control. "
+        f"Paired delay {delay['mean']:+.2f} steps (SE {delay['se']:.2f})."
+    )
 
 
 def order_effect_hint():
@@ -121,8 +123,10 @@ def order_effect_hint():
         return "  * Order Effect: unavailable without the mind package."
     state = SurvivalAgent().get_state()
     coherent, control = (abs(order_gap_at_lambda(state, lam=lam)) for lam in (0.0, 1.0))
-    return (f"  * Order Effect: From the default start, [Tremor -> Gas] and [Gas -> Tremor] differ in "
-            f"P(protect) by {coherent:.2f} at λ=0, against {control:.2f} at λ=1.")
+    return (
+        f"  * Order Effect: From the default start, [Tremor -> Gas] and [Gas -> Tremor] differ in "
+        f"P(protect) by {coherent:.2f} at λ=0, against {control:.2f} at λ=1."
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -135,86 +139,92 @@ GRID_DIM = 40
 TILE_SIZE = MAP_SIZE / GRID_DIM  # 22.5 px per tile
 FPS = 60
 
-# Palette Definitions - Clash of Clans / Hay Day Tactile Village & Island Game Palette
-COLOR_BG = (62, 40, 22)           # Carved Oak & Warm Timber Backdrop
+# Palette: warm wood, cream parchment and bright accents
+COLOR_BG = (62, 40, 22)  # Carved Oak & Warm Timber Backdrop
 COLOR_PANEL_BG = (250, 239, 212)  # Sunlit Cream Parchment Card Surface
-COLOR_PANEL_ALT = (234, 216, 178) # Recessed Sand-Parchment Sub-panel
-COLOR_CARD_BORDER = (106, 64, 28) # Chunky Carved Walnut Frame
-COLOR_CARD_HOVER = (224, 148, 24) # Royal Trophy Gold Highlight
+COLOR_PANEL_ALT = (234, 216, 178)  # Recessed Sand-Parchment Sub-panel
+COLOR_CARD_BORDER = (106, 64, 28)  # Chunky Carved Walnut Frame
+COLOR_CARD_HOVER = (224, 148, 24)  # Royal Trophy Gold Highlight
 
-COLOR_TEXT_MAIN = (54, 32, 14)    # Deep Espresso Timber Ink (High contrast on parchment)
-COLOR_TEXT_MUTED = (78, 48, 20)   # Warm Chestnut Brown
-COLOR_TEXT_HINT = (92, 58, 26)    # Caramel Wood Grain
+COLOR_TEXT_MAIN = (54, 32, 14)  # Deep Espresso Timber Ink (High contrast on parchment)
+COLOR_TEXT_MUTED = (78, 48, 20)  # Warm Chestnut Brown
+COLOR_TEXT_HINT = (92, 58, 26)  # Caramel Wood Grain
 
-# Supercell Village & Elixir Accents
-COLOR_GREEN = (62, 168, 32)       # Clash Emerald / Hay Day Meadow Green
-COLOR_GREEN_DARK = (30, 96, 16)   # Deep Orchard Canopy
-COLOR_CYAN = (10, 96, 146)        # Crystal Lagoon / Elixir Blue
-COLOR_CYAN_LIGHT = (88, 192, 242) # Sparkling Spring Water
-COLOR_PURPLE = (146, 58, 196)     # Quantum Elixir Amethyst
+# Accents
+COLOR_GREEN = (62, 168, 32)  # Meadow Green
+COLOR_GREEN_DARK = (30, 96, 16)  # Deep Orchard Canopy
+COLOR_CYAN = (10, 96, 146)  # Crystal Lagoon / Elixir Blue
+COLOR_CYAN_LIGHT = (88, 192, 242)  # Sparkling Spring Water
+COLOR_PURPLE = (146, 58, 196)  # Quantum Elixir Amethyst
 COLOR_PURPLE_LIGHT = (182, 108, 226)
-COLOR_YELLOW = (138, 80, 4)       # Clash Gold Coin Amber
-COLOR_RED = (172, 34, 26)         # Dragon Fire Ruby
-COLOR_BLUE = (44, 108, 184)       # Royal Banner Blue
-COLOR_ORANGE = (224, 96, 24)      # Harvest Pumpkin / Lava Ember
-COLOR_GOLD = (132, 76, 4)         # Royal Trophy Gold
+COLOR_YELLOW = (138, 80, 4)  # Coin Amber
+COLOR_RED = (172, 34, 26)  # Dragon Fire Ruby
+COLOR_BLUE = (44, 108, 184)  # Royal Banner Blue
+COLOR_ORANGE = (224, 96, 24)  # Harvest Pumpkin / Lava Ember
+COLOR_GOLD = (132, 76, 4)  # Royal Trophy Gold
 
-# Tile Base Colors - Hay Day / Clash of Clans Lush Island Diorama
+# Tile base colors
 TILE_COLORS = {
-    0: (48, 168, 214),   # Sparkling Turquoise Lagoon
-    1: (122, 196, 64),   # Sunlit Village Meadow Lawn
-    2: (58, 152, 38),    # Lush Orchard & Pine Canopy
+    0: (48, 168, 214),  # Sparkling Turquoise Lagoon
+    1: (122, 196, 64),  # Sunlit Village Meadow Lawn
+    2: (58, 152, 38),  # Lush Orchard & Pine Canopy
     3: (146, 132, 116),  # Stepped Highland Stone Crag
-    4: (212, 82, 42)     # Cozy Red-Roofed Village Hut
+    4: (212, 82, 42),  # Cozy Red-Roofed Village Hut
 }
 
 ACTION_COLORS = {
-    "forage": (62, 168, 32),         # Harvest Green
-    "drink": (28, 146, 208),         # Crystal Spring Blue
-    "build_shelter": (212, 118, 34), # Carpenter Gold-Timber
-    "rest": (146, 58, 196),          # Elixir Amethyst
-    "explore": (218, 134, 14),       # Compass Gold
-    "craft": (118, 96, 76),          # Blacksmith Iron-Wood
-    "hide": (212, 48, 38)            # Red Alert Shield
+    "forage": (62, 168, 32),  # Harvest Green
+    "drink": (28, 146, 208),  # Crystal Spring Blue
+    "build_shelter": (212, 118, 34),  # Carpenter Gold-Timber
+    "rest": (146, 58, 196),  # Elixir Amethyst
+    "explore": (218, 134, 14),  # Compass Gold
+    "craft": (118, 96, 76),  # Blacksmith Iron-Wood
+    "hide": (212, 48, 38),  # Red Alert Shield
 }
 
 ISLAND_PRESETS = [
     {"label": "Island Seed 101", "seed": 101, "tag": "All minds survive", "color": COLOR_GREEN},
     {"label": "Island Seed 105", "seed": 105, "tag": "All minds survive", "color": COLOR_ORANGE},
     {"label": "Island Seed 202", "seed": 202, "tag": "All minds survive", "color": COLOR_PURPLE},
-    {"label": "Island Seed 777", "seed": 777, "tag": "All minds die", "color": COLOR_CYAN}
+    {"label": "Island Seed 777", "seed": 777, "tag": "All minds die", "color": COLOR_CYAN},
 ]
 
 TITANIC_PRESETS = [
     {"label": "Third-Class Passenger", "seed": 105, "tag": "Far from the boats | Lower decks", "color": COLOR_CYAN},
     {"label": "First-Class Passenger", "seed": 106, "tag": "Near the boat deck | Upper decks", "color": COLOR_GOLD},
     {"label": "Server / Steward", "seed": 107, "tag": "Warns the cabins | Works the corridors", "color": COLOR_PURPLE},
-    {"label": "Evacuation Worker", "seed": 108, "tag": "Loads the lifeboats | Told early", "color": COLOR_RED}
+    {"label": "Evacuation Worker", "seed": 108, "tag": "Loads the lifeboats | Told early", "color": COLOR_RED},
 ]
 
 POMPEII_PRESETS = [
     {"label": "Resident", "seed": 105, "tag": "Follow a resident | Random panels", "color": COLOR_CYAN},
     {"label": "Enslaved Person", "seed": 106, "tag": "Follow an enslaved person | Random panels", "color": COLOR_PURPLE},
     {"label": "Merchant", "seed": 107, "tag": "Follow a merchant | Random panels", "color": COLOR_GREEN},
-    {"label": "Council Member", "seed": 108, "tag": "Follow a council member | Random panels", "color": COLOR_GOLD}
+    {"label": "Council Member", "seed": 108, "tag": "Follow a council member | Random panels", "color": COLOR_GOLD},
 ]
 POMPEII_SETTINGS = (  # (key, label, options); each changes results, so each is visible before launch
     # The first option in each row is the default, so B comes first: the user's chosen mapping.
-    ("event_mapping", "Mapping", ("B", "C", "D", "A")), ("population", "People", (11_500, 20_000)),
-    ("date", "Date", ("august", "autumn")), ("quake", "Quake", (True, False)),
-    ("restrict_enslaved", "Enslaved held", (False, True)), ("crowding", "Crowding", (True, False)),
+    ("event_mapping", "Mapping", ("B", "C", "D", "A")),
+    ("population", "People", (11_500, 20_000)),
+    ("date", "Date", ("august", "autumn")),
+    ("quake", "Quake", (True, False)),
+    ("restrict_enslaved", "Enslaved held", (False, True)),
+    ("crowding", "Crowding", (True, False)),
 )
 
 WATERLOO_PRESETS = [
     {"label": "Child", "seed": 104, "tag": "Follow a child | Random panels", "color": COLOR_GOLD},
     {"label": "Adult", "seed": 105, "tag": "Follow an adult | Random panels", "color": COLOR_CYAN},
     {"label": "Lifeguard or Instructor", "seed": 106, "tag": "Follow a lifeguard | Random panels", "color": COLOR_RED},
-    {"label": "Front Desk or Maintenance", "seed": 107, "tag": "Follow front desk staff | Random panels", "color": COLOR_GREEN}
+    {"label": "Front Desk or Maintenance", "seed": 107, "tag": "Follow front desk staff | Random panels", "color": COLOR_GREEN},
 ]
 WATERLOO_SETTINGS = (  # first option is the default; A is the user's chosen mapping
-    ("event_mapping", "Mapping", ("A", "B", "C")), ("population", "People", (100, 40, 300)),
-    ("leak_site", "Leak", ("pool_side", "north_end", "deck")), ("source_ppm", "Source ppm", (22.0, 11.0, 110.0)),
-    ("leak_minutes", "Leak min", (15.0, 5.0, 60.0)), ("alarm", "Alarm", (True, False)),
+    ("event_mapping", "Mapping", ("A", "B", "C")),
+    ("population", "People", (100, 40, 300)),
+    ("leak_site", "Leak", ("pool_side", "north_end", "deck")),
+    ("source_ppm", "Source ppm", (22.0, 11.0, 110.0)),
+    ("leak_minutes", "Leak min", (15.0, 5.0, 60.0)),
+    ("alarm", "Alarm", (True, False)),
 )
 CROWD_SCENARIOS = ("pompeii", "waterloo")
 TITANIC_DEFAULT_MAPPING = "default"
@@ -225,7 +235,7 @@ VOLCANO_PRESETS = [
     {"label": "Event Seed 101", "seed": 101, "tag": "Erupts at +20 h | First flow +30 h", "color": COLOR_CYAN},
     {"label": "Event Seed 105", "seed": 105, "tag": "No eruption | Unrest fades", "color": COLOR_ORANGE},
     {"label": "Event Seed 202", "seed": 202, "tag": "No eruption | Unrest fades", "color": COLOR_PURPLE},
-    {"label": "Event Seed 777", "seed": 777, "tag": "Erupts at +36 h | First flow +46 h", "color": COLOR_RED}
+    {"label": "Event Seed 777", "seed": 777, "tag": "Erupts at +36 h | First flow +46 h", "color": COLOR_RED},
 ]
 
 
@@ -290,14 +300,7 @@ def draw_vector_icon(surface: pygame.Surface, icon: str, x: int, y: int, size: i
         pygame.draw.line(surface, color, (x + size - pad, y + pad), (x + size - pad, y + size - pad), 2)
 
     elif icon == "speed":
-        pts = [
-            (cx + 2, y + pad),
-            (x + pad + 1, cy + 1),
-            (cx, cy + 1),
-            (cx - 2, y + size - pad),
-            (x + size - pad - 1, cy - 1),
-            (cx, cy - 1)
-        ]
+        pts = [(cx + 2, y + pad), (x + pad + 1, cy + 1), (cx, cy + 1), (cx - 2, y + size - pad), (x + size - pad - 1, cy - 1), (cx, cy - 1)]
         pygame.draw.polygon(surface, color, pts)
 
     elif icon == "menu" or icon == "home":
@@ -323,14 +326,7 @@ def draw_vector_icon(surface: pygame.Surface, icon: str, x: int, y: int, size: i
         pygame.draw.circle(surface, color, (x + size - pad - 4, y + size - pad - 4), max(1, size // 10))
 
     elif icon == "launch":
-        pts = [
-            (cx, y + pad),
-            (x + size - pad, cy + 4),
-            (cx + 3, y + size - pad),
-            (cx, y + size - pad - 4),
-            (cx - 3, y + size - pad),
-            (x + pad, cy + 4)
-        ]
+        pts = [(cx, y + pad), (x + size - pad, cy + 4), (cx + 3, y + size - pad), (cx, y + size - pad - 4), (cx - 3, y + size - pad), (x + pad, cy + 4)]
         pygame.draw.polygon(surface, color, pts)
 
     elif icon == "replay":
@@ -344,13 +340,11 @@ def draw_vector_icon(surface: pygame.Surface, icon: str, x: int, y: int, size: i
         pygame.draw.circle(surface, color, (cx + r, cy), r)
 
     elif icon == "shield":
-        pts = [(cx - size // 3, cy - size // 3), (cx + size // 3, cy - size // 3),
-               (cx + size // 3, cy), (cx, cy + size // 3), (cx - size // 3, cy)]
+        pts = [(cx - size // 3, cy - size // 3), (cx + size // 3, cy - size // 3), (cx + size // 3, cy), (cx, cy + size // 3), (cx - size // 3, cy)]
         pygame.draw.polygon(surface, color, pts, 2)
 
     elif icon == "volcano":
-        pts = [(x + pad, y + size - pad), (cx - size // 6, cy - size // 4),
-               (cx + size // 6, cy - size // 4), (x + size - pad, y + size - pad)]
+        pts = [(x + pad, y + size - pad), (cx - size // 6, cy - size // 4), (cx + size // 6, cy - size // 4), (x + size - pad, y + size - pad)]
         pygame.draw.polygon(surface, color, pts)
         pygame.draw.circle(surface, COLOR_YELLOW, (cx, cy - size // 4), max(2, size // 6))
 
@@ -390,9 +384,17 @@ def wrap_text(text: str, font: pygame.font.Font, max_width: int) -> List[str]:
     return lines
 
 
-def render_wrapped_text(surface: pygame.Surface, text: str, font: pygame.font.Font,
-                        color: Tuple[int, int, int], x: int, y: int, max_width: int,
-                        line_spacing: int = 4, max_lines: int = 4) -> int:
+def render_wrapped_text(
+    surface: pygame.Surface,
+    text: str,
+    font: pygame.font.Font,
+    color: Tuple[int, int, int],
+    x: int,
+    y: int,
+    max_width: int,
+    line_spacing: int = 4,
+    max_lines: int = 4,
+) -> int:
     """Renders text strictly wrapped inside container boundaries, returns bottom y."""
     lines = wrap_text(text, font, max_width)
     curr_y = y
@@ -413,11 +415,20 @@ def render_wrapped_text(surface: pygame.Surface, text: str, font: pygame.font.Fo
 # UI Component Classes
 # -----------------------------------------------------------------------------
 class UIButton:
-    def __init__(self, rect: Tuple[int, int, int, int], text: str, font: pygame.font.Font,
-                 bg_color=COLOR_PANEL_BG, text_color=COLOR_TEXT_MAIN,
-                 border_color=COLOR_CARD_BORDER, active_color=COLOR_CYAN,
-                 subtext: Optional[str] = None, subfont: Optional[pygame.font.Font] = None,
-                 icon: Optional[str] = None, variant: str = "default"):
+    def __init__(
+        self,
+        rect: Tuple[int, int, int, int],
+        text: str,
+        font: pygame.font.Font,
+        bg_color=COLOR_PANEL_BG,
+        text_color=COLOR_TEXT_MAIN,
+        border_color=COLOR_CARD_BORDER,
+        active_color=COLOR_CYAN,
+        subtext: Optional[str] = None,
+        subfont: Optional[pygame.font.Font] = None,
+        icon: Optional[str] = None,
+        variant: str = "default",
+    ):
         self.rect = pygame.Rect(rect)
         self.text = text
         self.subtext = subtext
@@ -449,7 +460,7 @@ class UIButton:
         dy = 2 if self.is_pressed else 0
         draw_rect = pygame.Rect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height)
 
-        # Determine button fill & 3D bottom bevel color (Supercell chunky tactile style)
+        # Determine button fill & 3D bottom bevel color (chunky tactile style)
         if self.is_active:
             bg = (
                 max(60, min(255, int(self.active_color[0] * 0.22 + 248 * 0.78))),
@@ -478,7 +489,7 @@ class UIButton:
         # 2. Main button body & top glossy specular strip
         pygame.draw.rect(surface, bg, draw_rect, border_radius=10)
         gloss_h = max(4, draw_rect.height // 2 - 2)
-        gloss_surf = pygame.Surface(( max(1, draw_rect.width - 8), gloss_h), pygame.SRCALPHA)
+        gloss_surf = pygame.Surface((max(1, draw_rect.width - 8), gloss_h), pygame.SRCALPHA)
         gloss_surf.fill((255, 255, 255, 65))
         surface.blit(gloss_surf, (draw_rect.x + 4, draw_rect.y + 3))
         pygame.draw.rect(surface, border, draw_rect, border_w, border_radius=10)
@@ -633,8 +644,15 @@ class WeatherSystem:
 # Island Pygame Viewer Application
 # -----------------------------------------------------------------------------
 class IslandVisualizerApp:
-    def __init__(self, seed: int = 101, mind_type: str = "quantum", noise_source: str = "stub",
-                 start_screen: str = "event_choice", scenario: str = "volcano", builder_factory=None):
+    def __init__(
+        self,
+        seed: int = 101,
+        mind_type: str = "quantum",
+        noise_source: str = "stub",
+        start_screen: str = "event_choice",
+        scenario: str = "volcano",
+        builder_factory=None,
+    ):
         setup_dpi_awareness()
         pygame.init()
         pygame.font.init()
@@ -669,8 +687,8 @@ class IslandVisualizerApp:
         self.font_bubble = ScaledFont("segoeui, calibri", 13, bold=True)
 
         # Simulation Parameters
-        self.app_state = start_screen   # "event_choice", "home", "sim"
-        self.scenario = scenario         # "island" or "volcano"
+        self.app_state = start_screen  # "event_choice", "home", "sim"
+        self.scenario = scenario  # "island" or "volcano"
         self.seed = seed
         self.mind_type = mind_type.lower()
         self.noise_source = noise_source
@@ -791,41 +809,41 @@ class IslandVisualizerApp:
         self.card4_rect = pygame.Rect(c4_x, card_y, card_w, card_h)
 
         self.btn_choice_island = UIButton(
-            (c1_x + 35, btn_y, btn_w, 48),
-            "ISLAND SURVIVAL  >>", self.font_sub,
-            bg_color=(56, 158, 28), active_color=COLOR_GREEN, icon="tree"
+            (c1_x + 35, btn_y, btn_w, 48), "ISLAND SURVIVAL  >>", self.font_sub, bg_color=(56, 158, 28), active_color=COLOR_GREEN, icon="tree"
         )
         self.btn_choice_volcano = UIButton(
-            (c2_x + 35, btn_y, btn_w, 48),
-            "VOLCANO EVACUATION  >>", self.font_sub,
-            bg_color=(214, 78, 24), active_color=COLOR_ORANGE, icon="volcano"
+            (c2_x + 35, btn_y, btn_w, 48), "VOLCANO EVACUATION  >>", self.font_sub, bg_color=(214, 78, 24), active_color=COLOR_ORANGE, icon="volcano"
         )
         self.btn_choice_titanic = UIButton(
-            (c3_x + 35, btn_y, btn_w, 48),
-            "TITANIC EVACUATION  >>", self.font_sub,
-            bg_color=(28, 84, 148), active_color=COLOR_BLUE, icon="launch"
+            (c3_x + 35, btn_y, btn_w, 48), "TITANIC EVACUATION  >>", self.font_sub, bg_color=(28, 84, 148), active_color=COLOR_BLUE, icon="launch"
         )
         self.btn_choice_pompeii = UIButton(
-            (c4_x + 35, btn_y, btn_w, 48),
-            "POMPEII EVACUATION  >>", self.font_sub,
-            bg_color=(140, 66, 40), active_color=COLOR_RED, icon="volcano"
+            (c4_x + 35, btn_y, btn_w, 48), "POMPEII EVACUATION  >>", self.font_sub, bg_color=(140, 66, 40), active_color=COLOR_RED, icon="volcano"
         )
         # The bottom row is shared: the Waterloo banner on the left, the scenario builder on the right.
         self.card5_rect = pygame.Rect(26, 752, 1010, 84)
         self.btn_choice_waterloo = UIButton(
             (self.card5_rect.right - btn_w - 24, 770, btn_w, 48),
-            "WATERLOO LEAK  >>", self.font_sub,
-            bg_color=(70, 120, 60), active_color=COLOR_GREEN, icon="launch"
+            "WATERLOO LEAK  >>",
+            self.font_sub,
+            bg_color=(70, 120, 60),
+            active_color=COLOR_GREEN,
+            icon="launch",
         )
         self.card_build_rect = pygame.Rect(self.card5_rect.right + 16, 752, WINDOW_WIDTH - 26 - self.card5_rect.right - 16, 84)
         self.btn_choice_build = UIButton(
             (self.card_build_rect.centerx - 230, 770, 460, 48),
-            "BUILD YOUR OWN SCENARIO  >>", self.font_sub,
-            bg_color=(146, 58, 196), active_color=COLOR_PURPLE, icon="menu"
+            "BUILD YOUR OWN SCENARIO  >>",
+            self.font_sub,
+            bg_color=(146, 58, 196),
+            active_color=COLOR_PURPLE,
+            icon="menu",
         )
 
     def _presets(self):
-        return {"volcano": VOLCANO_PRESETS, "titanic": TITANIC_PRESETS, "pompeii": POMPEII_PRESETS, "waterloo": WATERLOO_PRESETS}.get(self.scenario, ISLAND_PRESETS)
+        return {"volcano": VOLCANO_PRESETS, "titanic": TITANIC_PRESETS, "pompeii": POMPEII_PRESETS, "waterloo": WATERLOO_PRESETS}.get(
+            self.scenario, ISLAND_PRESETS
+        )
 
     @staticmethod
     def _horizon_for(scenario):
@@ -905,30 +923,40 @@ class IslandVisualizerApp:
 
         # Navigation / Fullscreen Toggle on Home Screen
         self.btn_home_back_scenario = UIButton(
-            (32, 24, 180, 36), "< Change Scenario", self.font_sub,
-            bg_color=COLOR_PANEL_ALT, active_color=COLOR_GOLD, icon="menu"
+            (32, 24, 180, 36), "< Change Scenario", self.font_sub, bg_color=COLOR_PANEL_ALT, active_color=COLOR_GOLD, icon="menu"
         )
         self.btn_home_fs = UIButton(
-            (WINDOW_WIDTH - 170, 24, 140, 36), "Fullscreen", self.font_body,
-            bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="fullscreen"
+            (WINDOW_WIDTH - 170, 24, 140, 36), "Fullscreen", self.font_body, bg_color=COLOR_PANEL_ALT, active_color=COLOR_CYAN, icon="fullscreen"
         )
 
         # 1. Mind Toggle Cards (3-Way Comparative Architecture)
         mind_card_w = 338
         self.btn_mind_quantum = UIButton(
-            (col2_x + 24, top_y + 34, mind_card_w, 76), "2-Qubit Quantum Mind", self.font_title,
+            (col2_x + 24, top_y + 34, mind_card_w, 76),
+            "2-Qubit Quantum Mind",
+            self.font_title,
             subtext="Non-commuting rotations, stress dephasing",
-            subfont=self.font_small, active_color=COLOR_PURPLE, icon="quantum"
+            subfont=self.font_small,
+            active_color=COLOR_PURPLE,
+            icon="quantum",
         )
         self.btn_mind_mixture = UIButton(
-            (col2_x + 378, top_y + 34, mind_card_w, 76), "Classical Mixture Control", self.font_title,
+            (col2_x + 378, top_y + 34, mind_card_w, 76),
+            "Classical Mixture Control",
+            self.font_title,
             subtext="Same gates, with all coherence removed (λ=1)",
-            subfont=self.font_small, active_color=COLOR_CYAN, icon="quantum"
+            subfont=self.font_small,
+            active_color=COLOR_CYAN,
+            icon="quantum",
         )
         self.btn_mind_classical = UIButton(
-            (col2_x + 732, top_y + 34, mind_card_w, 76), "Classical Rational Mind", self.font_title,
+            (col2_x + 732, top_y + 34, mind_card_w, 76),
+            "Classical Rational Mind",
+            self.font_title,
             subtext="Deterministic utility from hand-set weights",
-            subfont=self.font_small, active_color=COLOR_BLUE, icon="classical"
+            subfont=self.font_small,
+            active_color=COLOR_BLUE,
+            icon="classical",
         )
 
         # 2. Preset Buttons (2x2 Grid)
@@ -939,8 +967,7 @@ class IslandVisualizerApp:
         for i, preset in enumerate(presets):
             px = col2_x + 24 + (i % 2) * 531
             py = p_y + (i // 2) * 54
-            btn = UIButton((px, py, card_w, 48), preset["label"], self.font_sub,
-                           subtext=preset["tag"], subfont=self.font_small, active_color=preset["color"])
+            btn = UIButton((px, py, card_w, 48), preset["label"], self.font_sub, subtext=preset["tag"], subfont=self.font_small, active_color=preset["color"])
             self.preset_buttons.append(btn)
 
         # 3. Seed Steppers
@@ -952,8 +979,7 @@ class IslandVisualizerApp:
         self.btn_seed_p10 = UIButton((col2_x + 626, s_y, 55, 38), "+10", self.font_body)
         self.btn_seed_p100 = UIButton((col2_x + 687, s_y, 65, 38), "+100", self.font_body)
         rand_label = "Random Island" if self.scenario == "island" else "Random Events"
-        self.btn_seed_rand = UIButton((col2_x + 768, s_y, 270, 38), rand_label, self.font_sub,
-                                      active_color=COLOR_YELLOW, icon="random")
+        self.btn_seed_rand = UIButton((col2_x + 768, s_y, 270, 38), rand_label, self.font_sub, active_color=COLOR_YELLOW, icon="random")
 
         # 4. Step Number Buttons
         self.step_buttons: List[UIButton] = []
@@ -962,7 +988,7 @@ class IslandVisualizerApp:
         btn_w = 250
         for i, steps in enumerate(step_choices):
             sx = col2_x + 24 + i * (btn_w + 15)
-            span = f"{steps * 5} min" if self.scenario == "titanic" else f"{steps*2}h"
+            span = f"{steps * 5} min" if self.scenario == "titanic" else f"{steps * 2}h"
             btn = UIButton((sx, st_y, btn_w, 40), f"{steps} Steps ({span})", self.font_sub, active_color=COLOR_CYAN)
             self.step_buttons.append(btn)
 
@@ -973,8 +999,7 @@ class IslandVisualizerApp:
 
         # 5. Launch Button
         self.btn_launch = UIButton(
-            (col2_x + 24, top_y + 443, 1046, 58), launch_text, self.font_hero,
-            bg_color=(56, 164, 28), active_color=COLOR_GREEN, icon="launch"
+            (col2_x + 24, top_y + 443, 1046, 58), launch_text, self.font_hero, bg_color=(56, 164, 28), active_color=COLOR_GREEN, icon="launch"
         )
         self.btn_hero_launch = self.btn_launch
 
@@ -996,11 +1021,21 @@ class IslandVisualizerApp:
         # Debrief modal buttons
         mx = WINDOW_WIDTH // 2
         my = WINDOW_HEIGHT // 2
-        self.btn_modal_replay = UIButton((mx - 405, my + 256, 146, 46), "Replay Run", self.font_sub, bg_color=(36, 138, 198), active_color=COLOR_CYAN, icon="replay")
-        self.btn_modal_switch = UIButton((mx - 250, my + 256, 166, 46), "Compare Mind", self.font_sub, bg_color=(138, 56, 186), active_color=COLOR_PURPLE, icon="compare")
-        self.btn_modal_report = UIButton((mx - 75, my + 256, 170, 46), "Export Report", self.font_sub, bg_color=(30, 120, 70), active_color=COLOR_GREEN, icon="log")
-        self.btn_modal_scenario = UIButton((mx + 104, my + 256, 176, 46), "Change Scenario", self.font_sub, bg_color=(214, 96, 28), active_color=COLOR_ORANGE, icon="menu")
-        self.btn_modal_home = UIButton((mx + 289, my + 256, 116, 46), "Settings", self.font_sub, bg_color=(112, 74, 38), active_color=COLOR_CARD_HOVER, icon="home")
+        self.btn_modal_replay = UIButton(
+            (mx - 405, my + 256, 146, 46), "Replay Run", self.font_sub, bg_color=(36, 138, 198), active_color=COLOR_CYAN, icon="replay"
+        )
+        self.btn_modal_switch = UIButton(
+            (mx - 250, my + 256, 166, 46), "Compare Mind", self.font_sub, bg_color=(138, 56, 186), active_color=COLOR_PURPLE, icon="compare"
+        )
+        self.btn_modal_report = UIButton(
+            (mx - 75, my + 256, 170, 46), "Export Report", self.font_sub, bg_color=(30, 120, 70), active_color=COLOR_GREEN, icon="log"
+        )
+        self.btn_modal_scenario = UIButton(
+            (mx + 104, my + 256, 176, 46), "Change Scenario", self.font_sub, bg_color=(214, 96, 28), active_color=COLOR_ORANGE, icon="menu"
+        )
+        self.btn_modal_home = UIButton(
+            (mx + 289, my + 256, 116, 46), "Settings", self.font_sub, bg_color=(112, 74, 38), active_color=COLOR_CARD_HOVER, icon="home"
+        )
         self.btn_modal_close = UIButton((mx + 390, my - 316, 34, 34), "X", self.font_title, bg_color=COLOR_PANEL_BG)
 
         # History log modal close
@@ -1016,13 +1051,7 @@ class IslandVisualizerApp:
             extra = dict(self._scenario_settings()[1]) if self.scenario in CROWD_SCENARIOS else {}
             if self.scenario == "titanic":
                 extra["event_mapping"] = self.titanic_mapping
-            self.engine = engine_class(
-                seed=self.seed,
-                mind_type=self.mind_type,
-                noise_source=self.noise_source,
-                scenario=self.scenario,
-                **extra
-            )
+            self.engine = engine_class(seed=self.seed, mind_type=self.mind_type, noise_source=self.noise_source, scenario=self.scenario, **extra)
         self.world = self.engine.world
         self.agent = self.engine.agent
         self.event_gen = self.engine.event_gen
@@ -1044,7 +1073,7 @@ class IslandVisualizerApp:
         self.current_decision: Dict[str, Any] = {
             "action": "none",
             "probs": {a: 1.0 / len(contracts.ACTIONS) for a in contracts.ACTIONS},
-            "reason": "Initial baseline belief state."
+            "reason": "Initial baseline belief state.",
         }
         self.current_event = "none"
         self.current_weather = "calm"
@@ -1100,14 +1129,7 @@ class IslandVisualizerApp:
         self.bubble_text = action.replace("_", " ").capitalize()
         self.bubble_timer = 2.8
 
-        self.history.append({
-            "t": self.step_idx,
-            "state": record["state"],
-            "event": event,
-            "action": action,
-            "decision": record,
-            "narrative": reason
-        })
+        self.history.append({"t": self.step_idx, "state": record["state"], "event": event, "action": action, "decision": record, "narrative": reason})
         self.history_scroll = max(0, len(self.history) - 16)
 
         if not self.agent.is_alive or self.step_idx >= self.max_steps:
@@ -1181,8 +1203,9 @@ class IslandVisualizerApp:
         """Point the panels at the followed person and rebuild their personal log."""
         self.agent = self.engine.agent
         log = self.agent.log if self.scenario == "titanic" else self.engine.logs.get(self.agent.id, [])
-        self.history = [{"t": r["t"] + 1, "state": r["state"], "event": r["event"], "action": r["action"],
-                         "decision": r, "narrative": r["reason"]} for r in log]
+        self.history = [
+            {"t": r["t"] + 1, "state": r["state"], "event": r["event"], "action": r["action"], "decision": r, "narrative": r["reason"]} for r in log
+        ]
         self.history_scroll = max(0, len(self.history) - 16)
         if log:
             self.current_decision = log[-1]
@@ -1205,8 +1228,7 @@ class IslandVisualizerApp:
             self.open_sim(event.file)
             return True
 
-        if self.cutscene.active and (event.type == pygame.KEYDOWN or
-                                     (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
+        if self.cutscene.active and (event.type == pygame.KEYDOWN or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
             self.cutscene.skip()
             return True
 
@@ -1215,7 +1237,11 @@ class IslandVisualizerApp:
                 self.window_w, self.window_h = max(800, event.w), max(450, event.h)
                 self.screen = pygame.display.set_mode((self.window_w, self.window_h), pygame.RESIZABLE)
 
-        elif self.app_state == "builder" and event.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN, pygame.MOUSEWHEEL) and getattr(event, "key", None) != pygame.K_F11:
+        elif (
+            self.app_state == "builder"
+            and event.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN, pygame.MOUSEWHEEL)
+            and getattr(event, "key", None) != pygame.K_F11
+        ):
             self.builder.handle_event(event, v_mouse)
 
         elif event.type == pygame.MOUSEWHEEL and self.show_history_overlay:
@@ -1302,16 +1328,14 @@ class IslandVisualizerApp:
     def _toggle_video_recording(self):
         """Starts or stops live MP4 video recording of the simulation canvas."""
         from engine.exporter import LiveVideoRecorder
+
         if self.video_recorder is not None and self.video_recorder.active:
             saved = self.video_recorder.stop()
             self.video_recorder = None
             self.bubble_text = f"Saved video: {os.path.basename(saved)}"
             self.bubble_timer = 3.0
         else:
-            out_file = os.path.join(
-                "exports", "videos",
-                f"{self.scenario}_seed{self.seed}_{self.mind_type}_{int(time.time())}.mp4"
-            )
+            out_file = os.path.join("exports", "videos", f"{self.scenario}_seed{self.seed}_{self.mind_type}_{int(time.time())}.mp4")
             self.video_recorder = LiveVideoRecorder(out_file, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, fps=FPS)
             self.video_recorder.start()
             self.bubble_text = f"Recording MP4: {os.path.basename(out_file)}"
@@ -1320,6 +1344,7 @@ class IslandVisualizerApp:
     def _export_current_data(self):
         """Exports the current simulation timeline and evacuation survival dataset."""
         from engine.exporter import export_evacuation_datasets
+
         os.makedirs("exports", exist_ok=True)
         if hasattr(self.engine, "timeline"):
             tl_path = os.path.join("exports", f"timeline_{self.scenario}_seed{self.seed}_{self.mind_type}.json")
@@ -1339,8 +1364,7 @@ class IslandVisualizerApp:
             self.cutscene.update(sim_dt)
             if self.scenario in CROWD_SCENARIOS:
                 self._pompeii_poll_step()
-            if self.app_state == "sim" and not self.is_paused and not self.show_debrief_modal and not self.show_history_overlay \
-                    and not self.cutscene.active:
+            if self.app_state == "sim" and not self.is_paused and not self.show_debrief_modal and not self.show_history_overlay and not self.cutscene.active:
                 self.auto_step_timer += sim_dt
                 if self.auto_step_timer >= self.step_speed:
                     self.auto_step_timer = 0.0
@@ -1391,6 +1415,7 @@ class IslandVisualizerApp:
         elif self.mind_type == "classical_mixture":
             try:
                 from mind.quantum_mind import classical_mixture_decide
+
                 self.engine.decide_fn = classical_mixture_decide
             except ImportError:
                 self.engine.decide_fn = contracts.classical_decide
@@ -1405,42 +1430,66 @@ class IslandVisualizerApp:
     def _update_hovers(self, pos: Tuple[int, int]) -> bool:
         hovered = False
         if self.app_state == "event_choice":
-            c1_h = hasattr(self, 'card1_rect') and self.card1_rect.collidepoint(pos)
-            c2_h = hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(pos)
+            c1_h = hasattr(self, "card1_rect") and self.card1_rect.collidepoint(pos)
+            c2_h = hasattr(self, "card2_rect") and self.card2_rect.collidepoint(pos)
             if self.btn_choice_titanic.check_hover(pos) or self.card3_rect.collidepoint(pos):
                 return True
             if self.btn_choice_pompeii.check_hover(pos) or self.card4_rect.collidepoint(pos):
                 return True
             if self.btn_choice_waterloo.check_hover(pos) or self.card5_rect.collidepoint(pos):
                 return True
-            if self.btn_choice_build.check_hover(pos) or (hasattr(self, 'card_build_rect') and self.card_build_rect.collidepoint(pos)):
+            if self.btn_choice_build.check_hover(pos) or (hasattr(self, "card_build_rect") and self.card_build_rect.collidepoint(pos)):
                 return True
             return self.btn_choice_island.check_hover(pos) or self.btn_choice_volcano.check_hover(pos) or c1_h or c2_h
 
         elif self.app_state == "home":
-            btns = [
-                self.btn_home_back_scenario, self.btn_home_fs,
-                self.btn_mind_quantum, self.btn_mind_mixture, self.btn_mind_classical,
-                self.btn_seed_m100, self.btn_seed_m10, self.btn_seed_m1,
-                self.btn_seed_p1, self.btn_seed_p10, self.btn_seed_p100, self.btn_seed_rand,
-                self.btn_launch
-            ] + self.preset_buttons + [b for _, b in self._visible_step_buttons()] + self.cue_buttons
+            btns = (
+                [
+                    self.btn_home_back_scenario,
+                    self.btn_home_fs,
+                    self.btn_mind_quantum,
+                    self.btn_mind_mixture,
+                    self.btn_mind_classical,
+                    self.btn_seed_m100,
+                    self.btn_seed_m10,
+                    self.btn_seed_m1,
+                    self.btn_seed_p1,
+                    self.btn_seed_p10,
+                    self.btn_seed_p100,
+                    self.btn_seed_rand,
+                    self.btn_launch,
+                ]
+                + self.preset_buttons
+                + [b for _, b in self._visible_step_buttons()]
+                + self.cue_buttons
+            )
             for btn in btns:
                 hovered = btn.check_hover(pos) or hovered
             return hovered
 
         elif self.app_state == "sim":
             if self.show_debrief_modal:
-                return (self.btn_modal_replay.check_hover(pos) or self.btn_modal_switch.check_hover(pos) or self.btn_modal_report.check_hover(pos) or
-                        self.btn_modal_scenario.check_hover(pos) or self.btn_modal_home.check_hover(pos) or
-                        self.btn_modal_close.check_hover(pos))
+                return (
+                    self.btn_modal_replay.check_hover(pos)
+                    or self.btn_modal_switch.check_hover(pos)
+                    or self.btn_modal_report.check_hover(pos)
+                    or self.btn_modal_scenario.check_hover(pos)
+                    or self.btn_modal_home.check_hover(pos)
+                    or self.btn_modal_close.check_hover(pos)
+                )
             if self.show_history_overlay:
                 return self.btn_hist_close.check_hover(pos)
 
             nav_btns = [
-                self.btn_nav_home, self.btn_nav_pause, self.btn_nav_step,
-                self.btn_nav_speed, self.btn_nav_mind, self.btn_nav_evac,
-                self.btn_nav_log, self.btn_nav_rec, self.btn_nav_fs
+                self.btn_nav_home,
+                self.btn_nav_pause,
+                self.btn_nav_step,
+                self.btn_nav_speed,
+                self.btn_nav_mind,
+                self.btn_nav_evac,
+                self.btn_nav_log,
+                self.btn_nav_rec,
+                self.btn_nav_fs,
             ]
             for btn in nav_btns:
                 hovered = btn.check_hover(pos) or hovered
@@ -1529,8 +1578,8 @@ class IslandVisualizerApp:
         if self.btn_choice_build.check_hover(pos):
             self._open_builder()
             return
-        c1_hit = self.btn_choice_island.check_hover(pos) or (hasattr(self, 'card1_rect') and self.card1_rect.collidepoint(pos))
-        c2_hit = self.btn_choice_volcano.check_hover(pos) or (hasattr(self, 'card2_rect') and self.card2_rect.collidepoint(pos))
+        c1_hit = self.btn_choice_island.check_hover(pos) or (hasattr(self, "card1_rect") and self.card1_rect.collidepoint(pos))
+        c2_hit = self.btn_choice_volcano.check_hover(pos) or (hasattr(self, "card2_rect") and self.card2_rect.collidepoint(pos))
         c3_hit = self.btn_choice_titanic.check_hover(pos) or self.card3_rect.collidepoint(pos)
         c4_hit = self.btn_choice_pompeii.check_hover(pos) or self.card4_rect.collidepoint(pos)
         c5_hit = self.btn_choice_waterloo.check_hover(pos) or self.card5_rect.collidepoint(pos)
@@ -1731,7 +1780,7 @@ class IslandVisualizerApp:
     def draw_event_choice_screen(self, mouse_pos: Tuple[int, int]):
         self.canvas.fill(COLOR_BG)
 
-        # Supercell-Style Golden Wood Ribbon Header
+        # Golden Wood Ribbon Header
         header_y = 18
         rib_rect = pygame.Rect(WINDOW_WIDTH // 2 - 390, header_y, 780, 74)
         pygame.draw.rect(self.canvas, (94, 54, 22), (rib_rect.x, rib_rect.y + 4, rib_rect.width, rib_rect.height), border_radius=14)
@@ -1776,8 +1825,17 @@ class IslandVisualizerApp:
         self.draw_badge(rect.x + 24, rect.y + 12, "LOCAL: WATERLOO, ONTARIO", COLOR_GREEN)
         self.canvas.blit(self.font_sub.render("MOSES SPRINGER CHLORINE LEAK", True, COLOR_TEXT_MAIN), (rect.x + 290, rect.y + 16))
         text_width = self.btn_choice_waterloo.rect.x - rect.x - 48
-        render_wrapped_text(self.canvas, "A hypothetical evacuation at a real site. Most details of the 30 July 2012 leak are unknown, so the leak and head-count are labelled settings.",
-                            self.font_small, COLOR_TEXT_MUTED, rect.x + 24, rect.y + 42, text_width, line_spacing=2, max_lines=2)
+        render_wrapped_text(
+            self.canvas,
+            "A hypothetical evacuation at a real site. Most details of the 30 July 2012 leak are unknown, so the leak and head-count are labelled settings.",
+            self.font_small,
+            COLOR_TEXT_MUTED,
+            rect.x + 24,
+            rect.y + 42,
+            text_width,
+            line_spacing=2,
+            max_lines=2,
+        )
         self.btn_choice_waterloo.check_hover(mouse_pos)
         self.btn_choice_waterloo.draw(self.canvas)
 
@@ -1787,34 +1845,76 @@ class IslandVisualizerApp:
         self.draw_card(rect.x, rect.y, rect.width, rect.height, border_color=COLOR_PURPLE if hover else COLOR_CARD_BORDER, border_width=1)
         self.btn_choice_build.draw(self.canvas)
         if self.notice:
-            render_wrapped_text(self.canvas, self.notice, self.font_small, COLOR_RED, rect.x + 16, rect.bottom - 18, rect.width - 32, line_spacing=2, max_lines=1)
+            render_wrapped_text(
+                self.canvas, self.notice, self.font_small, COLOR_RED, rect.x + 16, rect.bottom - 18, rect.width - 32, line_spacing=2, max_lines=1
+            )
 
     def _hub_cards(self):
         return (
-            dict(badge="SECTOR 01: ARCHIPELAGO", color=COLOR_GREEN_DARK, title="ISLAND WILDERNESS", rect=self.card1_rect, button=self.btn_choice_island,
-                 subtitle="Procedural terrain  •  Resources  •  Shelter",
-                 shows="The baseline: one person, everyday needs, and no crowd.",
-                 desc="A generated island. One survivor balances food, water and warmth against storms and animals, gathering timber to build a shelter before the cold nights.",
-                 specs=(("Grid", "40 × 40 cells, 250 m each", COLOR_CYAN), ("Terrain", "Forest, streams, peaks", COLOR_GREEN_DARK),
-                        ("Hazards", "Storms, cold nights, animals", COLOR_YELLOW), ("Mind", "2-qubit belief interference", COLOR_PURPLE))),
-            dict(badge="SECTOR 02: CALDERA", color=COLOR_ORANGE, title="VOLCANO EVACUATION", rect=self.card2_rect, button=self.btn_choice_volcano,
-                 subtitle="Fictional island  •  Unrest  •  Emergency routes",
-                 shows="Cue order and stress change when the person leaves.",
-                 desc="A fictional volcano enters unrest. The person must read tremor and gas signs, avoid lava and ash, and walk the routes to the coastal assembly points.",
-                 specs=(("Grid", "40 × 40 cells, assumed rates", COLOR_CYAN), ("Routes", "Valleys to coastal assembly", COLOR_ORANGE),
-                        ("Hazards", "Lava, ash, flows, lahars", COLOR_RED), ("Mind", "Stress as dephasing", COLOR_PURPLE))),
-            dict(badge="HISTORICAL: APRIL 1912", color=COLOR_BLUE, title="TITANIC EVACUATION", rect=self.card3_rect, button=self.btn_choice_titanic,
-                 subtitle="Flooding  •  Lifeboats  •  Whole crowd",
-                 shows="One mind, with deck position setting who hears what, and when.",
-                 desc="Everyone aboard shares one mind. Each person hears different warnings in a different order, while water climbs through the hull and lifeboats leave at their recorded times.",
-                 specs=(("People", "2,208 with crew roles", COLOR_CYAN), ("Lifeboats", f"20 boats, {TOTAL_SEATS:,} seats", COLOR_ORANGE),
-                        ("Time step", "5 minutes, 23:30 to 03:30", COLOR_RED), ("Mind", "Same mind for everyone", COLOR_PURPLE))),
-            dict(badge="HISTORICAL: AD 79", color=COLOR_RED, title="POMPEII EVACUATION", rect=self.card4_rect, button=self.btn_choice_pompeii,
-                 subtitle="Two maps  •  Pumice and flows  •  Split screens",
-                 shows="How far deaths move with the cue translation you assume.",
-                 desc="A whole town shares one mind. News spreads by distance, chance and household servants while pumice builds on the roofs. The default settings overstate escape.",
-                 specs=(("People", "11,500, or 20,000", COLOR_CYAN), ("Maps", "City, and region to Vesuvius", COLOR_ORANGE),
-                        ("Time step", "15 minutes, about 32 hours", COLOR_RED), ("Mind", "Same mind for everyone", COLOR_PURPLE))),
+            dict(
+                badge="SECTOR 01: ARCHIPELAGO",
+                color=COLOR_GREEN_DARK,
+                title="ISLAND WILDERNESS",
+                rect=self.card1_rect,
+                button=self.btn_choice_island,
+                subtitle="Procedural terrain  •  Resources  •  Shelter",
+                shows="The baseline: one person, everyday needs, and no crowd.",
+                desc="A generated island. One survivor balances food, water and warmth against storms and animals, gathering timber to build a shelter before the cold nights.",
+                specs=(
+                    ("Grid", "40 × 40 cells, 250 m each", COLOR_CYAN),
+                    ("Terrain", "Forest, streams, peaks", COLOR_GREEN_DARK),
+                    ("Hazards", "Storms, cold nights, animals", COLOR_YELLOW),
+                    ("Mind", "2-qubit belief interference", COLOR_PURPLE),
+                ),
+            ),
+            dict(
+                badge="SECTOR 02: CALDERA",
+                color=COLOR_ORANGE,
+                title="VOLCANO EVACUATION",
+                rect=self.card2_rect,
+                button=self.btn_choice_volcano,
+                subtitle="Fictional island  •  Unrest  •  Emergency routes",
+                shows="Cue order and stress change when the person leaves.",
+                desc="A fictional volcano enters unrest. The person must read tremor and gas signs, avoid lava and ash, and walk the routes to the coastal assembly points.",
+                specs=(
+                    ("Grid", "40 × 40 cells, assumed rates", COLOR_CYAN),
+                    ("Routes", "Valleys to coastal assembly", COLOR_ORANGE),
+                    ("Hazards", "Lava, ash, flows, lahars", COLOR_RED),
+                    ("Mind", "Stress as dephasing", COLOR_PURPLE),
+                ),
+            ),
+            dict(
+                badge="HISTORICAL: APRIL 1912",
+                color=COLOR_BLUE,
+                title="TITANIC EVACUATION",
+                rect=self.card3_rect,
+                button=self.btn_choice_titanic,
+                subtitle="Flooding  •  Lifeboats  •  Whole crowd",
+                shows="One mind, with deck position setting who hears what, and when.",
+                desc="Everyone aboard shares one mind. Each person hears different warnings in a different order, while water climbs through the hull and lifeboats leave at their recorded times.",
+                specs=(
+                    ("People", "2,208 with crew roles", COLOR_CYAN),
+                    ("Lifeboats", f"20 boats, {TOTAL_SEATS:,} seats", COLOR_ORANGE),
+                    ("Time step", "5 minutes, 23:30 to 03:30", COLOR_RED),
+                    ("Mind", "Same mind for everyone", COLOR_PURPLE),
+                ),
+            ),
+            dict(
+                badge="HISTORICAL: AD 79",
+                color=COLOR_RED,
+                title="POMPEII EVACUATION",
+                rect=self.card4_rect,
+                button=self.btn_choice_pompeii,
+                subtitle="Two maps  •  Pumice and flows  •  Split screens",
+                shows="How far deaths move with the cue translation you assume.",
+                desc="A whole town shares one mind. News spreads by distance, chance and household servants while pumice builds on the roofs. The default settings overstate escape.",
+                specs=(
+                    ("People", "11,500, or 20,000", COLOR_CYAN),
+                    ("Maps", "City, and region to Vesuvius", COLOR_ORANGE),
+                    ("Time step", "15 minutes, about 32 hours", COLOR_RED),
+                    ("Mind", "Same mind for everyone", COLOR_PURPLE),
+                ),
+            ),
         )
 
     def _draw_scenario_card(self, x, y, w, h, mouse_pos, badge, color, title, rect, button, subtitle, desc, specs, shows):
@@ -1875,8 +1975,12 @@ class IslandVisualizerApp:
         title_surf = self.font_hero.render("QOGNITION", True, (58, 32, 10))
         self.canvas.blit(title_surf, (WINDOW_WIDTH // 2 - title_surf.get_width() // 2, 17))
 
-        scen_tag = {"volcano": "VOLCANO ERUPTION EVACUATION", "titanic": "TITANIC EVACUATION, APRIL 1912",
-                    "pompeii": "POMPEII EVACUATION, AD 79", "waterloo": "WATERLOO CHLORINE LEAK (HYPOTHETICAL)"}.get(self.scenario, "ISLAND WILDERNESS SURVIVAL")
+        scen_tag = {
+            "volcano": "VOLCANO ERUPTION EVACUATION",
+            "titanic": "TITANIC EVACUATION, APRIL 1912",
+            "pompeii": "POMPEII EVACUATION, AD 79",
+            "waterloo": "WATERLOO CHLORINE LEAK (HYPOTHETICAL)",
+        }.get(self.scenario, "ISLAND WILDERNESS SURVIVAL")
         sub_str = f"{scen_tag}  •  A MODEL, NOT A PREDICTION"
         sub_surf = self.font_sub.render(sub_str, True, (72, 42, 12))
         self.canvas.blit(sub_surf, (WINDOW_WIDTH // 2 - sub_surf.get_width() // 2, 52))
@@ -1900,7 +2004,9 @@ class IslandVisualizerApp:
         leg_y = col1_y + 368
         pygame.draw.circle(self.canvas, COLOR_RED, (col1_x + 36, leg_y + 7), 5)
         pygame.draw.circle(self.canvas, COLOR_TEXT_MAIN, (col1_x + 36, leg_y + 7), 3)
-        legend_text = {"pompeii": "Walled town. Each gate leads on to the region map", "waterloo": "Real outlines. Doors, fence and inside are assumed"}.get(self.scenario, "Red dot: where the person starts")
+        legend_text = {"pompeii": "Walled town. Each gate leads on to the region map", "waterloo": "Real outlines. Doors, fence and inside are assumed"}.get(
+            self.scenario, "Red dot: where the person starts"
+        )
         leg_surf = self.font_small.render(legend_text, True, COLOR_TEXT_MUTED)
         self.canvas.blit(leg_surf, (col1_x + 50, leg_y))
 
@@ -1915,7 +2021,11 @@ class IslandVisualizerApp:
         elif self.scenario == "waterloo":
             temp_w = SiteWorld(seed=self.seed)
         else:
-            temp_w = ShipWorld(seed=self.seed) if self.scenario == "titanic" else IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=self.seed, scenario=self.scenario)
+            temp_w = (
+                ShipWorld(seed=self.seed)
+                if self.scenario == "titanic"
+                else IslandWorld(width=GRID_DIM, height=GRID_DIM, seed=self.seed, scenario=self.scenario)
+            )
         land_tiles = sum(1 for row in temp_w.tiles for t in row if t in (1, 2, 3, 4))
         forest_tiles = sum(1 for row in temp_w.tiles for t in row if t == 2)
         streams = len(temp_w.freshwater_tiles)
@@ -1924,13 +2034,13 @@ class IslandVisualizerApp:
 
         lines = [
             f"Active Seed:      #{self.seed}",
-            f"Grid Geometry:    40x40 (1,600 Tiles)",
+            "Grid Geometry:    40x40 (1,600 Tiles)",
             f"Land Coverage:    {land_pct}% (Usable Mass)",
             f"Forest Density:   {forest_pct}% (Timber & Food)",
             f"Freshwater:       {str(streams) + ' tiles' if streams > 0 else 'Arid / Sparse'}",
             f"Starting Spawn:   [{temp_w.spawn_pos[0]}, {temp_w.spawn_pos[1]}]",
             f"Scenario Horizon: {self.scenario.upper()}",
-            f"Contract Engine:  contracts.py (Frozen)"
+            "Contract Engine:  contracts.py (Frozen)",
         ]
         if self.scenario == "titanic":
             lines = [
@@ -1941,7 +2051,7 @@ class IslandVisualizerApp:
                 "Compartments:     6 of 16 Breached",
                 "Time Span:        23:30 to 03:30",
                 "Scenario Horizon: TITANIC",
-                "Contract Engine:  contracts.py (Frozen)"
+                "Contract Engine:  contracts.py (Frozen)",
             ]
         if self.scenario == "pompeii":
             lines = [
@@ -1952,7 +2062,7 @@ class IslandVisualizerApp:
                 f"Event Mapping:    {self.pompeii_settings['event_mapping']}",
                 "Time Span:        About 32 Hours",
                 "Scenario Horizon: POMPEII",
-                "Contract Engine:  contracts.py (Frozen)"
+                "Contract Engine:  contracts.py (Frozen)",
             ]
         if self.scenario == "waterloo":
             lines = [
@@ -1963,7 +2073,7 @@ class IslandVisualizerApp:
                 f"Event Mapping:    {self.waterloo_settings['event_mapping']}",
                 "Time Span:        Up to 2 Hours",
                 "Scenario Horizon: WATERLOO",
-                "Contract Engine:  contracts.py (Frozen)"
+                "Contract Engine:  contracts.py (Frozen)",
             ]
         for i, line in enumerate(lines):
             col = COLOR_CYAN if i == 0 else (COLOR_GREEN_DARK if i in (2, 3) else COLOR_TEXT_MUTED)
@@ -1980,9 +2090,9 @@ class IslandVisualizerApp:
         m_lbl = self.font_title.render("1. Select Cognitive Mind Model", True, COLOR_TEXT_MAIN)
         self.canvas.blit(m_lbl, (col2_x + 24, col2_y + 14))
 
-        self.btn_mind_quantum.is_active = (self.mind_type == "quantum")
-        self.btn_mind_mixture.is_active = (self.mind_type == "classical_mixture")
-        self.btn_mind_classical.is_active = (self.mind_type == "classical")
+        self.btn_mind_quantum.is_active = self.mind_type == "quantum"
+        self.btn_mind_mixture.is_active = self.mind_type == "classical_mixture"
+        self.btn_mind_classical.is_active = self.mind_type == "classical"
         self.btn_mind_quantum.check_hover(mouse_pos)
         self.btn_mind_mixture.check_hover(mouse_pos)
         self.btn_mind_classical.check_hover(mouse_pos)
@@ -1997,7 +2107,7 @@ class IslandVisualizerApp:
 
         presets = self._presets()
         for i, p_btn in enumerate(self.preset_buttons):
-            p_btn.is_active = (self.seed == presets[i]["seed"])
+            p_btn.is_active = self.seed == presets[i]["seed"]
             p_btn.check_hover(mouse_pos)
             p_btn.draw(self.canvas)
 
@@ -2013,7 +2123,9 @@ class IslandVisualizerApp:
 
         # 3. Simulation Duration
         step_length = "5 Minutes" if self.scenario == "titanic" else "2 Hours"
-        st_text = "3. Scenario Settings (Each One Changes Results)" if self.scenario in CROWD_SCENARIOS else f"3. Simulation Step Horizon ({step_length} per Turn)"
+        st_text = (
+            "3. Scenario Settings (Each One Changes Results)" if self.scenario in CROWD_SCENARIOS else f"3. Simulation Step Horizon ({step_length} per Turn)"
+        )
         st_lbl = self.font_title.render(st_text, True, COLOR_TEXT_MAIN)
         self.canvas.blit(st_lbl, (col2_x + 24, col2_y + 322))
 
@@ -2040,28 +2152,28 @@ class IslandVisualizerApp:
             "  * Quantum Mind: Belief states represented as 2-qubit amplitudes with non-commuting projection angles.",
             order_effect_hint(),
             "  * Stress Model: Physiological stress maps to a simulated dephasing channel (stress model); no hardware decoherence is driven live.",
-            "  * Survival: Without water, death comes at about 58 h. All rates are assumed. Maintain shelter to reduce exposure."
+            "  * Survival: Without water, death comes at about 58 h. All rates are assumed. Maintain shelter to reduce exposure.",
         ]
         if self.scenario == "titanic":
             bullet_lines = [
                 "  * Same Mind: All 2,208 aboard run the same unedited mind. Role and class are never passed to it.",
                 "  * Perception: Collision shudder, steward knocks, rockets, trim and rising water reach people by deck and position.",
                 "  * Lifeboats: 20 boats (1,178 seats) launch on Wormstedt's schedule; boarding follows port/starboard rules.",
-                "  * Historical Context: 712 of 2,208 survived historically. See docs/TITANIC_MODEL.md."
+                "  * Historical Context: 712 of 2,208 survived historically. See docs/TITANIC_MODEL.md.",
             ]
         if self.scenario == "pompeii":
             bullet_lines = [
                 "  * Same Mind: Everyone uses the same unedited mind. Role and status are never passed to it.",
                 "  * News: What people notice depends on distance, being indoors, visibility, chance and household servants.",
                 "  * Mapping: The column and falling pumice are translated into the mind's events. Results depend strongly on this.",
-                "  * Caution: The default settings overstate escape. A demonstration, not a reconstruction. See docs/POMPEII_SOURCES.md."
+                "  * Caution: The default settings overstate escape. A demonstration, not a reconstruction. See docs/POMPEII_SOURCES.md.",
             ]
         if self.scenario == "waterloo":
             bullet_lines = [
                 "  * Same Mind: Everyone uses the same unedited mind. Role is never passed to it. Each person decides once a minute.",
                 "  * Warning: People learn by smell, from people nearby, from others hurrying, and from an alarm a staff member triggers.",
                 "  * Exposure: Reported against EPA planning levels. These do not predict injury, and nobody is scripted to die.",
-                "  * Caution: A hypothetical at a real site, not a reconstruction. Leak, head-count and inside are assumed. See docs/WATERLOO_SOURCES.md."
+                "  * Caution: A hypothetical at a real site, not a reconstruction. Leak, head-count and inside are assumed. See docs/WATERLOO_SOURCES.md.",
             ]
         for i, bl in enumerate(bullet_lines):
             self.canvas.blit(self.font_small.render(bl.strip()[2:], True, COLOR_TEXT_MUTED), (hints_box.x + 18, hints_box.y + 42 + i * 38))
@@ -2181,7 +2293,17 @@ class IslandVisualizerApp:
         self.btn_nav_fs.text = "Window" if self.is_fullscreen else "Fullscreen"
         self.btn_nav_fs.icon = "windowed" if self.is_fullscreen else "fullscreen"
 
-        for btn in (self.btn_nav_home, self.btn_nav_pause, self.btn_nav_step, self.btn_nav_speed, self.btn_nav_mind, self.btn_nav_evac, self.btn_nav_log, self.btn_nav_rec, self.btn_nav_fs):
+        for btn in (
+            self.btn_nav_home,
+            self.btn_nav_pause,
+            self.btn_nav_step,
+            self.btn_nav_speed,
+            self.btn_nav_mind,
+            self.btn_nav_evac,
+            self.btn_nav_log,
+            self.btn_nav_rec,
+            self.btn_nav_fs,
+        ):
             btn.check_hover(mouse_pos)
             btn.draw(self.canvas)
 
@@ -2222,11 +2344,11 @@ class IslandVisualizerApp:
                         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]
                     )
                     if has_water_adj:
-                        # Golden Hay Day / Clash Beach Sand with warm shoreline lip
+                        # Golden beach sand with a warm shoreline lip
                         color = (244, 214, 142) if (x + y) % 2 == 0 else (236, 204, 132)
                         speck = (218, 182, 108)
                     else:
-                        # Signature Clash of Clans / Hay Day Checkerboard Emerald Meadow
+                        # Checkerboard emerald meadow
                         color = (126, 202, 68) if (x + y) % 2 == 0 else (114, 190, 58)
                         speck = (96, 168, 44)
                     pygame.draw.rect(self.canvas, color, rect)
@@ -2236,7 +2358,7 @@ class IslandVisualizerApp:
                         pygame.draw.circle(self.canvas, (255, 232, 92), (rx + rw - 6, ry + rh - 6), 2)
 
                 elif tile == 2:
-                    # Lush Hay Day Puffy Orchard / Pine Tree on Checkerboard Grass
+                    # Puffy orchard or pine tree on checkerboard grass
                     grass = (118, 194, 62) if (x + y) % 2 == 0 else (108, 182, 54)
                     pygame.draw.rect(self.canvas, grass, rect)
                     # Drop shadow & trunk
@@ -2262,7 +2384,7 @@ class IslandVisualizerApp:
                     pygame.draw.polygon(self.canvas, (248, 244, 236), [p1, (rx + rw // 2 - 4, ry + 8), (rx + rw // 2 + 4, ry + 8)])
 
                 elif tile == 4:
-                    # Cozy Clash / Hay Day Timber Cottage with Red Tile Roof & Golden Window
+                    # Timber cottage with a red tile roof and golden window
                     pygame.draw.rect(self.canvas, (122, 196, 64), rect)
                     pygame.draw.rect(self.canvas, (198, 146, 84), (rx + 3, ry + 8, rw - 6, rh - 10), border_radius=2)
                     pygame.draw.rect(self.canvas, (108, 66, 30), (rx + 3, ry + 8, rw - 6, rh - 10), 1, border_radius=2)
@@ -2343,7 +2465,10 @@ class IslandVisualizerApp:
         scale_box = pygame.Rect(14, MAP_SIZE - 34, 156, 24)
         pygame.draw.rect(self.canvas, (248, 234, 198), scale_box, border_radius=6)
         pygame.draw.rect(self.canvas, (106, 64, 28), scale_box, 2, border_radius=6)
-        self.canvas.blit(self.font_small.render(f"SCALE: 1 TILE = {getattr(self.world, 'scale_m_per_tile', 250):.0f}m", True, COLOR_TEXT_MAIN), (scale_box.x + 10, scale_box.y + 4))
+        self.canvas.blit(
+            self.font_small.render(f"SCALE: 1 TILE = {getattr(self.world, 'scale_m_per_tile', 250):.0f}m", True, COLOR_TEXT_MAIN),
+            (scale_box.x + 10, scale_box.y + 4),
+        )
 
         comp_box = pygame.Rect(MAP_SIZE - 72, 60, 60, 24)
         pygame.draw.rect(self.canvas, (248, 234, 198), comp_box, border_radius=6)
@@ -2413,7 +2538,7 @@ class IslandVisualizerApp:
         if self.world.is_in_shelter(self.agent.pos[0], self.agent.pos[1]):
             pygame.draw.polygon(self.canvas, COLOR_GREEN, [(cx, cy - 27), (cx - 7, cy - 20), (cx + 7, cy - 20)])
 
-        # Supercell Parchment Speech Bubble
+        # Parchment speech bubble
         if self.bubble_timer > 0 and self.bubble_text:
             text_surf = self.font_bubble.render(self.bubble_text, True, COLOR_TEXT_MAIN)
             tw, th = text_surf.get_width() + 20, text_surf.get_height() + 12
@@ -2448,7 +2573,11 @@ class IslandVisualizerApp:
             tile_name = {0: "Outside or wall", 1: "Street or open", 2: "Garden", 4: "Building"}.get(tile_type, "Unknown")
             desc = f"{round(self.world.elevation[ty][tx])} m above the sea"
         if self.scenario == "waterloo":
-            tile_name = "Pool" if (tx, ty) in self.world.pool_tiles else {0: "Creek", 1: "Open ground", 3: "Wall, fence or building", 4: "Indoors"}.get(tile_type, "Unknown")
+            tile_name = (
+                "Pool"
+                if (tx, ty) in self.world.pool_tiles
+                else {0: "Creek", 1: "Open ground", 3: "Wall, fence or building", 4: "Indoors"}.get(tile_type, "Unknown")
+            )
             desc = f"{self.engine.chlorine.ppm_at(max(0, self.step_idx - 1), (tx, ty)):.2f} ppm chlorine"
         if self.scenario == "titanic":
             tile_name = {0: "Sea or hull", 1: "Open deck", 3: "Stairs", 4: "Interior"}.get(tile_type, "Unknown")
@@ -2477,9 +2606,14 @@ class IslandVisualizerApp:
         """Six bars that mean something in this scenario. Crowd counts are worked out once per step."""
         needs = self.agent.needs
         if self.scenario not in ACTION_NAMES:
-            return [("Hunger", needs["hunger"], COLOR_YELLOW), ("Thirst", needs["thirst"], COLOR_CYAN),
-                    ("Warmth", needs["warmth"], COLOR_ORANGE), ("Energy", needs["energy"], COLOR_GREEN),
-                    ("Safety", needs["safety"], (110, 126, 148)), ("Morale", needs["morale"], COLOR_PURPLE)]
+            return [
+                ("Hunger", needs["hunger"], COLOR_YELLOW),
+                ("Thirst", needs["thirst"], COLOR_CYAN),
+                ("Warmth", needs["warmth"], COLOR_ORANGE),
+                ("Energy", needs["energy"], COLOR_GREEN),
+                ("Safety", needs["safety"], (110, 126, 148)),
+                ("Morale", needs["morale"], COLOR_PURPLE),
+            ]
         cached = getattr(self, "_crowd_bars", None)
         if cached is None or cached[0] != self.step_idx or cached[1] is not self.engine:
             total = max(1, len(self.engine.people))
@@ -2487,21 +2621,27 @@ class IslandVisualizerApp:
             if self.scenario == "titanic":
                 boats = self.engine.boats
                 used = sum(len(b.aboard) for b in boats.boats + boats.floating)
-                bars = [("Seats left", 1 - used / TOTAL_SEATS, COLOR_CYAN), ("Ship afloat", max(0., 1 - self.step_idx / SINK_STEP), COLOR_BLUE)]
+                bars = [("Seats left", 1 - used / TOTAL_SEATS, COLOR_CYAN), ("Ship afloat", max(0.0, 1 - self.step_idx / SINK_STEP), COLOR_BLUE)]
             elif self.scenario == "pompeii":
-                bars = [("Left town", (counts["on_roads"] + counts["escaped"]) / total, COLOR_CYAN), ("Town alive", 1 - counts["dead"] / total, COLOR_GREEN_DARK)]
+                bars = [
+                    ("Left town", (counts["on_roads"] + counts["escaped"]) / total, COLOR_CYAN),
+                    ("Town alive", 1 - counts["dead"] / total, COLOR_GREEN_DARK),
+                ]
             else:
                 bars = [("Off site", counts["off_site"] / total, COLOR_CYAN), ("Know of leak", counts["knows"] / total, COLOR_ORANGE)]
             self._crowd_bars = cached = (self.step_idx, self.engine, bars)
-        return [("Warmth", needs["warmth"], COLOR_ORANGE), ("Energy", needs["energy"], COLOR_GREEN),
-                ("Safety", needs["safety"], (110, 126, 148)), ("Morale", needs["morale"], COLOR_PURPLE)] + cached[2]
+        return [
+            ("Warmth", needs["warmth"], COLOR_ORANGE),
+            ("Energy", needs["energy"], COLOR_GREEN),
+            ("Safety", needs["safety"], (110, 126, 148)),
+            ("Morale", needs["morale"], COLOR_PURPLE),
+        ] + cached[2]
 
     def draw_dashboard(self):
         panel_x = MAP_SIZE + 16
         panel_w = WINDOW_WIDTH - MAP_SIZE - 32
         if self.scenario in CROWD_SCENARIOS and self.show_split_panels:
-            self.split_panels.draw(self.canvas, panel_x, 12, panel_w, WINDOW_HEIGHT - 24,
-                                   (self.font_title, self.font_body, self.font_small))
+            self.split_panels.draw(self.canvas, panel_x, 12, panel_w, WINDOW_HEIGHT - 24, (self.font_title, self.font_body, self.font_small))
             return
         curr_y = 12
 
@@ -2549,16 +2689,10 @@ class IslandVisualizerApp:
             self.draw_progress_bar(bx, by, bar_w, 15, lbl, val, bar_color)
 
         stress_y = curr_y + 138
-        self.draw_progress_bar(
-            panel_x + 16, stress_y, bar_w, 17,
-            "Stress", self.agent.stress, COLOR_RED if self.agent.stress > 0.6 else COLOR_YELLOW
-        )
+        self.draw_progress_bar(panel_x + 16, stress_y, bar_w, 17, "Stress", self.agent.stress, COLOR_RED if self.agent.stress > 0.6 else COLOR_YELLOW)
 
         decoherence_pct = decoherence_strength(self.agent.stress)
-        self.draw_progress_bar(
-            panel_x + 32 + bar_w, stress_y, bar_w, 17,
-            "Decoherence", decoherence_pct, COLOR_PURPLE
-        )
+        self.draw_progress_bar(panel_x + 32 + bar_w, stress_y, bar_w, 17, "Decoherence", decoherence_pct, COLOR_PURPLE)
 
         inv = self.agent.inventory
         inv_str = f"RESOURCES:   Timber: {inv.get('wood', 0)}   |   Rations: {inv.get('food', 0)}   |   Crafted Tools: {inv.get('tools', 0)}"
@@ -2647,7 +2781,7 @@ class IslandVisualizerApp:
 
         q_diag = self.current_decision.get("quantum")
         if q_diag:
-            q_str = f"P(danger) {q_diag.get('p_danger',0):.2f}  P(protect) {q_diag.get('p_protect',0):.2f}"
+            q_str = f"P(danger) {q_diag.get('p_danger', 0):.2f}  P(protect) {q_diag.get('p_protect', 0):.2f}"
             q_surf = self.font_mono.render(q_str, True, COLOR_TEXT_MUTED)
             self.canvas.blit(q_surf, (panel_x + panel_w - q_surf.get_width() - 30, curr_y + 12))
 
@@ -2666,7 +2800,7 @@ class IslandVisualizerApp:
             pygame.draw.rect(self.canvas, (68, 42, 22), (bar_x, chart_y + 2, chart_w, 12), border_radius=5)
             fill_w = max(3, int(p * chart_w))
             pygame.draw.rect(self.canvas, act_color, (bar_x, chart_y + 2, fill_w, 12), border_radius=5)
-            pct_lbl = self.font_mono.render(f"{p*100:4.1f}%", True, COLOR_TEXT_MUTED)
+            pct_lbl = self.font_mono.render(f"{p * 100:4.1f}%", True, COLOR_TEXT_MUTED)
             self.canvas.blit(pct_lbl, (bar_x + chart_w + 8, chart_y - 1))
             chart_y += 19
 
@@ -2682,8 +2816,17 @@ class IslandVisualizerApp:
         self.canvas.blit(self.font_small.render("Order swap", True, COLOR_TEXT_MAIN), (swap_box.x + 8, swap_box.y + 5))
         self.btn_order_swap.check_hover(self.last_mouse)
         self.btn_order_swap.draw(self.canvas)
-        render_wrapped_text(self.canvas, self.quantum_panel.swap_result or "Swap the last two cues and see ΔP.", self.font_small, COLOR_TEXT_MUTED,
-                            swap_box.x + 8, swap_box.y + 68, swap_box.width - 14, line_spacing=2, max_lines=4)
+        render_wrapped_text(
+            self.canvas,
+            self.quantum_panel.swap_result or "Swap the last two cues and see ΔP.",
+            self.font_small,
+            COLOR_TEXT_MUTED,
+            swap_box.x + 8,
+            swap_box.y + 68,
+            swap_box.width - 14,
+            line_spacing=2,
+            max_lines=4,
+        )
 
         curr_y += card3_h + 12
 
@@ -2708,7 +2851,6 @@ class IslandVisualizerApp:
 
         mw, mh = 860, 680
         mx, my = (WINDOW_WIDTH - mw) // 2, (WINDOW_HEIGHT - mh) // 2
-        m_rect = pygame.Rect(mx, my, mw, mh)
         survived = self.agent.is_alive
         border_col = COLOR_GOLD if survived else COLOR_RED
         self.draw_card(mx, my, mw, mh, border_color=border_col, border_width=3)
@@ -2745,23 +2887,28 @@ class IslandVisualizerApp:
         lines = [
             ("Decision Engine:", engine_name, engine_col),
             ("World Environment:", f"Seed #{self.seed} ({scen_str}, 40x40 Grid, 1600 Tiles)", COLOR_TEXT_MAIN),
-            ("Final Stress & Noise:", f"{int(self.agent.stress*100)}% Stress  |  Decoherence: {int(decoherence_strength(self.agent.stress) * 100)}% off-diagonal decay (stress model)", COLOR_CYAN),
-            ("Physiological State:", f"Hunger: {int(self.agent.needs['hunger']*100)}% | Thirst: {int(self.agent.needs['thirst']*100)}% | Warmth: {int(self.agent.needs['warmth']*100)}%", COLOR_TEXT_MAIN),
-            ("Resource Harvest:", f"Gathered {self.agent.inventory.get('wood',0)} Timber | Consumed Rations | Crafted Tools: {self.agent.inventory.get('tools',0)}", COLOR_TEXT_MUTED)
+            (
+                "Final Stress & Noise:",
+                f"{int(self.agent.stress * 100)}% Stress  |  Decoherence: {int(decoherence_strength(self.agent.stress) * 100)}% off-diagonal decay (stress model)",
+                COLOR_CYAN,
+            ),
+            (
+                "Physiological State:",
+                f"Hunger: {int(self.agent.needs['hunger'] * 100)}% | Thirst: {int(self.agent.needs['thirst'] * 100)}% | Warmth: {int(self.agent.needs['warmth'] * 100)}%",
+                COLOR_TEXT_MAIN,
+            ),
+            (
+                "Resource Harvest:",
+                f"Gathered {self.agent.inventory.get('wood', 0)} Timber | Consumed Rations | Crafted Tools: {self.agent.inventory.get('tools', 0)}",
+                COLOR_TEXT_MUTED,
+            ),
         ]
 
         for i, (k, v, col) in enumerate(lines):
             ky = box_rect.y + 12 + i * 42
             self.canvas.blit(self.font_sub.render(k, True, COLOR_TEXT_HINT), (box_rect.x + 22, ky))
             render_wrapped_text(
-                surface=self.canvas,
-                text=v,
-                font=self.font_mono,
-                color=col,
-                x=box_rect.x + 215,
-                y=ky + 1,
-                max_width=box_rect.width - 235,
-                max_lines=1
+                surface=self.canvas, text=v, font=self.font_mono, color=col, x=box_rect.x + 215, y=ky + 1, max_width=box_rect.width - 235, max_lines=1
             )
 
         self.btn_modal_replay.check_hover(mouse_pos)
@@ -2831,13 +2978,17 @@ class IslandVisualizerApp:
             if mine["deaths"] is None:
                 lines.append(f"Off the site: {mine['survivors']} of {mine['total']} ({mine['survivors'] / mine['total'] * 100:.0f}%).")
             else:
-                lines.append(f"Survived: {mine['survivors']:,} of {mine['total']:,} ({mine['survivors'] / mine['total'] * 100:.1f}%). Died: {mine['deaths']:,}.")
+                lines.append(
+                    f"Survived: {mine['survivors']:,} of {mine['total']:,} ({mine['survivors'] / mine['total'] * 100:.1f}%). Died: {mine['deaths']:,}."
+                )
             if self.custom_game is None:
                 lines.append(paired_text(mine, self.paired.value))
         else:
             delay = first_hide(self.engine.steps)
-            lines.append(f"This run: {'survived' if self.agent.is_alive else 'died'} at step {self.step_idx} of {self.max_steps}, "
-                         + ("never hid." if delay is None else f"hid {delay} step{'' if delay == 1 else 's'} after the first sign."))
+            lines.append(
+                f"This run: {'survived' if self.agent.is_alive else 'died'} at step {self.step_idx} of {self.max_steps}, "
+                + ("never hid." if delay is None else f"hid {delay} step{'' if delay == 1 else 's'} after the first sign.")
+            )
             if self.custom_game is None:
                 lines.append(paired_text(None, self.paired.value))
             batch = saved_volcano_batch() if self.scenario == "volcano" else None
@@ -2861,8 +3012,12 @@ class IslandVisualizerApp:
         title = f"{focus.label} LEFT THE SITE" if focus.status == "out" else f"{focus.label} IS STILL ON SITE"
         surf = self.font_hero.render(title, True, border_col)
         self.canvas.blit(surf, (mx + (mw - surf.get_width()) // 2, my + 22))
-        sub = self.font_sub.render(f"This run: {counts['off_site']} of {len(engine.people)} off the site.  Mapping {engine.event_mapping}.  "
-                                   f"Mind {self.mind_type}.  Seed #{self.seed}.", True, COLOR_TEXT_MUTED)
+        sub = self.font_sub.render(
+            f"This run: {counts['off_site']} of {len(engine.people)} off the site.  Mapping {engine.event_mapping}.  "
+            f"Mind {self.mind_type}.  Seed #{self.seed}.",
+            True,
+            COLOR_TEXT_MUTED,
+        )
         self.canvas.blit(sub, (mx + (mw - sub.get_width()) // 2, my + 58))
         box = pygame.Rect(mx + 36, my + 84, mw - 72, 268)
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, box, border_radius=4)
@@ -2875,14 +3030,26 @@ class IslandVisualizerApp:
             line = f"{role.capitalize():26s}{str(row['off_site']) + ' of ' + str(row['total']):12s}{levels['1']:<8d}{levels['2']:<8d}{levels['3']:<8d}"
             self.canvas.blit(self.font_mono.render(line, True, COLOR_TEXT_MAIN), (box.x + 22, y))
             y += 20
+
         def seconds(value):
             return "not reached" if value is None else f"{value} s"
+
         line = f"After the leak starts: first knew {seconds(timing['first_knew'])}, alarm {seconds(timing['alarm'])}, half off site {seconds(timing['half_off_site'])}"
         self.canvas.blit(self.font_small.render(line, True, COLOR_TEXT_MUTED), (box.x + 22, y + 8))
-        self.canvas.blit(self.font_small.render("AEGL columns count people whose highest level was that one. EPA planning limits, not predictions of injury.",
-                                                True, COLOR_TEXT_HINT), (box.x + 22, y + 34))
-        self.canvas.blit(self.font_small.render("A hypothetical at a real site, not a reconstruction. The real head-count, leak and injuries are unknown; see docs/WATERLOO_SOURCES.md.",
-                                                True, COLOR_TEXT_HINT), (box.x + 22, y + 54))
+        self.canvas.blit(
+            self.font_small.render(
+                "AEGL columns count people whose highest level was that one. EPA planning limits, not predictions of injury.", True, COLOR_TEXT_HINT
+            ),
+            (box.x + 22, y + 34),
+        )
+        self.canvas.blit(
+            self.font_small.render(
+                "A hypothetical at a real site, not a reconstruction. The real head-count, leak and injuries are unknown; see docs/WATERLOO_SOURCES.md.",
+                True,
+                COLOR_TEXT_HINT,
+            ),
+            (box.x + 22, y + 54),
+        )
         for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_report, self.btn_modal_scenario, self.btn_modal_home):
             button.check_hover(mouse_pos)
             button.draw(self.canvas)
@@ -2895,8 +3062,11 @@ class IslandVisualizerApp:
         title = f"{focus.label} SURVIVED" if focus.is_alive else f"{focus.label} DIED ({str(focus.cause_of_death).upper()})"
         surf = self.font_hero.render(title, True, border_col)
         self.canvas.blit(surf, (mx + (mw - surf.get_width()) // 2, my + 22))
-        sub = self.font_sub.render(f"This run: {counts['dead']:,} deaths of {len(engine.people):,}.  Mapping {engine.event_mapping}.  "
-                                   f"Mind {self.mind_type}.  Seed #{self.seed}.", True, COLOR_TEXT_MUTED)
+        sub = self.font_sub.render(
+            f"This run: {counts['dead']:,} deaths of {len(engine.people):,}.  Mapping {engine.event_mapping}.  Mind {self.mind_type}.  Seed #{self.seed}.",
+            True,
+            COLOR_TEXT_MUTED,
+        )
         self.canvas.blit(sub, (mx + (mw - sub.get_width()) // 2, my + 58))
         box = pygame.Rect(mx + 36, my + 84, mw - 72, 268)
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, box, border_radius=4)
@@ -2911,10 +3081,18 @@ class IslandVisualizerApp:
         causes = deaths["causes"]
         line = f"Roof collapse {causes.get('roof_collapse', 0):,}   Pyroclastic flow {causes.get('pyroclastic_flow', 0):,}"
         self.canvas.blit(self.font_mono.render(line, True, COLOR_TEXT_MUTED), (box.x + 22, y + 6))
-        self.canvas.blit(self.font_small.render("History: about 1,150 bodies found on site, 38% of known victims in the pumice phase. Not a total death toll.",
-                                                True, COLOR_TEXT_HINT), (box.x + 22, y + 32))
-        self.canvas.blit(self.font_small.render("A demonstration, not a reconstruction. The default settings overstate escape; see docs/POMPEII_SOURCES.md.",
-                                                True, COLOR_TEXT_HINT), (box.x + 22, y + 52))
+        self.canvas.blit(
+            self.font_small.render(
+                "History: about 1,150 bodies found on site, 38% of known victims in the pumice phase. Not a total death toll.", True, COLOR_TEXT_HINT
+            ),
+            (box.x + 22, y + 32),
+        )
+        self.canvas.blit(
+            self.font_small.render(
+                "A demonstration, not a reconstruction. The default settings overstate escape; see docs/POMPEII_SOURCES.md.", True, COLOR_TEXT_HINT
+            ),
+            (box.x + 22, y + 52),
+        )
         for button in (self.btn_modal_replay, self.btn_modal_switch, self.btn_modal_report, self.btn_modal_scenario, self.btn_modal_home):
             button.check_hover(mouse_pos)
             button.draw(self.canvas)
@@ -2925,17 +3103,15 @@ class IslandVisualizerApp:
         focus, table = self.agent, self.engine.outcome_table()
         counts = self.engine.counts()
         saved = counts["boats"]
-        title = (f"{focus.label} SURVIVED" if focus.is_alive else f"{focus.label} DIED ({str(focus.cause_of_death).upper()})")
+        title = f"{focus.label} SURVIVED" if focus.is_alive else f"{focus.label} DIED ({str(focus.cause_of_death).upper()})"
         surf = self.font_hero.render(title, True, border_col)
         self.canvas.blit(surf, (mx + (mw - surf.get_width()) // 2, my + 26))
-        sub = self.font_sub.render(f"This run: {saved:,} of {len(self.engine.people):,} survived.  History: about 712 of 2,208.",
-                                   True, COLOR_TEXT_MUTED)
+        sub = self.font_sub.render(f"This run: {saved:,} of {len(self.engine.people):,} survived.  History: about 712 of 2,208.", True, COLOR_TEXT_MUTED)
         self.canvas.blit(sub, (mx + (mw - sub.get_width()) // 2, my + 66))
         box = pygame.Rect(mx + 36, my + 100, mw - 72, 245)
         pygame.draw.rect(self.canvas, COLOR_PANEL_ALT, box, border_radius=4)
         pygame.draw.rect(self.canvas, COLOR_CARD_BORDER, box, 1, border_radius=4)
-        names = [("first", "First-class passengers", 324, 201), ("second", "Second-class passengers", 284, 118),
-                 ("third", "Third-class passengers", 709, 181)]
+        names = [("first", "First-class passengers", 324, 201), ("second", "Second-class passengers", 284, 118), ("third", "Third-class passengers", 709, 181)]
         crew_keys = ("captain", "officer", "evac_worker", "server", "engine_worker")
         crew_aboard = sum(table[k]["aboard"] for k in crew_keys)
         crew_saved = sum(table[k]["saved"] for k in crew_keys)
@@ -2998,7 +3174,7 @@ class IslandVisualizerApp:
             act = rec["action"].upper()
             probs = rec["decision"].get("probs", {})
             top_p = max(probs.values()) if probs else 0.0
-            p_str = f"{top_p*100:4.1f}%"
+            p_str = f"{top_p * 100:4.1f}%"
             reason_raw = rec["decision"].get("reason", "")
 
             act_col = ACTION_COLORS.get(rec["action"], COLOR_TEXT_MAIN)
@@ -3022,7 +3198,7 @@ class IslandVisualizerApp:
         self.canvas.blit(tip, (hx + 30, hy + hh - 34))
 
     # -------------------------------------------------------------------------
-    # UI Utility Helpers - Clash of Clans / Hay Day Carved Wood & Parchment Style
+    # UI helpers: carved wood and parchment style
     # -------------------------------------------------------------------------
     def draw_card(self, x: int, y: int, w: int, h: int, border_color: Optional[Tuple[int, int, int]] = None, border_width: int = 2):
         self.canvas.cover(pygame.Rect(x, y, w, h))
@@ -3072,7 +3248,7 @@ class IslandVisualizerApp:
         if fill_w > 0:
             fill_rect = pygame.Rect(bar_x + 1, y + 3, fill_w, h - 4)
             pygame.draw.rect(self.canvas, color, fill_rect, border_radius=5)
-            # Supercell glossy top highlight strip
+            # Glossy top highlight strip
             gloss_rect = pygame.Rect(bar_x + 2, y + 4, max(1, fill_w - 2), max(2, (h - 4) // 2))
             gloss_s = pygame.Surface((gloss_rect.width, gloss_rect.height), pygame.SRCALPHA)
             gloss_s.fill((255, 255, 255, 95))
@@ -3082,11 +3258,17 @@ class IslandVisualizerApp:
         self.canvas.blit(val_surf, (bar_x + bar_w + 8, y))
 
 
-def launch_gui(seed: int = 101, mind: str = "quantum", noise: str = "stub", start_screen: str = "event_choice",
-               scenario: str = "volcano", builder_factory=None, open_sim=None):
+def launch_gui(
+    seed: int = 101,
+    mind: str = "quantum",
+    noise: str = "stub",
+    start_screen: str = "event_choice",
+    scenario: str = "volcano",
+    builder_factory=None,
+    open_sim=None,
+):
     """Launches the complete Pygame Quantum Cognition Simulation starting at the Event Choice Screen."""
-    app = IslandVisualizerApp(seed=seed, mind_type=mind, noise_source=noise, start_screen=start_screen,
-                              scenario=scenario, builder_factory=builder_factory)
+    app = IslandVisualizerApp(seed=seed, mind_type=mind, noise_source=noise, start_screen=start_screen, scenario=scenario, builder_factory=builder_factory)
     if open_sim:
         app.open_sim(open_sim)
     app.run()

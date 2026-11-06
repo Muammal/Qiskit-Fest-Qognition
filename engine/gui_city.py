@@ -5,6 +5,7 @@ panels showing individuals. The written thoughts are templates built only from v
 the model computed: what a person heard, their danger belief and their action. They are
 labelled as illustration on screen and invent no feelings or motives.
 """
+
 import random
 
 import pygame
@@ -34,9 +35,9 @@ def danger_phrase(p_danger):
     """Plain words for the mind's own belief value. Nothing is added to it."""
     if p_danger is None:
         return "No belief value for this mind."
-    if p_danger < .35:
+    if p_danger < 0.35:
         return "Belief leans safe."
-    if p_danger < .7:
+    if p_danger < 0.7:
         return "Belief is unsure."
     return "Belief leans to danger."
 
@@ -123,8 +124,7 @@ class SplitPanels:
         row += 22
         quantum = (record or {}).get("quantum") or {}
         if quantum:
-            values = (f"Danger belief {quantum.get('p_danger', 0):.2f}    P(protect) {quantum.get('p_protect', 0):.2f}"
-                      f"    Stress {person.stress:.2f}")
+            values = f"Danger belief {quantum.get('p_danger', 0):.2f}    P(protect) {quantum.get('p_protect', 0):.2f}    Stress {person.stress:.2f}"
         else:
             values = f"Stress {person.stress:.2f}"
         surface.blit(small.render(values, True, INK), (x + 16, row))
@@ -133,7 +133,7 @@ class SplitPanels:
             bar_w = width - 32
             for action, value in sorted(record["probs"].items(), key=lambda item: -item[1])[:2]:
                 pygame.draw.rect(surface, (234, 216, 178), (x + 16, row, bar_w, 17), border_radius=3)
-                pygame.draw.rect(surface, (182, 128, 214), (x + 16, row, int(bar_w * min(1., value)), 17), border_radius=3)
+                pygame.draw.rect(surface, (182, 128, 214), (x + 16, row, int(bar_w * min(1.0, value)), 17), border_radius=3)
                 surface.blit(small.render(f"{person.action_label(action)} {value:.0%}", True, INK), (x + 22, row))
                 row += 20
         row += 4
@@ -170,8 +170,8 @@ class CityView:
                 color = REGION_COLORS.get(tile, SEA)
                 pygame.draw.rect(surface, color, (round(x * TILE), round(y * TILE), TILE + 1, TILE + 1))
         vx, vy = region.vent
-        pygame.draw.circle(surface, (60, 40, 36), (int((vx + .5) * TILE), int((vy + .5) * TILE)), 16)
-        pygame.draw.circle(surface, (220, 90, 40), (int((vx + .5) * TILE), int((vy + .5) * TILE)), 7)
+        pygame.draw.circle(surface, (60, 40, 36), (int((vx + 0.5) * TILE), int((vy + 0.5) * TILE)), 16)
+        pygame.draw.circle(surface, (220, 90, 40), (int((vx + 0.5) * TILE), int((vy + 0.5) * TILE)), 7)
         return surface
 
     def _build_city(self, world):
@@ -186,10 +186,10 @@ class CityView:
         return surface
 
     def person_xy(self, person):
-        jx = ((person.id * 7919) % 19 - 9) * 1.
-        jy = ((person.id * 104729) % 19 - 9) * 1.
+        jx = ((person.id * 7919) % 19 - 9) * 1.0
+        jy = ((person.id * 104729) % 19 - 9) * 1.0
         x, y = person.pos
-        return (x + .5) * TILE + jx, (y + .5) * TILE + jy
+        return (x + 0.5) * TILE + jx, (y + 0.5) * TILE + jy
 
     def focus_xy(self, engine):
         return self.person_xy(engine.agent)
@@ -203,7 +203,7 @@ class CityView:
     def _ash_tint(self, canvas, amount):
         if amount > 0:
             layer = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
-            layer.fill((196, 188, 170, int(150 * min(1., amount))))
+            layer.fill((196, 188, 170, int(150 * min(1.0, amount))))
             canvas.blit(layer, (0, 0))
 
     def draw(self, app):
@@ -234,8 +234,7 @@ class CityView:
         for y, row in enumerate(hazard["region_ash_grid"]):
             for x, digit in enumerate(row):
                 if digit != "0":
-                    pygame.draw.rect(layer, (196, 188, 170, int(digit) * 16),
-                                     (round(x * TILE), round(y * TILE), TILE + 1, TILE + 1))
+                    pygame.draw.rect(layer, (196, 188, 170, int(digit) * 16), (round(x * TILE), round(y * TILE), TILE + 1, TILE + 1))
         canvas.blit(layer, (0, 0))
 
     def _draw_people(self, canvas, engine, status):
@@ -257,13 +256,14 @@ class CityView:
         band.fill((20, 14, 12, 190))
         canvas.blit(band, (0, 52))
         map_name = "REGION" if self.show_region else "CITY"
-        text = (f"{clock_text(t)}  {engine.eruption.phases[t].replace('_', ' ').upper()}  {map_name}   "
-                f"Town {counts['in_town']}   Roads {counts['on_roads']}   Escaped {counts['escaped']}   "
-                f"Dead {counts['dead']}   Pumice {hazard['pumice_m']:.1f} m")
+        text = (
+            f"{clock_text(t)}  {engine.eruption.phases[t].replace('_', ' ').upper()}  {map_name}   "
+            f"Town {counts['in_town']}   Roads {counts['on_roads']}   Escaped {counts['escaped']}   "
+            f"Dead {counts['dead']}   Pumice {hazard['pumice_m']:.1f} m"
+        )
         canvas.blit(self.font_sub.render(text, True, (246, 240, 226)), (14, 56))
         mapping = engine.event_mapping
-        line = (f"Following {engine.agent.label}.  Click a person to follow them.  M region map, P panels, "
-                f"Event mapping {mapping}.")
+        line = f"Following {engine.agent.label}.  Click a person to follow them.  M region map, P panels, Event mapping {mapping}."
         canvas.blit(self.font.render(line, True, (214, 204, 186)), (14, 78))
 
     def _draw_legend(self, canvas, engine):
@@ -278,13 +278,13 @@ class CityView:
     def pick_person(self, engine, pos):
         """Nearest living person on the map being shown, or None if nobody is close."""
         status = "road" if self.show_region else "city"
-        best, best_distance = None, 14.
+        best, best_distance = None, 14.0
         for person in engine.people:
             if person.is_alive and person.status == status:
                 x, y = self.person_xy(person)
                 distance = (x - pos[0]) ** 2 + (y - pos[1]) ** 2
-                if distance < best_distance ** 2:
-                    best, best_distance = person, distance ** .5
+                if distance < best_distance**2:
+                    best, best_distance = person, distance**0.5
         return best
 
 

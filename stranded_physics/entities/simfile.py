@@ -11,6 +11,7 @@ The hash catches damage in transit. It doesn't say who made a file, or that the 
     fetch_sim    a link to a Sim
     fetch_gallery, fetch_gallery_sim   the public gallery in this repository
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -34,11 +35,12 @@ from stranded_physics.entities.api import ScenarioFile, dump_scenario
 from stranded_physics.entities.build import people_of
 
 FORMAT, VERSION, SUFFIX = "qognition-sim", 1, ".qsim"
+LICENCE = "CC-BY-4.0"
 ROOT = Path(__file__).resolve().parents[2]
 EXPORTS = ROOT / "exports" / "sims"
 RAW_DATA = ROOT / "artifacts" / "physics" / "raw"
 MAX_BYTES = 256 * 1024
-MAX_ENTITIES, MAX_PEOPLE, MAX_HOURS, MAX_SEED = 64, 500, 240, 2 ** 31 - 1
+MAX_ENTITIES, MAX_PEOPLE, MAX_HOURS, MAX_SEED = 64, 500, 240, 2**31 - 1
 MAX_SHORT_TEXT, MAX_LONG_TEXT = 120, 600
 TIMEOUT_S, MAX_REDIRECTS = 15, 4
 REPOSITORY = "Muammal/Qiskit-Fest-Qognition"
@@ -47,6 +49,7 @@ GALLERY_INDEX = f"{GALLERY_ROOT}/index.json"
 UPLOAD_PAGE = f"https://github.com/{REPOSITORY}/upload/main/community/sims"
 GALLERY_FILE = re.compile(r"[a-z0-9][a-z0-9_-]{0,39}\.qsim")
 ENVELOPE_KEYS = {"format", "version", "title", "author", "description", "created_utc", "seed", "needs_data_pack", "scenario", "sha256"}
+OPTIONAL_ENVELOPE_KEYS = {"licence"}  # Files saved before licences were added don't have it.
 # Sources that read the data pack, tested by building each one on a checkout that doesn't hold it.
 DATA_PACK_SOURCES = {("terrain", "replay"), ("weather", "replay"), ("weather", "catalogue"), ("eruption", "replay"), ("storm", "replay")}
 SHIP_KINDS = {"ship", "breach", "lifeboats", "sea", "passengers"}
@@ -62,6 +65,7 @@ class Sim:
     created_utc: str
     needs_data_pack: bool
     sha256: str
+    licence: str = ""
 
     @property
     def title(self) -> str:
@@ -139,10 +143,19 @@ def to_bytes(draft: edit.Draft, seed: int, author: str = "", description: str = 
     if not 0 <= seed <= MAX_SEED:
         raise InterfaceError(f"The seed has to be from 0 to {MAX_SEED}")
     text = dump_scenario(scenario)
-    envelope = dict(format=FORMAT, version=VERSION, title=scenario.title, author=_plain(author, MAX_SHORT_TEXT, "The author"),
-                    description=_plain(description, MAX_LONG_TEXT, "The description"),
-                    created_utc=(now or datetime.now(timezone.utc)).isoformat(timespec="seconds"), seed=seed,
-                    needs_data_pack=needs_data_pack(scenario), scenario=text, sha256=_digest(text))
+    envelope = dict(
+        format=FORMAT,
+        version=VERSION,
+        title=scenario.title,
+        author=_plain(author, MAX_SHORT_TEXT, "The author"),
+        description=_plain(description, MAX_LONG_TEXT, "The description"),
+        created_utc=(now or datetime.now(timezone.utc)).isoformat(timespec="seconds"),
+        seed=seed,
+        needs_data_pack=needs_data_pack(scenario),
+        scenario=text,
+        sha256=_digest(text),
+        licence=LICENCE,
+    )
     data = json.dumps(envelope, indent=1, ensure_ascii=False).encode("utf-8")
     if len(data) > MAX_BYTES:
         raise InterfaceError(f"This comes to {len(data):,} bytes. A sim file can be {MAX_BYTES:,}")
@@ -172,7 +185,7 @@ def read_sim(data: bytes) -> Sim:
         raise InterfaceError("That sim file has no usable version")
     if envelope["version"] > VERSION:
         raise InterfaceError("That sim file was made by a newer version of the app. Update the app to open it")
-    if set(envelope) != ENVELOPE_KEYS:
+    if not ENVELOPE_KEYS <= set(envelope) <= ENVELOPE_KEYS | OPTIONAL_ENVELOPE_KEYS:
         raise InterfaceError("That sim file has missing or unknown fields")
     text = envelope["scenario"]
     if not isinstance(text, str) or _digest(text) != envelope["sha256"]:
@@ -183,6 +196,7 @@ def read_sim(data: bytes) -> Sim:
     author = _plain(envelope["author"], MAX_SHORT_TEXT, "The author")
     description = _plain(envelope["description"], MAX_LONG_TEXT, "The description")
     created = _plain(envelope["created_utc"], MAX_SHORT_TEXT, "The date")
+    licence = _plain(envelope.get("licence", ""), MAX_SHORT_TEXT, "The licence")
     try:
         draft = edit.draft_from_table(tomllib.loads(text))
     except (tomllib.TOMLDecodeError, ValueError, KeyError, TypeError, AttributeError, RecursionError) as error:
@@ -190,7 +204,7 @@ def read_sim(data: bytes) -> Sim:
     _walk_text(draft.header, "The scenario")
     _walk_text(draft.entries, "The scenario")
     scenario = _checked_scenario(draft)
-    return Sim(draft, seed, author, description, created, needs_data_pack(scenario), envelope["sha256"])
+    return Sim(draft, seed, author, description, created, needs_data_pack(scenario), envelope["sha256"], licence)
 
 
 def read_path(path: Path) -> Sim:
@@ -262,8 +276,14 @@ def _gallery_row(row: object) -> dict | None:
     try:
         if not GALLERY_FILE.fullmatch(row["file"]):
             return None
-        return dict(file=row["file"], title=_plain(row["title"], MAX_SHORT_TEXT, "title"), author=_plain(row["author"], MAX_SHORT_TEXT, "author"),
-                    description=_plain(row["description"], MAX_LONG_TEXT, "description"), needs_data_pack=row["needs_data_pack"] is True, sha256=str(row["sha256"]))
+        return dict(
+            file=row["file"],
+            title=_plain(row["title"], MAX_SHORT_TEXT, "title"),
+            author=_plain(row["author"], MAX_SHORT_TEXT, "author"),
+            description=_plain(row["description"], MAX_LONG_TEXT, "description"),
+            needs_data_pack=row["needs_data_pack"] is True,
+            sha256=str(row["sha256"]),
+        )
     except (KeyError, TypeError, InterfaceError):
         return None
 

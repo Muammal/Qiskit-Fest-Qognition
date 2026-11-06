@@ -1,4 +1,5 @@
 """The real April 2021 St Vincent scenario: each category's T1 model, on the real island."""
+
 from __future__ import annotations
 
 import math
@@ -19,24 +20,26 @@ from stranded_physics.packs.builder import Pack, build_pack, stream
 from stranded_physics.st_vincent import TIME, UTM, VENT_XY, to_utm
 
 SCENARIO_TIME = replace(TIME, n=48)  # 96 hours, so the published first flow, 21:30 UTC on 10 April, is followed by a night of activity.
-CONTRACT_GRID = GridSpec(UTM, 687000., 1481000., 500., 40, 40)  # The contract's 40 x 40 tiles, on the northern 20 km of the island.
+CONTRACT_GRID = GridSpec(UTM, 687000.0, 1481000.0, 500.0, 40, 40)  # The contract's 40 x 40 tiles, on the northern 20 km of the island.
 LOCAL_HOUR_AT_START = 20  # 00:00 UTC on 8 April is 20:00 the evening before, at UTC-4.
 # Village positions are from memory, to about 500 m, and every site is snapped to land below. Check these against a gazetteer.
 SPAWNS = {"chateaubelair": (-61.243, 13.283), "richmond": (-61.226, 13.317)}  # West-coast villages in the 2021 red zone. Richmond lies by the Wallibou valley.
 ASSEMBLY_LONLAT = ((-61.267, 13.233), (-61.140, 13.240))  # Barrouallie to the south-west, Colonarie to the south-east.
-MOST_SNAP_M = 1500.
+MOST_SNAP_M = 1500.0
 
 
 def _nearest(mask: np.ndarray, point: XY) -> XY:
     rows, cols = np.nonzero(mask)
     if rows.size == 0:
         raise InterfaceError("no cell qualifies for this site")
-    xs, ys = GRID.x0_m + (cols + .5) * GRID.dx_m, GRID.y0_m - (rows + .5) * GRID.dx_m
+    xs, ys = GRID.x0_m + (cols + 0.5) * GRID.dx_m, GRID.y0_m - (rows + 0.5) * GRID.dx_m
     best = int(np.argmin(np.hypot(xs - point[0], ys - point[1])))
     return float(xs[best]), float(ys[best])
 
 
-def place_sites(starts_lonlat: list[tuple[float, float]], assembly_lonlat: list[tuple[float, float]], vent: XY | None, generated_land=None, seed: int = 0) -> dict[str, list[XY]]:
+def place_sites(
+    starts_lonlat: list[tuple[float, float]], assembly_lonlat: list[tuple[float, float]], vent: XY | None, generated_land=None, seed: int = 0
+) -> dict[str, list[XY]]:
     """Sites from the surface: people on land, and water at the nearest channel, not at a chosen spot.
 
     A generated island's coast depends on its seed, so a site there may need to move further to reach land, and that isn't an error.
@@ -51,7 +54,12 @@ def place_sites(starts_lonlat: list[tuple[float, float]], assembly_lonlat: list[
     for point, site in zip(wanted, placed):
         if generated_land is None and math.dist(point, site) > MOST_SNAP_M:
             raise InterfaceError(f"site {point} is {math.dist(point, site):.0f} m from land; check its coordinates")
-    return {"spawn": placed[:len(starts_lonlat)], "vent": [vent] if vent else [], "assembly": placed[len(starts_lonlat):], "water": [_nearest(channels, point) for point in placed]}
+    return {
+        "spawn": placed[: len(starts_lonlat)],
+        "vent": [vent] if vent else [],
+        "assembly": placed[len(starts_lonlat) :],
+        "water": [_nearest(channels, point) for point in placed],
+    }
 
 
 def sites(spawn: str = "chateaubelair") -> dict[str, list[XY]]:
@@ -59,8 +67,15 @@ def sites(spawn: str = "chateaubelair") -> dict[str, list[XY]]:
 
 
 def scenario(spawn: str = "chateaubelair") -> ScenarioSpec:
-    domains = (Terrain(), Atmos(SCENARIO_TIME), Eruption(SCENARIO_TIME), Tephra(GRID, SCENARIO_TIME, VENT_XY), Exposure(GRID, SCENARIO_TIME),
-               Pdc(GRID, SCENARIO_TIME, VENT_XY), Lahar(GRID, SCENARIO_TIME, VENT_XY))
+    domains = (
+        Terrain(),
+        Atmos(SCENARIO_TIME),
+        Eruption(SCENARIO_TIME),
+        Tephra(GRID, SCENARIO_TIME, VENT_XY),
+        Exposure(GRID, SCENARIO_TIME),
+        Pdc(GRID, SCENARIO_TIME, VENT_XY),
+        Lahar(GRID, SCENARIO_TIME, VENT_XY),
+    )
     return ScenarioSpec(f"st_vincent_2021_{spawn}", GRID, CONTRACT_GRID, SCENARIO_TIME, LOCAL_HOUR_AT_START, domains, sites(spawn))
 
 

@@ -5,6 +5,7 @@
 Writes mind/results/arms_batch.json. Uses the default argmax rule and the default
 start, so the quantum, mixture and classical rows are the paper's batch.
 """
+
 import json
 import math
 from concurrent.futures import ProcessPoolExecutor
@@ -37,13 +38,21 @@ def run_seed(seed):
 def summarise(records):
     table = {}
     for arm in ARMS:
-        diffs = [r[arm]["delay"] - r["classical_mixture"]["delay"] for r in records
-                 if r[arm]["delay"] is not None and r["classical_mixture"]["delay"] is not None]
+        diffs = [
+            r[arm]["delay"] - r["classical_mixture"]["delay"] for r in records if r[arm]["delay"] is not None and r["classical_mixture"]["delay"] is not None
+        ]
         n = len(diffs)
         mean = sum(diffs) / n if n else None
         se = math.sqrt(sum((d - mean) ** 2 for d in diffs) / (n - 1) / n) if n > 1 else None
-        table[arm] = dict(survival=sum(r[arm]["survived"] for r in records) / len(records), paired_n=n, delay_vs_mixture=mean, se=se,
-                          later=sum(d > 0 for d in diffs), earlier=sum(d < 0 for d in diffs), same=sum(d == 0 for d in diffs))
+        table[arm] = dict(
+            survival=sum(r[arm]["survived"] for r in records) / len(records),
+            paired_n=n,
+            delay_vs_mixture=mean,
+            se=se,
+            later=sum(d > 0 for d in diffs),
+            earlier=sum(d < 0 for d in diffs),
+            same=sum(d == 0 for d in diffs),
+        )
     return table
 
 

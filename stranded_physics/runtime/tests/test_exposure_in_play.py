@@ -1,4 +1,5 @@
 """Hazards meeting a body: flows, ash, roofs, gas and lava, on a small flat pack."""
+
 import numpy as np
 import pytest
 
@@ -11,7 +12,7 @@ from stranded_physics.runtime.perception import SO2_SMELL_UG_M3, perceive
 from stranded_physics.runtime.simulation import PackSimulation
 from stranded_physics.runtime.tests.test_people_together import FlatLand, GRID, NoRain, TIME, doing
 
-HOME, SHELTER = (5250., 5250.), (15250., 15250.)
+HOME, SHELTER = (5250.0, 5250.0), (15250.0, 15250.0)
 
 
 class Fields:
@@ -36,7 +37,10 @@ def flow_everywhere():
 
 
 def pack(*domains, spawn=HOME, seed=1, assembly=SHELTER):
-    return build_pack(ScenarioSpec("flat", GRID, GRID, TIME, 8, (FlatLand(), NoRain(), *domains), {"spawn": [spawn], "assembly": [assembly], "water": [(10250., 10250.)]}), seed)
+    return build_pack(
+        ScenarioSpec("flat", GRID, GRID, TIME, 8, (FlatLand(), NoRain(), *domains), {"spawn": [spawn], "assembly": [assembly], "water": [(10250.0, 10250.0)]}),
+        seed,
+    )
 
 
 def one_step_outcomes(spawn, count=300):
@@ -51,14 +55,14 @@ def one_step_outcomes(spawn, count=300):
 def test_most_people_outdoors_die_in_a_flow_and_survivors_are_injured():
     outcomes = one_step_outcomes(HOME)
     dead = sum(not alive for alive, _ in outcomes) / len(outcomes)
-    assert abs(dead - SETTINGS["flow_death_outdoors"]) < .05
+    assert abs(dead - SETTINGS["flow_death_outdoors"]) < 0.05
     assert all(injured for alive, injured in outcomes if alive)
 
 
 def test_shelter_improves_the_odds():
     outcomes = one_step_outcomes(SHELTER)
     dead = sum(not alive for alive, _ in outcomes) / len(outcomes)
-    assert abs(dead - SETTINGS["flow_death_sheltered"]) < .1
+    assert abs(dead - SETTINGS["flow_death_sheltered"]) < 0.1
 
 
 def test_no_flow_means_no_harm():
@@ -80,7 +84,7 @@ def test_a_flow_is_one_roll_per_step():
     class Counting:
         def random(self):
             calls.append(1)
-            return .99
+            return 0.99
 
     person.luck = Counting()
     person.step()
@@ -93,9 +97,9 @@ def ash(load):
 
 
 def test_ash_tires_a_person_and_shelter_helps():
-    outdoors = PackSimulation(pack(ash(50.)), decide_fn=doing("explore"))
-    clean = PackSimulation(pack(ash(0.)), decide_fn=doing("explore"))
-    indoors = PackSimulation(pack(ash(50.), spawn=SHELTER), decide_fn=doing("explore"))
+    outdoors = PackSimulation(pack(ash(50.0)), decide_fn=doing("explore"))
+    clean = PackSimulation(pack(ash(0.0)), decide_fn=doing("explore"))
+    indoors = PackSimulation(pack(ash(50.0), spawn=SHELTER), decide_fn=doing("explore"))
     for person in (outdoors, clean, indoors):
         person.step()
     assert needs(outdoors.agent.balance)["energy"] < needs(indoors.agent.balance)["energy"] < needs(clean.agent.balance)["energy"]
@@ -106,21 +110,21 @@ def roofs(share):
 
 
 def test_a_failed_roof_injures_and_ends_the_shelter():
-    person = PackSimulation(pack(ash(1000.), roofs(1.), spawn=SHELTER), decide_fn=doing("rest"))
+    person = PackSimulation(pack(ash(1000.0), roofs(1.0), spawn=SHELTER), decide_fn=doing("rest"))
     assert person._sheltered()
     person.step()
     assert person.agent.injured and not person._sheltered()
 
 
 def test_roofs_fail_only_as_the_load_grows():
-    person = PackSimulation(pack(ash(100.), roofs(0.), spawn=SHELTER), decide_fn=doing("rest"))
+    person = PackSimulation(pack(ash(100.0), roofs(0.0), spawn=SHELTER), decide_fn=doing("rest"))
     person.step()
     assert not person.agent.injured and person._sheltered()
-    assert roof_failure_fraction(0.) == 0.
+    assert roof_failure_fraction(0.0) == 0.0
 
 
 def test_a_person_outdoors_has_no_roof_to_lose():
-    person = PackSimulation(pack(ash(1000.), roofs(1.)), decide_fn=doing("rest"))
+    person = PackSimulation(pack(ash(1000.0), roofs(1.0)), decide_fn=doing("rest"))
     person.step()
     assert not person.roof_lost
 
@@ -131,8 +135,8 @@ def test_gas_is_noticed_only_where_it_is_strong(level, smelled):
     row, col = GRID.locate(HOME)
     field[:, row, col] = level
     built = pack(Fields("gas", gas__so2_concentration=field))
-    assert perceive(built, HOME, 0.).gas_smell is smelled
-    assert perceive(built, SHELTER, 0.).gas_smell is False
+    assert perceive(built, HOME, 0.0).gas_smell is smelled
+    assert perceive(built, SHELTER, 0.0).gas_smell is False
 
 
 def test_lava_kills_at_the_end_of_a_walk_through_it():

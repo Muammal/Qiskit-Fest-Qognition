@@ -26,7 +26,9 @@ The same file and seed give the same world on any copy of the same version.
 
 **Share > Publish online** saves your file and opens this repository's upload page on GitHub in your browser. Nothing is uploaded by the app. You need a free GitHub account. If you don't have write access, GitHub turns your upload into a pull request.
 
-Each pull request runs `python tools/publish_sim.py check`. Once it is merged to `main`, the sim appears under **Community** in everyone's app and on the [gallery page](../community/README.md). A maintainer adds an already-reviewed file with:
+Published sims are shared under [CC BY 4.0](../community/LICENSE.txt), so anyone can use and adapt them if they credit the author. Agreeing to that is part of publishing, and each `.qsim` file records it.
+
+Each pull request runs `python tools/publish_sim.py check`, and a maintainer then follows [the review rules](../community/REVIEW.md). Review checks that a sim is safe and fair to publish, not that it is accurate. Once it is merged to `main`, the sim appears under **Community** in everyone's app and on the [gallery page](../community/README.md). A maintainer adds an already-reviewed file with:
 
 ```bash
 python tools/publish_sim.py add my_sim.qsim
@@ -54,7 +56,7 @@ Sim files come from strangers, so `stranded_physics/entities/simfile.py` treats 
 - **Links.** `https` only, to public addresses, with each redirect checked, and a size limit.
 - **The hash** catches damage in transit. It doesn't say who made a file or whether it is any good.
 
-Nobody validates community sims. The app says so when you open one, and the report records it.
+Nobody validates community sims. The app says so when you open one, and the report records it. Files that are shared directly, or by link, have had no review at all.
 
 ## Limits
 

@@ -1,4 +1,5 @@
 """The README's scenario numbers come from a generated table, not from typing."""
+
 import importlib.util
 from pathlib import Path
 
@@ -8,15 +9,22 @@ tool = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(tool)
 
 SAMPLE = dict(
-    generated_utc="2026-11-06T00:00:00+00:00", commit="abc1234", seed=42,
+    generated_utc="2026-11-06T00:00:00+00:00",
+    commit="abc1234",
+    seed=42,
     order_effect=dict(default_stress=0.3, lambda_0=0.3, lambda_1=0.04),
-    volcano=dict(seeds=200, survival=dict(quantum=.995, classical_mixture=.995, classical=1.),
-                 paired_delay_steps=dict(mean=.55, se=.091, later=45, earlier=5, same=90, n=140)),
+    volcano=dict(
+        seeds=200,
+        survival=dict(quantum=0.995, classical_mixture=0.995, classical=1.0),
+        paired_delay_steps=dict(mean=0.55, se=0.091, later=45, earlier=5, same=90, n=140),
+    ),
     titanic=[dict(mapping="default", mind=m, total=2208, saved=600, dead=1608) for m in tool.MINDS],
     pompeii=[dict(mapping="B", mind=m, total=11500, dead=100) for m in tool.MINDS],
-    waterloo=[dict(mapping="A", alarm=alarm, mind=m, total=100, off_site=90,
-                   exposure={tool.AEGL2_OR_WORSE[0]: 3, tool.AEGL2_OR_WORSE[1]: 1, "below AEGL-1": 96})
-              for m in tool.MINDS for alarm in (True, False)],
+    waterloo=[
+        dict(mapping="A", alarm=alarm, mind=m, total=100, off_site=90, exposure={tool.AEGL2_OR_WORSE[0]: 3, tool.AEGL2_OR_WORSE[1]: 1, "below AEGL-1": 96})
+        for m in tool.MINDS
+        for alarm in (True, False)
+    ],
 )
 
 

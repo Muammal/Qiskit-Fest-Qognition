@@ -9,6 +9,7 @@ window size.
 A shape or surface drawn over recorded text removes that text, so a modal hides what is
 behind it. Text drawn onto any other surface, or clipped, is an ordinary blit.
 """
+
 import sys
 
 import pygame
@@ -23,6 +24,7 @@ def setup_dpi_awareness():
         return
     try:
         import ctypes
+
         try:
             ctypes.windll.shcore.SetProcessDpiAwareness(2)
         except Exception:
@@ -57,6 +59,7 @@ def scale_shapes(canvas, scaled_w, scaled_h):
 
 class TextSurface(pygame.Surface):
     """A rendered string that remembers enough to be rendered again at another size."""
+
     font = None
     text = ""
     color = (0, 0, 0)
@@ -114,6 +117,7 @@ class ScaledFont:
 
 class UICanvas(pygame.Surface):
     """The logical canvas. Records text instead of drawing it when `defer_text` is on."""
+
     defer_text = False
     text_layer = ()
 

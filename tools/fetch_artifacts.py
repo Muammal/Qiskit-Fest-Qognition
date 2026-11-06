@@ -5,6 +5,7 @@
 Every part, the joined archive and every file are checked against their SHA-256 hashes. Parts already downloaded are kept.
 Research papers and some third-party web pages aren't shared, because we don't have the right to redistribute them.
 """
+
 from __future__ import annotations
 
 import hashlib

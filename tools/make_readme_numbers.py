@@ -8,6 +8,7 @@ Nothing in the table is hand-typed. These are single-seed model runs, not
 forecasts, and the spread across cue translations is itself a finding: the
 translation is an assumption.
 """
+
 import argparse
 import json
 import subprocess
@@ -49,10 +50,11 @@ def run_volcano(seeds=range(200)):
 
     records = run_batch(seeds)
     stats = paired_evac_delay_stats(records)
-    return dict(seeds=len(list(seeds)),
-                survival={m: survival_rate(records, m) for m in MINDS},
-                paired_delay_steps=dict(mean=stats["mean"], se=stats["se"], later=stats["pos"],
-                                        earlier=stats["neg"], same=stats["zero"], n=stats["n"]))
+    return dict(
+        seeds=len(list(seeds)),
+        survival={m: survival_rate(records, m) for m in MINDS},
+        paired_delay_steps=dict(mean=stats["mean"], se=stats["se"], later=stats["pos"], earlier=stats["neg"], same=stats["zero"], n=stats["n"]),
+    )
 
 
 def run_titanic():
@@ -89,25 +91,39 @@ def run_waterloo():
             for mind in MINDS:
                 sim = WaterlooSimulation(seed=SEED, mind_type=mind, event_mapping=mapping, alarm=alarm)
                 timeline = sim.run()
-                rows.append(dict(mapping=mapping, alarm=alarm, mind=mind, total=len(sim.people),
-                                 off_site=sim.counts()["off_site"], exposure=timeline["crowd"]["exposure"]))
+                rows.append(
+                    dict(
+                        mapping=mapping,
+                        alarm=alarm,
+                        mind=mind,
+                        total=len(sim.people),
+                        off_site=sim.counts()["off_site"],
+                        exposure=timeline["crowd"]["exposure"],
+                    )
+                )
     return rows
 
 
 def collect():
     started = time.time()
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-    data = dict(generated_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"), commit=commit, seed=SEED,
-                order_effect=order_effect(), volcano=run_volcano(),
-                titanic=run_titanic(), pompeii=run_pompeii(), waterloo=run_waterloo())
+    data = dict(
+        generated_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        commit=commit,
+        seed=SEED,
+        order_effect=order_effect(),
+        volcano=run_volcano(),
+        titanic=run_titanic(),
+        pompeii=run_pompeii(),
+        waterloo=run_waterloo(),
+    )
     data["seconds"] = round(time.time() - started, 1)
     return data
 
 
 def _table(rows, value, heading):
     keys = list(dict.fromkeys(r["mapping"] for r in rows))
-    out = [f"| {heading} | " + " | ".join(MIND_LABEL[m] for m in MINDS) + " |",
-           "| --- |" + " --- |" * len(MINDS)]
+    out = [f"| {heading} | " + " | ".join(MIND_LABEL[m] for m in MINDS) + " |", "| --- |" + " --- |" * len(MINDS)]
     for key in keys:
         by_mind = {r["mind"]: r for r in rows if r["mapping"] == key}
         out.append(f"| {key} | " + " | ".join(value(by_mind[m]) for m in MINDS) + " |")
@@ -148,10 +164,12 @@ def render(data):
         "| --- | --- |",
     ]
     lines += [f"| {MIND_LABEL[m]} | {volcano['survival'][m] * 100:.1f}% |" for m in MINDS]
-    lines += ["",
-              f"Paired evacuation delay, quantum minus mixture: {delay['mean']:+.2f} steps (SE {delay['se']:.3f}), "
-              f"n={delay['n']}: {delay['later']} later, {delay['earlier']} earlier, {delay['same']} same.",
-              ""]
+    lines += [
+        "",
+        f"Paired evacuation delay, quantum minus mixture: {delay['mean']:+.2f} steps (SE {delay['se']:.3f}), "
+        f"n={delay['n']}: {delay['later']} later, {delay['earlier']} earlier, {delay['same']} same.",
+        "",
+    ]
 
     titanic = data["titanic"]
     lines += [f"## Titanic ({titanic[0]['total']:,} aboard), saved in boats", ""]

@@ -1,0 +1,3 @@
+# Checks used by contributors and CI.
+pytest>=7.0.0
+ruff==0.14.10

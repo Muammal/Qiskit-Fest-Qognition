@@ -9,6 +9,7 @@ Also exports research-paper-backed deliberation models from
 `mind.cognition_models` (`busemeyer_hamiltonian`, `busemeyer_hamiltonian_U`,
 `p_protect_busemeyer`, `belief_degree_huang`, `p_protect_qlbn`).
 """
+
 import numpy as np
 
 from mind.cognition_models import (
@@ -46,16 +47,18 @@ def build_U(q_S, q_D, eta):
 
     cos_beta = -kappa * np.sqrt(q_S * q_D) / np.sqrt((1 - q_S) * (1 - q_D))
     cos_beta = np.clip(cos_beta, -1.0, 1.0)
-    sin_beta = np.sqrt(max(0.0, 1 - cos_beta ** 2))
+    sin_beta = np.sqrt(max(0.0, 1 - cos_beta**2))
 
     # index: 0=(safe,carry) 1=(danger,carry) 2=(safe,protect) 3=(danger,protect)
     u = np.array([np.sqrt(1 - q_S), 0.0, np.sqrt(q_S), 0.0])
-    w = np.array([
-        np.sqrt(1 - q_D) * cos_beta,
-        np.sqrt(1 - q_D) * sin_beta,
-        np.sqrt(q_D) * kappa,
-        np.sqrt(q_D) * np.sqrt(max(0.0, 1 - kappa ** 2)),
-    ])
+    w = np.array(
+        [
+            np.sqrt(1 - q_D) * cos_beta,
+            np.sqrt(1 - q_D) * sin_beta,
+            np.sqrt(q_D) * kappa,
+            np.sqrt(q_D) * np.sqrt(max(0.0, 1 - kappa**2)),
+        ]
+    )
 
     seed = np.column_stack([u, w, np.eye(4)[:, 2], np.eye(4)[:, 3]])
     Q, _R = np.linalg.qr(seed)

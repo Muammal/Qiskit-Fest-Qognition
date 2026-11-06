@@ -3,7 +3,6 @@ Tech C Deliverable (Engine, World & Interactive Visualization)
 """
 
 import argparse
-import sys
 from engine.gui import launch_gui
 
 
@@ -17,8 +16,7 @@ def main():
     args = parser.parse_args()
     start_screen = "home" if args.scenario else "event_choice"
     print(f"Launching Qognition (Seed={args.seed}, Mind={args.mind})...")
-    launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen,
-               scenario=args.scenario or "volcano")
+    launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen, scenario=args.scenario or "volcano")
 
 
 if __name__ == "__main__":

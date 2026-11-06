@@ -5,6 +5,7 @@ it sets where they start, what they hear and when, and what an action does.
 Head-counts: Wikipedia, Sinking of the Titanic, casualty table citing Encyclopedia
 Titanica (2,208 aboard). Crew departments: British Wreck Commissioner's Inquiry.
 """
+
 import random
 
 from engine.agent import SurvivalAgent
@@ -12,7 +13,9 @@ from engine.flood import STEP_MINUTES, START_HOUR, START_MINUTE
 from engine.ship import A, B, BOAT, C, D, E, F, G, TANK
 
 PASSENGERS = {  # class: (men, women, children), Wikipedia casualty table
-    "first": (175, 142, 7), "second": (166, 92, 26), "third": (444, 176, 89),
+    "first": (175, 142, 7),
+    "second": (166, 92, 26),
+    "third": (444, 176, 89),
 }
 CREW_GROUPS = (866, 23, 2)  # men, women, children; Wikipedia casualty table
 DECK_DEPARTMENT, ENGINE_DEPARTMENT = 66, 325  # British Wreck Commissioner's Inquiry
@@ -21,24 +24,40 @@ CAPTAINS, OFFICERS = 1, 7  # Smith; Wilde, Murdoch, Lightoller, Pitman, Boxhall,
 SERVERS = sum(CREW_GROUPS) - DECK_DEPARTMENT - ENGINE_DEPARTMENT
 EVAC_WORKERS = DECK_DEPARTMENT - CAPTAINS - OFFICERS
 ROLE_NAMES = {
-    "captain": "Captain", "officer": "Officer", "evac_worker": "Evacuation worker",
-    "server": "Server / steward", "engine_worker": "Engine room worker", "passenger": "Passenger",
+    "captain": "Captain",
+    "officer": "Officer",
+    "evac_worker": "Evacuation worker",
+    "server": "Server / steward",
+    "engine_worker": "Engine room worker",
+    "passenger": "Passenger",
 }
 ROLE_COLORS = {
-    "captain": (255, 214, 64), "officer": (255, 170, 60), "evac_worker": (255, 120, 70),
-    "server": (240, 240, 245), "engine_worker": (170, 150, 130), "passenger": (120, 200, 255),
+    "captain": (255, 214, 64),
+    "officer": (255, 170, 60),
+    "evac_worker": (255, 120, 70),
+    "server": (240, 240, 245),
+    "engine_worker": (170, 150, 130),
+    "passenger": (120, 200, 255),
 }
 SPAWN_AREAS = {  # assumption: schematic berthing as (rows, x range)
-    "first": ((A, B, C), (14, 30)), "second": ((D, E, F), (8, 16)),
-    "third_forward": ((F, G), (30, 36)), "third_aft": ((F, G), (3, 9)),
-    "captain": ((BOAT,), (30, 30)), "officer": ((BOAT, A), (28, 31)),
-    "evac_worker": ((C, D), (15, 30)), "engine_worker": ((G, TANK), (12, 27)),
+    "first": ((A, B, C), (14, 30)),
+    "second": ((D, E, F), (8, 16)),
+    "third_forward": ((F, G), (30, 36)),
+    "third_aft": ((F, G), (3, 9)),
+    "captain": ((BOAT,), (30, 30)),
+    "officer": ((BOAT, A), (28, 31)),
+    "evac_worker": ((C, D), (15, 30)),
+    "engine_worker": ((G, TANK), (12, 27)),
     "server": ((A, B, C, D, E, F, G), (4, 34)),
 }
 ACTION_LABELS = {
-    "hide": "Heads for the boats", "rest": "Stays put", "explore": "Looks for information",
-    "forage": "Fetches a lifebelt", "drink": "Stops for water",
-    "build_shelter": "Moves indoors", "craft": "Helps people nearby",
+    "hide": "Heads for the boats",
+    "rest": "Stays put",
+    "explore": "Looks for information",
+    "forage": "Fetches a lifebelt",
+    "drink": "Stops for water",
+    "build_shelter": "Moves indoors",
+    "craft": "Helps people nearby",
 }
 ROLE_ACTION_LABELS = {
     "captain": {"rest": "Holds the bridge", "craft": "Directs the crew", "explore": "Inspects the damage"},
@@ -48,14 +67,14 @@ ROLE_ACTION_LABELS = {
     "engine_worker": {"rest": "Keeps pumps and lights running", "craft": "Works the pumps"},
 }
 STEP_FRACTION = STEP_MINUTES / 120  # assumption: base decay rates are per two hours
-DECK_CHILL, INDOOR_CHILL = .012, .002  # assumption: freezing air outdoors; heating fades indoors
-WATER_CHILL = .3  # assumption: with warmth .9, death in 15 minutes; Wikipedia gives 15-30 minutes in -2 C
-WATER_CHILL_LIFEBELT = .18  # assumption: floating upright stretches that to about 25 minutes
-NO_LIFEBELT_DROWN_CHANCE = .15  # assumption: per step in the water without flotation
-LIFEBOAT_WARMTH_FLOOR = .05  # assumption: exposure in boats is unpleasant, not modelled as lethal
+DECK_CHILL, INDOOR_CHILL = 0.012, 0.002  # assumption: freezing air outdoors; heating fades indoors
+WATER_CHILL = 0.3  # assumption: with warmth .9, death in 15 minutes; Wikipedia gives 15-30 minutes in -2 C
+WATER_CHILL_LIFEBELT = 0.18  # assumption: floating upright stretches that to about 25 minutes
+NO_LIFEBELT_DROWN_CHANCE = 0.15  # assumption: per step in the water without flotation
+LIFEBOAT_WARMTH_FLOOR = 0.05  # assumption: exposure in boats is unpleasant, not modelled as lethal
 CROWD_PER_INTERIOR, CROWD_PER_STAIR = 40, 15  # assumption: people on a tile that halve walking speed
 BOAT_DECK_TILES_PER_STEP = 12  # assumption: about 85 m along a crowded boat deck in five minutes
-STATION_QUEUE_WEIGHT = 4.  # assumption: tiles someone would walk to avoid a queue as long as the seats left
+STATION_QUEUE_WEIGHT = 4.0  # assumption: tiles someone would walk to avoid a queue as long as the seats left
 
 
 class ShipAgent(SurvivalAgent):
@@ -84,7 +103,7 @@ class ShipAgent(SurvivalAgent):
 
     def board(self, boat):
         self.status, self.boat_id = "boat", boat.id
-        self.needs["safety"] = max(self.needs["safety"], .7)
+        self.needs["safety"] = max(self.needs["safety"], 0.7)
 
     def enter_water(self):
         self.status = "water"
@@ -93,7 +112,7 @@ class ShipAgent(SurvivalAgent):
         """Walk along a least-time field for one step; crowds on a tile slow everyone on it."""
         if field is None:
             return
-        budget = STEP_MINUTES * (.5 if self.injured else 1.)
+        budget = STEP_MINUTES * (0.5 if self.injured else 1.0)
         p = tuple(self.pos)
         while budget > 0:
             q = field.get(p)
@@ -125,9 +144,11 @@ class ShipAgent(SurvivalAgent):
 
     def _choose_station(self, stations):
         """Nearest station, discounted by how many are already waiting for its free seats."""
+
         def score(station):
             waiting, free_seats = stations[station]
             return abs(station - self.pos[0]) + STATION_QUEUE_WEIGHT * waiting / (free_seats + 1)
+
         return min(stations, key=score)
 
     def execute_ship_action(self, action, world, fields, crowding, rng, warned_only_hide=False):
@@ -139,50 +160,53 @@ class ShipAgent(SurvivalAgent):
         if action == "hide":
             if not warned_only_hide or bool(self.recent_events):
                 self.walk_to_boat(world, fields, crowding)
-                self.needs["safety"] = min(1, self.needs["safety"] + .05)
-                self.stress = max(0, self.stress - .02)
+                self.needs["safety"] = min(1, self.needs["safety"] + 0.05)
+                self.stress = max(0, self.stress - 0.02)
             else:
-                self.needs["energy"] = min(1, self.needs["energy"] + .02)
+                self.needs["energy"] = min(1, self.needs["energy"] + 0.02)
         elif action == "forage":
             if not self.inventory["lifebelt"]:
                 if indoors:
                     self.inventory["lifebelt"] = 1
                 else:
                     self.walk(world, fields["indoors"], crowding)
-            self.needs["warmth"] = min(1, self.needs["warmth"] + .05 * indoors)  # assumption: warm clothes collected too
+            self.needs["warmth"] = min(1, self.needs["warmth"] + 0.05 * indoors)  # assumption: warm clothes collected too
         elif action == "build_shelter":
             self.walk(world, fields["indoors"], crowding)
-            self.needs["warmth"] = min(1, self.needs["warmth"] + .03 * indoors)  # assumption: out of the wind
+            self.needs["warmth"] = min(1, self.needs["warmth"] + 0.03 * indoors)  # assumption: out of the wind
         elif action == "rest":
-            self.needs["energy"] = min(1, self.needs["energy"] + .02)
+            self.needs["energy"] = min(1, self.needs["energy"] + 0.02)
         elif action == "explore":
             options = [p for p in world.neighbors(tuple(self.pos)) if world.walkable(p)]
             if options:
                 self.pos = list(rng.choice(options))
         elif action == "drink":
-            self.needs["thirst"] = min(1, self.needs["thirst"] + .1)
+            self.needs["thirst"] = min(1, self.needs["thirst"] + 0.1)
         if action != "rest":
-            self.needs["energy"] = max(0, self.needs["energy"] - .025 * STEP_FRACTION)
+            self.needs["energy"] = max(0, self.needs["energy"] - 0.025 * STEP_FRACTION)
         zone = world.zones[self.pos[1]][self.pos[0]]
         if any(e in ("tremor", "gas_plume", "eruption", "ash_fall") for e in self.recent_events):
-            self.needs["safety"] = min(self.needs["safety"], (.8, .5, .3)[zone])  # same warning caps as the volcano scenario
+            self.needs["safety"] = min(self.needs["safety"], (0.8, 0.5, 0.3)[zone])  # same warning caps as the volcano scenario
 
     def step_decay(self, in_shelter: bool, forest_cover: bool = False):
         """SurvivalAgent's two-hour decay rescaled to five minutes, on a minute clock."""
-        self.needs["hunger"] = max(0., self.needs["hunger"] - .025 * STEP_FRACTION)
-        self.needs["thirst"] = max(0., self.needs["thirst"] - STEP_FRACTION / 36)
+        self.needs["hunger"] = max(0.0, self.needs["hunger"] - 0.025 * STEP_FRACTION)
+        self.needs["thirst"] = max(0.0, self.needs["thirst"] - STEP_FRACTION / 36)
         if self.status == "water":
             chill = WATER_CHILL_LIFEBELT if self.inventory["lifebelt"] else WATER_CHILL
         elif self.status == "boat":
             chill = INDOOR_CHILL
         else:
             chill = INDOOR_CHILL if in_shelter else DECK_CHILL
-        self.needs["warmth"] = max(LIFEBOAT_WARMTH_FLOOR if self.status == "boat" else 0.,
-                                   self.needs["warmth"] - chill)
-        peril = ((1. - self.needs["safety"]) * .35 + (1. - self.needs["thirst"]) * .25
-                 + (1. - self.needs["hunger"]) * .2 + (1. - self.needs["warmth"]) * .15
-                 + (.2 if self.injured else 0.))
-        self.stress = round(.7 * self.stress + .3 * min(1., peril), 3)
+        self.needs["warmth"] = max(LIFEBOAT_WARMTH_FLOOR if self.status == "boat" else 0.0, self.needs["warmth"] - chill)
+        peril = (
+            (1.0 - self.needs["safety"]) * 0.35
+            + (1.0 - self.needs["thirst"]) * 0.25
+            + (1.0 - self.needs["hunger"]) * 0.2
+            + (1.0 - self.needs["warmth"]) * 0.15
+            + (0.2 if self.injured else 0.0)
+        )
+        self.stress = round(0.7 * self.stress + 0.3 * min(1.0, peril), 3)
         self.minute += STEP_MINUTES
         if self.minute >= 60:
             self.minute -= 60
@@ -190,7 +214,7 @@ class ShipAgent(SurvivalAgent):
             if self.hour >= 24:
                 self.hour -= 24
                 self.day += 1
-        if self.needs["warmth"] <= 0.:
+        if self.needs["warmth"] <= 0.0:
             self.is_alive, self.cause_of_death = False, "hypothermia"
 
 
@@ -202,8 +226,8 @@ def _spawn(rng, world, area):
 
 def _jitter(agent, rng):
     """Small seeded differences in starting state, in coarse steps; the mind stays identical."""
-    agent.needs["safety"] = round(agent.needs["safety"] + rng.choice((-.05, 0., .05)), 3)
-    agent.stress = round(agent.stress + rng.choice((-.05, 0., .05)), 3)
+    agent.needs["safety"] = round(agent.needs["safety"] + rng.choice((-0.05, 0.0, 0.05)), 3)
+    agent.stress = round(agent.stress + rng.choice((-0.05, 0.0, 0.05)), 3)
 
 
 def build_crowd(world, seed):
@@ -225,8 +249,7 @@ def build_crowd(world, seed):
                     area = cabin_class
                 add("passenger", group, cabin_class, area)
     groups = ["man"] * CREW_GROUPS[0] + ["woman"] * CREW_GROUPS[1] + ["child"] * CREW_GROUPS[2]
-    for role, count in (("captain", CAPTAINS), ("officer", OFFICERS), ("evac_worker", EVAC_WORKERS),
-                        ("engine_worker", ENGINE_DEPARTMENT)):
+    for role, count in (("captain", CAPTAINS), ("officer", OFFICERS), ("evac_worker", EVAC_WORKERS), ("engine_worker", ENGINE_DEPARTMENT)):
         for _ in range(count):
             add(role, groups.pop(0), "crew", role)
     while groups:  # the women and boys among the crew are all in the victualling department

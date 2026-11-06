@@ -1,4 +1,5 @@
 """The scenario checker must never let evidence travel, or count weak evidence as agreement."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -54,15 +55,18 @@ def test_own_tests_must_all_pass_and_have_been_run():
     assert check.verification_status([]) == "NONE"
 
 
-@pytest.mark.parametrize("parts, expected", [
-    ([part(has_model=False)], check.CANNOT_RUN),
-    ([part(verification="NOT_RUN")], check.NOT_VERIFIED),
-    ([part(verification="NONE")], check.NOT_VERIFIED),
-    ([part()], check.NOT_VALIDATED),
-    ([part(agrees=("a",)), part(disagrees=("b",))], check.PARTLY),
-    ([part(agrees=("a",))], check.AGREES),
-    ([part(disagrees=("b",))], check.DISAGREES),
-])
+@pytest.mark.parametrize(
+    "parts, expected",
+    [
+        ([part(has_model=False)], check.CANNOT_RUN),
+        ([part(verification="NOT_RUN")], check.NOT_VERIFIED),
+        ([part(verification="NONE")], check.NOT_VERIFIED),
+        ([part()], check.NOT_VALIDATED),
+        ([part(agrees=("a",)), part(disagrees=("b",))], check.PARTLY),
+        ([part(agrees=("a",))], check.AGREES),
+        ([part(disagrees=("b",))], check.DISAGREES),
+    ],
+)
 def test_overall_result(parts, expected):
     assert check.overall(parts) == expected
 

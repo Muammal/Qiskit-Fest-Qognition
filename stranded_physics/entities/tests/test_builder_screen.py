@@ -1,4 +1,5 @@
 """Drives the real game window with real clicks and keys, with no display. Stage 5 is done when a save reloads identically and the game runs it."""
+
 from __future__ import annotations
 
 import os
@@ -17,14 +18,15 @@ from stranded_physics.entities.draft import from_file, place, set_header  # noqa
 ROOT = Path(__file__).resolve().parents[3]
 HAS_RAW = (ROOT / "artifacts/physics/raw/atmos/weather_st_vincent.json").exists()
 needs_raw = pytest.mark.skipif(not HAS_RAW, reason="raw data is not held in this checkout")
-RICHMOND_ON_MAP = (.38, .42)
-BUILD_LIMIT_S = 120.
+RICHMOND_ON_MAP = (0.38, 0.42)
+BUILD_LIMIT_S = 120.0
 
 
 @pytest.fixture
 def app(tmp_path):
     from engine.gui import IslandVisualizerApp
     from main import open_builder
+
     window = IslandVisualizerApp(seed=101, start_screen="event_choice", builder_factory=open_builder)
     window._open_builder()
     window.builder.save_folder = tmp_path
@@ -61,6 +63,7 @@ def type_into(window, label, text):
 
 def on_map(window, fx, fy):
     from stranded_physics.builder_screen import MAP_RECT
+
     click_at(window, (MAP_RECT.x + int(fx * MAP_RECT.width), MAP_RECT.y + int(fy * MAP_RECT.height)))
 
 
@@ -68,19 +71,20 @@ def add_person_and_shelter(window):
     press(window, "add:person")
     on_map(window, *RICHMOND_ON_MAP)
     press(window, "add:shelter")
-    on_map(window, .25, .85)
+    on_map(window, 0.25, 0.85)
 
 
 def wait_for_game(window):
     started = time.time()
     while window.app_state == "builder" and window.builder.building and time.time() - started < BUILD_LIMIT_S:
         window.draw((0, 0))
-        time.sleep(.05)
+        time.sleep(0.05)
     window.draw((0, 0))
 
 
 def test_the_game_says_so_when_it_was_started_without_the_builder():
     from engine.gui import IslandVisualizerApp
+
     window = IslandVisualizerApp(seed=101, start_screen="event_choice")
     window.draw((0, 0))
     window.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=window.btn_choice_build.rect.center), window.btn_choice_build.rect.center)
@@ -92,6 +96,7 @@ def test_the_game_says_so_when_it_was_started_without_the_builder():
 def test_the_menu_button_opens_the_builder():
     from engine.gui import IslandVisualizerApp
     from main import open_builder
+
     window = IslandVisualizerApp(seed=101, start_screen="event_choice", builder_factory=open_builder)
     window.draw((0, 0))
     window.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=window.btn_choice_build.rect.center), window.btn_choice_build.rect.center)
@@ -104,7 +109,7 @@ def test_clicking_the_map_places_what_is_selected(app):
     assert "start_lat" in app.builder.problem
     on_map(app, *RICHMOND_ON_MAP)
     entry = app.builder.draft.entries[-1]
-    assert -61.4 < entry["start_lon"] < -61. and 13.2 < entry["start_lat"] < 13.4
+    assert -61.4 < entry["start_lon"] < -61.0 and 13.2 < entry["start_lat"] < 13.4
 
 
 def test_a_typed_value_out_of_range_is_refused_and_the_old_value_stays(app):
@@ -132,7 +137,7 @@ def test_the_problem_is_shown_until_it_is_fixed_and_play_is_off_until_then(app):
     assert "shelter" in app.builder.problem
     assert not [h for h in app.builder.hot if h.label == "PLAY THIS SCENARIO"]
     press(app, "add:shelter")
-    on_map(app, .25, .85)
+    on_map(app, 0.25, 0.85)
     assert app.builder.problem is None
     assert [h for h in app.builder.hot if h.label == "PLAY THIS SCENARIO"]
 
@@ -189,8 +194,14 @@ def test_a_strange_seed_is_refused_not_fatal(app):
 
 def test_every_saved_scenario_can_be_reached_in_the_open_list(app, tmp_path):
     from stranded_physics.entities.draft import add_entity, new_draft, save_draft
+
     for number in range(14):
-        save_draft(set_header(place(place(add_entity(add_entity(new_draft(), "person"), "shelter"), 2, (-61.226, 13.317)), 3, (-61.267, 13.233)), "id", f"saved_{number:02d}"), tmp_path)
+        save_draft(
+            set_header(
+                place(place(add_entity(add_entity(new_draft(), "person"), "shelter"), 2, (-61.226, 13.317)), 3, (-61.267, 13.233)), "id", f"saved_{number:02d}"
+            ),
+            tmp_path,
+        )
     press(app, "Open")
     assert not [h for h in app.builder.hot if h.label == "open:saved_13"]
     app.handle_event(pygame.event.Event(pygame.MOUSEWHEEL, x=0, y=-30), (0, 0))
@@ -202,6 +213,7 @@ def test_a_builder_that_cannot_start_leaves_the_original_game_playable(monkeypat
     from engine.gui import IslandVisualizerApp
     from main import open_builder
     from stranded_physics.entities import draft as module
+
     window = IslandVisualizerApp(seed=101, start_screen="event_choice", builder_factory=open_builder)
     monkeypatch.setattr(module, "new_draft", lambda: (_ for _ in ()).throw(FileNotFoundError("no template")))
     window._open_builder()
@@ -219,7 +231,9 @@ def test_a_shipped_scenario_cannot_be_saved_over_its_evidence(app, tmp_path):
 
 def test_a_build_that_fails_is_reported_not_fatal(app, monkeypatch):
     import stranded_physics.builder_screen as screen
+
     monkeypatch.setattr(screen, "build_game", lambda scenario, seed: (_ for _ in ()).throw(ValueError("broken on purpose")))
+    monkeypatch.setattr(screen.simfile, "data_pack_present", lambda: True)
     add_person_and_shelter(app)
     press(app, "PLAY THIS SCENARIO")
     wait_for_game(app)
@@ -258,6 +272,7 @@ def test_the_game_runs_what_was_saved_and_the_same_file_plays_the_same(app, tmp_
     assert len(played) == app.step_idx
 
     from stranded_physics.runtime.game import build_game
+
     again = build_game(load_scenario(tmp_path / "saved_then_played.toml"), app.seed).simulation(app.mind_type)
     assert [(r["action"], r["pos_after"]) for r in again.run()["steps"]] == played
 
@@ -309,19 +324,24 @@ def test_leaving_for_the_original_scenarios_puts_them_back(app):
     app._handle_event_choice_click(app.btn_choice_volcano.rect.center)
     from engine.gui import DEFAULT_STEPS
     from engine.simulation import SimulationEngine
+
     assert app.custom_game is None and app.max_steps == DEFAULT_STEPS and isinstance(app.engine, SimulationEngine)
     assert app.seed == 101 and app.mind_type == "quantum" and app.btn_nav_mind.text == "Quantum"
 
 
 @needs_raw
-@pytest.mark.parametrize("entity, message", [
-    ({"kind": "storm", "source": "replay", "event": "beryl_2024", "site_lon": -61.227, "site_lat": 13.158}, "storm"),
-])
+@pytest.mark.parametrize(
+    "entity, message",
+    [
+        ({"kind": "storm", "source": "replay", "event": "beryl_2024", "site_lon": -61.227, "site_lat": 13.158}, "storm"),
+    ],
+)
 def test_a_recorded_event_outside_the_scenarios_dates_is_refused(entity, message, tmp_path):
     from stranded_physics.core.api import InterfaceError
     from stranded_physics.entities.draft import add_entity, new_draft, to_scenario
     from dataclasses import replace
     from stranded_physics.runtime.game import build_game
+
     draft = place(add_entity(new_draft(), "person"), 2, (-61.226, 13.317))
     draft = place(add_entity(draft, "shelter"), 3, (-61.267, 13.233))
     draft = set_header(replace(draft, entries=(*draft.entries, entity)), "hours", "24")
@@ -337,6 +357,7 @@ def test_opening_a_draft_keeps_from_file_in_step_with_the_screen(app):
 
 def test_every_kind_can_be_added_and_no_button_sits_under_the_footer(app):
     from stranded_physics.entities.kinds import KINDS
+
     app.draw((0, 0))
     labels = {h.label: h.rect for h in app.builder.hot}
     footer_top = min(rect.top for label, rect in labels.items() if label in ("New", "Open", "Save"))

@@ -1,4 +1,4 @@
-# Stranded: Quantum Cognition Survival Engine - Pinned Dependencies
+# Qognition: runtime dependencies. Run from a checkout. See CONTRIBUTING.md.
 # Owned by Tech C (Integration & Contracts)
 
 # Quantum Computing & Simulation

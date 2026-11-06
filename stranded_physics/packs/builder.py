@@ -1,4 +1,5 @@
 """Builds one immutable ScenarioPack offline. The same scenario and seed always give the same hash."""
+
 from __future__ import annotations
 
 import hashlib
@@ -87,7 +88,7 @@ class Pack:
             raise InterfaceError(f"{name} is a series; use series()")
         located = self.grid.locate(xy_m)
         if located is None:
-            return float("inf") if kind == "arrival" else 0.
+            return float("inf") if kind == "arrival" else 0.0
         if kind == "frames":
             if t_s is None:
                 raise InterfaceError(f"{name} changes with time; pass t_s")
@@ -130,16 +131,22 @@ def build_pack(spec: ScenarioSpec, seed: int, verdicts: Mapping[str, Verdict] | 
         if problems:
             recorded[f"{domain.id}.validity"] = "OUT_OF_DOMAIN"
         budgets[domain.id] = {k: float(v) for k, v in domain.run(scoped, stream(seed, domain.id)).items()}
-        domain_rows.append({"id": domain.id, "tier": domain.tier, "problems": problems,
-                            "parameters": [p.id for p in domain.parameters]})
+        domain_rows.append({"id": domain.id, "tier": domain.tier, "problems": problems, "parameters": [p.id for p in domain.parameters]})
     arrays = {name: store.stored(name).data for name in store.names()}
     arrays["__agent_uniforms__"] = stream(seed, "agent", "uniforms").random((spec.time.n, AGENT_DRAWS_PER_STEP))
     header = {
-        "schema": PACK_SCHEMA, "interface_version": INTERFACE_VERSION, "scenario": spec.name, "seed": seed,
-        "verdicts": recorded, "domains": domain_rows, "budgets": budgets,
-        "grid": asdict(spec.grid), "contract_grid": asdict(spec.contract_grid),
+        "schema": PACK_SCHEMA,
+        "interface_version": INTERFACE_VERSION,
+        "scenario": spec.name,
+        "seed": seed,
+        "verdicts": recorded,
+        "domains": domain_rows,
+        "budgets": budgets,
+        "grid": asdict(spec.grid),
+        "contract_grid": asdict(spec.contract_grid),
         "time": {"t0_utc": spec.time.t0_utc.isoformat(), "dt_s": spec.time.dt_s, "n": spec.time.n},
-        "t0_local_hour": spec.t0_local_hour, "sites": {k: [list(p) for p in v] for k, v in spec.sites.items()},
+        "t0_local_hour": spec.t0_local_hour,
+        "sites": {k: [list(p) for p in v] for k, v in spec.sites.items()},
         "fields": {name: {"unit": store.stored(name).unit, "kind": store.stored(name).kind} for name in store.names()},
     }
     header["content_hash"] = _content_hash(header, arrays)

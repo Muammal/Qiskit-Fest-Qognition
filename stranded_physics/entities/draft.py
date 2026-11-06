@@ -1,4 +1,5 @@
 """A scenario being edited. The builder screen changes one of these and draws it; every rule lives here, so it can be tested without a window."""
+
 from __future__ import annotations
 
 import math
@@ -23,11 +24,13 @@ MAX_UTC_OFFSET = 14
 WINDOWS_DEVICE_NAMES = {"con", "prn", "aux", "nul", *(f"com{n}" for n in range(1, 10)), *(f"lpt{n}" for n in range(1, 10))}  # Can never be file names there.
 PORTABLE_SOURCE = dict(terrain="dials", weather="dials", eruption="catalogue", storm="dials")
 # (template, name, what it is, needs the data pack)
-TEMPLATES = (("volcano_island", "Eruption on a made-up island", "One person, a sampled eruption, and a coast to reach", False),
-             ("storm_island", "Storm on a made-up island", "One person and a cyclone passing close", False),
-             ("mind_contest", "Quantum against control", "Two groups with different minds face the same eruption", False),
-             ("blank_island", "Empty island", "Land and weather only. Add everything else yourself", False),
-             ("st_vincent", "St Vincent, April 2021", "The real recorded eruption. Needs the 230 MB data pack", True))
+TEMPLATES = (
+    ("volcano_island", "Eruption on a made-up island", "One person, a sampled eruption, and a coast to reach", False),
+    ("storm_island", "Storm on a made-up island", "One person and a cyclone passing close", False),
+    ("mind_contest", "Quantum against control", "Two groups with different minds face the same eruption", False),
+    ("blank_island", "Empty island", "Land and weather only. Add everything else yourself", False),
+    ("st_vincent", "St Vincent, April 2021", "The real recorded eruption. Needs the 230 MB data pack", True),
+)
 HEADER_KEYS = ("id", "title", "place", "start_utc", "hours", "step_hours", "local_utc_offset")
 
 
@@ -94,9 +97,13 @@ def add_portable(draft: Draft, kind: str) -> Draft:
 def next_steps(draft: Draft) -> tuple[tuple[str, bool, tuple[str, ...]], ...]:
     """What a playable scenario still needs: (label, done, kinds to add)."""
     kinds = {entry["kind"] for entry in draft.entries}
-    return (("Land", "terrain" in kinds, ("terrain",)), ("Weather", "weather" in kinds, ("weather",)),
-            ("Danger", bool(kinds & {"eruption", "storm", "ship"}), ("eruption", "ash", "flow")),
-            ("People", bool(kinds & {"person", "group", "passengers"}), ("person",)), ("Safe place", "shelter" in kinds or "ship" in kinds, ("shelter",)))
+    return (
+        ("Land", "terrain" in kinds, ("terrain",)),
+        ("Weather", "weather" in kinds, ("weather",)),
+        ("Danger", bool(kinds & {"eruption", "storm", "ship"}), ("eruption", "ash", "flow")),
+        ("People", bool(kinds & {"person", "group", "passengers"}), ("person",)),
+        ("Safe place", "shelter" in kinds or "ship" in kinds, ("shelter",)),
+    )
 
 
 def new_draft() -> Draft:
@@ -120,7 +127,7 @@ def problem(draft: Draft) -> str | None:
 
 
 def _changed(draft: Draft, index: int, entry: Mapping[str, object]) -> Draft:
-    return replace(draft, entries=(*draft.entries[:index], entry, *draft.entries[index + 1:]))
+    return replace(draft, entries=(*draft.entries[:index], entry, *draft.entries[index + 1 :]))
 
 
 def add_entity(draft: Draft, kind: str) -> Draft:
@@ -148,7 +155,7 @@ def _starting_values(dials: tuple, source: str) -> dict[str, float]:
 
 
 def remove_entity(draft: Draft, index: int) -> Draft:
-    return replace(draft, entries=(*draft.entries[:index], *draft.entries[index + 1:]))
+    return replace(draft, entries=(*draft.entries[:index], *draft.entries[index + 1 :]))
 
 
 def dials_of(entry: Mapping[str, object]) -> tuple:

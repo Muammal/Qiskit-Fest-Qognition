@@ -1,11 +1,24 @@
 """Phase 3 UI checks: sharp text, legibility, layout at three window sizes, and the new panels."""
+
 import contracts  # noqa: F401  (must load before mind)
 import pygame
 import pytest
 
 from engine.debrief import MODEL_FOOTER, control_for, paired_text, run_title
-from engine.gui import (ACTION_NAMES, COLOR_CYAN, COLOR_GOLD, COLOR_PANEL_ALT, COLOR_PANEL_BG, COLOR_RED, COLOR_TEXT_HINT, COLOR_TEXT_MAIN,
-                        COLOR_TEXT_MUTED, COLOR_YELLOW, CUE_TRANSLATIONS, IslandVisualizerApp)
+from engine.gui import (
+    ACTION_NAMES,
+    COLOR_CYAN,
+    COLOR_GOLD,
+    COLOR_PANEL_ALT,
+    COLOR_PANEL_BG,
+    COLOR_RED,
+    COLOR_TEXT_HINT,
+    COLOR_TEXT_MAIN,
+    COLOR_TEXT_MUTED,
+    COLOR_YELLOW,
+    CUE_TRANSLATIONS,
+    IslandVisualizerApp,
+)
 from engine.gui_quantum import QuantumPanel, order_swap_delta, swap_last_two
 from engine.hidpi import ScaledFont, TextSurface, UICanvas, compose, scale_sprite, window_fit
 from engine.agent import SurvivalAgent
@@ -25,25 +38,26 @@ def make_app(window, scenario="volcano", start="event_choice"):
 
 def luminance(color):
     channels = [c / 255 for c in color]
-    linear = [c / 12.92 if c <= .03928 else ((c + .055) / 1.055) ** 2.4 for c in channels]
-    return .2126 * linear[0] + .7152 * linear[1] + .0722 * linear[2]
+    linear = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in channels]
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
 
 
 def contrast(a, b):
     high, low = sorted((luminance(a), luminance(b)), reverse=True)
-    return (high + .05) / (low + .05)
+    return (high + 0.05) / (low + 0.05)
 
 
 def overlaps(rects):
     found = []
     for i, (text_a, a) in enumerate(rects):
-        for text_b, b in rects[i + 1:]:
+        for text_b, b in rects[i + 1 :]:
             if a.inflate(-2, -2).colliderect(b.inflate(-2, -2)):
                 found.append((text_a, text_b))
     return found
 
 
 # Text and resolution ---------------------------------------------------------
+
 
 def test_text_colors_read_on_both_panels():
     for color in TEXT_COLORS:
@@ -107,6 +121,7 @@ def test_screen_text_never_uses_the_recorder_without_text():
 
 # Layout at three sizes -------------------------------------------------------
 
+
 @pytest.mark.parametrize("window", WINDOWS)
 def test_hub_text_has_no_collisions_and_stays_above_buttons(window):
     app = make_app(window)
@@ -114,8 +129,12 @@ def test_hub_text_has_no_collisions_and_stays_above_buttons(window):
     scale = window_fit(*window)[0]
     rects = app.canvas.text_rects(scale)
     assert overlaps(rects) == []
-    for rect, button in ((app.card1_rect, app.btn_choice_island), (app.card2_rect, app.btn_choice_volcano),
-                         (app.card3_rect, app.btn_choice_titanic), (app.card4_rect, app.btn_choice_pompeii)):
+    for rect, button in (
+        (app.card1_rect, app.btn_choice_island),
+        (app.card2_rect, app.btn_choice_volcano),
+        (app.card3_rect, app.btn_choice_titanic),
+        (app.card4_rect, app.btn_choice_pompeii),
+    ):
         top = round(button.rect.y * scale)
         left, right = round(rect.x * scale), round(rect.right * scale)
         card_top = round(rect.y * scale)
@@ -145,6 +164,7 @@ def test_section_headings_clear_the_buttons_above_them(window):
 
 # Cue translation -------------------------------------------------------------
 
+
 @pytest.mark.parametrize("scenario, mappings", [("titanic", TITANIC_MAPPINGS), ("pompeii", POMPEII_MAPPINGS), ("waterloo", WATERLOO_MAPPINGS)])
 def test_each_translation_is_a_real_mapping(scenario, mappings):
     values = [value for _, value, _ in CUE_TRANSLATIONS[scenario]]
@@ -170,6 +190,7 @@ def test_the_selector_labels_its_choice_an_assumption():
 
 # Quantum panel ---------------------------------------------------------------
 
+
 def test_swap_last_two_ignores_none():
     assert swap_last_two(["none", "tremor", "gas_plume"]) == ["none", "gas_plume", "tremor"]
     assert swap_last_two(["storm", "none", "tremor"]) == ["tremor", "none", "storm"]
@@ -183,7 +204,7 @@ def test_order_swap_delta_is_the_order_gap():
     state["recent_events"] = ["none", "tremor", "gas_plume"]
     swapped, delta = order_swap_delta(state)
     assert swapped == ["none", "gas_plume", "tremor"]
-    assert delta == pytest.approx(order_gap_at_lambda(dict(state, stress=.1), "gas_plume", "tremor", 0.0), abs=1e-9)
+    assert delta == pytest.approx(order_gap_at_lambda(dict(state, stress=0.1), "gas_plume", "tremor", 0.0), abs=1e-9)
 
 
 def test_panel_records_quantum_and_control_on_one_state():
@@ -220,6 +241,7 @@ def test_order_swap_button_sits_in_its_widget():
 
 # Scenario panels -------------------------------------------------------------
 
+
 @pytest.mark.parametrize("scenario", ["titanic", "pompeii", "waterloo"])
 def test_crowd_panels_have_no_island_vitals_or_actions(scenario):
     app = make_app((1280, 720), scenario, "sim")
@@ -246,10 +268,11 @@ def test_no_empty_person_cards():
     class Patron:
         status, recent_events = "site", ["none", "none", "smell"]
 
-    assert "smell" in waterloo_text(Patron, None, .4) and "0.40 ppm" in waterloo_text(Patron, None, .4)
+    assert "smell" in waterloo_text(Patron, None, 0.4) and "0.40 ppm" in waterloo_text(Patron, None, 0.4)
 
 
 # Debrief ---------------------------------------------------------------------
+
 
 def test_title_follows_steps_endured():
     assert run_title(True, 5, 36, None, "volcano") == "RUN STOPPED AT 10 h, STILL ALIVE"
@@ -291,6 +314,7 @@ def test_debrief_shows_the_footer(scenario):
 
 
 # Naming ----------------------------------------------------------------------
+
 
 def test_window_caption_is_qognition():
     make_app((1280, 720))

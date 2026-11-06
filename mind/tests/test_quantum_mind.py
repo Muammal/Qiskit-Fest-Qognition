@@ -5,6 +5,7 @@ repo (SurvivalAgent, contracts.get_prior); the plan's own numbers are from
 a prototype run and may not match exactly (its Section 4.7 test 3 says to
 assert inequalities, not equalities, for that reason).
 """
+
 import time
 
 import contracts
@@ -15,14 +16,12 @@ from engine.simulation import SimulationEngine
 from mind.quantum_mind import (
     classical_mixture_decide,
     decision_probs,
-    decoherence_strength,
     quantum_decide,
 )
 
 
 def test_decision_probs_split():
-    prior = {"forage": 0.1, "drink": 0.1, "build_shelter": 0.1, "rest": 0.1,
-             "explore": 0.4, "craft": 0.1, "hide": 0.1}
+    prior = {"forage": 0.1, "drink": 0.1, "build_shelter": 0.1, "rest": 0.1, "explore": 0.4, "craft": 0.1, "hide": 0.1}
     probs = decision_probs(0.4, prior)
     assert probs["hide"] == pytest.approx(0.4, abs=1e-9)
     carry_on_sum = sum(v for k, v in probs.items() if k != "hide")
@@ -39,20 +38,22 @@ def test_contract_seven_actions_sum_to_one_and_diagnostics_present():
     assert sum(decision["probs"].values()) == pytest.approx(1.0, abs=1e-6)
 
     q = decision["quantum"]
-    for key in ("p_danger", "p_protect", "p_classical", "lam", "q_safe",
-                "q_danger", "order_gap", "reflex", "decision_rule"):
+    for key in ("p_danger", "p_protect", "p_classical", "lam", "q_safe", "q_danger", "order_gap", "reflex", "decision_rule"):
         assert key in q
 
 
-@pytest.mark.parametrize("test_name", [
-    "test_contracts_stubs",
-    "test_quantum_order_effect_in_contracts",
-    "test_quantum_stress_decoherence",
-    "test_volcanic_order_effect_and_lethal_overlay",
-    "test_urgent_thirst_beats_warning_in_both_stubs",
-    "test_simulation_engine_run",
-    "test_demo_pack_validity",
-])
+@pytest.mark.parametrize(
+    "test_name",
+    [
+        "test_contracts_stubs",
+        "test_quantum_order_effect_in_contracts",
+        "test_quantum_stress_decoherence",
+        "test_volcanic_order_effect_and_lethal_overlay",
+        "test_urgent_thirst_beats_warning_in_both_stubs",
+        "test_simulation_engine_run",
+        "test_demo_pack_validity",
+    ],
+)
 def test_repo_compatibility(monkeypatch, test_name):
     import test_contracts_and_engine as repo_tests
 

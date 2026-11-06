@@ -1,4 +1,5 @@
 """Hourly UTC weather replay; rain uses completed hours only."""
+
 from __future__ import annotations
 
 import hashlib
@@ -17,10 +18,10 @@ HERE = Path(__file__).resolve().parent
 RAW = HERE.parents[2] / "artifacts/physics/raw/atmos"
 PARAMETERS = load_parameters(HERE / "params.toml")
 SETTINGS = {p.id.split(".", 1)[1]: float(p.value.magnitude) for p in PARAMETERS}
-SECONDS_PER_HOUR = 3600.
+SECONDS_PER_HOUR = 3600.0
 KMH_PER_MS = 3.6
-FROM_TO_ROTATION = 180.
-FULL_TURN = 360.
+FROM_TO_ROTATION = 180.0
+FULL_TURN = 360.0
 
 COLUMNS = {
     "wind_speed": ("surface", "wind_speed_10m"),
@@ -36,8 +37,7 @@ COLUMNS = {
 
 def default_files():
     records = {r.id: r for r in load_datasets(HERE / "datasets.toml", "atmos")}
-    return {role: (RAW / (name + ".json"), records[name].sha256)
-            for role, name in (("upper", "upper_wind_st_vincent"), ("surface", "weather_st_vincent"))}
+    return {role: (RAW / (name + ".json"), records[name].sha256) for role, name in (("upper", "upper_wind_st_vincent"), ("surface", "weather_st_vincent"))}
 
 
 @lru_cache(maxsize=int(SETTINGS["cache_files"]))
@@ -62,13 +62,11 @@ class Atmos:
         self.files = default_files() if files is None else files
 
     def _moments(self):
-        return [self.time.t0_utc.astimezone(timezone.utc) + timedelta(seconds=k * self.time.dt_s)
-                for k in range(self.time.n)]
+        return [self.time.t0_utc.astimezone(timezone.utc) + timedelta(seconds=k * self.time.dt_s) for k in range(self.time.n)]
 
     def check_validity(self, fields):
         reasons = []
-        if (self.time.n < 1 or not np.isfinite(self.time.dt_s) or self.time.dt_s <= 0
-                or self.time.t0_utc.utcoffset() is None):
+        if self.time.n < 1 or not np.isfinite(self.time.dt_s) or self.time.dt_s <= 0 or self.time.t0_utc.utcoffset() is None:
             return ["weather replay needs a positive time axis with timezone-aware UTC instants"]
         hour = SECONDS_PER_HOUR
         if self.time.dt_s % hour or any((m.minute or m.second or m.microsecond) for m in self._moments()):
@@ -90,8 +88,7 @@ class Atmos:
                 moments = self._moments()
                 needed = {m.strftime("%Y-%m-%dT%H:%M") for m in moments}
                 for moment in moments[1:]:
-                    needed.update((moment - timedelta(seconds=j * hour)).strftime("%Y-%m-%dT%H:%M")
-                                  for j in range(int(self.time.dt_s / hour)))
+                    needed.update((moment - timedelta(seconds=j * hour)).strftime("%Y-%m-%dT%H:%M") for j in range(int(self.time.dt_s / hour)))
                 if not needed <= index.keys():
                     reasons.append(f"{role}: data does not cover the requested time axis")
                     continue
@@ -116,8 +113,9 @@ class Atmos:
             values = []
             for k, moment in enumerate(moments):
                 hours = 1 if k == 0 or name != "rain_rate" else int(self.time.dt_s / SECONDS_PER_HOUR)
-                values.append(np.mean([hourly[column][index[(moment - timedelta(seconds=j * SECONDS_PER_HOUR)).strftime("%Y-%m-%dT%H:%M")]]
-                                       for j in range(hours)]))
+                values.append(
+                    np.mean([hourly[column][index[(moment - timedelta(seconds=j * SECONDS_PER_HOUR)).strftime("%Y-%m-%dT%H:%M")]] for j in range(hours)])
+                )
             data = np.asarray(values)
             if name.startswith("wind_speed"):
                 data = data / KMH_PER_MS

@@ -5,6 +5,7 @@ so rising water is visible and "walking uphill" means climbing a staircase.
 It is a schematic for an evacuation demonstration, not a deck plan.
 Numerical choices are assumptions unless a source is cited.
 """
+
 import copy
 import heapq
 import math
@@ -17,23 +18,37 @@ SHIP_LENGTH_M = 269  # Wikipedia, RMS Titanic: overall length
 SHIP_M_PER_TILE = 7  # assumption: 269 m drawn across 38 tiles
 ROW_M = 1.4  # assumption: two rows per 2.8 m deck; vertical is not to horizontal scale
 WALK_M_PER_S = 1.0  # assumption: unhurried crowded corridor walking
-STAIR_MINUTES_PER_ROW = .25  # assumption: fifteen seconds per stair row in a crowd
+STAIR_MINUTES_PER_ROW = 0.25  # assumption: fifteen seconds per stair row in a crowd
 
 # Contract tile meanings on the ship: 1 open deck, 3 stairs, 4 interior, 0 blocked or sea.
 OPEN_DECK, STAIRS, INTERIOR = 1, 3, 4
-TERRAIN_MINUTES = {OPEN_DECK: 1., INTERIOR: 1.15, STAIRS: 1.}  # assumption: interior corridors slow walkers
+TERRAIN_MINUTES = {OPEN_DECK: 1.0, INTERIOR: 1.15, STAIRS: 1.0}  # assumption: interior corridors slow walkers
 
 BOAT, A, B, C, D, E, F, G, TANK = 10, 12, 14, 16, 18, 20, 22, 24, 26  # assumption: one row per deck, spaced by two
 DECK_ROWS = dict(boat=BOAT, a=A, b=B, c=C, d=D, e=E, f=F, g=G, tank=TANK)
 WATERLINE_ROW = 21.5  # assumption: resting waterline sits between E and F decks
 DECK_SPANS = {
-    BOAT: (9, 31), A: (9, 31), B: (6, 33), C: (2, 37),
-    D: (2, 37), E: (1, 38), F: (2, 37), G: (3, 36), TANK: (5, 34),
+    BOAT: (9, 31),
+    A: (9, 31),
+    B: (6, 33),
+    C: (2, 37),
+    D: (2, 37),
+    E: (1, 38),
+    F: (2, 37),
+    G: (3, 36),
+    TANK: (5, 34),
 }  # assumption: schematic hull and superstructure outline
 OPEN_SPANS = {BOAT: [(9, 31)], C: [(2, 6), (33, 37)]}  # assumption: boat deck plus aft and forward well decks
 STAIR_COLUMNS = {
-    6: (C, G), 12: (BOAT, G), 17: (BOAT, E), 24: (BOAT, E),
-    28: (BOAT, G), 35: (C, G), 10: (G, TANK), 20: (G, TANK), 30: (G, TANK),
+    6: (C, G),
+    12: (BOAT, G),
+    17: (BOAT, E),
+    24: (BOAT, E),
+    28: (BOAT, G),
+    35: (C, G),
+    10: (G, TANK),
+    20: (G, TANK),
+    30: (G, TANK),
 }  # assumption: schematic main stairs, crew routes and engine-room ladders
 # Six of sixteen compartments open to the sea; Wikipedia, Sinking of the Titanic.
 BULKHEADS = (35, 33, 31, 29, 27, 25, 22, 20, 17, 15, 13, 10, 8, 6, 4)  # assumption: x positions of 15 bulkheads
@@ -47,7 +62,7 @@ class ShipWorld(IslandWorld):
         self.seed, self.scenario = seed, scenario
         self.lava, self.pdc, self.lahar = set(), set(), set()
         self.active_pdc, self.active_lahar, self.surge = set(), set(), set()
-        self.ash, self.ash_grid = 0., None
+        self.ash, self.ash_grid = 0.0, None
         self.volcanic_sign_seen = False
         self.shelter_tiles = []
         self.depleted_food = set()
@@ -61,7 +76,7 @@ class ShipWorld(IslandWorld):
         tile = self.get_tile(*b)
         if a[1] != b[1]:
             return STAIR_MINUTES_PER_ROW
-        return SHIP_M_PER_TILE / WALK_M_PER_S / 60 * TERRAIN_MINUTES.get(tile, 1.)
+        return SHIP_M_PER_TILE / WALK_M_PER_S / 60 * TERRAIN_MINUTES.get(tile, 1.0)
 
     def next_step_field(self, goals):
         """Multi-source least-time field: each tile maps to its next tile toward a goal."""
@@ -69,9 +84,9 @@ class ShipWorld(IslandWorld):
         for goal in goals:
             goal = tuple(goal)
             if self.walkable(goal):
-                costs[goal] = 0.
+                costs[goal] = 0.0
                 following[goal] = None
-                queue.append((0., goal))
+                queue.append((0.0, goal))
         heapq.heapify(queue)
         while queue:
             cost, p = heapq.heappop(queue)
@@ -88,8 +103,7 @@ class ShipWorld(IslandWorld):
 
     def export_dict(self):
         exported = super().export_dict()
-        exported.update(scale_m_per_tile=SHIP_M_PER_TILE, deck_rows=dict(DECK_ROWS),
-                        bulkheads=list(BULKHEADS), breached_from_x=BREACHED_FROM_X)
+        exported.update(scale_m_per_tile=SHIP_M_PER_TILE, deck_rows=dict(DECK_ROWS), bulkheads=list(BULKHEADS), breached_from_x=BREACHED_FROM_X)
         return exported
 
 
@@ -145,6 +159,7 @@ def _ship_terrain(width, height):
 def boat_stations():
     """Boat-deck tiles for the two davit groups, forward and aft, one entry per tile."""
     from engine.lifeboats import BOAT_TABLE
+
     return list(dict.fromkeys((row["x"], BOAT) for row in BOAT_TABLE))
 
 

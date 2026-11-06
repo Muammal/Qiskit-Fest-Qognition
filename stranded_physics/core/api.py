@@ -3,6 +3,7 @@
 Categories share data only through `Fields`. They never import each other.
 Every value carries its own source, valid range and role, so a claim can be traced to it.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -94,7 +95,7 @@ class GridSpec:
     ny: int
 
     def centre(self, row: int, col: int) -> XY:
-        return self.x0_m + (col + .5) * self.dx_m, self.y0_m - (row + .5) * self.dx_m
+        return self.x0_m + (col + 0.5) * self.dx_m, self.y0_m - (row + 0.5) * self.dx_m
 
     def locate(self, xy: XY) -> tuple[int, int] | None:
         """The (row, col) containing a point, or None outside the grid."""
@@ -191,4 +192,4 @@ class Percept:
     ash_kg_m2: float
     rain_mm_h: float
     flow_visible: bool
-    wind_m_s: float = 0.  # Added by change note 002. Storm wind where a storm is in the scenario.
+    wind_m_s: float = 0.0  # Added by change note 002. Storm wind where a storm is in the scenario.

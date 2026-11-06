@@ -8,6 +8,7 @@ Caveat: T1 relaxation pushes the belief toward |0>=safe as well as
 destroying coherence, so this is not a pure T2 measurement in the full
 decision circuit - only the coherence-probe circuit isolates T2 alone.
 """
+
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -37,28 +38,30 @@ def run_delay_experiment(shots=4000, seed_transpiler=7, sampler_seed=7, qubit=PR
     rows = []
     for t_us in DELAYS_US:
         probe = build_coherence_probe_circuit(t_us)
-        probe_t = transpile(probe, backend=backend, optimization_level=1,
-                             seed_transpiler=seed_transpiler, initial_layout=[qubit, qubit + 1],
-                             scheduling_method="alap")
+        probe_t = transpile(
+            probe, backend=backend, optimization_level=1, seed_transpiler=seed_transpiler, initial_layout=[qubit, qubit + 1], scheduling_method="alap"
+        )
         probe_job = sampler.run([probe_t], shots=shots).result()
         p0 = probe_job[0].data.c.get_counts().get("0", 0) / shots
         x_measured = 2 * p0 - 1
         theory = float(np.exp(-t_us / t2))
 
         decide = build_delay_circuit(t_us, Q_S, Q_D, ETA)
-        decide_t = transpile(decide, backend=backend, optimization_level=1,
-                              seed_transpiler=seed_transpiler, initial_layout=[qubit, qubit + 1],
-                              scheduling_method="alap")
+        decide_t = transpile(
+            decide, backend=backend, optimization_level=1, seed_transpiler=seed_transpiler, initial_layout=[qubit, qubit + 1], scheduling_method="alap"
+        )
         decide_job = sampler.run([decide_t], shots=shots).result()
         p_protect = decide_job[0].data.c.get_counts().get("1", 0) / shots
 
-        rows.append({
-            "t_us": t_us,
-            "coherence_x_measured": x_measured,
-            "coherence_theory_exp_t_over_t2": theory,
-            "coherence_ratio_measured_over_theory": x_measured / theory if theory > 0 else None,
-            "p_protect_under_delay": p_protect,
-        })
+        rows.append(
+            {
+                "t_us": t_us,
+                "coherence_x_measured": x_measured,
+                "coherence_theory_exp_t_over_t2": theory,
+                "coherence_ratio_measured_over_theory": x_measured / theory if theory > 0 else None,
+                "p_protect_under_delay": p_protect,
+            }
+        )
 
     summary = {
         "backend": backend.name,
@@ -72,8 +75,7 @@ def run_delay_experiment(shots=4000, seed_transpiler=7, sampler_seed=7, qubit=PR
         "sampler_seed": sampler_seed,
         "date": datetime.now(timezone.utc).isoformat(),
         "p_protect_exact_no_delay": exact_no_delay,
-        "caveat": "T1 relaxation also pushes the belief toward |0>=safe in the full "
-                  "decision circuit; only the coherence-probe rows isolate T2 alone.",
+        "caveat": "T1 relaxation also pushes the belief toward |0>=safe in the full decision circuit; only the coherence-probe rows isolate T2 alone.",
         "rows": rows,
     }
     return summary

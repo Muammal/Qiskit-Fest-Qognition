@@ -1,13 +1,24 @@
 """Tests for the Pompeii scenario: the two linked maps and the eruption timeline."""
+
 import json
 import math
 
 import pytest
 
-from engine.city import (CITY_M_PER_TILE, GATE_TO_REGION, PROVENANCE, REGION_M_PER_TILE, REGION_ROADS, VESUVIUS,
-                         CityWorld, RegionWorld)
-from engine.eruption import (DEVASTATING_STEP, FALL_END_STEP, FIRST_CITY_WIDE_STEP, FIRST_FLOW_AT_TOWN_STEP, HORIZON,
-                             PLINIAN_STEP, PUMICE_TOTAL_M, QUAKE_STEP, BREAK_STEP, EruptionModel, clock_step)
+from engine.city import CITY_M_PER_TILE, GATE_TO_REGION, PROVENANCE, REGION_M_PER_TILE, REGION_ROADS, VESUVIUS, CityWorld, RegionWorld
+from engine.eruption import (
+    DEVASTATING_STEP,
+    FALL_END_STEP,
+    FIRST_CITY_WIDE_STEP,
+    FIRST_FLOW_AT_TOWN_STEP,
+    HORIZON,
+    PLINIAN_STEP,
+    PUMICE_TOTAL_M,
+    QUAKE_STEP,
+    BREAK_STEP,
+    EruptionModel,
+    clock_step,
+)
 from engine.eruption import PROVENANCE as ERUPTION_PROVENANCE
 from engine.world import IslandWorld
 
@@ -34,11 +45,11 @@ def test_both_maps_keep_the_island_world_interface(city, region):
 
 def test_city_area_and_walls_are_near_the_sourced_figures(city):
     inside = sum(1 for y in range(40) for x in range(40) if 0 <= ((x - 20) / 17.5) ** 2 + ((y - 20) / 13.3) ** 2 <= 1)
-    assert 660_000 * .95 <= inside * CITY_M_PER_TILE ** 2 <= 660_000 * 1.05
+    assert 660_000 * 0.95 <= inside * CITY_M_PER_TILE**2 <= 660_000 * 1.05
     # Ramanujan's ellipse perimeter. A smooth oval comes out about 9% under the sourced wall length.
     a, b = 17.5, 13.3
     perimeter = math.pi * (3 * (a + b) - math.sqrt((3 * a + b) * (a + 3 * b))) * CITY_M_PER_TILE
-    assert perimeter == pytest.approx(3_200, rel=.1)
+    assert perimeter == pytest.approx(3_200, rel=0.1)
 
 
 def test_seven_gates_are_the_only_ways_through_the_wall(city):
@@ -72,7 +83,7 @@ def test_each_gate_road_reaches_the_map_edge(city):
 
 def test_vesuvius_is_eight_kilometres_from_the_town(region):
     metres = math.dist(VESUVIUS, (30, 30)) * REGION_M_PER_TILE
-    assert metres == pytest.approx(8_000, rel=.03)
+    assert metres == pytest.approx(8_000, rel=0.03)
     assert region.get_tile(*VESUVIUS) == 3
     assert region.elevation[VESUVIUS[1]][VESUVIUS[0]] > 1000
 
@@ -87,7 +98,7 @@ def test_every_city_gate_links_to_a_road_out_of_the_region(region):
 def test_roads_end_on_land_and_the_town_is_about_the_right_size(region):
     assert all(region.get_tile(*end) for end in REGION_ROADS.values())
     town = [(x, y) for y in range(40) for x in range(40) if region.get_tile(x, y) == 4]
-    assert 660_000 * .7 <= len(town) * REGION_M_PER_TILE ** 2 <= 660_000 * 1.6
+    assert 660_000 * 0.7 <= len(town) * REGION_M_PER_TILE**2 <= 660_000 * 1.6
 
 
 def test_naples_road_skirts_the_mountain_instead_of_crossing_it(region):
@@ -97,10 +108,9 @@ def test_naples_road_skirts_the_mountain_instead_of_crossing_it(region):
 
 
 def test_side_streets_do_not_swamp_the_town(city):
-    inside = [(x, y) for y in range(40) for x in range(40)
-              if ((x - 20) / 17.5) ** 2 + ((y - 20) / 13.3) ** 2 <= 1 and (x, y) not in city.wall_tiles]
+    inside = [(x, y) for y in range(40) for x in range(40) if ((x - 20) / 17.5) ** 2 + ((y - 20) / 13.3) ** 2 <= 1 and (x, y) not in city.wall_tiles]
     buildings = sum(city.get_tile(*p) in (2, 4) for p in inside)
-    assert buildings / len(inside) > .55
+    assert buildings / len(inside) > 0.55
 
 
 def test_sarno_is_one_channel_broken_only_by_bridges(region):
@@ -210,6 +220,7 @@ def test_date_setting_only_changes_temperature(city, region):
 def test_every_event_is_a_name_the_mind_accepts(eruption):
     import contracts
     from mind.config import COLLAPSE_EVENTS, EVENT_GATES
+
     for event in eruption.world_events:
         assert event in contracts.EVENTS
         assert event == "none" or event in EVENT_GATES or event in COLLAPSE_EVENTS
@@ -231,8 +242,7 @@ import inspect
 import random
 
 import contracts
-from engine.citizens import (DEFAULT_POPULATION, HIGH_POPULATION, Citizen, build_citizens, notice_chance, relay_chance,
-                             role_counts, spread_household_news)
+from engine.citizens import DEFAULT_POPULATION, HIGH_POPULATION, Citizen, build_citizens, notice_chance, relay_chance, role_counts, spread_household_news
 from engine.citizens import PROVENANCE as CITIZEN_PROVENANCE
 
 
@@ -274,9 +284,11 @@ def test_every_enslaved_person_belongs_to_a_free_household(crowd):
 
 def test_wealthier_households_hold_more_servants(crowd):
     people, households = crowd
+
     def mean_servants(role):
         rows = [h for h in households.values() if people[h["head"]].role == role]
         return sum(len(h["servants"]) for h in rows) / len(rows)
+
     assert mean_servants("magistrate") > mean_servants("council") > mean_servants("merchant")
 
 
@@ -289,9 +301,9 @@ def test_mind_receives_no_role_status_or_household(crowd):
 
 def test_noticing_takes_no_role_and_follows_distance_indoors_and_view():
     assert set(inspect.signature(notice_chance).parameters) == {"distance_tiles", "indoors", "visibility"}
-    assert notice_chance(0, False, 1.) > notice_chance(10, False, 1.) > notice_chance(30, False, 1.)
-    assert notice_chance(5, True, 1.) < notice_chance(5, False, 1.)
-    assert notice_chance(5, False, .25) < notice_chance(5, False, 1.)
+    assert notice_chance(0, False, 1.0) > notice_chance(10, False, 1.0) > notice_chance(30, False, 1.0)
+    assert notice_chance(5, True, 1.0) < notice_chance(5, False, 1.0)
+    assert notice_chance(5, False, 0.25) < notice_chance(5, False, 1.0)
     assert relay_chance(0) > relay_chance(30)
 
 
@@ -321,12 +333,14 @@ def test_more_servants_means_sooner_news_with_no_role_bonus():
 def test_hide_walks_toward_a_gate_and_pumice_slows_it(city):
     field = city.next_step_field(city.gates.values())
     start = (21, 23)
+
     def walked(depth):
         person = Citizen(0, "resident", 0, start, start)
         person.knows_danger = True
-        person.step_budget = lambda d, v, original=person.step_budget: original(depth, 1.) / 12
-        person.execute_town_action("hide", city, dict(leave=field), {}, random.Random(1), depth, 1.)
+        person.step_budget = lambda d, v, original=person.step_budget: original(depth, 1.0) / 12
+        person.execute_town_action("hide", city, dict(leave=field), {}, random.Random(1), depth, 1.0)
         return math.dist(person.pos, start)
+
     assert walked(0) > walked(2.8) > 0
 
 
@@ -335,11 +349,13 @@ def test_restriction_switch_only_holds_back_enslaved_people(city):
     home_field = city.next_step_field([(21, 23)])
     start, home = (21, 23), (21, 23)
     fields = dict(leave=field, home=home_field)
+
     def moved(role, restrict, head_in_town):
         person = Citizen(0, role, 0, start, home)
         person.knows_danger = True
-        person.execute_town_action("hide", city, fields, {}, random.Random(1), 0., 1., restrict, head_in_town)
+        person.execute_town_action("hide", city, fields, {}, random.Random(1), 0.0, 1.0, restrict, head_in_town)
         return tuple(person.pos) != start
+
     assert moved("enslaved", False, True)
     assert not moved("enslaved", True, True)
     assert moved("enslaved", True, False)
@@ -359,9 +375,9 @@ def test_autumn_setting_only_chills_people_outdoors():
     warm = Citizen(0, "resident", 0, (21, 23), (21, 23))
     cold = Citizen(1, "resident", 0, (21, 23), (21, 23))
     sheltered = Citizen(2, "resident", 0, (21, 23), (21, 23))
-    warm.step_decay(False, temperature_c=27.)
-    cold.step_decay(False, temperature_c=17.)
-    sheltered.step_decay(True, temperature_c=17.)
+    warm.step_decay(False, temperature_c=27.0)
+    cold.step_decay(False, temperature_c=17.0)
+    sheltered.step_decay(True, temperature_c=17.0)
     assert cold.needs["warmth"] < warm.needs["warmth"] == sheltered.needs["warmth"]
 
 
@@ -397,6 +413,7 @@ def test_full_population_is_the_default():
 
 def test_every_mapping_uses_names_the_mind_accepts():
     from mind.config import COLLAPSE_EVENTS, EVENT_GATES
+
     assert DEFAULT_MAPPING == "B" and set(EVENT_MAPPINGS) == set("ABCD")
     for mapping in EVENT_MAPPINGS.values():
         for event in {**EVENT_NAMES, **mapping}.values():
@@ -413,6 +430,7 @@ def test_everyone_uses_the_same_mind_and_state_contract():
         contracts.validate_state(state)
         assert not {"role", "household", "status", "knows_danger"} & set(state)
         return quantum_decide(state)
+
     sim = PompeiiSimulation(seed=4, decide_fn=spy, **SMALL)
     sim.step()
     assert sim.decide_fn is spy
@@ -452,6 +470,7 @@ def test_flows_kill_anyone_they_cover_indoors_or_out():
     for person in sim.people:
         person.pos, person.status = [21, 23], "city"
     from engine.eruption import DEVASTATING_STEP
+
     sim._apply_flows(DEVASTATING_STEP, sim.eruption.hazard_by_step[DEVASTATING_STEP])
     assert sim.counts()["dead"] == 1_500
     assert {p.cause_of_death for p in sim.people} == {"pyroclastic_flow"}
@@ -465,7 +484,7 @@ def test_collapse_kills_about_half_and_injures_the_rest():
     hazard = dict(sim.eruption.hazard_by_step[0], new_collapse=[tile])
     _, hurt = sim._collapse_buildings(10, hazard)
     dead = sim.counts()["dead"]
-    assert dead / 1_500 == pytest.approx(.5, abs=.06)
+    assert dead / 1_500 == pytest.approx(0.5, abs=0.06)
     assert len(hurt) == 1_500 - dead
     assert all(sim.people[i].injured for i in hurt)
     assert sim.world.get_tile(*tile) == 1
@@ -482,6 +501,7 @@ def test_crowding_switch_slows_leaving():
         for _ in range(6):
             sim.step()
         return sim.counts()["in_town"]
+
     assert in_town(True) > in_town(False)
 
 
@@ -523,12 +543,20 @@ def test_six_scene_kinds_from_different_cameras():
 
 def test_every_scene_draws_and_ends_on_its_own(stepped):
     app = FakeApp(stepped)
-    base = dict(t=20, caption="c", focus=True, role="resident", world=stepped.world, field=stepped._city_leave,
-                thought="Pumice is falling. Belief is unsure. Heads for a gate.", flow=True)
+    base = dict(
+        t=20,
+        caption="c",
+        focus=True,
+        role="resident",
+        world=stepped.world,
+        field=stepped._city_leave,
+        thought="Pumice is falling. Belief is unsure. Heads for a gate.",
+        flow=True,
+    )
     for kind in SCENES:
         player = PompeiiCutscenes(app.font_sub, app.font_small)
         player.enqueue([dict(base, kind=kind)])
-        for fraction in (0., .3, .6, .99):
+        for fraction in (0.0, 0.3, 0.6, 0.99):
             player.elapsed = fraction * DURATION
             player.draw(app.canvas)
         player.update(DURATION)
@@ -578,7 +606,7 @@ def test_panels_draw(stepped):
 
 def test_thoughts_only_use_model_values_and_never_mention_motives():
     person = Citizen(0, "enslaved", 0, (21, 23), (21, 23))
-    record = dict(story="A servant brings news", action_label="Stays at their work", quantum=dict(p_danger=.5))
+    record = dict(story="A servant brings news", action_label="Stays at their work", quantum=dict(p_danger=0.5))
     text = thought_text(person, record)
     assert text == "A servant brings news. Belief is unsure. Stays at their work."
     for word in ("master", "afraid", "fear", "owner", "family", "scared", "want"):
@@ -630,10 +658,8 @@ def test_gui_opens_pompeii_from_the_choice_screen():
 
 def test_home_settings_reach_the_simulation():
     app = _pompeii_app()
-    assert app.pompeii_settings == dict(event_mapping="B", population=11_500, date="august", quake=True,
-                                        restrict_enslaved=False, crowding=True)
-    for key, value in dict(event_mapping="C", population=11_500, date="autumn", quake=False,
-                           restrict_enslaved=True, crowding=False).items():
+    assert app.pompeii_settings == dict(event_mapping="B", population=11_500, date="august", quake=True, restrict_enslaved=False, crowding=True)
+    for key, value in dict(event_mapping="C", population=11_500, date="autumn", quake=False, restrict_enslaved=True, crowding=False).items():
         app.pompeii_settings[key] = value
     app._handle_mouse_click(app.btn_launch.rect.center)
     assert app.engine.event_mapping == "C" and app.engine.crowding is False and app.engine.restrict_enslaved is True
@@ -686,8 +712,7 @@ def test_clicking_a_person_follows_them_and_fills_a_panel():
     app = _pompeii_app()
     app.pompeii_settings["population"] = 1_500
     app._handle_mouse_click(app.btn_launch.rect.center)
-    target = next(p for p in app.engine.people if p.status == "city" and p not in app.split_panels.people
-                  and app.city_view.person_xy(p)[1] > 120)
+    target = next(p for p in app.engine.people if p.status == "city" and p not in app.split_panels.people and app.city_view.person_xy(p)[1] > 120)
     x, y = app.city_view.person_xy(target)
     app._handle_sim_click((x, y))
     assert app.agent in app.split_panels.people and app.agent is app.engine.agent

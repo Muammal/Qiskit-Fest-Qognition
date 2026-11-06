@@ -1,4 +1,5 @@
 """The lead-time sweep and sensitivity helpers. Experiment results themselves are in docs/results/."""
+
 import math
 
 import numpy as np
@@ -14,8 +15,8 @@ def test_a_person_depends_only_on_seed_and_replicate():
     assert sweep.person(3, 7) != sweep.person(3, 8)
     draws = [sweep.person(s, r) for s in range(40) for r in range(10)]
     assert all(-1 <= eta <= 0 for _, eta in draws)
-    assert np.mean([eta for _, eta in draws]) == pytest.approx(ETA, abs=.03)
-    assert np.mean([offset for offset, _ in draws]) == pytest.approx(0, abs=.03)
+    assert np.mean([eta for _, eta in draws]) == pytest.approx(ETA, abs=0.03)
+    assert np.mean([offset for offset, _ in draws]) == pytest.approx(0, abs=0.03)
 
 
 def test_start_tiles_lie_on_the_valley_every_flow_uses():
@@ -24,7 +25,7 @@ def test_start_tiles_lie_on_the_valley_every_flow_uses():
     world = IslandWorld(seed=MAP_SEED, scenario="volcano")
     for distance, tile in sweep.start_tiles().items():
         assert tile in world.valleys[0]
-        assert math.dist(tile, world.vent) == pytest.approx(distance, abs=.6)
+        assert math.dist(tile, world.vent) == pytest.approx(distance, abs=0.6)
 
 
 def test_run_once_is_repeatable_and_paired_on_the_world():
@@ -44,25 +45,25 @@ def test_trait_stress_reaches_lambda_in_the_quantum_arm():
     from engine.agent import SurvivalAgent
 
     state = SurvivalAgent().get_state()
-    state["stress"] = .5
-    calm = sweep.make_decider("quantum", -.2, ETA)(state)["quantum"]["lam"]
-    tense = sweep.make_decider("quantum", .2, ETA)(state)["quantum"]["lam"]
+    state["stress"] = 0.5
+    calm = sweep.make_decider("quantum", -0.2, ETA)(state)["quantum"]["lam"]
+    tense = sweep.make_decider("quantum", 0.2, ETA)(state)["quantum"]["lam"]
     assert calm < tense
 
 
 def test_holm_adjustment():
-    assert sweep.holm([.01, .04, .03]) == pytest.approx([.03, .06, .06])
+    assert sweep.holm([0.01, 0.04, 0.03]) == pytest.approx([0.03, 0.06, 0.06])
 
 
 def test_bootstrap_interval_covers_the_mean():
     rng = np.random.default_rng(1)
-    low, high = sweep.bootstrap_ci([.1, .2, .3, .4], rng)
-    assert low < .25 < high
+    low, high = sweep.bootstrap_ci([0.1, 0.2, 0.3, 0.4], rng)
+    assert low < 0.25 < high
 
 
 def test_sign_flip_test_flags_a_clear_effect_and_not_a_null():
     rng = np.random.default_rng(2)
-    assert sweep.bootstrap_p([.2] * 30, rng) < .01
+    assert sweep.bootstrap_p([0.2] * 30, rng) < 0.01
     assert sweep.bootstrap_p([0.0] * 30, rng) == 1.0
 
 
@@ -93,7 +94,10 @@ def test_order_gap_at_defaults_matches_the_paper():
 
 
 def test_sensitivity_verdicts_flag_a_sign_change():
-    rows = [dict(constant=name, value=1, is_default=True, order_gap=.14, delay=.5, delay_se=.1, survival_quantum=.99, survival_mixture=.99) for name in sensitivity.GRID]
-    rows.append(dict(constant="angle_scale", value=2, is_default=False, order_gap=-.1, delay=.5, delay_se=.1, survival_quantum=.99, survival_mixture=.99))
+    rows = [
+        dict(constant=name, value=1, is_default=True, order_gap=0.14, delay=0.5, delay_se=0.1, survival_quantum=0.99, survival_mixture=0.99)
+        for name in sensitivity.GRID
+    ]
+    rows.append(dict(constant="angle_scale", value=2, is_default=False, order_gap=-0.1, delay=0.5, delay_se=0.1, survival_quantum=0.99, survival_mixture=0.99))
     verdict = sensitivity.verdicts(rows)
     assert verdict["angle_scale"]["order_gap"] is False and verdict["STRESS_SPAN"]["order_gap"] is True

@@ -1,5 +1,5 @@
 # =============================================================================
-# .gitignore - Stranded: Quantum Cognition Survival Engine
+# .gitignore - Qognition
 # =============================================================================
 
 # --- Python Bytecode & Build Artifacts ---
@@ -100,10 +100,8 @@ RISKS_AND_FAQ.md
 *risks*.md
 *RISKS*.md
 
-# Tracked on purpose: these three carry public claims about the project.
-!/PLAN.md
-!/TECH_STACK.md
-!/RISKS_AND_FAQ.md
+# Tracked on purpose: the project's original plans, kept for the record.
+!/docs/archive/*.md
 
 # --- Generated end-of-event reports ---
 exports/reports/

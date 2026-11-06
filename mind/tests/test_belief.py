@@ -2,6 +2,7 @@
 
 In this stage lam is always 0; dephasing is added to run_events in Stage 3.
 """
+
 import numpy as np
 import pytest
 

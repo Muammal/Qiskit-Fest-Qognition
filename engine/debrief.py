@@ -3,11 +3,12 @@
 One debrief at the end, no mid-run cutscenes. Titles are based on the steps actually
 endured, and the paired comparison reruns the same seed with the other mind.
 """
+
 import threading
 
 from engine.events import VOLCANIC
 
-HOURS_PER_STEP = {"titanic": 5 / 60, "pompeii": .25, "waterloo": 10 / 3600}
+HOURS_PER_STEP = {"titanic": 5 / 60, "pompeii": 0.25, "waterloo": 10 / 3600}
 MODEL_FOOTER = "A model, not a prediction."
 
 

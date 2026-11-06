@@ -45,7 +45,7 @@ One test was already failing before this work: `stranded_physics/core/tests/test
 **Different from the prompt:**
 
 - **Item 4:** the old text, ".33, against .04", was hard-coded but not wrong. From the default start the computed gaps are 0.328 and 0.043. It is computed now anyway.
-- **Item 5:** `RISKS_AND_FAQ.md`, `PLAN.md` and `TECH_STACK.md` were git-ignored, so these edits first existed only locally. They are now tracked, with exceptions in `.gitignore`.
+- **Item 5:** the FAQ and plans were git-ignored, so these edits first existed only locally. They are now tracked, as `docs/FAQ.md` and in `docs/archive/`.
 
 ## Phase 2: scientific work
 
@@ -149,6 +149,14 @@ A bug in the script's first draft was caught by a unit test before the run. It i
 ## Sim files and the easier builder
 
 The builder opens on starting points, with a checklist, undo, plain messages and an Advanced switch. `.qsim` files carry a scenario and seed to any copy of the app, and the community gallery publishes them through GitHub. See [SIM_FILES.md](SIM_FILES.md).
+
+## Licence, review and repository cleanup
+
+- **Licences:** code is Apache-2.0, community sims are CC BY 4.0, and `NOTICE` says what neither covers.
+- **Review:** `community/REVIEW.md`, automatic gallery rules, `CODEOWNERS` and a pull request template.
+- **Project files:** `pyproject.toml`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `AUTHORS`, `.editorconfig`, `.gitattributes`, `requirements-dev.txt`, and a CI workflow.
+- **Code:** `ruff` lint and format now pass across the repository. Formatting touched about 200 files, with no intended change in behaviour.
+- **Removed or moved:** the stray root `timeline.json`, machine-specific paths in docs, game-brand references, and the hackathon plans, now in `docs/archive/`.
 
 ## Tests
 
