@@ -42,6 +42,18 @@ ETA = -0.7853897988344999
 STRESS_FLOOR = 0.2
 STRESS_SPAN = 0.7
 
+# Dephasing per decision slot, or per unit of time. "per_slot" is the paper's model.
+# REFERENCE_SLOT_SECONDS is the 2 h step that lam(stress) was defined on.
+DEPHASING_MODE = "per_slot"
+REFERENCE_SLOT_SECONDS = 7200.0
+
+# Opt-in comparison arm, fitted by mind/human_tests/extended.py on disjunction.csv only.
+# Median of the split-half fits. Nothing in the simulator was used to choose it.
+MARKOV_HESITATION = 0.0
+
+# Opt-in qr_unitary_superposed: decision start angle per unit of |x|, in radians. Same source.
+SUPERPOSED_PHI = 0.0
+
 # D3 / Section 4.7.
 ORDER_GAP_REPORT_THRESHOLD = 0.02
 DECISION_RULE = "argmax"

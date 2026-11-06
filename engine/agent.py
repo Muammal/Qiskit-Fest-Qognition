@@ -14,6 +14,8 @@ class SurvivalAgent:
     Conforms to the state schema defined in contracts.py.
     """
 
+    dt_seconds = 7200  # one decision slot; read only when a mind runs with dephasing_mode="per_time"
+
     def __init__(self, start_pos: Optional[List[int]] = None):
         self.scenario = "volcano"
         self.explore_walk = "random"  # "grover" opts in to contracts.explore_step on the island
@@ -55,7 +57,8 @@ class SurvivalAgent:
             "stress": round(self.stress, 3),
             "injured": self.injured,
             "inventory": dict(self.inventory),
-            "recent_events": list(self.recent_events)
+            "recent_events": list(self.recent_events),
+            "dt_seconds": self.dt_seconds
         }
         contracts.validate_state(state)
         return state

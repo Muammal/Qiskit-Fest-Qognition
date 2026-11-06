@@ -91,6 +91,8 @@ def relay_chance(distance_tiles):
 
 
 class Citizen(SurvivalAgent):
+    dt_seconds = 900  # decides every fifteen-minute step
+
     def __init__(self, agent_id, role, group_household, start_pos, home):
         super().__init__(start_pos)
         self.id, self.role = agent_id, role

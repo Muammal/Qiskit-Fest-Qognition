@@ -11,10 +11,12 @@ Also exports continuous-time GKSL Lindblad open-system evolution
 import numpy as np
 
 from mind.cognition_models import evolve_lindblad, lindblad_rhs
-from mind.config import STRESS_FLOOR, STRESS_SPAN
+from mind.config import REFERENCE_SLOT_SECONDS, STRESS_FLOOR, STRESS_SPAN
 
 __all__ = [
     "decoherence_strength",
+    "decoherence_time",
+    "lam_for_interval",
     "apply_phase_damping",
     "lindblad_rhs",
     "evolve_lindblad",
@@ -24,6 +26,29 @@ __all__ = [
 def decoherence_strength(stress):
     """lam = clamp((stress - STRESS_FLOOR) / STRESS_SPAN, 0, 1). D5."""
     return float(np.clip((stress - STRESS_FLOOR) / STRESS_SPAN, 0.0, 1.0))
+
+
+def decoherence_time(stress):
+    """tau(stress) in seconds, chosen so a 2 h interval gives exactly lam(stress).
+
+    lam = 0 gives inf (no dephasing) and lam = 1 gives 0 (instant dephasing).
+    """
+    lam = decoherence_strength(stress)
+    if lam <= 0.0:
+        return float("inf")
+    if lam >= 1.0:
+        return 0.0
+    return float(-REFERENCE_SLOT_SECONDS / np.log1p(-lam))
+
+
+def lam_for_interval(stress, dt_seconds):
+    """lam_slot = 1 - exp(-dt / tau(stress)). At dt = 2 h this equals decoherence_strength."""
+    tau = decoherence_time(stress)
+    if tau == float("inf"):
+        return 0.0
+    if tau == 0.0:
+        return 1.0 if dt_seconds > 0 else 0.0
+    return float(-np.expm1(-dt_seconds / tau))
 
 
 def apply_phase_damping(rho, lam):

@@ -155,6 +155,7 @@ def build_patrons(world, seed, population=DEFAULT_POPULATION, decision_seconds=D
         for _ in range(role_counts(population)[role]):
             place = rng.choices(names, weights)[0]
             agent = Patron(len(people), role, rng.choice(places[place]), rng.randrange(cycle))
+            agent.dt_seconds = decision_seconds
             agent.needs["safety"] = round(agent.needs["safety"] + rng.choice((-.05, 0., .05)), 3)  # same jitter as Pompeii
             agent.stress = round(agent.stress + rng.choice((-.05, 0., .05)), 3)
             people.append(agent)

@@ -13,16 +13,18 @@ from engine.events import EventGenerator, VOLCANIC
 from engine.volcano import VolcanoModel
 
 try:
-    from mind.quantum_mind import classical_mixture_decide
+    from mind.quantum_mind import (classical_mixture_decide, classical_no_interference_decide,
+                                   markov_hesitation_decide)
 except ImportError:
-    classical_mixture_decide = None
+    classical_mixture_decide = classical_no_interference_decide = markov_hesitation_decide = None
 
 DEFAULT_STEPS = 36  # assumption: 72 hours, two hours per step
 
 
 class SimulationEngine:
     def __init__(self, seed=42, mind_type='quantum', noise_source='stub', decide_fn=None,
-                 scenario='volcano', scripted_events=None, explore_walk='random'):
+                 scenario='volcano', scripted_events=None, explore_walk='random',
+                 warning_lead_override_hours=None, spawn_override=None, decision_seed=None):
         self.seed, self.mind_type = seed, mind_type.lower()
         self.noise_source = noise_source
         self.scenario = scenario
@@ -54,9 +56,12 @@ class SimulationEngine:
             self.initial_world = copy.deepcopy(self.world.export_dict())
             self.agent = SurvivalAgent(self.world.spawn_pos)
             self.event_gen = EventGenerator(seed, scripted_events=scripted_events)
-            self.volcano = VolcanoModel(seed, self.world, weather=self.event_gen.weather)
+            self.volcano = VolcanoModel(seed, self.world, weather=self.event_gen.weather,
+                                        warning_lead_override_hours=warning_lead_override_hours)
             self.event_gen.prepare(self.volcano)
 
+        if spawn_override is not None:
+            self.agent.pos = list(spawn_override)
         self.agent.scenario = scenario
         self.agent.explore_walk = explore_walk  # 'grover' opts in to contracts.explore_step
 
@@ -66,11 +71,16 @@ class SimulationEngine:
             self.decide_fn = contracts.quantum_decide
         elif self.mind_type == 'classical_mixture' and classical_mixture_decide is not None:
             self.decide_fn = classical_mixture_decide
+        elif self.mind_type == 'classical_no_interference' and classical_no_interference_decide is not None:
+            self.decide_fn = classical_no_interference_decide
+        elif self.mind_type == 'markov_hesitation' and markov_hesitation_decide is not None:
+            self.decide_fn = markov_hesitation_decide
         else:
             self.decide_fn = contracts.classical_decide
         self.steps = []
         self.previous_action, self.previous_moved = 'rest', False
-        self.random_state = random.Random(seed).getstate()
+        # decision_seed varies decisions on one world; the default keeps the seed's own stream.
+        self.random_state = random.Random(seed if decision_seed is None else decision_seed).getstate()
 
     def step(self):
         t = len(self.steps)

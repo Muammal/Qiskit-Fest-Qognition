@@ -59,6 +59,8 @@ STATION_QUEUE_WEIGHT = 4.  # assumption: tiles someone would walk to avoid a que
 
 
 class ShipAgent(SurvivalAgent):
+    dt_seconds = 300  # decides every five-minute step
+
     def __init__(self, agent_id, role, group, cabin_class, start_pos):
         super().__init__(start_pos)
         self.id, self.role, self.group, self.cabin_class = agent_id, role, group, cabin_class

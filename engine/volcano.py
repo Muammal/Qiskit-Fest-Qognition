@@ -19,34 +19,46 @@ PDC_WIDTH_RANGE = (1.5, 2.5)  # assumption: corridor radius in tiles
 PDC_APRON_RADIUS = 5.0  # assumption: proximal collapse apron, 1.25 km from vent
 PDC_GEOMETRY_SEED_OFFSET = 2027  # assumption: independent geometry random stream
 LAVA_RATE = 2  # assumption: at most 500 m/2 h; supplied USGS <0.15 m/s anchor
+WARNING_SWEEP_ONSET_RANGE = (16, 21)  # assumption: onset for lead sweeps, late enough for a 30 h lead
 
 
 _FORECAST_CACHE = OrderedDict()  # assumption: retain at most 128 immutable forecasts
 
 
 class VolcanoModel:
-    def __init__(self, seed, world, horizon=HORIZON, weather=None):
+    def __init__(self, seed, world, horizon=HORIZON, weather=None, warning_lead_override_hours=None):
         if weather is None:
             from engine.events import EventGenerator
             weather = EventGenerator(seed, horizon).weather
-        key = (seed, horizon, tuple(weather), world.vent, world.width, world.height,
+        key = (seed, horizon, warning_lead_override_hours, tuple(weather), world.vent, world.width, world.height,
                tuple(map(tuple,world.elevation)), tuple(map(tuple,world.tiles)),
                tuple(map(tuple,world.valleys)), tuple(map(tuple,world.zones)))
         if key in _FORECAST_CACHE:
             _FORECAST_CACHE.move_to_end(key)
             self.__dict__.update(copy.deepcopy(_FORECAST_CACHE[key]))
             return
-        self._generate(seed, world, horizon, weather)
+        self._generate(seed, world, horizon, weather, warning_lead_override_hours)
         _FORECAST_CACHE[key] = copy.deepcopy(self.__dict__)
         if len(_FORECAST_CACHE)>128:  # assumption: bounded forecast cache
             _FORECAST_CACHE.popitem(last=False)
 
-    def _generate(self, seed, world, horizon, weather):
+    def _generate(self, seed, world, horizon, weather, warning_lead_override_hours=None):
         rng = random.Random(seed)
         self.erupts = rng.random() < ERUPTION_PROBABILITY
         transition = rng.randint(*ONSET_RANGE)
         self.onset_step = transition if self.erupts else None
         self.first_pdc_step = min(horizon-1, transition+rng.choice(PDC_DELAYS)) if self.erupts else None
+        sign_step = None
+        if warning_lead_override_hours is not None:
+            # Lead-time sweeps only. Every seed erupts, the first flow comes with the onset, and the
+            # first sign comes exactly this long before it. The onset step ignores the lead, so
+            # runs that differ only in lead share the same onset and hazards.
+            transition = rng.randint(*WARNING_SWEEP_ONSET_RANGE)
+            lead_steps = round(warning_lead_override_hours / 2)
+            if lead_steps < 0 or lead_steps > transition:
+                raise ValueError(f"warning lead of {warning_lead_override_hours} h does not fit before step {transition}")
+            self.erupts, self.onset_step, self.first_pdc_step = True, transition, transition
+            sign_step = transition - lead_steps
         self.phases, self.world_events, self.hazard_by_step = [], [], []
         self.vent = world.vent
         lava, pdc, lahar = set(), set(), set()
@@ -74,6 +86,11 @@ class VolcanoModel:
             if phase == 'fading':
                 probability = SIGN_BASE * max(0, 1-(t-transition)/6)  # assumption: six-step fade
             event = rng.choice(('tremor', 'gas_plume')) if rng.random() < probability else 'none'
+            if sign_step is not None:
+                if t < sign_step:
+                    event = 'none'
+                elif t == sign_step and event == 'none':
+                    event = rng.choice(('tremor', 'gas_plume'))
             new_lava, new_pdc, new_lahar = set(), set(), set()
             active_pdc, active_lahar, surge = set(), set(), set()
             wind = (wind+rng.uniform(-6, 6)) % 360  # assumption: slow wind drift
