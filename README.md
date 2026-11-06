@@ -165,11 +165,34 @@ End-of-simulation telemetry modal displaying survivor status, cause of death, ph
 QWC/
 ├── contracts.py                  # Frozen interfaces, Grover DTQW explore_step & classical baseline
 ├── data/priors.json              # BLS ATUS baseline time-use priors
-├── main.py                       # Unified executable entrypoint (GUI, CLI, demo, batch, exports)
-├── test_contracts_and_engine.py  # Contract and engine integration test suite
+├── main.py                       # Unified executable entrypoint (GUI, CLI, demo, batch, exports, --3d)
+├── play3d.py                     # Standalone 3D front-end entrypoint (Ursina / Panda3D)
+├── requirements.txt              # Core dependencies for simulation and 2D visualizer
+├── requirements-3d.txt           # Additional dependencies for stylized 3D front-end
+├── test_contracts_and_engine.py  # Contract and engine integration test suite (68 tests)
+├── test_gui_hayday.py            # Hay Day 2D GUI and resolution scaling test suite (5 tests)
+├── test_gui3d.py                 # Stylized 3D Ursina front-end verification suite (5 tests)
 ├── test_titanic.py               # RMS Titanic scenario verification suite
 ├── test_pompeii.py               # Pompeii AD 79 scenario verification suite
 ├── test_waterloo.py              # Waterloo chlorine leak scenario verification suite
+├── tools/
+│   └── make_assets.py            # Procedural Pillow asset generator for 2D sprites, tiles & icons
+├── assets/                       # UI assets, fonts (Lilita One), tiles, icons, and theme.json
+├── gui3d/                        # Stylized 3D Front-end (Ursina / Panda3D)
+│   ├── app.py                    # Main Ursina GameApp lifecycle and scene director
+│   ├── world.py                  # Batched merged terrain mesh, scenery instancing & celestial day/night
+│   ├── models.py                 # Procedural low-poly models (Agent3D, trees, rocks, volcano, huts)
+│   ├── agent3d.py                # Animated Agent3D character with bob/walk cycles & expressive poses
+│   ├── ui.py                     # 2D HUD (vital progress bars, speech bubbles, quantum panel, wood buttons)
+│   ├── cinematics.py             # Single cinematic ending cut scene (crane orbit, count-ups, star ratings)
+│   ├── cameras.py                # Tilted 3/4 perspective, camera orbit/pan/zoom, trauma screen shake
+│   ├── shaders.py                # Stepped cel-shading & animated shoreline foam water shaders
+│   ├── particles.py              # Zero-allocation pooled particle systems (ash, rain, embers, confetti)
+│   ├── playback.py               # Pure-Python frame-by-frame simulation playback state machine
+│   ├── ending_stats.py           # Pure function evaluating grades, stars, telemetry & counterfactuals
+│   ├── data_source.py            # Multi-threaded simulation worker & replay timeline adapter
+│   ├── layout.py                 # Resolution-adaptive 1600x900 coordinate mapper & letterboxing
+│   └── palette.py                # Warm saturated Hay Day color palette (#7CC24A, #B9783F, #F8EBC8)
 ├── mind/                         # Tech A: 2-Qubit Quantum Cognitive Architecture
 │   ├── model.py                  # Deliberation unitary U(q_S, q_D) & Tversky-Shafir calibration
 │   ├── cognition_models.py       # 6 published quantum cognition models (Busemeyer, QLBN, Lindblad, etc.)
@@ -187,6 +210,11 @@ QWC/
 │   ├── catalog.py                # Automated dataset & parameter catalog builder
 │   └── gates.py                  # Physical verification gate runner (22/22 PASS)
 ├── engine/                       # Tech C: Multi-Scenario Evacuation Engine & Visualizer
+│   ├── display.py                # Resolution-adaptive 2D display manager & debounced resize
+│   ├── ui_kit.py                 # 2D Hay Day UI components (NineSlicePanel, WoodButton, OutlinedText)
+│   ├── assets.py                 # Scale-keyed cached sprite & asset loader
+│   ├── fx.py                     # Optional ModernGL post-processing (vignette, warm grade)
+│   ├── screens/                  # Modular 2D screen controllers (hub, config, ending)
 │   ├── world.py                  # Dual-scenario DEM, priority-flood drainage & Tobler pathfinder
 │   ├── volcano.py                # Ash grid, active PDC/lahar, surge & lava models
 │   ├── titanic.py                # RMS Titanic 2,208-agent simulation loop
@@ -198,7 +226,7 @@ QWC/
 │   ├── chlorine.py               # 2D advection-diffusion gas dispersion model
 │   ├── builder.py                # In-engine custom scenario creator
 │   ├── exporter.py               # Full MP4 video renderer & evacuation data exporter
-│   └── gui.py                    # 1600x900 interactive Pygame Visualizer & Dashboard
+│   └── gui.py                    # Resolution-adaptive 2D Pygame Visualizer & Dashboard
 ├── artifacts/physics/raw/        # Tech B: 19 Verified Raw Data Assets (Copernicus DEM, FABDEM, etc.)
 ├── exports/                      # Exported survival rates, policy CSVs, and full simulation videos
 └── site/                         # Product D: Client-Side Web Replay & Quantum Inspector (index.html)
@@ -310,19 +338,27 @@ python play3d.py --smoke
 The entire repository is verified using automated test suites, physical gate runners, and Qiskit validation scripts:
 
 ```powershell
-# 1. Full unified pytest suite (Tech A + Tech B + Tech C + Titanic + Pompeii + Waterloo)
+# 1. Tech C Core Integration & GUI test suites (68 contracts/engine + 5 Hay Day 2D + 5 Stylized 3D)
+python main.py --test
+# -> 78 passed in 12s
+
+# 2. Dedicated 3D headless smoke test
+python play3d.py --smoke
+# -> Exits 0 cleanly
+
+# 3. Full unified pytest suite (Tech A + Tech B + Tech C + Titanic + Pompeii + Waterloo)
 $env:SDL_VIDEODRIVER="dummy"; $env:SDL_AUDIODRIVER="dummy"; python -m pytest -q
 # -> 816 passed, 3 skipped in 13m 19s
 
-# 2. Tech B 14-Domain Physical Verification Gates
+# 4. Tech B 14-Domain Physical Verification Gates
 python -m stranded_physics.gates required
 # -> 22/22 PASS across all domains
 
-# 3. Automated Physical Parameter & Dataset Catalog Builder
+# 5. Automated Physical Parameter & Dataset Catalog Builder
 python -m stranded_physics.catalog
 # -> Generated workboard/CATALOG.md (49 datasets, 20 Pint parameters)
 
-# 4. Tech A Quantum Cognition Validation Suite
+# 6. Tech A Quantum Cognition Validation Suite
 python -m mind.experiments.validate
 # -> Generated docs/tech-a/07-validation-report.md (any_failed=False)
 ```
