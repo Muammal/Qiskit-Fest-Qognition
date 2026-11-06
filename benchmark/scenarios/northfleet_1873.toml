@@ -1,0 +1,88 @@
+# Elinder and Erixson 2012, PNAS 109(33):13220, Table 1: aboard, cause, duration, order and passenger women share.
+# Flooding approximation of collision in English Channel, United Kingdom. No shore escape or hull breakup is resolved.
+# Geometry scales Titanic dimensions by the cube root of aboard / assumed reference occupancy 2208; displacement scales linearly (assumption).
+# Equal compartments and six forward holes approximate Titanic damage (assumption).
+# Breach area matches the sinking-time input to this record; this is not tuning to survival.
+# Passenger/crew split approximates Titanic proportions using the same assumed reference occupancy, rounded; no children or class split without evidence (assumption).
+# Women share applies only to passengers, rounded to whole people; all crew treated as men (assumption).
+# Boats scale Titanic count by aboard; seats use rounded Titanic mean, launch fractions use its timeline (assumption).
+# Deck ranges and reach delays use Titanic choices; delays scale by chosen sinking time / 160 (assumption).
+# All crew are assigned to deck duty for boat manning (assumption).
+# sink_minutes = 30
+# https://en.wikipedia.org/wiki/Northfleet_(ship) - quote: sank within half an hour
+id = "northfleet_1873" # Elinder and Erixson 2012, Table 1: event identity
+title = "northfleet 1873" # Elinder and Erixson 2012, Table 1: event identity
+place = "real"
+start_utc = "1873-01-22T22:20:00+00:00" # https://en.wikipedia.org/wiki/Northfleet_(ship): date 1873-01-22; recorded local clock minus impact delay
+hours = 1 # assumption: half-hour horizon extending beyond foundering
+step_minutes = 1 # assumption: at least ten steps before and after impact before sinking
+local_utc_offset = 0 # assumption: clock is the ship's local time, encoded with zero offset
+
+[[entity]]
+kind = "ship"
+source = "dials"
+length_m = 142.86692 # assumption: Titanic-based approximation as described above
+beam_m = 15.501689 # assumption: Titanic-based approximation as described above
+draught_m = 5.795677 # assumption: Titanic-based approximation as described above
+displacement_t = 8834.191218 # assumption: Titanic-based approximation as described above
+compartments = 16 # assumption: Titanic-based approximation as described above
+bulkhead_top_m = 1.843444 # assumption: Titanic-based approximation as described above
+boat_deck_m = 9.719978 # assumption: Titanic-based approximation as described above
+
+[[entity]]
+kind = "breach"
+source = "dials"
+first_compartment = 0 # assumption: Titanic-based approximation as described above
+holed = 6 # assumption: Titanic-based approximation as described above
+area_m2 = 0.88739770 # assumption: matches sinking-time input to this record, not tuning to survival
+impact_minutes = 10 # https://en.wikipedia.org/wiki/Northfleet_(ship) - quote: around 10.30 p.m.
+alarm_minutes = 14.687500 # assumption: Titanic timeline fractions scaled to chosen sinking duration
+
+[[entity]]
+kind = "lifeboats"
+source = "dials"
+boats = 3 # assumption: Titanic-based approximation as described above
+seats = 59 # assumption: Titanic-based approximation as described above
+first_launch_minutes = 20.626930 # assumption: Titanic timeline fractions scaled to chosen sinking duration
+last_launch_minutes = 37.501930 # assumption: Titanic timeline fractions scaled to chosen sinking duration
+women_first = 1 # Elinder and Erixson 2012, Table 1: women and children first order
+port_women_only = 0 # assumption: no separate port restriction
+
+[[entity]]
+kind = "sea"
+source = "dials"
+temperature_c = 7 # assumption, typical for the place and month: English Channel, United Kingdom, 01
+
+[[entity]]
+kind = "weather"
+source = "dials"
+rain_mm_h = 0.0 # assumption: Titanic-based approximation as described above
+wind_m_s = 0.0 # assumption: Titanic-based approximation as described above
+wind_bearing_deg = 0.0 # assumption: Titanic-based approximation as described above
+temperature_c = 0.0 # assumption: Titanic-based approximation as described above
+upper_wind_m_s = 0.0 # assumption: Titanic-based approximation as described above
+upper_bearing_deg = 0.0 # assumption: Titanic-based approximation as described above
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "passengers"
+men = 170 # assumption: remaining passengers after rounded women count
+women = 50 # Elinder and Erixson 2012, Table 1: 22.8% of assumed 220 passengers, rounded
+children = 0 # assumption: Titanic-based approximation as described above
+deck_from = 0.05 # assumption: Titanic-based approximation as described above
+deck_to = 0.95 # assumption: Titanic-based approximation as described above
+reach_minutes = 4.687500 # assumption: Titanic reach delay scaled to chosen sinking duration
+boat_crew = 0.0 # assumption: Titanic-based approximation as described above
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "crew_deck"
+men = 147 # assumption: Titanic-based approximation as described above
+women = 0 # assumption: Titanic-based approximation as described above
+children = 0 # assumption: Titanic-based approximation as described above
+deck_from = 0.25 # assumption: Titanic-based approximation as described above
+deck_to = 0.65 # assumption: Titanic-based approximation as described above
+reach_minutes = 0.000000 # assumption: Titanic reach delay scaled to chosen sinking duration
+boat_crew = 1.0 # assumption: Titanic-based approximation as described above
