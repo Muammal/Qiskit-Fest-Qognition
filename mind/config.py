@@ -49,10 +49,10 @@ REFERENCE_SLOT_SECONDS = 7200.0
 
 # Opt-in comparison arm, fitted by mind/human_tests/extended.py on disjunction.csv only.
 # Median of the split-half fits. Nothing in the simulator was used to choose it.
-MARKOV_HESITATION = 0.0
+MARKOV_HESITATION = 0.2396072020948411
 
 # Opt-in qr_unitary_superposed: decision start angle per unit of |x|, in radians. Same source.
-SUPERPOSED_PHI = 0.0
+SUPERPOSED_PHI = -0.2705260340591211
 
 # D3 / Section 4.7.
 ORDER_GAP_REPORT_THRESHOLD = 0.02
