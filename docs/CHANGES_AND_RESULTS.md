@@ -144,7 +144,7 @@ A bug in the script's first draft was caught by a unit test before the run. It i
 
 ## Tests
 
-The standard command gives 413 passed, 3 skipped (the 3 need `qiskit_ibm_runtime`, which is not installed here). `test_ui_layout.py`, `test_gui3d.py` and `mind/human_tests` add 75 passed. The README had claimed 712, which matched nothing. New files: `mind/tests/test_paper_baseline.py`, `test_cross_check_verdicts.py`, `test_phase1_honesty.py`, `test_readme_numbers.py`, `test_extended_models.py`, `test_synthetic_recovery.py`, `test_time_aware.py`, `test_lead_sweep.py`, and `test_ui_layout.py`.
+The standard command gives 413 passed, 3 skipped (the 3 need `qiskit_ibm_runtime`, which is not installed here). `test_ui_layout.py` and `mind/human_tests` add 64 passed. The README had claimed 712, which matched nothing. New files: `mind/tests/test_paper_baseline.py`, `test_cross_check_verdicts.py`, `test_phase1_honesty.py`, `test_readme_numbers.py`, `test_extended_models.py`, `test_synthetic_recovery.py`, `test_time_aware.py`, `test_lead_sweep.py`, and `test_ui_layout.py`.
 
 ## Suggested paper edits
 
