@@ -152,10 +152,25 @@ Procedural 40×40 topographic island wilderness and volcanic evacuation environm
 
 ---
 
-### 8. Mission Debrief & Comparative Telemetry Modal
-End-of-simulation telemetry modal displaying survivor status, cause of death, physiological logs, and instant single-click buttons for replay or mind-to-mind comparison on the exact same seed.
+### 8. Single Cinematic Ending Cut Scene
+Replaces intrusive mid-run modals with **one** uninterrupted, cinematic game-ending sequence triggered only upon run completion (survived to horizon or fatal conclusion):
+- **Atmospheric Transition**: Ambient vignette and sky-mood shift (warm sunrise for survival, dusk/ash for disaster).
+- **Outlined Ribbon Title Card**: Scenario-tailored banners (*"Rescued at Dawn"*, *"Against All Odds"*, *"The Island Claimed Them"*, *"Lost to the Eruption"*).
+- **Staggered Results Reveal & Animated Count-Ups**:
+  - **Grade & Stars**: Tiered letter grades (**S / A / B / C / D**) paired with 1–3 animated gold stars calculated from survival longevity and physiological vitals.
+  - **Survival Rate**: Count-up percentage of the horizon endured, along with background-computed counterfactual comparisons (**Quantum vs Classical** on the identical seed).
+  - **Comprehensive Telemetry**: Lowest vital timestamp, resources gathered/consumed, distance covered, shelter construction count, and hazard zones crossed.
+  - **Quantum Cognition Highlights**: Decision divergences against classical baselines, cue order-effect interference count, and stress-induced decoherence episodes.
+  - **Decision Timeline Strip**: Chronological action strip with color-coded badges and hazard markers.
+  - **Closing Epilogue & Freeze Frame**: Expressive character freeze frame (happy, exhausted, or fallen) and epilogue narrative quote.
+  - **Tactile Navigation**: WoodButtons and hotkeys for Replay (`[R]`), New Seed (`[N]`), Switch Mind (`[Q]`), and Main Menu (`[ESC]`/`[H]`), with `[SPACE]`/`[ENTER]` animation skipping.
 
-![Mission Debrief Modal](docs/images/05_mission_debrief.png)
+---
+
+### 9. Resolution-Adaptive Rendering & Design System
+- **Crisp Vector & Procedural Graphics**: Tactile *Hay Day*-inspired palette (#7CC24A grass, #B9783F carved timber, #F8EBC8 warm parchment, #3B2312 espresso borders) powered by `tools/make_assets.py` procedural generator and bundled with `Lilita One` Google font.
+- **Resolution-Adaptive Scale Manager (`engine/display.py`)**: Seamless rendering from 1024×576 up to 4K Ultrawide (21:9) using quantized design scaling (`Display.S()`), DPI awareness, and ~150ms debounced window resize caching.
+- **Zero Mid-Run Interruptions**: Runs in Island Wilderness and Volcano Evacuation proceed completely uninterrupted—no modal popups, forced freezes, or dialogue modals pause the simulation during gameplay.
 
 ---
 
@@ -166,10 +181,14 @@ QWC/
 ├── contracts.py                  # Frozen interfaces, Grover DTQW explore_step & classical baseline
 ├── data/priors.json              # BLS ATUS baseline time-use priors
 ├── main.py                       # Unified executable entrypoint (GUI, CLI, demo, batch, exports)
-├── test_contracts_and_engine.py  # Contract and engine integration test suite
+├── test_contracts_and_engine.py  # Contract and engine integration test suite (68 tests)
+├── test_gui_hayday.py            # Hay Day GUI, resolution scaling & uninterrupted sim suite (4 tests)
 ├── test_titanic.py               # RMS Titanic scenario verification suite
 ├── test_pompeii.py               # Pompeii AD 79 scenario verification suite
 ├── test_waterloo.py              # Waterloo chlorine leak scenario verification suite
+├── tools/
+│   └── make_assets.py            # Procedural Pillow asset generator (sprites, tiles, icons)
+├── assets/                       # UI assets, fonts (Lilita One), tiles, icons, and theme.json
 ├── mind/                         # Tech A: 2-Qubit Quantum Cognitive Architecture
 │   ├── model.py                  # Deliberation unitary U(q_S, q_D) & Tversky-Shafir calibration
 │   ├── cognition_models.py       # 6 published quantum cognition models (Busemeyer, QLBN, Lindblad, etc.)
@@ -187,6 +206,14 @@ QWC/
 │   ├── catalog.py                # Automated dataset & parameter catalog builder
 │   └── gates.py                  # Physical verification gate runner (22/22 PASS)
 ├── engine/                       # Tech C: Multi-Scenario Evacuation Engine & Visualizer
+│   ├── display.py                # Resolution-adaptive display manager & debounced resize
+│   ├── ui_kit.py                 # Hay Day UI components (NineSlicePanel, WoodButton, OutlinedText)
+│   ├── assets.py                 # Scale-keyed cached sprite & asset loader
+│   ├── fx.py                     # Optional ModernGL post-processing (vignette, warm grade)
+│   ├── screens/                  # Modular screen controllers
+│   │   ├── hub.py                # Event Choice Hub with hanging wooden signboards
+│   │   ├── config.py             # Scenario configuration parchment modal
+│   │   └── ending.py             # Single cinematic ending cut scene & stats evaluator
 │   ├── world.py                  # Dual-scenario DEM, priority-flood drainage & Tobler pathfinder
 │   ├── volcano.py                # Ash grid, active PDC/lahar, surge & lava models
 │   ├── titanic.py                # RMS Titanic 2,208-agent simulation loop
@@ -198,7 +225,7 @@ QWC/
 │   ├── chlorine.py               # 2D advection-diffusion gas dispersion model
 │   ├── builder.py                # In-engine custom scenario creator
 │   ├── exporter.py               # Full MP4 video renderer & evacuation data exporter
-│   └── gui.py                    # 1600x900 interactive Pygame Visualizer & Dashboard
+│   └── gui.py                    # Resolution-adaptive Pygame Visualizer & Dashboard
 ├── artifacts/physics/raw/        # Tech B: 19 Verified Raw Data Assets (Copernicus DEM, FABDEM, etc.)
 ├── exports/                      # Exported survival rates, policy CSVs, and full simulation videos
 └── site/                         # Product D: Client-Side Web Replay & Quantum Inspector (index.html)
