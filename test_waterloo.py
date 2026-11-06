@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 
 import contracts
-from engine.chlorine import LEAK_SITES, LEAK_START_STEP, ODOUR_PPM, SOURCE_PPM, ChlorineModel, exposure_level, wind_at
-from engine.patrons import POPULATION_SETTINGS, role_counts, smell_chance
+from engine.chlorine import LEAK_SITES, LEAK_START_STEP, ODOUR_PPM, SOURCE_PPM, STEP_SECONDS, ChlorineModel, exposure_level, wind_at
+from engine.patrons import POPULATION_SETTINGS, Patron, role_counts, smell_chance
 from engine.scenes_waterloo import SCENES, WaterlooCutscenes
 from engine.site import BUILDING, DOORS, POOL, POOL_GATES, PROVENANCE, SITE_M_PER_TILE, SiteWorld
 from engine.waterloo import EVENT_MAPPINGS, WaterlooSimulation
@@ -391,3 +391,35 @@ def test_alarm_pool_scene_plays_when_the_alarm_starts():
     sim = WaterlooSimulation(seed=3)
     scenes = _all_scenes(sim)
     assert next(s for s in scenes if s["kind"] == "alarm_pool")["t"] == sim.alarm_step
+
+
+# --- Walking speed ---
+
+def _walk_metres(role, start, steps, world):
+    patron = Patron(0, role, list(start), 0)
+    field = world.next_step_field(world.exits.values())
+    moved, position = 0., tuple(start)
+    for _ in range(steps):
+        patron.walk(world, field)
+        while position != tuple(patron.pos):
+            position = field[position]
+            moved += SITE_M_PER_TILE
+    return moved
+
+
+def test_average_walking_speed_matches_the_sourced_values(world):
+    # From the north end of the building, the route to an exit is long and stays out of the water.
+    for role, speed in (("adult", 1.3), ("child", 1.5)):
+        steps = 6
+        assert _walk_metres(role, (20, 9), steps, world) == pytest.approx(speed * steps * STEP_SECONDS, abs=SITE_M_PER_TILE)
+
+
+def test_slow_water_still_lets_people_move(world, monkeypatch):
+    import engine.site as site_module
+    monkeypatch.setattr(site_module, "WADE_M_PER_S", .25)
+    start = max(world.pool_tiles, key=lambda p: p[0] + p[1])
+    field = world.next_step_field(world.exits.values())
+    patron = Patron(0, "adult", list(start), 0)
+    for _ in range(6):
+        patron.walk(world, field)
+    assert tuple(patron.pos) != start

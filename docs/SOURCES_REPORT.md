@@ -1,15 +1,16 @@
-# Sources and derivation report: Titanic and Pompeii scenarios
+# Sources and derivation report: Titanic, Pompeii and Waterloo scenarios
 
-For use in writing up the research. It records where each number came from, how it was derived and how far it can be trusted. More detail is in [TITANIC_MODEL.md](TITANIC_MODEL.md) and [POMPEII_SOURCES.md](POMPEII_SOURCES.md).
+For use in writing up the research. It records where each number came from, how it was derived and how far it can be trusted. More detail is in [TITANIC_MODEL.md](TITANIC_MODEL.md), [POMPEII_SOURCES.md](POMPEII_SOURCES.md) and [WATERLOO_SOURCES.md](WATERLOO_SOURCES.md).
 
 **Scope:** every scenario built so far. Later scenarios should be added here.
 
 ## Summary
 
 - Both scenarios run everyone on the same, unedited quantum mind: 2,208 people on Titanic and 11,500 in Pompeii. Role and status never reach it.
+- Waterloo runs 100 people by default on the same mind. It is a hypothetical at a real site, because almost nothing about the real 2012 leak could be confirmed.
 - **These are demonstrations, not reconstructions.** Agreement with history is weak evidence, and neither scenario was fitted to history.
 - **Results depend heavily on modelling choices with no source.** In Pompeii, `quantum` deaths range from 0 to about 11,400 depending on those choices.
-- **The results do not show that quantum cognition explains real evacuations.** A coherence effect appears under one Pompeii mapping and in none of the other three. On Titanic, `quantum` and its no-coherence control are close.
+- **The results do not show that quantum cognition explains real evacuations.** A coherence effect appears under one Pompeii mapping and in none of the other three. On Titanic, `quantum` and its no-coherence control are close. At Waterloo it appears under two of three mappings, and nearly vanishes under the third.
 
 ## Status labels
 
@@ -34,6 +35,8 @@ For use in writing up the research. It records where each number came from, how 
 | [Luongo et al. (2003)](https://www.iris.unina.it/handle/11588/163033), doi:10.1016/S0377-0273(03)00147-1 | Victim counts. Abstract only |
 | [Sigurdsson et al. (1985)](https://digitalcommons.uri.edu/gsofacpubs/1114) and [Carey & Sigurdsson (1987)](https://digitalcommons.uri.edu/gsofacpubs/1107) | Classic chronology. Abstracts only |
 | Seth Bernard's article in *Past & Present*, reported by [Hyperallergic](https://hyperallergic.com/new-research-shows-slaverys-outsized-role-in-pompeiis-economy) | Enslaved share. News report only |
+| [CTV Kitchener, 31 July 2012](https://www.ctvnews.ca/kitchener/article/chlorine-leak-forces-evacuation-at-waterloo-community-centre/) and the *Waterloo Region Record* archive | Waterloo incident. Article body did not load; only the caption was read |
+| Forssberg et al. (2019), Larusdottir and Dederichs (*Fire Technology*), Hashempour et al. (doi:10.1002/fam.3209), SFPE Handbook | Evacuation behaviour. Excerpts only, or not obtained |
 
 ## Method common to both
 
@@ -178,6 +181,20 @@ Five seeds (1-5), one change at a time. Mean deaths. Full table in [POMPEII_SOUR
 
 ---
 
+## Waterloo
+
+A hypothetical evacuation at Moses Springer Community Centre, not a reconstruction. All numbers, links, status labels and assumption tests are in [WATERLOO_SOURCES.md](WATERLOO_SOURCES.md).
+
+**Sourced:** the facility and its outlines (City of Waterloo, OpenStreetMap), chlorine limits (EPA, NIOSH, CDC), walking speeds (Rinne et al. 2010), and modelled weather (Open-Meteo).
+
+**Assumed:** the head-count and roles, leak place, size and length, doors and interior, how gas spreads, the chances of noticing, and the alarm.
+
+**Main results,** 100 people, 10 seeds, time until half have left: mapping A `quantum` 564 s against 241 s for `classical_mixture`; mapping B `quantum` 253 s. With the alarm off under A, about 25 of 100 `quantum` people leave against about 91. Mapping A was chosen after seeing results. The alarm is the strongest assumption, and whether the centre had one in 2012 is unknown.
+
+**Comparability:** the mind's three-event memory spans 3 minutes here, 45 minutes in Pompeii and 6 hours on the island. Harm is counted differently too: exposure levels here, deaths in Titanic and Pompeii.
+
+---
+
 ## A risk in how the mind is loaded
 
 `contracts.py` and `mind/quantum_mind.py` import each other. If `mind` is imported first, `contracts.quantum_decide` silently uses a heuristic stub instead of the quantum mind, with no error. Checked on 5 November 2026: the window and command-line launchers, the Titanic, Pompeii and Waterloo simulations and the three sweep scripts all load the real mind. A test-only `conftest.py` keeps plain `pytest` on the real mind. The fallback itself remains, so any new script should import `contracts` first and confirm that decisions include a `quantum` field.
@@ -189,10 +206,12 @@ Five seeds (1-5), one change at a time. Mean deaths. Full table in [POMPEII_SOUR
 **Supported, as statements about the model:**
 - The same mind reaches different decisions when people hear the same events in a different order.
 - Results are highly sensitive to how events are translated, and to the unsourced assumptions listed above.
-- Under mapping C only, removing coherence greatly reduces deaths.
+- In Pompeii, under mapping C only, removing coherence greatly reduces deaths.
+- At Waterloo, removing coherence shortens evacuation time under mappings A and C, and barely changes it under B.
 
 **Not supported:**
-- That quantum cognition explains behaviour on the Titanic or at Pompeii.
+- That quantum cognition explains behaviour on the Titanic, at Pompeii or at Waterloo.
+- That Waterloo shows what happened on 30 July 2012, or anything about the centre's staff or safety systems.
 - That either scenario reproduces what happened. Totals that fall near history are not validation.
 - That the simulations show how any real person, or any group such as enslaved people, thought or acted. The written thoughts on screen are templates, not model output.
 
