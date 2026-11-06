@@ -65,6 +65,37 @@ class EventChoiceHubScreen:
         self.btn_waterloo = WoodButton(pygame.Rect(0, 0, 170, 38), "Waterloo Chlorine [5]", 14, bg_color=(68, 128, 60), callback=self.on_choose_waterloo)
         self.btn_builder = WoodButton(pygame.Rect(0, 0, 190, 38), "Scenario Builder [B]", 14, bg_color=(140, 60, 180), callback=self.on_choose_builder)
 
+        # Initial layout at reference 1600x900 resolution
+        self._layout(1600, 900)
+
+    def _layout(self, w: int, h: int):
+        board_w = min(Display.S(540), int((w - Display.S(100)) // 2))
+        board_h = min(Display.S(580), int(h * 0.68))
+        board_spacing = Display.S(40)
+        total_w = board_w * 2 + board_spacing
+        start_x = (w - total_w) // 2
+        base_y = Display.S(150)
+
+        self.card_island_rect = pygame.Rect(start_x, base_y - int(self.bounce_island), board_w, board_h)
+        self.card_volcano_rect = pygame.Rect(start_x + board_w + board_spacing, base_y - int(self.bounce_volcano), board_w, board_h)
+
+        self.btn_play_island.orig_rect = pygame.Rect(self.card_island_rect.centerx - Display.S(110), self.card_island_rect.bottom - Display.S(68), Display.S(220), Display.S(48))
+        self.btn_play_volcano.orig_rect = pygame.Rect(self.card_volcano_rect.centerx - Display.S(110), self.card_volcano_rect.bottom - Display.S(68), Display.S(220), Display.S(48))
+
+        bar_h = Display.S(54)
+        bar_y = h - bar_h - Display.S(12)
+        btn_w = Display.S(180)
+        btn_h = Display.S(38)
+        spacing = Display.S(12)
+        total_btns_w = btn_w * 4 + spacing * 3
+        bx = (w - total_btns_w) // 2
+        by = bar_y + (bar_h - btn_h) // 2
+
+        self.btn_titanic.orig_rect = pygame.Rect(bx, by, btn_w, btn_h)
+        self.btn_pompeii.orig_rect = pygame.Rect(bx + (btn_w + spacing), by, btn_w, btn_h)
+        self.btn_waterloo.orig_rect = pygame.Rect(bx + (btn_w + spacing) * 2, by, btn_w, btn_h)
+        self.btn_builder.orig_rect = pygame.Rect(bx + (btn_w + spacing) * 3, by, btn_w, btn_h)
+
     def update(self, dt: float, mouse_pos: Tuple[int, int]):
         self.anim_time += dt
 
@@ -75,6 +106,8 @@ class EventChoiceHubScreen:
                 c[0] = -300
 
         # Hover bounces (smooth ease in/out)
+        self.hover_island = self.card_island_rect.collidepoint(mouse_pos)
+        self.hover_volcano = self.card_volcano_rect.collidepoint(mouse_pos)
         target_bi = Display.S(12) if self.hover_island else 0.0
         target_bv = Display.S(12) if self.hover_volcano else 0.0
         self.bounce_island += (target_bi - self.bounce_island) * min(1.0, 12.0 * dt)
@@ -86,27 +119,19 @@ class EventChoiceHubScreen:
 
     def handle_event(self, event: pygame.event.Event, mouse_pos: Tuple[int, int]) -> bool:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if self.btn_play_island.handle_mouse_down(mouse_pos) or self.card_island_rect.collidepoint(mouse_pos):
+            for b in (self.btn_play_island, self.btn_play_volcano, self.btn_titanic, self.btn_pompeii, self.btn_waterloo, self.btn_builder):
+                if b.handle_mouse_down(mouse_pos):
+                    return True
+            if self.card_island_rect.collidepoint(mouse_pos):
                 self.on_choose_island()
                 return True
-            elif self.btn_play_volcano.handle_mouse_down(mouse_pos) or self.card_volcano_rect.collidepoint(mouse_pos):
+            elif self.card_volcano_rect.collidepoint(mouse_pos):
                 self.on_choose_volcano()
-                return True
-            elif self.btn_titanic.handle_mouse_down(mouse_pos):
-                if self.on_choose_titanic: self.on_choose_titanic()
-                return True
-            elif self.btn_pompeii.handle_mouse_down(mouse_pos):
-                if self.on_choose_pompeii: self.on_choose_pompeii()
-                return True
-            elif self.btn_waterloo.handle_mouse_down(mouse_pos):
-                if self.on_choose_waterloo: self.on_choose_waterloo()
-                return True
-            elif self.btn_builder.handle_mouse_down(mouse_pos):
-                if self.on_choose_builder: self.on_choose_builder()
                 return True
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             for b in (self.btn_play_island, self.btn_play_volcano, self.btn_titanic, self.btn_pompeii, self.btn_waterloo, self.btn_builder):
-                b.handle_mouse_up(mouse_pos)
+                if b.handle_mouse_up(mouse_pos):
+                    return True
         elif event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_1, pygame.K_KP1, pygame.K_i):
                 self.on_choose_island()
@@ -126,16 +151,12 @@ class EventChoiceHubScreen:
             elif event.key in (pygame.K_6, pygame.K_KP6, pygame.K_b):
                 if self.on_choose_builder: self.on_choose_builder()
                 return True
-                self.on_choose_island()
-                return True
-            elif event.key in (pygame.K_2, pygame.K_v):
-                self.on_choose_volcano()
-                return True
         return False
 
-    def draw(self, surface: pygame.Surface, mouse_pos: Tuple[int, int]):
+    def draw(self, surface: pygame.Surface, mouse_pos: Tuple[int, int] = (0, 0)):
         w = surface.get_width()
         h = surface.get_height()
+        self._layout(w, h)
 
         # 1. Sky & Sunlit Gradient Backdrop
         surface.fill(COLOR_SKY)
