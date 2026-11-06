@@ -63,3 +63,15 @@ The holdout score is computed at most **three times**: (1) before any tuning, (2
 ## Behaviour, not only survival
 
 Where records allow, the benchmark also compares behaviour, for example how full the Titanic's boats were when they left. These measures are added to `targets.csv` before they're scored.
+
+## Amendment, 6 November 2026: tune shared settings only
+
+Written while checkpoint 1 was running, before any of its results were seen.
+
+`benchmark/TUNABLE.md` shows that the classical mind in `contracts.py` has no settings of its own, and every constant in `mind/config.py` affects only the quantum mind and the classical control. Tuning mind settings would let only the quantum mind improve, and a better quantum score would then partly reflect that. So:
+
+- **Mind settings aren't tuned.** Every mind keeps its defaults, including `DECISION_RULE = "argmax"`.
+- **Only the `[shared]` settings are tuned:** `reach_minutes_scale`, `boat_crew_share` and `lifebelt`. They apply identically to every mind and both bounds.
+- **Budget:** 20 tuning runs in total, logged in `benchmark/LOG.md` as lines `- run <n> mind=shared <settings> error=<value>`, and checked with `benchmark.tuning.check_budget(log, "shared")`.
+- **What tuning aims for:** the lowest calibration error averaged over the three minds, with each mind weighted equally, so that no mind is favoured.
+- Checkpoints 2 and 3 use the tuned shared settings for every mind.
