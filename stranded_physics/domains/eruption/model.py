@@ -1,4 +1,5 @@
 """Evidence-backed event times with explicit unresolved column assumptions."""
+
 from __future__ import annotations
 
 import csv
@@ -11,7 +12,7 @@ from stranded_physics.core.api import InterfaceError
 from stranded_physics.core.fields import spec
 from stranded_physics.core.records import load_parameters
 
-METRES_PER_KM = 1000.
+METRES_PER_KM = 1000.0
 
 HERE = Path(__file__).resolve().parent
 PARAMETERS = load_parameters(HERE / "params.toml")
@@ -70,6 +71,7 @@ class Eruption:
                 read_events()
             else:
                 from .generator import validate_generated
+
                 validate_generated(self.generated)
         except (OSError, ValueError, KeyError) as error:
             return [str(error)]
@@ -88,7 +90,7 @@ class Eruption:
             moments = np.arange(self.time.n) * self.time.dt_s
             escalation = self.generated.onset_s - self.generated.lead_s
         first = events[0][0]
-        phase = np.where(moments >= first, 2., np.where(moments >= escalation, 1., 0.))
+        phase = np.where(moments >= first, 2.0, np.where(moments >= escalation, 1.0, 0.0))
         run_up = phase == 1
         tremor, gas = np.zeros(self.time.n), np.zeros(self.time.n)
         draws = rng.random((int(run_up.sum()), 2))
@@ -99,10 +101,9 @@ class Eruption:
             # Frame zero has no preceding frame; record only an onset exactly at axis start.
             began = (start > moments - self.time.dt_s) & (start <= moments)
             began[0] = start == moments[0]
-            explosion[began] = 1.
-            overlap = np.maximum(0., np.minimum(moments, start + duration)
-                                 - np.maximum(moments - self.time.dt_s, start))
-            overlap[0] = 0.
+            explosion[began] = 1.0
+            overlap = np.maximum(0.0, np.minimum(moments, start + duration) - np.maximum(moments - self.time.dt_s, start))
+            overlap[0] = 0.0
             rate += mastin_mass_rate_kg_s(height) * overlap / self.time.dt_s
             column[overlap > 0] = np.maximum(column[overlap > 0], height)
         values = (phase, tremor, gas, explosion, rate, column)

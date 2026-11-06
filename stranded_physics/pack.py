@@ -1,7 +1,8 @@
 """Build a scenario pack offline.
 
-    python -m stranded_physics.pack build --scenario st_vincent_2021 --seed 1
+python -m stranded_physics.pack build --scenario st_vincent_2021 --seed 1
 """
+
 from __future__ import annotations
 
 import argparse
@@ -12,9 +13,9 @@ from stranded_physics.core.fakes import fake_scenario
 from stranded_physics.packs.builder import build_pack, save_pack
 
 
-
 def st_vincent_scenario(spawn: str = "chateaubelair"):
     from stranded_physics.packs.st_vincent_2021 import scenario  # Needs the raw data, so it loads only when asked for.
+
     return scenario(spawn)
 
 

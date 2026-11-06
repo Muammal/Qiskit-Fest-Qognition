@@ -1,4 +1,5 @@
 """Log-log height versus mass-rate exponent of the implemented Mastin relation."""
+
 import csv
 import json
 import sys
@@ -15,14 +16,16 @@ from .model import Eruption, SETTINGS, mastin_mass_rate_kg_s
 
 def generator_measure(name):
     from .generator import BOUNDS, CATALOG, generate, lead_catalog, sample_lead_s, sample_size
+
     rng = np.random.default_rng(int(SETTINGS["generator_measure_seed"]))
     if name == "size_holdout":
-        samples = np.array([sample_size(rng, before_year=2000)
-                            for _ in range(int(SETTINGS["size_sample_count"]))])
+        samples = np.array([sample_size(rng, before_year=2000) for _ in range(int(SETTINGS["size_sample_count"]))])
         with (CATALOG / "eruptions.csv").open(encoding="utf-8-sig", newline="") as stream:
-            held = [int(row["vei"]) for row in csv.DictReader(stream)
-                    if row["start_year"].strip() and float(row["start_year"]) >= SETTINGS["size_before_year"]
-                    and row["vei"].strip()]
+            held = [
+                int(row["vei"])
+                for row in csv.DictReader(stream)
+                if row["start_year"].strip() and float(row["start_year"]) >= SETTINGS["size_before_year"] and row["vei"].strip()
+            ]
         if not held:
             raise ValueError("no holdout eruption sizes")
         size_count = int(BOUNDS["generated_size"][1]) + 1
@@ -40,12 +43,17 @@ def generator_measure(name):
         sample_median = float(np.median(samples))
         catalogue = lead_catalog()
         catalogue_median = float(np.median(catalogue))
-        return {"value": sample_median / catalogue_median,
-                "sample_median_s": sample_median, "catalogue_median_s": catalogue_median,
-                "sample_count": len(samples), "catalogue_count": len(catalogue)}
-    masses = [generate(rng, SETTINGS["generator_measure_axis_s"],
-                       size=int(SETTINGS["mass_sample_size"])).total_mass_kg
-              for _ in range(int(SETTINGS["mass_sample_count"]))]
+        return {
+            "value": sample_median / catalogue_median,
+            "sample_median_s": sample_median,
+            "catalogue_median_s": catalogue_median,
+            "sample_count": len(samples),
+            "catalogue_count": len(catalogue),
+        }
+    masses = [
+        generate(rng, SETTINGS["generator_measure_axis_s"], size=int(SETTINGS["mass_sample_size"])).total_mass_kg
+        for _ in range(int(SETTINGS["mass_sample_count"]))
+    ]
     return {"value": float(np.log10(np.median(masses)))}
 
 
@@ -60,14 +68,20 @@ def main(argv):
         axis = TimeAxis(start, (end - start).total_seconds() / (frames - 1), frames)
         model, store = Eruption(axis), FieldStore()
         model.run(ScopedFields(store, model.id, model.inputs, model.outputs), np.random.default_rng(1))
-        print(json.dumps({"model_kg": float(store.get("eruption.mass_rate", "kg/s").sum() * axis.dt_s),
-                          "cole_whole_eruption_kg": SETTINGS["cole_whole_eruption_kg"],
-                          "axis_end_utc": end.strftime("%Y-%m-%dT%H:%MZ")}))
+        print(
+            json.dumps(
+                {
+                    "model_kg": float(store.get("eruption.mass_rate", "kg/s").sum() * axis.dt_s),
+                    "cole_whole_eruption_kg": SETTINGS["cole_whole_eruption_kg"],
+                    "axis_end_utc": end.strftime("%Y-%m-%dT%H:%MZ"),
+                }
+            )
+        )
         return 0
     if argv != ["mastin_slope"]:
         return 2
     rates = np.array([1e6, 1e8])
-    heights = [brentq(lambda h: mastin_mass_rate_kg_s(h) - rate, 0., 100000.) for rate in rates]
+    heights = [brentq(lambda h, target=rate: mastin_mass_rate_kg_s(h) - target, 0.0, 100000.0) for rate in rates]
     print(json.dumps({"value": float(np.log(heights[1] / heights[0]) / np.log(rates[1] / rates[0]))}))
     return 0
 

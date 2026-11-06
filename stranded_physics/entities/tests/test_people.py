@@ -1,4 +1,5 @@
 """People, groups, resources and storm-only play, from scenario files."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -21,17 +22,28 @@ def person(**changes):
 
 
 def group(**changes):
-    return {"kind": "group", "source": "dials", "start_lon": -61.243, "start_lat": 13.283, "count": 5, "radius_km": 1., "name": "Village", **changes}
+    return {"kind": "group", "source": "dials", "start_lon": -61.243, "start_lat": 13.283, "count": 5, "radius_km": 1.0, "name": "Village", **changes}
 
 
 def scenario(*entities, start="2021-04-08T00:00:00+00:00", hours=24):
-    return parse_scenario({"id": "people", "title": "People", "place": "real", "start_utc": start, "hours": hours, "step_hours": 2, "local_utc_offset": -4, "entity": list(entities)})
+    return parse_scenario(
+        {
+            "id": "people",
+            "title": "People",
+            "place": "real",
+            "start_utc": start,
+            "hours": hours,
+            "step_hours": 2,
+            "local_utc_offset": -4,
+            "entity": list(entities),
+        }
+    )
 
 
 def test_a_group_becomes_that_many_people_inside_its_radius():
-    people = people_of(scenario(TERRAIN, group(count=12, radius_km=2.)))
+    people = people_of(scenario(TERRAIN, group(count=12, radius_km=2.0)))
     assert len(people) == 12
-    assert all(abs(p.start[0] + 61.243) <= 2. / 111. + 1e-9 and abs(p.start[1] - 13.283) <= 2. / 111. + 1e-9 for p in people)
+    assert all(abs(p.start[0] + 61.243) <= 2.0 / 111.0 + 1e-9 and abs(p.start[1] - 13.283) <= 2.0 / 111.0 + 1e-9 for p in people)
     assert len({p.start for p in people}) == 12
 
 
@@ -49,7 +61,7 @@ def test_an_unknown_mind_or_resource_is_refused():
     with pytest.raises(InterfaceError, match="telepathy"):
         scenario(TERRAIN, person(mind="telepathy"))
     with pytest.raises(InterfaceError, match="what"):
-        scenario(TERRAIN, {"kind": "resource", "source": "dials", "lon": 0., "lat": 0., "what": "gold"})
+        scenario(TERRAIN, {"kind": "resource", "source": "dials", "lon": 0.0, "lat": 0.0, "what": "gold"})
 
 
 def test_a_group_of_too_many_is_refused_not_clamped():
@@ -72,6 +84,7 @@ class TestPlaying:
         from stranded_physics.entities.build import to_spec
         from stranded_physics.packs.builder import build_pack
         from stranded_physics.runtime.group import play_people
+
         pack = build_pack(to_spec(file), 1)
         return pack, play_people(pack, [p.mind for p in people_of(file)])
 
@@ -81,6 +94,7 @@ class TestPlaying:
 
     def test_all_three_minds_play_side_by_side_with_exact_contract_keys(self):
         from stranded_physics.runtime.body import NEED_KEYS, STATE_KEYS
+
         pack, runs = self.play(scenario(TERRAIN, WEATHER, person(mind="quantum"), person(mind="classical_mixture"), person(mind="classical"), SHELTER))
         assert len(runs) == 3
         assert all(set(s["state"]) == STATE_KEYS and set(s["state"]["needs"]) == NEED_KEYS for run in runs for s in run["steps"])
@@ -97,6 +111,7 @@ class TestPlaying:
 
     def test_sharing_the_map_and_routes_changes_nobodys_result(self):
         from stranded_physics.runtime.simulation import PackSimulation
+
         pack, together = self.play(scenario(TERRAIN, WEATHER, person(mind="quantum"), person(mind="classical", start_lon=-61.226, start_lat=13.317), SHELTER))
         apart = [PackSimulation(pack, mind_type=mind, person=index).run() for index, mind in enumerate(("quantum", "classical"))]
         assert [run["steps"] for run in together] == [run["steps"] for run in apart]
@@ -104,10 +119,12 @@ class TestPlaying:
 
     def test_food_near_a_person_lifts_hunger_when_they_forage(self):
         def forage(state):
-            return {"action": "forage", "probs": {"forage": 1.}, "reason": "test"}
+            return {"action": "forage", "probs": {"forage": 1.0}, "reason": "test"}
+
         from stranded_physics.entities.build import to_spec
         from stranded_physics.packs.builder import build_pack
         from stranded_physics.runtime.simulation import PackSimulation
+
         food = {"kind": "resource", "source": "dials", "what": "food", "lon": -61.243, "lat": 13.283}
         fed = PackSimulation(build_pack(to_spec(scenario(TERRAIN, WEATHER, person(), SHELTER, food)), 1), decide_fn=forage).run()
         hungry = PackSimulation(build_pack(to_spec(scenario(TERRAIN, WEATHER, person(), SHELTER)), 1), decide_fn=forage).run()

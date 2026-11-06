@@ -14,30 +14,22 @@ class SurvivalAgent:
     Conforms to the state schema defined in contracts.py.
     """
 
+    dt_seconds = 7200  # one decision slot; read only when a mind runs with dephasing_mode="per_time"
+
     def __init__(self, start_pos: Optional[List[int]] = None):
         self.scenario = "volcano"
+        self.explore_walk = "random"  # "grover" opts in to contracts.explore_step on the island
         self.day: int = 1
         self.hour: int = 8  # Start at 08:00 AM on Day 1
         self.pos: List[int] = list(start_pos) if start_pos else [20, 20]
-        
+
         # Physiological needs normalized [0.0, 1.0]
-        self.needs: Dict[str, float] = {
-            "hunger": 0.85,
-            "thirst": 0.80,
-            "warmth": 0.90,
-            "energy": 0.90,
-            "safety": 0.85,
-            "morale": 0.80
-        }
-        
+        self.needs: Dict[str, float] = {"hunger": 0.85, "thirst": 0.80, "warmth": 0.90, "energy": 0.90, "safety": 0.85, "morale": 0.80}
+
         self.stress: float = 0.15
         self.injured: bool = False
         self.injury_cooldown: int = 0
-        self.inventory: Dict[str, int] = {
-            "wood": 0,
-            "food": 0,
-            "tools": 0
-        }
+        self.inventory: Dict[str, int] = {"wood": 0, "food": 0, "tools": 0}
         self.recent_events: List[str] = ["none", "none"]
         self.volcanic_sign_seen = False
         self.steps_without_food = 0
@@ -54,7 +46,8 @@ class SurvivalAgent:
             "stress": round(self.stress, 3),
             "injured": self.injured,
             "inventory": dict(self.inventory),
-            "recent_events": list(self.recent_events)
+            "recent_events": list(self.recent_events),
+            "dt_seconds": self.dt_seconds,
         }
         contracts.validate_state(state)
         return state
@@ -69,8 +62,8 @@ class SurvivalAgent:
             self.volcanic_sign_seen = True
             self.stress = min(1.0, self.stress + 0.08)
             if self.scenario == "volcano":
-                self.needs["safety"] = max(0., self.needs["safety"]-.1)  # assumption: warning costs perceived safety
-                self.needs["morale"] = max(0., self.needs["morale"]-.02)  # assumption: warning morale cost
+                self.needs["safety"] = max(0.0, self.needs["safety"] - 0.1)  # assumption: warning costs perceived safety
+                self.needs["morale"] = max(0.0, self.needs["morale"] - 0.02)  # assumption: warning morale cost
 
         if event == "storm":
             if in_shelter:
@@ -84,7 +77,9 @@ class SurvivalAgent:
         elif event == "cold_night":
             chill = 0.03 if in_shelter else (0.06 if forest_cover else 0.10)  # assumption: two-hour cold episode
             self.needs["warmth"] = max(0.0, self.needs["warmth"] - chill)
-            self.needs["morale"] = max(0.0, self.needs["morale"] - (0.10 if self.scenario == "island" else 0.04))  # assumption: a damp tropical night is miserable, not grave
+            self.needs["morale"] = max(
+                0.0, self.needs["morale"] - (0.10 if self.scenario == "island" else 0.04)
+            )  # assumption: a damp tropical night is miserable, not grave
 
         elif event == "animal":
             if in_shelter:
@@ -94,7 +89,7 @@ class SurvivalAgent:
                 self.needs["safety"] = max(0.0, self.needs["safety"] - 0.40)
                 self.stress = min(1.0, self.stress + 0.45)
                 # Possible physical confrontation injury
-                if self.scenario == "island" or self.needs["energy"] < .3:  # source: 11e4366 island; assumption: volcano fatigue prevents escape
+                if self.scenario == "island" or self.needs["energy"] < 0.3:  # source: 11e4366 island; assumption: volcano fatigue prevents escape
                     self.injured = True
                     self.injury_cooldown = 4
 
@@ -112,7 +107,7 @@ class SurvivalAgent:
             self.stress = max(0.0, self.stress - 0.10)
 
     def movement_budget(self, world):
-        if world.scenario == 'island':
+        if world.scenario == "island":
             speed = 8  # assumption: original island 1 km/h, two hours, 250 m tiles
             if self.injured:
                 speed //= 2
@@ -120,17 +115,17 @@ class SurvivalAgent:
                 speed = max(1, speed * 3 // 4)
             return speed
         # assumption: 120 walking minutes; injury, night and local ash reduce speed.
-        speed = (.5 if self.injured else 1.) * (.75 if self.hour >= 20 or self.hour <= 6 else 1.)
-        return 120*speed
+        speed = (0.5 if self.injured else 1.0) * (0.75 if self.hour >= 20 or self.hour <= 6 else 1.0)
+        return 120 * speed
 
     def follow_path(self, world, path):
-        if world.scenario == 'island':
+        if world.scenario == "island":
             if path:
-                self.pos = list(path[min(len(path)-1, self.movement_budget(world))])
+                self.pos = list(path[min(len(path) - 1, self.movement_budget(world))])
             return
         budget, moved = self.movement_budget(world), 0
-        for a,b in zip(path,path[1:]):
-            cost = world.travel_minutes(a,b)/(1-.5*world.ash_at(*a))
+        for a, b in zip(path, path[1:]):
+            cost = world.travel_minutes(a, b) / (1 - 0.5 * world.ash_at(*a))
             if moved and cost > budget:
                 break
             self.pos = list(b)
@@ -143,35 +138,39 @@ class SurvivalAgent:
         self.follow_path(world, world.path(self.pos, goals, avoid_danger))
 
     def eat_if_needed(self):
-        if self.needs['hunger'] < .5 and self.inventory['food']:
-            self.inventory['food'] -= 1
-            self.needs['hunger'] = min(1., self.needs['hunger']+.4)  # assumption: ration recovery
+        if self.needs["hunger"] < 0.5 and self.inventory["food"]:
+            self.inventory["food"] -= 1
+            self.needs["hunger"] = min(1.0, self.needs["hunger"] + 0.4)  # assumption: ration recovery
             self.steps_without_food = 0
 
     def execute_action(self, action, world):
         self.eat_if_needed()
         if self.injury_cooldown:
-            self.injury_cooldown = max(0, self.injury_cooldown-(2 if action == 'rest' else 1))  # assumption: rest halves healing time
+            self.injury_cooldown = max(0, self.injury_cooldown - (2 if action == "rest" else 1))  # assumption: rest halves healing time
             self.injured = self.injury_cooldown > 0
         x, y = self.pos
         warned = self.volcanic_sign_seen or world.volcanic_sign_seen
         if action == "hide":
             if warned and (world.zones[y][x] != 0 if world.scenario == "island" else tuple(self.pos) not in world.assembly_points):
                 self.walk_to(world, world.assembly_points, avoid_danger=world.zones[y][x] != 2)
-            self.needs["safety"] = min(1, self.needs["safety"] + .2)
-            self.stress = max(0, self.stress - .1)
+            self.needs["safety"] = min(1, self.needs["safety"] + 0.2)
+            self.stress = max(0, self.stress - 0.1)
         elif action == "drink":
             # Least walking time to water. Whether to leave danger is the mind's choice alone.
             sources = [p for p in world.freshwater_tiles if p not in world.lava]
-            goals = {(px,py) for sx,sy in sources
-                     for px in range(sx-2,sx+3) for py in range(sy-2,sy+3)
-                     if (px-sx)**2+(py-sy)**2 <= 4 and world.walkable((px,py))}
+            goals = {
+                (px, py)
+                for sx, sy in sources
+                for px in range(sx - 2, sx + 3)
+                for py in range(sy - 2, sy + 3)
+                if (px - sx) ** 2 + (py - sy) ** 2 <= 4 and world.walkable((px, py))
+            }
             self.follow_path(world, world.path(self.pos, goals))
-            near = [p for p in sources if sum((a-b)**2 for a,b in zip(p,self.pos)) <= 4]
+            near = [p for p in sources if sum((a - b) ** 2 for a, b in zip(p, self.pos)) <= 4]
             if near:
-                dirty = world.stream_ash() > .1 and not any(p in world.clean_springs for p in near)
-                self.needs["thirst"] = min(1, self.needs["thirst"] + (.3 if dirty else .65))
-                self.needs["morale"] = max(0, self.needs["morale"] - (.06 if dirty else 0))
+                dirty = world.stream_ash() > 0.1 and not any(p in world.clean_springs for p in near)
+                self.needs["thirst"] = min(1, self.needs["thirst"] + (0.3 if dirty else 0.65))
+                self.needs["morale"] = max(0, self.needs["morale"] - (0.06 if dirty else 0))
         elif action == "forage":
             if world.scenario == "island":
                 # source: 11e4366 island forage preserves forest detours and repeatable patches.
@@ -186,13 +185,14 @@ class SurvivalAgent:
                     self.inventory["food"] += 2  # source: 11e4366 island harvest
                 if world.get_tile(*self.pos) == 2:
                     self.inventory["wood"] += 1  # source: 11e4366 island timber
-                if self.inventory["food"] and self.needs["hunger"] < .7:
+                if self.inventory["food"] and self.needs["hunger"] < 0.7:
                     self.inventory["food"] -= 1
-                    self.needs["hunger"] = min(1, self.needs["hunger"] + .4)  # source: 11e4366 forage meal
+                    self.needs["hunger"] = min(1, self.needs["hunger"] + 0.4)  # source: 11e4366 forage meal
                     self.steps_without_food = 0
             else:
-                food = [p for p in world.food_tiles if p not in world.depleted_food and world.walkable(p)
-                        and sum((a-b)**2 for a,b in zip(p,self.pos)) <= 4]  # assumption: local 500 m search
+                food = [
+                    p for p in world.food_tiles if p not in world.depleted_food and world.walkable(p) and sum((a - b) ** 2 for a, b in zip(p, self.pos)) <= 4
+                ]  # assumption: local 500 m search
                 if tuple(self.pos) not in food and self.inventory["food"] < 4:
                     self.walk_to(world, food)
                 if tuple(self.pos) in food and self.inventory["food"] < 4:  # assumption: four-ration carrying capacity
@@ -209,26 +209,34 @@ class SurvivalAgent:
             elif world.get_tile(*self.pos) == 2:
                 self.inventory["wood"] += 1
         elif action == "rest":
-            self.needs["energy"] = min(1, self.needs["energy"] + .3)
-            self.needs["warmth"] = min(1, self.needs["warmth"] + (.12 if world.is_in_shelter(*self.pos) else .015))
-            self.needs["safety"] = min(1, self.needs["safety"] + .05)
+            self.needs["energy"] = min(1, self.needs["energy"] + 0.3)
+            self.needs["warmth"] = min(1, self.needs["warmth"] + (0.12 if world.is_in_shelter(*self.pos) else 0.015))
+            self.needs["safety"] = min(1, self.needs["safety"] + 0.05)
+        elif action == "explore" and world.scenario == "island" and self.explore_walk == "grover":
+            # Opt-in. Each call moves one or two tiles, so walk until the budget is spent.
+            budget = self.movement_budget(world)
+            while budget > 0:
+                before = list(self.pos)
+                self.pos = contracts.explore_step(self.pos, world, mode="quantum")
+                budget -= abs(self.pos[0] - before[0]) + abs(self.pos[1] - before[1]) or 1
         elif action == "explore" and world.scenario == "island":
             import random
+
             budget = self.movement_budget(world)
-            dx, dy = random.choice([(1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,1),(1,-1),(-1,-1)])
+            dx, dy = random.choice([(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)])
             for _ in range(budget):
                 x, y = self.pos
-                candidates = [(x+cx, y+cy) for cx, cy in ((1,0),(-1,0),(0,1),(0,-1))
-                              if world.walkable((x+cx, y+cy))]
+                candidates = [(x + cx, y + cy) for cx, cy in ((1, 0), (-1, 0), (0, 1), (0, -1)) if world.walkable((x + cx, y + cy))]
                 if not candidates:
                     break
-                favored = [c for c in candidates if (c[0]-x)*dx >= 0 and (c[1]-y)*dy >= 0]
+                favored = [c for c in candidates if (c[0] - x) * dx >= 0 and (c[1] - y) * dy >= 0]
                 if favored and random.random() < 0.75:
                     self.pos = list(random.choice(favored))
                 else:
                     self.pos = list(random.choice(candidates))
         elif action == "explore":
             import random
+
             reachable = [p for p in world.neighbors(tuple(self.pos)) if world.walkable(p)]
             if reachable:
                 destination = random.choice(reachable)
@@ -243,10 +251,10 @@ class SurvivalAgent:
             self.inventory["tools"] += 1
         self.eat_if_needed()
         if action != "rest":
-            self.needs["energy"] = max(0, self.needs["energy"] - .025)
-        if world.scenario == 'volcano' and any(e in ('tremor','gas_plume','eruption','ash_fall') for e in self.recent_events):
+            self.needs["energy"] = max(0, self.needs["energy"] - 0.025)
+        if world.scenario == "volcano" and any(e in ("tremor", "gas_plume", "eruption", "ash_fall") for e in self.recent_events):
             zone = world.zones[self.pos[1]][self.pos[0]]
-            self.needs['safety'] = min(self.needs['safety'], (.8,.5,.3)[zone])  # assumption: warning safety caps
+            self.needs["safety"] = min(self.needs["safety"], (0.8, 0.5, 0.3)[zone])  # assumption: warning safety caps
         return f"{action} at {self.pos}"
 
     def step_decay(self, in_shelter: bool, forest_cover: bool = False):
@@ -256,9 +264,9 @@ class SurvivalAgent:
         self.needs["thirst"] = max(0.0, self.needs["thirst"] - (1 / 36))  # assumption: full hydration lasts 72 hours; initial .8 lasts 29 steps
 
         self.steps_without_food += 1
-        if self.needs["hunger"] <= .15:
-            self.needs["energy"] = max(0, self.needs["energy"] - .015)
-            self.needs["morale"] = max(0, self.needs["morale"] - .015)
+        if self.needs["hunger"] <= 0.15:
+            self.needs["energy"] = max(0, self.needs["energy"] - 0.015)
+            self.needs["morale"] = max(0, self.needs["morale"] - 0.015)
         # Baseline energy and warmth
         if not in_shelter and (self.hour >= 21 or self.hour <= 5):
             self.needs["warmth"] = max(0.0, self.needs["warmth"] - (0.015 if forest_cover else 0.025))
@@ -272,7 +280,7 @@ class SurvivalAgent:
             (1.0 - self.needs["thirst"]) * 0.25,
             (1.0 - self.needs["hunger"]) * 0.20,
             (1.0 - self.needs["warmth"]) * 0.15,
-            0.20 if self.injured else 0.0
+            0.20 if self.injured else 0.0,
         ]
         target_stress = min(1.0, sum(peril_factors))
         # Smooth stress transition

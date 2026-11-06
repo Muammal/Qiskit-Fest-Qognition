@@ -1,0 +1,50 @@
+[project]
+name = "qognition"
+version = "0.2.0"
+description = "A two-qubit density-matrix decision model, with stress as dephasing, run inside 2D evacuation simulations."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+
+[project.urls]
+Homepage = "https://stranded-qognition-268.vercel.app/"
+Repository = "https://github.com/Muammal/Qiskit-Fest-Qognition"
+
+[tool.ruff]
+line-length = 160
+target-version = "py311"
+extend-exclude = ["notebooks", "scratch", "artifacts", "Claude outputs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B"]
+ignore = [
+    "E501",  # Long strings and tables stay on one line. The formatter handles the rest.
+    "B905",  # zip(strict=) would change behaviour. Lengths are checked where they matter.
+]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["range"]
+
+[tool.ruff.lint.per-file-ignores]
+"test_*.py" = ["E402", "E731"]  # contracts must load before mind, and pytest helpers before the modules under test.
+"**/tests/*.py" = ["E402", "E731"]
+"tools/*.py" = ["E402", "B007", "B023", "E741"]  # One-off data scripts. They add the repository to sys.path first.
+"engine/gui.py" = ["E402"]  # Adds the repository to sys.path so it can also be run directly.
+"engine/batch_runner.py" = ["E402"]
+"mind/experiments/*.py" = ["E402"]
+"stranded_physics/runtime/simulation.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "test_contracts_and_engine.py",
+    "test_titanic.py",
+    "test_pompeii.py",
+    "test_waterloo.py",
+    "test_ui_layout.py",
+    "test_report.py",
+    "test_simfile.py",
+    "mind",
+    "stranded_physics",
+]
+filterwarnings = ["ignore::DeprecationWarning:pygame.*"]

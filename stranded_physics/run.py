@@ -1,7 +1,8 @@
 """Play one pack from the command line, and say plainly how far its result can be trusted.
 
-    python -m stranded_physics.run --scenario st_vincent_2021 --seed 1 --mind quantum
+python -m stranded_physics.run --scenario st_vincent_2021 --seed 1 --mind quantum
 """
+
 from __future__ import annotations
 
 import argparse
@@ -14,8 +15,10 @@ from stranded_physics.runtime.simulation import PackSimulation
 
 CAVEATS = {
     "fake": "FAKE T0 PHYSICS: this checks the interfaces only. Do not cite any result from it.",
-    "st_vincent_2021": ("REAL PLACE AND TIMELINE, SIMPLE MODELS: see python -m stranded_physics.check stranded_physics/scenario_cards/st_vincent_2021.toml for what agrees "
-                        "with 2021 records and what doesn't. Thirst, hunger and energy are still placeholder rates, so survival numbers are not findings about people."),
+    "st_vincent_2021": (
+        "REAL PLACE AND TIMELINE, SIMPLE MODELS: see python -m stranded_physics.check stranded_physics/scenario_cards/st_vincent_2021.toml for what agrees "
+        "with 2021 records and what doesn't. Thirst, hunger and energy are still placeholder rates, so survival numbers are not findings about people."
+    ),
 }
 CAVEATS["st_vincent_2021_richmond"] = CAVEATS["st_vincent_2021"]
 

@@ -1,4 +1,5 @@
 """Interface checks. Everything here must hold before any category code is written."""
+
 from __future__ import annotations
 
 import ast
@@ -52,7 +53,9 @@ def test_parameter_units_must_match_its_range():
 
 def test_unknown_keys_are_rejected(tmp_path):
     path = tmp_path / "params.toml"
-    path.write_text('[[parameter]]\nid="p"\nvalue=1.0\nunit="m"\nvalid_min=0.0\nvalid_max=2.0\nrole="input"\nstatus="assumption"\nmystery=1\n', encoding="utf-8")
+    path.write_text(
+        '[[parameter]]\nid="p"\nvalue=1.0\nunit="m"\nvalid_min=0.0\nvalid_max=2.0\nrole="input"\nstatus="assumption"\nmystery=1\n', encoding="utf-8"
+    )
     with pytest.raises(InterfaceError, match="mystery"):
         load_parameters(path)
 
@@ -78,8 +81,8 @@ def test_dataset_needs_a_bot_page_check_and_a_real_hash():
 
 def test_fields_convert_units():
     store = FieldStore()
-    store.put("atmos.wind_speed", np.full(FAKE_TIME.n, 36.), "km/h", time=FAKE_TIME)
-    assert store.get("atmos.wind_speed", "m/s") == pytest.approx(np.full(FAKE_TIME.n, 10.))
+    store.put("atmos.wind_speed", np.full(FAKE_TIME.n, 36.0), "km/h", time=FAKE_TIME)
+    assert store.get("atmos.wind_speed", "m/s") == pytest.approx(np.full(FAKE_TIME.n, 10.0))
     with pytest.raises(InterfaceError):
         store.get("atmos.wind_speed", "kg")
 
@@ -96,10 +99,10 @@ def test_fields_reject_nan_duplicates_and_wrong_shapes():
 
 
 def test_fields_regrid_between_grids():
-    coarse = GridSpec("EPSG:32620", 0., 400., 200., 2, 2)
-    fine = GridSpec("EPSG:32620", 0., 400., 100., 4, 4)
+    coarse = GridSpec("EPSG:32620", 0.0, 400.0, 200.0, 2, 2)
+    fine = GridSpec("EPSG:32620", 0.0, 400.0, 100.0, 4, 4)
     store = FieldStore()
-    store.put("terrain.elevation", np.array([[1., 2.], [3., 4.]]), "m", coarse)
+    store.put("terrain.elevation", np.array([[1.0, 2.0], [3.0, 4.0]]), "m", coarse)
     out = store.get("terrain.elevation", "m", fine)
     assert out.shape == (4, 4) and out[0, 0] == 1 and out[0, 3] == 2 and out[3, 0] == 3 and out[3, 3] == 4
     with pytest.raises(InterfaceError, match="CRS"):
@@ -172,6 +175,7 @@ def test_circular_dependency_is_an_error():
         id = "b"
         inputs = (spec("terrain.elevation"),)
         outputs = (spec("atmos.wind_speed"),)
+
     with pytest.raises(InterfaceError, match="circular"):
         dependency_order((A(), B()))
 
@@ -206,6 +210,7 @@ def test_a_validity_breach_blocks_play_unless_explicitly_allowed():
     class Strict(ConeTerrain):
         def check_validity(self, fields):
             return ["slope outside this model's range"]
+
     scenario = fake_scenario()
     pack = build_pack(replace(scenario, domains=(Strict(), *scenario.domains[1:])), 1)
     assert pack.verdicts["terrain.validity"] == "OUT_OF_DOMAIN"
@@ -255,8 +260,23 @@ def test_timeline_keeps_every_existing_json_key():
 
 def test_world_view_has_what_the_legacy_gui_reads():
     world = PackSimulation(build_pack(fake_scenario(), 1)).world
-    for name in ("width", "height", "tiles", "zones", "spawn_pos", "vent", "assembly_points", "freshwater_tiles",
-                 "clean_springs", "food_tiles", "shelter_tiles", "lava", "pdc", "lahar", "ash"):
+    for name in (
+        "width",
+        "height",
+        "tiles",
+        "zones",
+        "spawn_pos",
+        "vent",
+        "assembly_points",
+        "freshwater_tiles",
+        "clean_springs",
+        "food_tiles",
+        "shelter_tiles",
+        "lava",
+        "pdc",
+        "lahar",
+        "ash",
+    ):
         assert hasattr(world, name), name
     assert world.get_tile(-1, 0) == 0 and world.get_tile(*world.spawn_pos) in contracts.TILE_TYPES
     assert world.is_in_shelter(*world.spawn_pos) is False and isinstance(world.ash_at(0, 0), float)
@@ -268,9 +288,9 @@ def _with_future_changed(pack: Pack, after_step: int) -> Pack:
     arrival = arrays["pdc.arrival"]
     cut = after_step * pack.time.dt_s
     arrays["pdc.arrival"] = np.where(arrival > cut, np.inf, arrival)
-    arrays["pdc.active"][after_step + 1:] = 0
-    arrays["eruption.tremor"][after_step + 1:] = 1 - arrays["eruption.tremor"][after_step + 1:]
-    arrays["tephra.deposit_load"][after_step + 1:] = 0
+    arrays["pdc.active"][after_step + 1 :] = 0
+    arrays["eruption.tremor"][after_step + 1 :] = 1 - arrays["eruption.tremor"][after_step + 1 :]
+    arrays["tephra.deposit_load"][after_step + 1 :] = 0
     return Pack(dict(pack.header), arrays)
 
 
@@ -289,20 +309,20 @@ def test_minds_cannot_see_the_future(seed):
 
 def test_perception_is_local_and_cannot_read_ahead():
     pack = build_pack(fake_scenario(erupts=True), 5)
-    far = (pack.grid.x0_m + 50., pack.grid.y0_m - 50.)
+    far = (pack.grid.x0_m + 50.0, pack.grid.y0_m - 50.0)
     arrival = pack.frame("pdc.arrival")
     first = float(arrival[np.isfinite(arrival)].min())
     near = pack.sites["vent"][0]
-    assert perceive(pack, near, first - 1.).flow_visible is False
+    assert perceive(pack, near, first - 1.0).flow_visible is False
     assert perceive(pack, near, first).flow_visible is True
     assert perceive(pack, far, first).flow_visible is False
 
 
 def test_a_person_standing_in_a_flow_dies_and_one_who_leaves_lives():
     pack = build_pack(fake_scenario(erupts=True), 5)
-    stay = PackSimulation(pack, decide_fn=lambda s: {"action": "rest", "probs": {"rest": 1.}, "reason": "t"})
+    stay = PackSimulation(pack, decide_fn=lambda s: {"action": "rest", "probs": {"rest": 1.0}, "reason": "t"})
     assert stay.run()["cause"] == "pyroclastic_flow"
-    leave = PackSimulation(pack, decide_fn=lambda s: {"action": "hide", "probs": {"hide": 1.}, "reason": "t"})
+    leave = PackSimulation(pack, decide_fn=lambda s: {"action": "hide", "probs": {"hide": 1.0}, "reason": "t"})
     assert leave.run()["cause"] != "pyroclastic_flow"
 
 
@@ -310,42 +330,44 @@ def test_a_person_standing_in_a_flow_dies_and_one_who_leaves_lives():
 
 
 def test_no_target_is_never_a_pass():
-    assert judge_value(1., None, None) == "NO_TARGET"
+    assert judge_value(1.0, None, None) == "NO_TARGET"
     assert judge_rate(5, 10, None, None) == "NO_TARGET"
 
 
 def test_value_judged_against_the_committed_target():
-    assert judge_value(10.5, 10., 1.) == "PASS" and judge_value(12., 10., 1.) == "FAIL"
-    assert judge_value(None, 10., 1.) == "NOT_RUN"
+    assert judge_value(10.5, 10.0, 1.0) == "PASS" and judge_value(12.0, 10.0, 1.0) == "FAIL"
+    assert judge_value(None, 10.0, 1.0) == "NOT_RUN"
 
 
 def test_zero_events_alone_do_not_pass_a_rare_event_bar():
-    assert judge_rate(0, 10, None, .01) == "INSUFFICIENT_DATA"
-    assert judge_rate(0, 100000, None, .01) == "PASS"
-    assert judge_rate(500, 1000, None, .01) == "FAIL"
-    assert judge_rate(0, 0, None, .01) == "NOT_RUN"
+    assert judge_rate(0, 10, None, 0.01) == "INSUFFICIENT_DATA"
+    assert judge_rate(0, 100000, None, 0.01) == "PASS"
+    assert judge_rate(500, 1000, None, 0.01) == "FAIL"
+    assert judge_rate(0, 0, None, 0.01) == "NOT_RUN"
 
 
 def test_wilson_interval_known_values():
     low, high = wilson_interval(0, 10)
-    assert low == 0. and high == pytest.approx(.2775, abs=.001)
+    assert low == 0.0 and high == pytest.approx(0.2775, abs=0.001)
     low, high = wilson_interval(5, 10)
-    assert low == pytest.approx(.2366, abs=.001) and high == pytest.approx(.7634, abs=.001)
+    assert low == pytest.approx(0.2366, abs=0.001) and high == pytest.approx(0.7634, abs=0.001)
 
 
 def test_only_holdout_predictions_count_toward_agreement():
-    rows = [{"role": "prediction", "split": "holdout", "verdict": "PASS"},
-            {"role": "prediction", "split": "holdout", "verdict": "FAIL"},
-            {"role": "input", "split": "holdout", "verdict": "PASS"},
-            {"role": "anchor", "split": "calibration", "verdict": "PASS"},
-            {"role": "prediction", "split": "calibration", "verdict": "PASS"},
-            {"role": "prediction", "split": "holdout", "verdict": "NO_TARGET"}]
+    rows = [
+        {"role": "prediction", "split": "holdout", "verdict": "PASS"},
+        {"role": "prediction", "split": "holdout", "verdict": "FAIL"},
+        {"role": "input", "split": "holdout", "verdict": "PASS"},
+        {"role": "anchor", "split": "calibration", "verdict": "PASS"},
+        {"role": "prediction", "split": "calibration", "verdict": "PASS"},
+        {"role": "prediction", "split": "holdout", "verdict": "NO_TARGET"},
+    ]
     assert agreement(rows) == (1, 2)
 
 
 def test_changing_a_target_makes_a_verdict_stale():
-    gate = {"id": "g", "kind": "validation", "command": "python x", "target": 1., "tolerance": .1}
-    assert gates.input_hash(gate) != gates.input_hash({**gate, "target": 2.})
+    gate = {"id": "g", "kind": "validation", "command": "python x", "target": 1.0, "tolerance": 0.1}
+    assert gates.input_hash(gate) != gates.input_hash({**gate, "target": 2.0})
 
 
 def test_gate_judgement_rules():
@@ -354,9 +376,9 @@ def test_gate_judgement_rules():
     assert gates.judge(verification, 0, "")["verdict"] == "PASS"
     assert gates.judge(verification, 1, "")["verdict"] == "FAIL"
     assert gates.judge(validation, 0, "")["verdict"] == "NO_TARGET"
-    assert gates.judge({**validation, "target": 5., "tolerance": 1.}, 0, '{"value": 5.5}')["verdict"] == "PASS"
-    assert gates.judge({**validation, "target": 5., "tolerance": 1.}, 0, '{"value": 9}')["verdict"] == "FAIL"
-    assert gates.judge({**validation, "rate_high": .01}, 0, '{"successes": 0, "trials": 10}')["verdict"] == "INSUFFICIENT_DATA"
+    assert gates.judge({**validation, "target": 5.0, "tolerance": 1.0}, 0, '{"value": 5.5}')["verdict"] == "PASS"
+    assert gates.judge({**validation, "target": 5.0, "tolerance": 1.0}, 0, '{"value": 9}')["verdict"] == "FAIL"
+    assert gates.judge({**validation, "rate_high": 0.01}, 0, '{"successes": 0, "trials": 10}')["verdict"] == "INSUFFICIENT_DATA"
 
 
 # Workboard and categories
@@ -364,7 +386,24 @@ def test_gate_judgement_rules():
 
 def test_every_category_loads_with_strict_records():
     text = catalog.build()
-    expected = {"ship", "sea", "terrain", "atmos", "storm", "eruption", "tephra", "pdc", "lahar", "lava", "gas", "exposure", "agent", "seismic", "tsunami", "impact"}
+    expected = {
+        "ship",
+        "sea",
+        "terrain",
+        "atmos",
+        "storm",
+        "eruption",
+        "tephra",
+        "pdc",
+        "lahar",
+        "lava",
+        "gas",
+        "exposure",
+        "agent",
+        "seismic",
+        "tsunami",
+        "impact",
+    }
     assert expected == set(gates.categories())
     for category in expected:
         assert f"## {category}:" in text

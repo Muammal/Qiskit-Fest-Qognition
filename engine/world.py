@@ -1,6 +1,7 @@
 """Seeded terrain, priority-flood drainage and least walking-time routes.
 Supports both Volcano Evacuation (default) and Island Wilderness scenarios.
 """
+
 import copy
 import heapq
 import math
@@ -10,12 +11,12 @@ from functools import lru_cache
 MAP_SEED = 42  # assumption: shared terrain across event seeds
 SCALE_M_PER_TILE = 250  # assumption: scenario resolution
 NEIGHBORS = ((1, 0), (-1, 0), (0, 1), (0, -1))  # assumption: cardinal walking/routing
-TERRAIN_SPEED = {0: 1, 1: 1, 2: .8, 3: .65, 4: 1}  # assumption: forest/mountain obstruction
+TERRAIN_SPEED = {0: 1, 1: 1, 2: 0.8, 3: 0.65, 4: 1}  # assumption: forest/mountain obstruction
 SPAWN_MIN_VENT_TILES = 6  # assumption: 1.5 km from the vent
 FOOD_VALLEY_TILES = 3  # assumption: moist valley bottoms reach 750 m from a main channel
 FOOD_VALLEY_ELEVATION = (30, 650)  # assumption: metres; little grows on the upper cone or at the shore
-FOOD_VALLEY_DENSITY = .45  # assumption: one-ration patches per valley tile
-FOOD_UPLAND_DENSITY = .03  # assumption: one-ration patches per drier forest tile
+FOOD_VALLEY_DENSITY = 0.45  # assumption: one-ration patches per valley tile
+FOOD_UPLAND_DENSITY = 0.03  # assumption: one-ration patches per drier forest tile
 
 
 class IslandWorld:
@@ -28,7 +29,7 @@ class IslandWorld:
         self.scenario = scenario
         self.lava, self.pdc, self.lahar = set(), set(), set()
         self.active_pdc, self.active_lahar, self.surge = set(), set(), set()
-        self.ash, self.ash_grid = 0., None
+        self.ash, self.ash_grid = 0.0, None
         self.volcanic_sign_seen = False
         self.shelter_tiles = []
         self.depleted_food = set()
@@ -54,15 +55,15 @@ class IslandWorld:
 
     def travel_minutes(self, a, b):
         slope = (self.elevation[b[1]][b[0]] - self.elevation[a[1]][a[0]]) / SCALE_M_PER_TILE
-        speed = 6 * math.exp(-3.5 * abs(slope + .05)) * .6  # Tobler hiking function; off-path factor
-        return .25 / speed * 60 / TERRAIN_SPEED[self.get_tile(*b)]
+        speed = 6 * math.exp(-3.5 * abs(slope + 0.05)) * 0.6  # Tobler hiking function; off-path factor
+        return 0.25 / speed * 60 / TERRAIN_SPEED[self.get_tile(*b)]
 
     def route_minutes(self, route):
         return sum(self.travel_minutes(a, b) for a, b in zip(route, route[1:])) if route else math.inf
 
     def path(self, start, goals, avoid_danger=False):
         start, goals = tuple(start), {tuple(p) for p in goals}
-        queue, costs, previous = [(0., start)], {start: 0.}, {start: None}
+        queue, costs, previous = [(0.0, start)], {start: 0.0}, {start: None}
         while queue:
             cost, p = heapq.heappop(queue)
             if cost != costs[p]:
@@ -127,11 +128,7 @@ def _island_terrain(width, height, seed):
     for y in range(height):
         for x in range(width):
             dist = math.hypot(x - cx, y - cy)
-            noise = (
-                math.sin(x * 0.4 + seed % 10) * 1.8
-                + math.cos(y * 0.4 + seed % 7) * 1.8
-                + math.sin((x + y) * 0.3) * 1.2
-            )
+            noise = math.sin(x * 0.4 + seed % 10) * 1.8 + math.cos(y * 0.4 + seed % 7) * 1.8 + math.sin((x + y) * 0.3) * 1.2
             effective_dist = dist + noise
             if effective_dist > max_radius:
                 tiles[y][x] = 0
@@ -162,22 +159,12 @@ def _island_terrain(width, height, seed):
     clean_springs = list(stream_tiles[:2])
     freshwater_tiles = list(dict.fromkeys(stream_tiles + clean_springs))
 
-    candidates = [
-        [x, y]
-        for y in range(8, height - 8)
-        for x in range(8, width - 8)
-        if tiles[y][x] in (1, 2)
-    ]
+    candidates = [[x, y] for y in range(8, height - 8) for x in range(8, width - 8) if tiles[y][x] in (1, 2)]
     spawn = rng.choice(candidates) if candidates else [cx, cy + 4]
     tiles[spawn[1]][spawn[0]] = 2
     elevation[spawn[1]][spawn[0]] = max(120.0, elevation[spawn[1]][spawn[0]])
 
-    food = [
-        (x, y)
-        for y in range(height)
-        for x in range(width)
-        if tiles[y][x] == 2 and rng.random() < 0.35
-    ]
+    food = [(x, y) for y in range(height) for x in range(width) if tiles[y][x] == 2 and rng.random() < 0.35]
     if tuple(spawn) not in food:
         food.append(tuple(spawn))
 
@@ -220,11 +207,13 @@ def _build_terrain(width, height, seed):
         for x in range(width):
             dx, dy = (x - cx) * 40 / width, (y - cy) * 40 / height
             r, angle = math.hypot(dx, dy), math.atan2(dy, dx)
-            radius = 16 + 2.6 * math.sin(3 * angle + .7) + 1.8 * math.sin(7 * angle + seed)  # assumption: irregular coast
+            radius = 16 + 2.6 * math.sin(3 * angle + 0.7) + 1.8 * math.sin(7 * angle + seed)  # assumption: irregular coast
             fraction = max(0, 1 - r / radius)
-            carving = 1 - .42 * math.exp(-.5 * (math.sin(3 * angle + .4 + .45 * math.sin(r * .55)) / .25) ** 2) * min(1, r / 3)  # assumption: winding erosional gullies
-            h = 1030 * fraction ** 1.6 * carving + rng.uniform(-18, 18) * fraction if r < radius else -20 - 8 * (r - radius)
-            row.append(max(1., h) if r < radius else h)
+            carving = 1 - 0.42 * math.exp(-0.5 * (math.sin(3 * angle + 0.4 + 0.45 * math.sin(r * 0.55)) / 0.25) ** 2) * min(
+                1, r / 3
+            )  # assumption: winding erosional gullies
+            h = 1030 * fraction**1.6 * carving + rng.uniform(-18, 18) * fraction if r < radius else -20 - 8 * (r - radius)
+            row.append(max(1.0, h) if r < radius else h)
         elevation.append(row)
 
     def neighbors(p):
@@ -246,7 +235,7 @@ def _build_terrain(width, height, seed):
             if (x, y) in seen:
                 continue
             seen.add((x, y))
-            elevation[y][x] = max(elevation[y][x], level + .001)  # assumption: numerical flat gradient
+            elevation[y][x] = max(elevation[y][x], level + 0.001)  # assumption: numerical flat gradient
             heapq.heappush(heap, (elevation[y][x], (x, y)))
     drainage = {}
     for y in range(height):
@@ -275,8 +264,7 @@ def _build_terrain(width, height, seed):
             d, above = math.dist((x, y), q), h - elevation[q[1]][q[0]]
             radial = math.dist((x, y), (cx, cy))
             zr.append(
-                2 if radial <= 4.5 or (d <= 1.6 and above < 100) else
-                1 if radial <= 7 or (d <= 3 and above < 180) else 0
+                2 if radial <= 4.5 or (d <= 1.6 and above < 100) else 1 if radial <= 7 or (d <= 3 and above < 180) else 0
             )  # assumption: terrain exposure thresholds
             tr.append(0 if h <= 0 else 3 if h > 750 else 2 if h > 100 else 1)  # assumption: vegetation bands
         zones.append(zr)
@@ -300,7 +288,7 @@ def _build_terrain(width, height, seed):
     def forage_chance(p):
         h = elevation[p[1]][p[0]]
         moist = any(math.dist(p, q) <= FOOD_VALLEY_TILES for q in channels) and FOOD_VALLEY_ELEVATION[0] < h < FOOD_VALLEY_ELEVATION[1]
-        return FOOD_VALLEY_DENSITY if moist else FOOD_UPLAND_DENSITY if tiles[p[1]][p[0]] == 2 else 0.
+        return FOOD_VALLEY_DENSITY if moist else FOOD_UPLAND_DENSITY if tiles[p[1]][p[0]] == 2 else 0.0
 
     food = [p for p in land if rng.random() < forage_chance(p)]
     if tuple(spawn) not in food:

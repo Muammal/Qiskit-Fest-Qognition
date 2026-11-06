@@ -1,4 +1,5 @@
 """Strict loaders for params.toml and datasets.toml. Unknown keys are rejected, never ignored."""
+
 from __future__ import annotations
 
 import tomllib
@@ -23,11 +24,17 @@ def load_parameters(path: Path) -> tuple[Parameter, ...]:
     for entry in table.get("parameter", []):
         _check_keys(entry, PARAM_KEYS, f"{path}: {entry.get('id')}")
         unit = entry["unit"]
-        parameters.append(Parameter(
-            id=entry["id"], value=Q_(entry["value"], unit),
-            valid=(Q_(entry["valid_min"], unit), Q_(entry["valid_max"], unit)),
-            role=entry["role"], status=entry["status"], source=entry.get("source"),
-            sd=Q_(entry["sd"], unit) if "sd" in entry else None))
+        parameters.append(
+            Parameter(
+                id=entry["id"],
+                value=Q_(entry["value"], unit),
+                valid=(Q_(entry["valid_min"], unit), Q_(entry["valid_max"], unit)),
+                role=entry["role"],
+                status=entry["status"],
+                source=entry.get("source"),
+                sd=Q_(entry["sd"], unit) if "sd" in entry else None,
+            )
+        )
     return tuple(parameters)
 
 

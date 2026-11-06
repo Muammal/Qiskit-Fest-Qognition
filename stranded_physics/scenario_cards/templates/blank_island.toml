@@ -1,0 +1,24 @@
+# A starting point in the scenario builder. Needs no downloaded data.
+id = "my_island"
+title = "My island"
+place = "generated"
+start_utc = "2023-06-01T00:00:00+00:00"
+hours = 96
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "dials"
+summit_m = 900.0
+area_km2 = 200.0
+
+[[entity]]
+kind = "weather"
+source = "dials"
+rain_mm_h = 1.0
+wind_m_s = 6.0
+wind_bearing_deg = 270.0
+temperature_c = 27.0
+upper_wind_m_s = 20.0
+upper_bearing_deg = 90.0

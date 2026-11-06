@@ -22,10 +22,17 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 
-from engine.simulation import SimulationEngine, DEFAULT_STEPS
-from engine.titanic import TitanicSimulation, compare_titanic_policies
+from engine.simulation import SimulationEngine
+from engine.titanic import compare_titanic_policies
 from engine.pompeii import PompeiiSimulation
 from engine.waterloo import WaterlooSimulation
+
+
+VIDEO_HELP = "Recording video needs ffmpeg, or opencv-python-headless. Install either one and try again."
+
+
+class VideoBackendMissing(RuntimeError):
+    """Neither ffmpeg nor OpenCV is available."""
 
 
 class LiveVideoRecorder:
@@ -48,26 +55,38 @@ class LiveVideoRecorder:
             cmd = [
                 ffmpeg_bin,
                 "-y",
-                "-f", "rawvideo",
-                "-vcodec", "rawvideo",
-                "-s", f"{self.width}x{self.height}",
-                "-pix_fmt", "rgb24",
-                "-r", str(self.fps),
-                "-i", "-",
+                "-f",
+                "rawvideo",
+                "-vcodec",
+                "rawvideo",
+                "-s",
+                f"{self.width}x{self.height}",
+                "-pix_fmt",
+                "rgb24",
+                "-r",
+                str(self.fps),
+                "-i",
+                "-",
                 "-an",
-                "-vcodec", "libx264",
-                "-pix_fmt", "yuv420p",
-                "-preset", "fast",
-                "-crf", "21",
+                "-vcodec",
+                "libx264",
+                "-pix_fmt",
+                "yuv420p",
+                "-preset",
+                "fast",
+                "-crf",
+                "21",
                 self.output_path,
             ]
-            self._proc = subprocess.Popen(
-                cmd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-            )
+            self._proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             self.active = True
             return self.output_path
 
-        import cv2
+        try:
+            import cv2
+        except ImportError:
+            raise VideoBackendMissing(VIDEO_HELP) from None
+
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         self._cv_writer = cv2.VideoWriter(self.output_path, fourcc, float(self.fps), (self.width, self.height))
         self.active = True
@@ -77,6 +96,7 @@ class LiveVideoRecorder:
         if not self.active:
             return
         import pygame
+
         # array3d returns shape (W, H, 3); transpose to (H, W, 3)
         rgb = np.transpose(pygame.surfarray.array3d(surface), (1, 0, 2))
         if self._proc is not None and self._proc.stdin is not None:
@@ -87,6 +107,7 @@ class LiveVideoRecorder:
                 self.active = False
         elif self._cv_writer is not None:
             import cv2
+
             bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
             self._cv_writer.write(bgr)
             self.frame_count += 1
@@ -123,7 +144,6 @@ def export_simulation_video(
     """Renders an entire simulation from start to finish into an MP4 video file."""
     os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
     os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
-    import pygame
     from engine.gui import IslandVisualizerApp, WINDOW_WIDTH, WINDOW_HEIGHT
 
     if output_path is None:
@@ -219,9 +239,9 @@ def export_evacuation_datasets(output_dir: str = "exports", num_seeds: int = 12)
                 (abs(s.get("quantum", {}).get("order_gap") or 0.0) for s in q_steps if s.get("quantum")),
                 default=0.0,
             )
-            mean_coherence = float(
-                np.mean([s["quantum"].get("coherence") or 0.0 for s in q_steps if s.get("quantum")])
-            ) if any(s.get("quantum") for s in q_steps) else 0.0
+            mean_coherence = (
+                float(np.mean([s["quantum"].get("coherence") or 0.0 for s in q_steps if s.get("quantum")])) if any(s.get("quantum") for s in q_steps) else 0.0
+            )
 
             q_evac = q_run.get("evacuation", {}).get("first_evacuating_step")
             m_evac = m_run.get("evacuation", {}).get("first_evacuating_step")
@@ -238,27 +258,29 @@ def export_evacuation_datasets(output_dir: str = "exports", num_seeds: int = 12)
             else:
                 insight = "Aligned trajectory across Quantum and Classical Mixture"
 
-            seed_rows.append({
-                "scenario": scenario,
-                "seed": seed,
-                "erupts": q_run["world"]["volcano"]["erupts"] if scenario == "volcano" else False,
-                "quantum_outcome": q_run["outcome"],
-                "quantum_cause": q_run["cause"] or "none",
-                "quantum_steps": len(q_steps),
-                "quantum_first_evac_step": q_evac if q_evac is not None else -1,
-                "mixture_outcome": m_run["outcome"],
-                "mixture_cause": m_run["cause"] or "none",
-                "mixture_steps": len(m_steps),
-                "mixture_first_evac_step": m_evac if m_evac is not None else -1,
-                "classical_outcome": c_run["outcome"],
-                "classical_cause": c_run["cause"] or "none",
-                "classical_steps": len(c_steps),
-                "classical_first_evac_step": c_evac if c_evac is not None else -1,
-                "qm_action_divergences": qm_div,
-                "mean_quantum_coherence": round(mean_coherence, 4),
-                "max_order_effect_gap": round(max_order_gap, 4),
-                "evacuation_insight": insight,
-            })
+            seed_rows.append(
+                {
+                    "scenario": scenario,
+                    "seed": seed,
+                    "erupts": q_run["world"]["volcano"]["erupts"] if scenario == "volcano" else False,
+                    "quantum_outcome": q_run["outcome"],
+                    "quantum_cause": q_run["cause"] or "none",
+                    "quantum_steps": len(q_steps),
+                    "quantum_first_evac_step": q_evac if q_evac is not None else -1,
+                    "mixture_outcome": m_run["outcome"],
+                    "mixture_cause": m_run["cause"] or "none",
+                    "mixture_steps": len(m_steps),
+                    "mixture_first_evac_step": m_evac if m_evac is not None else -1,
+                    "classical_outcome": c_run["outcome"],
+                    "classical_cause": c_run["cause"] or "none",
+                    "classical_steps": len(c_steps),
+                    "classical_first_evac_step": c_evac if c_evac is not None else -1,
+                    "qm_action_divergences": qm_div,
+                    "mean_quantum_coherence": round(mean_coherence, 4),
+                    "max_order_effect_gap": round(max_order_gap, 4),
+                    "evacuation_insight": insight,
+                }
+            )
 
     # Write critical_evacuation_seeds_catalog.csv
     seeds_csv = out_path / "critical_evacuation_seeds_catalog.csv"
@@ -282,28 +304,42 @@ def export_evacuation_datasets(output_dir: str = "exports", num_seeds: int = 12)
     for pol_name, mind_map in titanic_policies.items():
         for mind in minds:
             row = mind_map[mind]
-            policy_rows.append({
-                "scenario": "titanic",
-                "seed": 42,
-                "policy_id": pol_name,
-                "mind": mind,
-                "population": 2208,
-                "survived_or_safe": row["saved"],
-                "fatalities_or_high_exposure": row["dead"],
-                "survival_or_safety_rate_pct": round(row["survival_rate"] * 100.0, 2),
-                "real_life_policy_recommendation": policy_descriptions[pol_name],
-            })
+            policy_rows.append(
+                {
+                    "scenario": "titanic",
+                    "seed": 42,
+                    "policy_id": pol_name,
+                    "mind": mind,
+                    "population": 2208,
+                    "survived_or_safe": row["saved"],
+                    "fatalities_or_high_exposure": row["dead"],
+                    "survival_or_safety_rate_pct": round(row["survival_rate"] * 100.0, 2),
+                    "real_life_policy_recommendation": policy_descriptions[pol_name],
+                }
+            )
 
     # 2B. Pompeii Event-Framing & Bottleneck Counterfactuals (1,500 sample population for fast export)
     pompeii_configs = [
-        ("mapping_A_unambiguous_column", dict(event_mapping="A", crowding=True, restrict_enslaved=False),
-         "Clear hazard communication: eruption column treated as unambiguous danger (eruption collapse)"),
-        ("mapping_B_literal_default", dict(event_mapping="B", crowding=True, restrict_enslaved=False),
-         "Default literal framing: column is gas_plume rotation, pumice is ash_fall collapse"),
-        ("mapping_C_ambiguous_cues", dict(event_mapping="C", crowding=True, restrict_enslaved=False),
-         "Ambiguous cues: both column and pumice treated as non-collapsing gas_plume rotations (quantum disjunction delay)"),
-        ("mapping_D_milder_plus_enslaved_restricted", dict(event_mapping="D", crowding=True, restrict_enslaved=True),
-         "Worst-case ambiguity + household movement restriction on enslaved persons"),
+        (
+            "mapping_A_unambiguous_column",
+            dict(event_mapping="A", crowding=True, restrict_enslaved=False),
+            "Clear hazard communication: eruption column treated as unambiguous danger (eruption collapse)",
+        ),
+        (
+            "mapping_B_literal_default",
+            dict(event_mapping="B", crowding=True, restrict_enslaved=False),
+            "Default literal framing: column is gas_plume rotation, pumice is ash_fall collapse",
+        ),
+        (
+            "mapping_C_ambiguous_cues",
+            dict(event_mapping="C", crowding=True, restrict_enslaved=False),
+            "Ambiguous cues: both column and pumice treated as non-collapsing gas_plume rotations (quantum disjunction delay)",
+        ),
+        (
+            "mapping_D_milder_plus_enslaved_restricted",
+            dict(event_mapping="D", crowding=True, restrict_enslaved=True),
+            "Worst-case ambiguity + household movement restriction on enslaved persons",
+        ),
     ]
     for pol_id, kwargs, desc in pompeii_configs:
         for mind in minds:
@@ -312,26 +348,37 @@ def export_evacuation_datasets(output_dir: str = "exports", num_seeds: int = 12)
             counts = sim.counts()
             dead = counts["dead"]
             escaped = 500 - dead
-            policy_rows.append({
-                "scenario": "pompeii",
-                "seed": 42,
-                "policy_id": pol_id,
-                "mind": mind,
-                "population": 500,
-                "survived_or_safe": escaped,
-                "fatalities_or_high_exposure": dead,
-                "survival_or_safety_rate_pct": round(escaped / 500.0 * 100.0, 2),
-                "real_life_policy_recommendation": desc,
-            })
+            policy_rows.append(
+                {
+                    "scenario": "pompeii",
+                    "seed": 42,
+                    "policy_id": pol_id,
+                    "mind": mind,
+                    "population": 500,
+                    "survived_or_safe": escaped,
+                    "fatalities_or_high_exposure": dead,
+                    "survival_or_safety_rate_pct": round(escaped / 500.0 * 100.0, 2),
+                    "real_life_policy_recommendation": desc,
+                }
+            )
 
     # 2C. Waterloo Chlorine Gas Leak Alarm Policy Counterfactuals (100 visitors)
     waterloo_configs = [
-        ("alarm_off_ambiguous_smell", dict(alarm=False, event_mapping="A"),
-         "No facility alarm: visitors rely on chlorine smell & word of mouth (quantum hesitation increases AEGL-2 exposure)"),
-        ("alarm_on_ambiguous_mapping_A", dict(alarm=True, event_mapping="A"),
-         "Staff alarm enabled (mapped to gas_plume rotation): partial reduction in exposure"),
-        ("alarm_on_unambiguous_mapping_B", dict(alarm=True, event_mapping="B"),
-         "Unambiguous staff alarm (mapped to projective collapse): eliminates quantum hesitation & minimizes AEGL-2 exposure"),
+        (
+            "alarm_off_ambiguous_smell",
+            dict(alarm=False, event_mapping="A"),
+            "No facility alarm: visitors rely on chlorine smell & word of mouth (quantum hesitation increases AEGL-2 exposure)",
+        ),
+        (
+            "alarm_on_ambiguous_mapping_A",
+            dict(alarm=True, event_mapping="A"),
+            "Staff alarm enabled (mapped to gas_plume rotation): partial reduction in exposure",
+        ),
+        (
+            "alarm_on_unambiguous_mapping_B",
+            dict(alarm=True, event_mapping="B"),
+            "Unambiguous staff alarm (mapped to projective collapse): eliminates quantum hesitation & minimizes AEGL-2 exposure",
+        ),
     ]
     for pol_id, kwargs, desc in waterloo_configs:
         for mind in minds:
@@ -340,17 +387,19 @@ def export_evacuation_datasets(output_dir: str = "exports", num_seeds: int = 12)
             table = sim.outcome_table()
             aegl2_plus = sum(r["levels"]["2"] + r["levels"]["3"] for r in table.values())
             safe_count = 100 - aegl2_plus
-            policy_rows.append({
-                "scenario": "waterloo",
-                "seed": 42,
-                "policy_id": pol_id,
-                "mind": mind,
-                "population": 100,
-                "survived_or_safe": safe_count,
-                "fatalities_or_high_exposure": aegl2_plus,
-                "survival_or_safety_rate_pct": round(safe_count / 100.0 * 100.0, 2),
-                "real_life_policy_recommendation": desc,
-            })
+            policy_rows.append(
+                {
+                    "scenario": "waterloo",
+                    "seed": 42,
+                    "policy_id": pol_id,
+                    "mind": mind,
+                    "population": 100,
+                    "survived_or_safe": safe_count,
+                    "fatalities_or_high_exposure": aegl2_plus,
+                    "survival_or_safety_rate_pct": round(safe_count / 100.0 * 100.0, 2),
+                    "real_life_policy_recommendation": desc,
+                }
+            )
 
     policies_csv = out_path / "evacuation_policy_interventions.csv"
     with open(policies_csv, "w", newline="", encoding="utf-8") as f:
@@ -364,22 +413,26 @@ def export_evacuation_datasets(output_dir: str = "exports", num_seeds: int = 12)
         rows_s = [r for r in seed_rows if r["scenario"] == scenario]
         for mind_prefix, mind_name in (("quantum", "quantum"), ("mixture", "classical_mixture"), ("classical", "classical")):
             surv = sum(1 for r in rows_s if r[f"{mind_prefix}_outcome"] == "survived")
-            scenario_summary.append({
-                "scenario": scenario,
-                "mind": mind_name,
-                "SampleSize": f"{len(rows_s)} seeds",
-                "survived_or_safe_pct": round(surv / max(1, len(rows_s)) * 100.0, 2),
-                "notes": f"Evaluated across seeds 100..{100 + len(rows_s) - 1}",
-            })
+            scenario_summary.append(
+                {
+                    "scenario": scenario,
+                    "mind": mind_name,
+                    "SampleSize": f"{len(rows_s)} seeds",
+                    "survived_or_safe_pct": round(surv / max(1, len(rows_s)) * 100.0, 2),
+                    "notes": f"Evaluated across seeds 100..{100 + len(rows_s) - 1}",
+                }
+            )
     for row in policy_rows:
         if row["policy_id"] in ("historical_baseline", "mapping_C_ambiguous_cues", "alarm_on_unambiguous_mapping_B"):
-            scenario_summary.append({
-                "scenario": f"{row['scenario']} ({row['policy_id']})",
-                "mind": row["mind"],
-                "SampleSize": f"{row['population']} agents (seed 42)",
-                "survived_or_safe_pct": row["survival_or_safety_rate_pct"],
-                "notes": row["real_life_policy_recommendation"],
-            })
+            scenario_summary.append(
+                {
+                    "scenario": f"{row['scenario']} ({row['policy_id']})",
+                    "mind": row["mind"],
+                    "SampleSize": f"{row['population']} agents (seed 42)",
+                    "survived_or_safe_pct": row["survival_or_safety_rate_pct"],
+                    "notes": row["real_life_policy_recommendation"],
+                }
+            )
 
     summary_csv = out_path / "evacuation_survival_rates_by_scenario.csv"
     with open(summary_csv, "w", newline="", encoding="utf-8") as f:
@@ -417,12 +470,14 @@ def export_evacuation_datasets(output_dir: str = "exports", num_seeds: int = 12)
             f"| `{r['scenario']}` | `{r['policy_id']}` | `{r['mind']}` | {r['population']:,} | "
             f"{r['survived_or_safe']:,} | {r['fatalities_or_high_exposure']:,} | **{r['survival_or_safety_rate_pct']:.2f}%** |"
         )
-    md_lines.extend([
-        "",
-        "## 3. Critical Evacuation Seeds Catalog (`critical_evacuation_seeds_catalog.csv`)",
-        "| Scenario | Seed | Quantum Outcome | Mixture Outcome | Classical Outcome | Q-M Divergences | Max Order Gap | Insight |",
-        "|---|---:|---|---|---|---:|---:|---|",
-    ])
+    md_lines.extend(
+        [
+            "",
+            "## 3. Critical Evacuation Seeds Catalog (`critical_evacuation_seeds_catalog.csv`)",
+            "| Scenario | Seed | Quantum Outcome | Mixture Outcome | Classical Outcome | Q-M Divergences | Max Order Gap | Insight |",
+            "|---|---:|---|---|---|---:|---:|---|",
+        ]
+    )
     for r in seed_rows:
         md_lines.append(
             f"| `{r['scenario']}` | `{r['seed']}` | **{r['quantum_outcome']}** ({r['quantum_cause']}) | "

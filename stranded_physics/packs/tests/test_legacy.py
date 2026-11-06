@@ -1,5 +1,4 @@
 """Compare the adapter to the unchanged legacy forecast and exercise pack play."""
-from dataclasses import replace
 
 import numpy as np
 import pytest
@@ -9,10 +8,13 @@ from engine.simulation import DEFAULT_STEPS
 from engine.volcano import VolcanoModel
 from engine.world import IslandWorld, MAP_SEED, SCALE_M_PER_TILE
 from stranded_physics.core.api import InterfaceError
-from stranded_physics.packs.builder import build_pack
 from stranded_physics.packs.legacy import (
-    LEGACY_ASH_FULL_KG_M2, LEGACY_LAHAR_M, LEGACY_RAIN_MM_H, LEGACY_STORM_MM_H,
-    build_legacy_pack, legacy_scenario,
+    LEGACY_ASH_FULL_KG_M2,
+    LEGACY_LAHAR_M,
+    LEGACY_RAIN_MM_H,
+    LEGACY_STORM_MM_H,
+    build_legacy_pack,
+    legacy_scenario,
 )
 from stranded_physics.runtime.perception import perceive
 from stranded_physics.runtime.simulation import PackSimulation
@@ -29,20 +31,19 @@ def test_every_field_and_site(seed):
     assert (pack.time.n, pack.time.dt_s, pack.t0_local_hour) == (DEFAULT_STEPS, 7200, 8)
     assert not pack.has("terrain.flow_accumulation")
     assert not pack.has("terrain.height_above_drainage")
-    for name, expected in (("elevation", world.elevation), ("land_mask", np.array(world.elevation) > 0),
-                           ("land_cover", world.tiles), ("zone", world.zones)):
+    for name, expected in (("elevation", world.elevation), ("land_mask", np.array(world.elevation) > 0), ("land_cover", world.tiles), ("zone", world.zones)):
         np.testing.assert_array_equal(pack.frame(f"terrain.{name}"), expected)
-    for name, tiles in (("spawn", [world.spawn_pos]), ("vent", [world.vent]),
-                        ("assembly", world.assembly_points), ("water", world.freshwater_tiles),
-                        ("food", world.food_tiles)):
+    for name, tiles in (
+        ("spawn", [world.spawn_pos]),
+        ("vent", [world.vent]),
+        ("assembly", world.assembly_points),
+        ("water", world.freshwater_tiles),
+        ("food", world.food_tiles),
+    ):
         assert pack.sites[name] == [pack.grid.centre(y, x) for x, y in tiles]
         assert [pack.grid.locate(p) for p in pack.sites[name]] == [(y, x) for x, y in tiles]
-    np.testing.assert_array_equal(pack.series("atmos.rain_rate"),
-                                  [{"calm": 0, "rain": LEGACY_RAIN_MM_H,
-                                    "storm": LEGACY_STORM_MM_H}[w] for w in weather])
-    np.testing.assert_array_equal(pack.series("eruption.phase"),
-                                  [{"unrest": 0, "escalating": 1, "erupting": 2, "fading": 3}[p]
-                                   for p in volcano.phases])
+    np.testing.assert_array_equal(pack.series("atmos.rain_rate"), [{"calm": 0, "rain": LEGACY_RAIN_MM_H, "storm": LEGACY_STORM_MM_H}[w] for w in weather])
+    np.testing.assert_array_equal(pack.series("eruption.phase"), [{"unrest": 0, "escalating": 1, "erupting": 2, "fading": 3}[p] for p in volcano.phases])
     for name, event in (("tremor", "tremor"), ("gas", "gas_plume"), ("explosion", "eruption")):
         np.testing.assert_array_equal(pack.series(f"eruption.{name}"), [e == event for e in volcano.world_events])
     arrival = np.full((40, 40), np.inf)
@@ -57,8 +58,7 @@ def test_every_field_and_site(seed):
         for x, y in hazard["new_lava"]:
             lava[y, x] = 1
         ash = np.array([[int(d) for d in row] for row in hazard["ash_grid"]]) / 9 * LEGACY_ASH_FULL_KG_M2
-        for name, expected in (("pdc.active", pdc), ("lahar.depth", lahar),
-                               ("lava.footprint", lava), ("tephra.deposit_load", ash)):
+        for name, expected in (("pdc.active", pdc), ("lahar.depth", lahar), ("lava.footprint", lava), ("tephra.deposit_load", ash)):
             np.testing.assert_array_equal(pack.frame(name, k * 7200), expected)
             np.testing.assert_array_equal(pack.frame(name, k * 7200 + 7199), expected)
     np.testing.assert_array_equal(pack.frame("pdc.arrival"), arrival)
@@ -100,6 +100,7 @@ def test_no_future_percept():
 
 def test_invalid_axes_raise(monkeypatch):
     from stranded_physics.packs import legacy
+
     monkeypatch.setattr(legacy, "DEFAULT_STEPS", 35)
     with pytest.raises(InterfaceError):
         legacy_scenario(1)

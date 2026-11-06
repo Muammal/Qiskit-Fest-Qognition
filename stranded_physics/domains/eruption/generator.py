@@ -1,4 +1,5 @@
 """Catalogue sampling and explicit, uncalibrated eruption timing."""
+
 from __future__ import annotations
 
 import csv
@@ -13,7 +14,7 @@ from .model import HERE, PARAMETERS, SETTINGS, mastin_mass_rate_kg_s
 
 CATALOG = HERE.parents[2] / "disaster_data/catalog"
 BOUNDS = {p.id.split(".", 1)[1]: tuple(float(q.magnitude) for q in p.valid) for p in PARAMETERS}
-SECONDS_PER_HOUR = 3600.
+SECONDS_PER_HOUR = 3600.0
 
 
 @dataclass(frozen=True)
@@ -50,8 +51,7 @@ def axis_end(axis_seconds):
         raise InterfaceError("axis_seconds must be a duration or increasing seconds from zero") from error
     if axis.ndim == 0:
         end = float(axis)
-    elif (axis.ndim == 1 and len(axis) >= 2 and np.isfinite(axis).all()
-          and axis[0] == 0 and (np.diff(axis) > 0).all()):
+    elif axis.ndim == 1 and len(axis) >= 2 and np.isfinite(axis).all() and axis[0] == 0 and (np.diff(axis) > 0).all():
         end = float(axis[-1])
     else:
         raise InterfaceError("axis_seconds must be a duration or increasing seconds from zero")
@@ -87,8 +87,7 @@ def sample_size(rng, before_year=2000) -> int:
 @lru_cache(maxsize=1)
 def lead_catalog():
     with (CATALOG / "precursor_lead_times.csv").open(encoding="utf-8-sig", newline="") as stream:
-        values = tuple(checked("generated_lead_s", float(row["lead_hours"]) * SECONDS_PER_HOUR)
-                       for row in csv.DictReader(stream) if row["lead_hours"].strip())
+        values = tuple(checked("generated_lead_s", float(row["lead_hours"]) * SECONDS_PER_HOUR) for row in csv.DictReader(stream) if row["lead_hours"].strip())
     if not values:
         raise InterfaceError("no recorded precursor lead times")
     return values
@@ -115,14 +114,16 @@ def generate(rng, axis_seconds, size=None, lead_s=None, onset_s=None, column_m=N
         onset = checked("generated_onset_s", onset_s)
     if onset < lead or onset > end:
         raise InterfaceError("onset must lie on the axis and warning cannot precede its start")
-    height = (float(rng.uniform(SETTINGS[f"size_{size}_height_min"], SETTINGS[f"size_{size}_height_max"]))
-              if column_m is None else checked("generated_column_m", column_m))
-    volume = float(np.exp(rng.uniform(np.log(SETTINGS[f"size_{size}_volume_min"]),
-                                     np.log(SETTINGS[f"size_{size}_volume_max"]))))
+    height = (
+        float(rng.uniform(SETTINGS[f"size_{size}_height_min"], SETTINGS[f"size_{size}_height_max"]))
+        if column_m is None
+        else checked("generated_column_m", column_m)
+    )
+    volume = float(np.exp(rng.uniform(np.log(SETTINGS[f"size_{size}_volume_min"]), np.log(SETTINGS[f"size_{size}_volume_max"]))))
     mass = volume * SETTINGS["bulk_density"]
     rate = mastin_mass_rate_kg_s(height)
     active_s = mass / rate
-    events, emitted, start = [], 0., onset
+    events, emitted, start = [], 0.0, onset
     while emitted < mass:
         duration = active_s * rng.uniform(SETTINGS["pulse_fraction_min"], SETTINGS["pulse_fraction_max"])
         remaining = mass - emitted
@@ -163,11 +164,13 @@ def validate_generated(generated):
     previous_end = generated.onset_s
     for event in generated.events:
         checked("generated_column_m", event.height_m)
-        if (not np.isfinite([event.start_s, event.duration_s]).all()
-                or event.start_s < previous_end or event.duration_s <= 0):
+        if not np.isfinite([event.start_s, event.duration_s]).all() or event.start_s < previous_end or event.duration_s <= 0:
             raise InterfaceError("generated events must be finite, positive and nonoverlapping")
         previous_end = event.start_s + event.duration_s
     actual = fsum(mastin_mass_rate_kg_s(e.height_m) * e.duration_s for e in generated.events)
-    if (not np.isfinite(generated.total_mass_kg) or generated.total_mass_kg <= 0
-            or not np.isclose(actual, generated.total_mass_kg, rtol=SETTINGS["mass_relative_tolerance"], atol=0)):
+    if (
+        not np.isfinite(generated.total_mass_kg)
+        or generated.total_mass_kg <= 0
+        or not np.isclose(actual, generated.total_mass_kg, rtol=SETTINGS["mass_relative_tolerance"], atol=0)
+    ):
         raise InterfaceError("generated event mass does not match total_mass_kg")

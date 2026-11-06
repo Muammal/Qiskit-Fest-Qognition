@@ -1,8 +1,9 @@
 """Turns a scenario file into a scenario the engine can run. No scenario should need new engine code.
 
-    python -m stranded_physics.entities.build check <file>
-    python -m stranded_physics.entities.build run <file> --seed 1 [--mind quantum]
+python -m stranded_physics.entities.build check <file>
+python -m stranded_physics.entities.build run <file> --seed 1 [--mind quantum]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -19,7 +20,7 @@ from stranded_physics.entities.api import EntitySpec, ScenarioFile, load_scenari
 from stranded_physics.entities.kinds import BUILD_ORDER, KINDS, SECONDS_PER_HOUR, World, check_entity, vent_of
 from stranded_physics.st_vincent import to_utm
 
-KM_PER_DEGREE = 111.  # Close enough for spreading people around a point.
+KM_PER_DEGREE = 111.0  # Close enough for spreading people around a point.
 
 
 PLACED = ("person", "group", "shelter", "resource")
@@ -46,7 +47,7 @@ def _check_timing(scenario: ScenarioFile, entity: EntitySpec) -> None:
     if entity.source == "replay":
         return
     for name in ("onset_hours", "closest_hours"):
-        if settings.get(name, 0.) > hours:
+        if settings.get(name, 0.0) > hours:
             raise InterfaceError(f"{entity.kind}: {name} = {settings[name]} comes after this {scenario.hours}-hour scenario ends")
     if entity.kind == "eruption" and "lead_hours" in settings and settings["lead_hours"] > settings.get("onset_hours", hours):
         raise InterfaceError(f"eruption: a warning of {settings['lead_hours']} hours would start before the scenario does")
@@ -55,6 +56,7 @@ def _check_timing(scenario: ScenarioFile, entity: EntitySpec) -> None:
 def check_scenario(scenario: ScenarioFile) -> None:
     """Every entity can be built, and everything each one depends on is present."""
     from stranded_physics.packs.st_vincent_2021 import CONTRACT_GRID
+
     present = {entity.kind for entity in scenario.entities}
     if "ship" in present and present & {"terrain", "person", "group", "eruption", "shelter"}:
         raise InterfaceError("A ship is its own map, so it can't share a scenario with land, or with people placed on land. Use passengers")
@@ -85,8 +87,14 @@ def people_of(scenario: ScenarioFile) -> list[Person]:
         elif entity.kind == "group":
             rng = np.random.default_rng([zlib.crc32(scenario.id.encode()), index])
             for number in range(int(entity.settings["count"])):
-                angle, distance = rng.uniform(0., 2. * math.pi), entity.settings["radius_km"] * math.sqrt(rng.uniform()) / KM_PER_DEGREE
-                people.append(Person(f"{entity.name or 'group'} {number + 1}", (entity.settings["start_lon"] + distance * math.cos(angle), entity.settings["start_lat"] + distance * math.sin(angle)), entity.mind))
+                angle, distance = rng.uniform(0.0, 2.0 * math.pi), entity.settings["radius_km"] * math.sqrt(rng.uniform()) / KM_PER_DEGREE
+                people.append(
+                    Person(
+                        f"{entity.name or 'group'} {number + 1}",
+                        (entity.settings["start_lon"] + distance * math.cos(angle), entity.settings["start_lat"] + distance * math.sin(angle)),
+                        entity.mind,
+                    )
+                )
     return people
 
 
@@ -102,6 +110,7 @@ def check_events_happen(pack: ScenarioPack) -> None:
 def to_spec(scenario: ScenarioFile, seed: int = 1) -> ScenarioSpec:
     """A catalogue entity samples from this seed, so give build_pack the same one."""
     from stranded_physics.packs.st_vincent_2021 import CONTRACT_GRID, place_sites
+
     check_scenario(scenario)
     time = TimeAxis(scenario.start_utc, scenario.step_s, round(scenario.hours * SECONDS_PER_HOUR / scenario.step_s))
     world = World(time, seed, vent=next((vent_of(e) for e in scenario.entities if e.kind == "eruption"), None))
@@ -115,7 +124,9 @@ def to_spec(scenario: ScenarioFile, seed: int = 1) -> ScenarioSpec:
     if people:
         land = next(domain for domain in domains if domain.id == "terrain")
         generated_land = next(e for e in scenario.entities if e.kind == "terrain").source != "replay"
-        sites = place_sites([person.start for person in people], [(s.settings["lon"], s.settings["lat"]) for s in shelters], world.vent, land if generated_land else None, seed)
+        sites = place_sites(
+            [person.start for person in people], [(s.settings["lon"], s.settings["lat"]) for s in shelters], world.vent, land if generated_land else None, seed
+        )
         for what in ("water", "food", "wood"):
             found = [to_utm((e.settings["lon"], e.settings["lat"])) for e in scenario.entities if e.kind == "resource" and e.what == what]
             if found:
@@ -123,6 +134,7 @@ def to_spec(scenario: ScenarioFile, seed: int = 1) -> ScenarioSpec:
     local_hour = (time.t0_utc.hour + scenario.local_utc_offset) % 24
     if world.ship is not None:
         from stranded_physics.runtime.ship import ship_sites
+
         sites = ship_sites(scenario, world)
     return ScenarioSpec(scenario.id, world.grid, world.contract_grid or CONTRACT_GRID, time, local_hour, tuple(domains), sites)
 
@@ -144,17 +156,21 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     from stranded_physics.packs.builder import build_pack
     from stranded_physics.runtime.group import play_people
+
     pack = build_pack(to_spec(scenario, args.seed), args.seed)
     check_events_happen(pack)
     if pack.has("ship.afloat"):
         from stranded_physics.runtime.ship import play_ship, summary
+
         print(f"{scenario.id}: pack {pack.content_hash[:12]}")
         for label, share in summary(play_ship(pack, scenario)).items():
             print(f"  {label}: {share:.3f}")
         return 0
     people = people_of(scenario)
     if not people:
-        print(f"{scenario.id}: built pack {pack.content_hash[:12]}, with fields {sorted(pack.header['fields'])}. It has no people, so there is nothing to play.")
+        print(
+            f"{scenario.id}: built pack {pack.content_hash[:12]}, with fields {sorted(pack.header['fields'])}. It has no people, so there is nothing to play."
+        )
         return 0
     print(f"{scenario.id}: pack {pack.content_hash[:12]}, {len(people)} people")
     for person, timeline in zip(people, play_people(pack, [person.mind for person in people])):

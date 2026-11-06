@@ -1,7 +1,8 @@
 """Compares the flow model on real St Vincent terrain with what Cole et al. report. Each mode ends with a JSON line for the gates.
 
-    python -m stranded_physics.validation.st_vincent_flows west_sea|sea_off_west|southeast_reach_km|first_flow_h|lahar_frames|sensitivity
+python -m stranded_physics.validation.st_vincent_flows west_sea|sea_off_west|southeast_reach_km|first_flow_h|lahar_frames|sensitivity
 """
+
 from __future__ import annotations
 
 import json
@@ -16,8 +17,8 @@ from stranded_physics.domains.pdc.model import Pdc, flow_footprint
 from stranded_physics.domains.terrain.model import ST_VINCENT_GRID as GRID, Terrain
 from stranded_physics.st_vincent import TIME, VENT_XY
 
-WEST_FLANK = (225., 315.)  # The paper says "West flank" without bearings, so this sector is an assumption, set with the target.
-SOUTHEAST = (112., 157.)
+WEST_FLANK = (225.0, 315.0)  # The paper says "West flank" without bearings, so this sector is an assumption, set with the target.
+SOUTHEAST = (112.0, 157.0)
 
 
 def terrain_store() -> FieldStore:
@@ -31,10 +32,10 @@ def terrain_store() -> FieldStore:
 
 
 def bearings_and_distance() -> tuple[np.ndarray, np.ndarray]:
-    xs = GRID.x0_m + (np.arange(GRID.nx) + .5) * GRID.dx_m - VENT_XY[0]
-    ys = GRID.y0_m - (np.arange(GRID.ny) + .5) * GRID.dx_m - VENT_XY[1]
+    xs = GRID.x0_m + (np.arange(GRID.nx) + 0.5) * GRID.dx_m - VENT_XY[0]
+    ys = GRID.y0_m - (np.arange(GRID.ny) + 0.5) * GRID.dx_m - VENT_XY[1]
     x, y = np.meshgrid(xs, ys)
-    return (np.degrees(np.arctan2(x, y)) + 360.) % 360., np.hypot(x, y)
+    return (np.degrees(np.arctan2(x, y)) + 360.0) % 360.0, np.hypot(x, y)
 
 
 def in_sector(bearing: np.ndarray, sector: tuple[float, float]) -> np.ndarray:
@@ -49,27 +50,33 @@ def footprint_summary(store: FieldStore) -> dict[str, float]:
     at_sea = reached & binary_dilation(~land, structure=np.ones((3, 3)))
     west = in_sector(bearing, WEST_FLANK)
     southeast = reached & in_sector(bearing, SOUTHEAST)
-    return {"west_sea": float((at_sea & west).any()),
-            "sea_off_west": float((at_sea & ~west).sum() / max(at_sea.sum(), 1)),
-            "southeast_reach_km": float(distance[southeast].max() / 1000.) if southeast.any() else 0.,
-            "reached_km2": float(reached.sum() * GRID.dx_m ** 2 / 1e6), "max_reach_km": float(distance[reached].max() / 1000.),
-            "sea_cells": int(at_sea.sum()), "slowest_arrival_min": float(travel[reached].max() / 60.)}
+    return {
+        "west_sea": float((at_sea & west).any()),
+        "sea_off_west": float((at_sea & ~west).sum() / max(at_sea.sum(), 1)),
+        "southeast_reach_km": float(distance[southeast].max() / 1000.0) if southeast.any() else 0.0,
+        "reached_km2": float(reached.sum() * GRID.dx_m**2 / 1e6),
+        "max_reach_km": float(distance[reached].max() / 1000.0),
+        "sea_cells": int(at_sea.sum()),
+        "slowest_arrival_min": float(travel[reached].max() / 60.0),
+    }
 
 
 def first_flow_hours(store: FieldStore) -> float:
     store.put("eruption.explosion", np.zeros(48), "dimensionless", time=_axis())
     domain = Pdc(GRID, _axis(), VENT_XY)
     domain.run(ScopedFields(store, domain.id, domain.inputs, domain.outputs), np.random.default_rng(0))
-    return float(store.stored("pdc.arrival").data.min() / 3600.)
+    return float(store.stored("pdc.arrival").data.min() / 3600.0)
 
 
 def _axis():
     from dataclasses import replace
+
     return replace(TIME, n=48)
 
 
 def lahar_frames() -> dict[str, float]:
     from stranded_physics.packs.st_vincent_2021 import build
+
     pack = build(1)
     depth = np.asarray([pack.frame("lahar.depth", t * pack.time.dt_s) for t in range(pack.time.n)])
     rain = pack.series("atmos.rain_rate")
@@ -80,8 +87,8 @@ def sensitivity(store: FieldStore) -> dict[str, dict[str, float]]:
     """Reach under other assumed settings, to show how much the verdicts hang on them. For reporting, never for tuning."""
     table = {}
     original = dict(pdc_model.SETTINGS)
-    for ratio in (.1, .2, .3):
-        for height in (500., 1000., 1500.):
+    for ratio in (0.1, 0.2, 0.3):
+        for height in (500.0, 1000.0, 1500.0):
             pdc_model.SETTINGS.update(height_over_length=ratio, collapse_height=height)
             summary = footprint_summary(store)
             table[f"HL{ratio}_Hc{int(height)}"] = {k: round(summary[k], 2) for k in ("west_sea", "sea_off_west", "southeast_reach_km", "reached_km2")}

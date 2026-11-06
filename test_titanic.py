@@ -1,4 +1,5 @@
 """Tests for the Titanic scenario: head-counts, shared mind, flood, boats, GUI hooks."""
+
 import json
 import os
 
@@ -93,9 +94,9 @@ def test_flood_timing_and_independence_from_decisions():
     world = ShipWorld()
     flood = FloodModel(5, world)
     assert all(not h["new_flood"] for h in flood.hazard_by_step[:COLLISION_STEP])
-    covered = {tuple(p) for h in flood.hazard_by_step[:BRIDGE_UNDER_STEP + 1] for p in h["new_flood"]}
+    covered = {tuple(p) for h in flood.hazard_by_step[: BRIDGE_UNDER_STEP + 1] for p in h["new_flood"]}
     assert (30, BOAT) in covered
-    covered = {tuple(p) for h in flood.hazard_by_step[:SINK_STEP + 1] for p in h["new_flood"]}
+    covered = {tuple(p) for h in flood.hazard_by_step[: SINK_STEP + 1] for p in h["new_flood"]}
     assert all((x, y) in covered for y in range(40) for x in range(40) if world.get_tile(x, y))
     quantum = TitanicSimulation(seed=5, mind_type="quantum")
     classical = TitanicSimulation(seed=5, mind_type="classical")
@@ -105,8 +106,8 @@ def test_flood_timing_and_independence_from_decisions():
 def test_flood_rises_gradually_after_the_collision():
     flood = FloodModel(5, ShipWorld())
     first_step = len(flood.hazard_by_step[COLLISION_STEP]["new_flood"])
-    total = len({tuple(p) for h in flood.hazard_by_step[:SINK_STEP + 1] for p in h["new_flood"]})
-    assert first_step < total * .1
+    total = len({tuple(p) for h in flood.hazard_by_step[: SINK_STEP + 1] for p in h["new_flood"]})
+    assert first_step < total * 0.1
 
 
 def test_boat_table_and_seats():
@@ -186,7 +187,7 @@ def test_gui_runs_a_whole_night_and_follows_people(app):
 def test_cutscene_pauses_and_skips(app):
     app._handle_mouse_click(app.btn_choice_titanic.rect.center)
     app._handle_mouse_click(app.btn_launch.rect.center)
-    scene = dict(kind="jump_sea", t=30, caption="x", focus=True, side="port", role="server", count=4, trim_deg=9.)
+    scene = dict(kind="jump_sea", t=30, caption="x", focus=True, side="port", role="server", count=4, trim_deg=9.0)
     app.cutscene.enqueue([scene])
     assert app.cutscene.active
     app.draw((5, 5))
@@ -200,9 +201,8 @@ def test_cutscene_ends_on_its_own_and_every_scene_draws():
     font = pygame.font.SysFont("arial", 14)
     for kind in SCENES:
         player = CutscenePlayer(font, font)
-        player.enqueue([dict(kind=kind, t=20, caption=kind, focus=True, side="port",
-                             role="passenger", count=3, trim_deg=5.)])
-        for fraction in (0., .3, .6, .99):
+        player.enqueue([dict(kind=kind, t=20, caption=kind, focus=True, side="port", role="passenger", count=3, trim_deg=5.0)])
+        for fraction in (0.0, 0.3, 0.6, 0.99):
             player.elapsed = fraction * DURATION
             player.draw(canvas)
         player.update(DURATION)
@@ -213,7 +213,7 @@ def test_crowd_jump_scenes_are_rate_limited_but_focus_scenes_are_not():
     pygame.init()
     font = pygame.font.SysFont("arial", 14)
     player = CutscenePlayer(font, font)
-    crowd = dict(kind="jump_sea", caption="c", focus=False, side="port", role="passenger", count=3, trim_deg=5.)
+    crowd = dict(kind="jump_sea", caption="c", focus=False, side="port", role="passenger", count=3, trim_deg=5.0)
     player.enqueue([dict(crowd, t=10)])
     player.skip()
     player.enqueue([dict(crowd, t=11)])
@@ -227,7 +227,7 @@ def test_disabling_cutscenes_queues_nothing():
     font = pygame.font.SysFont("arial", 14)
     player = CutscenePlayer(font, font)
     player.enabled = False
-    player.enqueue([dict(kind="float_off", t=3, caption="c", focus=True, side="port", role="passenger", trim_deg=1.)])
+    player.enqueue([dict(kind="float_off", t=3, caption="c", focus=True, side="port", role="passenger", trim_deg=1.0)])
     assert not player.active
 
 
@@ -244,4 +244,3 @@ def test_gui_three_mind_cards_and_titanic_policy_mappings(app):
     sim_amb.run()
     sim_pa_open.run()
     assert sim_pa_open.counts()["boats"] > sim_amb.counts()["boats"]
-

@@ -1,8 +1,9 @@
 """The Titanic against the 1912 record. Each mode prints a final JSON line for the gate runner.
 
-    python -m stranded_physics.validation.titanic saved_all|saved_adult_male|saved_adult_female|saved_child|saved_first_class|saved_second_class|saved_third_class|saved_crew
-    python -m stranded_physics.validation.titanic minds     every mind side by side, reported with no target
+python -m stranded_physics.validation.titanic saved_all|saved_adult_male|saved_adult_female|saved_child|saved_first_class|saved_second_class|saved_third_class|saved_crew
+python -m stranded_physics.validation.titanic minds     every mind side by side, reported with no target
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -26,7 +27,16 @@ CREW = ("crew_deck", "crew_engine", "crew_victualling")
 def run(mind: str | None = None) -> dict[str, object]:
     """One full run takes minutes, and there are eight gates, so the result is kept against a hash of everything it depends on."""
     digest = hashlib.sha256((mind or "card").encode())
-    for pattern in ("stranded_physics/runtime/*.py", "stranded_physics/domains/ship/*", "stranded_physics/domains/sea/*", "stranded_physics/entities/*.py", "stranded_physics/validation/titanic.py", "stranded_physics/scenario_cards/titanic_1912.toml", "mind/*.py", "contracts.py"):
+    for pattern in (
+        "stranded_physics/runtime/*.py",
+        "stranded_physics/domains/ship/*",
+        "stranded_physics/domains/sea/*",
+        "stranded_physics/entities/*.py",
+        "stranded_physics/validation/titanic.py",
+        "stranded_physics/scenario_cards/titanic_1912.toml",
+        "mind/*.py",
+        "contracts.py",
+    ):
         for path in sorted(ROOT.glob(pattern)):
             if path.is_file():
                 digest.update(path.read_bytes().replace(b"\r\n", b"\n"))

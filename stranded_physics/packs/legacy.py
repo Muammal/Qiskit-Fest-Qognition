@@ -3,6 +3,7 @@
 PackSimulation uses its own body model, so survival differs from the old engine.
 No agent is constructed or read when building this pack.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -17,11 +18,11 @@ from stranded_physics.core.api import GridSpec, InterfaceError, ScenarioSpec, Ti
 from stranded_physics.core.fields import spec
 from stranded_physics.packs.builder import Pack, build_pack
 
-LEGACY_RAIN_MM_H = 2.  # assumption: representative T0 rain, below the runtime's storm threshold.
-LEGACY_STORM_MM_H = 10.  # assumption: representative T0 storm, at least 5 mm/h for runtime labelling.
-LEGACY_LAHAR_M = 1.  # assumption: binary old lahar becomes positive depth; any positive depth is lethal in the runtime.
-LEGACY_ASH_FULL_KG_M2 = 1.  # assumption: old full-scale ash maps to one kg/m²; affects perceived ash, not a measured load.
-LEGACY_DT_S = 7200.  # assumption: old two-hour frames are held constant until the next frame.
+LEGACY_RAIN_MM_H = 2.0  # assumption: representative T0 rain, below the runtime's storm threshold.
+LEGACY_STORM_MM_H = 10.0  # assumption: representative T0 storm, at least 5 mm/h for runtime labelling.
+LEGACY_LAHAR_M = 1.0  # assumption: binary old lahar becomes positive depth; any positive depth is lethal in the runtime.
+LEGACY_ASH_FULL_KG_M2 = 1.0  # assumption: old full-scale ash maps to one kg/m²; affects perceived ash, not a measured load.
+LEGACY_DT_S = 7200.0  # assumption: old two-hour frames are held constant until the next frame.
 LEGACY_LOCAL_HOUR = 8  # assumption: old simulation's local start hour.
 LEGACY_T0 = datetime(2000, 1, 1, 8, tzinfo=timezone.utc)  # assumption: arbitrary epoch, with local time equal to UTC.
 LEGACY_CRS = "LOCAL:legacy"  # assumption: fictional Cartesian metres; no geographic registration.
@@ -29,8 +30,22 @@ PHASE_CODES = {"unrest": 0, "escalating": 1, "erupting": 2, "fading": 3}
 ASH_DIGIT_FULL = 9  # assumption: old ash encoding's full-scale digit.
 
 
-OUTPUTS = ("terrain.elevation", "terrain.land_mask", "terrain.land_cover", "terrain.zone", "atmos.rain_rate", "eruption.phase", "eruption.tremor",
-           "eruption.gas", "eruption.explosion", "pdc.active", "pdc.arrival", "lahar.depth", "lava.footprint", "tephra.deposit_load")
+OUTPUTS = (
+    "terrain.elevation",
+    "terrain.land_mask",
+    "terrain.land_cover",
+    "terrain.zone",
+    "atmos.rain_rate",
+    "eruption.phase",
+    "eruption.tremor",
+    "eruption.gas",
+    "eruption.explosion",
+    "pdc.active",
+    "pdc.arrival",
+    "lahar.depth",
+    "lava.footprint",
+    "tephra.deposit_load",
+)
 
 
 def _forecast_arrays(grid: GridSpec, time: TimeAxis, world, volcano, weather) -> dict[str, np.ndarray]:
@@ -46,7 +61,7 @@ def _forecast_arrays(grid: GridSpec, time: TimeAxis, world, volcano, weather) ->
         "terrain.land_mask": np.asarray(world.elevation) > 0,
         "terrain.land_cover": np.asarray(world.tiles),
         "terrain.zone": np.asarray(world.zones),
-        "atmos.rain_rate": np.array([{"calm": 0., "rain": LEGACY_RAIN_MM_H, "storm": LEGACY_STORM_MM_H}[w] for w in weather]),
+        "atmos.rain_rate": np.array([{"calm": 0.0, "rain": LEGACY_RAIN_MM_H, "storm": LEGACY_STORM_MM_H}[w] for w in weather]),
         "eruption.phase": np.array([PHASE_CODES[p] for p in volcano.phases]),
     }
     for name, event in (("tremor", "tremor"), ("gas", "gas_plume"), ("explosion", "eruption")):
@@ -58,13 +73,13 @@ def _forecast_arrays(grid: GridSpec, time: TimeAxis, world, volcano, weather) ->
     lava = np.zeros(shape[1:])
     for k, hazard in enumerate(volcano.hazard_by_step):
         for x, y in hazard["active_pdc"]:
-            arrays["pdc.active"][k, y, x] = 1.
+            arrays["pdc.active"][k, y, x] = 1.0
             if np.isinf(arrival[y, x]):
                 arrival[y, x] = k * time.dt_s
         for x, y in hazard["active_lahar"]:
             arrays["lahar.depth"][k, y, x] = LEGACY_LAHAR_M
         for x, y in hazard["new_lava"]:
-            lava[y, x] = 1.
+            lava[y, x] = 1.0
         arrays["lava.footprint"][k] = lava
         arrays["tephra.deposit_load"][k] = np.array([[int(digit) for digit in row] for row in hazard["ash_grid"]]) / ASH_DIGIT_FULL * LEGACY_ASH_FULL_KG_M2
     arrays["pdc.arrival"] = arrival
@@ -87,7 +102,13 @@ class LegacyPart:
 
     def run(self, fields, rng: np.random.Generator) -> dict[str, float]:
         for output in self.outputs:
-            fields.put(output.name, self.arrays[output.name], output.unit, None if output.kind == "series" else self.grid, self.time if output.kind in ("series", "frames") else None)
+            fields.put(
+                output.name,
+                self.arrays[output.name],
+                output.unit,
+                None if output.kind == "series" else self.grid,
+                self.time if output.kind in ("series", "frames") else None,
+            )
         return {}
 
 
@@ -96,12 +117,18 @@ def legacy_scenario(seed: int) -> ScenarioSpec:
     weather = EventGenerator(seed).weather
     volcano = VolcanoModel(seed, world, weather=weather)
     # assumption: arbitrary origin at the north-west corner, with north-up rows.
-    grid = GridSpec(LEGACY_CRS, 0., 0., SCALE_M_PER_TILE, world.width, world.height)
+    grid = GridSpec(LEGACY_CRS, 0.0, 0.0, SCALE_M_PER_TILE, world.width, world.height)
     time = TimeAxis(LEGACY_T0, LEGACY_DT_S, DEFAULT_STEPS)
-    sites = {name: [grid.centre(y, x) for x, y in tiles] for name, tiles in (
-        ("spawn", [world.spawn_pos]), ("vent", [world.vent]),
-        ("assembly", world.assembly_points), ("water", world.freshwater_tiles), ("food", world.food_tiles),
-    )}
+    sites = {
+        name: [grid.centre(y, x) for x, y in tiles]
+        for name, tiles in (
+            ("spawn", [world.spawn_pos]),
+            ("vent", [world.vent]),
+            ("assembly", world.assembly_points),
+            ("water", world.freshwater_tiles),
+            ("food", world.food_tiles),
+        )
+    }
     arrays = _forecast_arrays(grid, time, world, volcano, tuple(weather))
     parts = tuple(LegacyPart(category, arrays, grid, time) for category in sorted({name.split(".")[0] for name in OUTPUTS}))
     return ScenarioSpec("legacy_island", grid, grid, time, LEGACY_LOCAL_HOUR, parts, sites)

@@ -1,4 +1,5 @@
 """Names, units and kinds of everything categories exchange, and the store that enforces them."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -81,8 +82,8 @@ def _regrid(data: np.ndarray, source: GridSpec, target: GridSpec) -> np.ndarray:
         return data
     if source.crs != target.crs:
         raise InterfaceError(f"grids use different CRS: {source.crs} and {target.crs}")
-    columns = np.clip(np.floor((target.x0_m + (np.arange(target.nx) + .5) * target.dx_m - source.x0_m) / source.dx_m).astype(int), 0, source.nx - 1)
-    rows = np.clip(np.floor((source.y0_m - (target.y0_m - (np.arange(target.ny) + .5) * target.dx_m)) / source.dx_m).astype(int), 0, source.ny - 1)
+    columns = np.clip(np.floor((target.x0_m + (np.arange(target.nx) + 0.5) * target.dx_m - source.x0_m) / source.dx_m).astype(int), 0, source.nx - 1)
+    rows = np.clip(np.floor((source.y0_m - (target.y0_m - (np.arange(target.ny) + 0.5) * target.dx_m)) / source.dx_m).astype(int), 0, source.ny - 1)
     return data[..., rows[:, None], columns[None, :]]
 
 

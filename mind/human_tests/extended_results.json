@@ -1,0 +1,439 @@
+{
+ "eta": -0.7853897988344999,
+ "rows": [
+  {
+   "study": "Shafir & Tversky 1992",
+   "a": 0.97,
+   "b": 0.84,
+   "observed": 0.63,
+   "quantum_fixed": 0.8505865985868939,
+   "classical_average": 0.905,
+   "classical_best": 0.84,
+   "markov_held_out": 0.7075261929144216,
+   "eta_exact": -3.969283100678676,
+   "blocked": true,
+   "own_eta_prediction": 0.8357179676972449,
+   "eta_from_others": -0.4587175792164828,
+   "loo_prediction": 0.8732191138588821,
+   "superposed_loo": 0.9552887622723187,
+   "superposed_reach_low": 0.0362672498560892,
+   "superposed_reach_high": 0.989757339550191,
+   "unitary_bound_low": 0.8357179676972449
+  },
+  {
+   "study": "Croson 1999",
+   "a": 0.67,
+   "b": 0.32,
+   "observed": 0.3,
+   "quantum_fixed": 0.13133823134306422,
+   "classical_average": 0.495,
+   "classical_best": 0.32,
+   "markov_held_out": 0.3842166091331122,
+   "eta_exact": -0.4211358574709131,
+   "blocked": false,
+   "own_eta_prediction": 0.3,
+   "eta_from_others": -0.555194936304664,
+   "loo_prediction": 0.2379261587232881,
+   "superposed_loo": 0.22181019456888618,
+   "superposed_reach_low": 0.03082707121049988,
+   "superposed_reach_high": 0.9616273197714061,
+   "unitary_bound_low": 0.021291228706919574
+  },
+  {
+   "study": "Li & Taplin 2002",
+   "a": 0.83,
+   "b": 0.66,
+   "observed": 0.6,
+   "quantum_fixed": 0.5561794861055914,
+   "classical_average": 0.745,
+   "classical_best": 0.66,
+   "markov_held_out": 0.5618699956835802,
+   "eta_exact": -0.6031204898355846,
+   "blocked": false,
+   "own_eta_prediction": 0.6,
+   "eta_from_others": -0.5248641642438854,
+   "loo_prediction": 0.6188140966888551,
+   "superposed_loo": 0.7349673503004459,
+   "superposed_reach_low": 0.02889391014199527,
+   "superposed_reach_high": 0.9729934289574428,
+   "unitary_bound_low": 0.5045836943965738
+  },
+  {
+   "study": "Busemeyer Matthew Wang 2006",
+   "a": 0.91,
+   "b": 0.84,
+   "observed": 0.66,
+   "quantum_fixed": 0.78075322413986,
+   "classical_average": 0.875,
+   "classical_best": 0.84,
+   "markov_held_out": 0.6695286061703474,
+   "eta_exact": -1.7916666666666667,
+   "blocked": true,
+   "own_eta_prediction": 0.755,
+   "eta_from_others": -0.4587175792164828,
+   "loo_prediction": 0.8199538904940221,
+   "superposed_loo": 0.9085769793824912,
+   "superposed_reach_low": 0.014519416097715787,
+   "superposed_reach_high": 0.9745701632451742,
+   "unitary_bound_low": 0.755
+  },
+  {
+   "study": "Kuhberger Komunska Perner 2001 exp 3",
+   "a": 0.8,
+   "b": 0.38,
+   "observed": 0.43,
+   "quantum_fixed": 0.3134357129381151,
+   "classical_average": 0.5900000000000001,
+   "classical_best": 0.43,
+   "markov_held_out": 0.4524081696704454,
+   "eta_exact": -0.4543694673976522,
+   "blocked": false,
+   "own_eta_prediction": 0.42999999999999994,
+   "eta_from_others": -0.5496560013168741,
+   "loo_prediction": 0.39644614895804,
+   "superposed_loo": 0.49135897653656957,
+   "superposed_reach_low": 0.06792424681827791,
+   "superposed_reach_high": 0.9998226166846241,
+   "unitary_bound_low": 0.23786366276681992
+  },
+  {
+   "study": "Lambdin & Burdsal 2007 coin",
+   "a": 0.64,
+   "b": 0.47,
+   "observed": 0.39,
+   "quantum_fixed": 0.21193655751389523,
+   "classical_average": 0.5549999999999999,
+   "classical_best": 0.47,
+   "markov_held_out": 0.42688052446205077,
+   "eta_exact": -0.37774155085889466,
+   "blocked": false,
+   "own_eta_prediction": 0.39,
+   "eta_from_others": -0.5624273207400003,
+   "loo_prediction": 0.3093280380167506,
+   "superposed_loo": 0.32850678817304607,
+   "superposed_reach_low": 0.011866253304666619,
+   "superposed_reach_high": 0.9972429741493382,
+   "unitary_bound_low": 0.11819340664316885
+  },
+  {
+   "study": "Broekaert Busemeyer Pothos 2020 exp 1",
+   "a": 0.45,
+   "b": 0.66,
+   "observed": 0.6,
+   "quantum_fixed": 0.2153699888802723,
+   "classical_average": 0.555,
+   "classical_best": 0.6,
+   "markov_held_out": 0.403437127890573,
+   "eta_exact": 0.1040618902641479,
+   "blocked": false,
+   "own_eta_prediction": 0.6,
+   "eta_from_others": -0.6427278942605075,
+   "loo_prediction": 0.2770619847640088,
+   "superposed_loo": 0.32911745127339154,
+   "superposed_reach_low": 0.007226731808814391,
+   "superposed_reach_high": 0.9463446695055601,
+   "unitary_bound_low": 0.12256503379120698
+  }
+ ],
+ "markov": {
+  "splits": 70,
+  "h_median": 0.2396072020948411,
+  "h_min": 0.14651364405730094,
+  "h_max": 0.3184774884754842,
+  "held_out_error": 0.07124450006481003,
+  "prediction": {
+   "Shafir & Tversky 1992": 0.7075261929144216,
+   "Croson 1999": 0.3842166091331122,
+   "Li & Taplin 2002": 0.5618699956835802,
+   "Busemeyer Matthew Wang 2006": 0.6695286061703474,
+   "Kuhberger Komunska Perner 2001 exp 3": 0.4524081696704454,
+   "Lambdin & Burdsal 2007 coin": 0.42688052446205077,
+   "Broekaert Busemeyer Pothos 2020 exp 1": 0.403437127890573
+  }
+ },
+ "scores": {
+  "quantum_fixed_eta": 0.17615426370654505,
+  "classical_average": 0.1714285714285714,
+  "classical_best": 0.07857142857142856,
+  "markov_held_out": 0.07124450006481003,
+  "per_study_eta_in_sample": 0.042959709671035,
+  "per_study_eta_loo": 0.13160353865423882,
+  "superposed_loo": 0.16867966206807167
+ },
+ "final_phi": -0.2705260340591211,
+ "config_phi": -0.2705260340591211,
+ "config_markov": 0.2396072020948411,
+ "test2": [
+  {
+   "study": "Clinton-Gore",
+   "domain": "survey",
+   "tvd_classical": 0.09490000000000001,
+   "tvd_quantum_mean": 0.4142056054372659,
+   "tvd_quantum_better": 0.17196298412052197,
+   "q": -0.0032000000000000084,
+   "z": -0.11393902192024893,
+   "qq_survives": true,
+   "chi2": 10.080327905826273,
+   "no_order_effect_survives": false
+  },
+  {
+   "study": "Gingrich-Dole",
+   "domain": "survey",
+   "tvd_classical": 0.06745,
+   "tvd_quantum_mean": 0.4898856121868552,
+   "tvd_quantum_better": 0.29820881831791063,
+   "q": -0.0030999999999999917,
+   "z": -0.08986054532869292,
+   "qq_survives": true,
+   "chi2": 4.4219902132064846,
+   "no_order_effect_survives": true
+  },
+  {
+   "study": "White-Black",
+   "domain": "survey",
+   "tvd_classical": 0.12300000000000001,
+   "tvd_quantum_mean": 0.3775862540869496,
+   "tvd_quantum_better": 0.36275533213812877,
+   "q": -0.01899999999999999,
+   "z": -0.7476285764661093,
+   "qq_survives": true,
+   "chi2": 65.7643715357351,
+   "no_order_effect_survives": false
+  },
+  {
+   "study": "Rose-Jackson",
+   "domain": "survey, with new information between questions",
+   "tvd_classical": 0.20070000000000002,
+   "tvd_quantum_mean": 0.44875865797078324,
+   "tvd_quantum_better": 0.3802342623419436,
+   "q": 0.15139999999999998,
+   "z": 5.426348866150951,
+   "qq_survives": false,
+   "chi2": 64.38872034633624,
+   "no_order_effect_survives": false
+  },
+  {
+   "study": "Racial hostility",
+   "domain": "lab",
+   "tvd_classical": 0.2283,
+   "tvd_quantum_mean": 0.44228490386070823,
+   "tvd_quantum_better": 0.38680494718907044,
+   "q": 0.07560000000000006,
+   "z": 1.221970819988025,
+   "qq_survives": true,
+   "chi2": 26.73967248454923,
+   "no_order_effect_survives": false
+  },
+  {
+   "study": "Affirmative action",
+   "domain": "lab",
+   "tvd_classical": 0.08294999999999998,
+   "tvd_quantum_mean": 0.4019909216303934,
+   "tvd_quantum_better": 0.21898739466599754,
+   "q": 0.04300000000000001,
+   "z": 0.8363145356620466,
+   "qq_survives": true,
+   "chi2": 1.665180708283014,
+   "no_order_effect_survives": true
+  },
+  {
+   "study": "BK Mr F paper",
+   "domain": "experiment from a paper arguing against these models",
+   "tvd_classical": 0.154251,
+   "tvd_quantum_mean": 0.4035260263278609,
+   "tvd_quantum_better": 0.3315405286204279,
+   "q": 0.012048000000000003,
+   "z": 0.2902691582778592,
+   "qq_survives": true,
+   "chi2": 15.585129855580725,
+   "no_order_effect_survives": false
+  },
+  {
+   "study": "BK Bill paper",
+   "domain": "experiment from a paper arguing against these models",
+   "tvd_classical": 0.12761550000000002,
+   "tvd_quantum_mean": 0.4862142863052652,
+   "tvd_quantum_better": 0.19249486984407754,
+   "q": -0.08613199999999999,
+   "z": -1.9899311158716892,
+   "qq_survives": false,
+   "chi2": 8.571532105248968,
+   "no_order_effect_survives": false
+  },
+  {
+   "study": "BK Mr F computer",
+   "domain": "experiment from a paper arguing against these models",
+   "tvd_classical": 0.04713600000000002,
+   "tvd_quantum_mean": 0.33192652983267834,
+   "tvd_quantum_better": 0.23016630610003436,
+   "q": -0.024138999999999994,
+   "z": -0.5187270126303226,
+   "qq_survives": true,
+   "chi2": 2.2801389364652396,
+   "no_order_effect_survives": true
+  },
+  {
+   "study": "BK Bill computer",
+   "domain": "experiment from a paper arguing against these models",
+   "tvd_classical": 0.04915500000000003,
+   "tvd_quantum_mean": 0.345993953040899,
+   "tvd_quantum_better": 0.2965363594651945,
+   "q": -0.037217,
+   "z": -0.7080355205733798,
+   "qq_survives": true,
+   "chi2": 2.8463787581004265,
+   "no_order_effect_survives": true
+  },
+  {
+   "study": "BK Linda computer paid",
+   "domain": "experiment from a paper arguing against these models",
+   "tvd_classical": 0.09052599999999997,
+   "tvd_quantum_mean": 0.47431126730465245,
+   "tvd_quantum_better": 0.210526,
+   "q": 0.00806999999999991,
+   "z": 0.14372091512173307,
+   "qq_survives": true,
+   "chi2": 5.55330407747926,
+   "no_order_effect_survives": true
+  },
+  {
+   "study": "BK Linda not paid A",
+   "domain": "experiment from a paper arguing against these models",
+   "tvd_classical": 0.13355250000000002,
+   "tvd_quantum_mean": 0.3978535123170083,
+   "tvd_quantum_better": 0.3604122494126365,
+   "q": 0.12640000000000007,
+   "z": 2.2728546402193714,
+   "qq_survives": false,
+   "chi2": 6.863901866898692,
+   "no_order_effect_survives": true
+  },
+  {
+   "study": "BK Linda not paid B",
+   "domain": "experiment from a paper arguing against these models",
+   "tvd_classical": 0.225335,
+   "tvd_quantum_mean": 0.49667808748012604,
+   "tvd_quantum_better": 0.453238546514231,
+   "q": 0.20330399999999998,
+   "z": 3.916810985841258,
+   "qq_survives": false,
+   "chi2": 18.40727191831234,
+   "no_order_effect_survives": false
+  }
+ ],
+ "first_order_fit": {
+  "Clinton-Gore": {
+   "fit_tvd": 0.14734262131674392,
+   "p_b_given_a": 0.9163860830527498,
+   "p_notb_given_nota": 0.6202450032237267
+  },
+  "Gingrich-Dole": {
+   "fit_tvd": 0.2186267938689446,
+   "p_b_given_a": 0.8268907563025211,
+   "p_notb_given_nota": 0.38866628506010303
+  },
+  "White-Black": {
+   "fit_tvd": 0.11383092194882076,
+   "p_b_given_a": 0.9581831290555154,
+   "p_notb_given_nota": 0.7239253296797397
+  },
+  "Rose-Jackson": {
+   "fit_tvd": 0.19552439562883975,
+   "p_b_given_a": 0.5104229607250755,
+   "p_notb_given_nota": 0.9473372781065089
+  },
+  "Racial hostility": {
+   "fit_tvd": 0.09872004332836222,
+   "p_b_given_a": 0.8056719303899451,
+   "p_notb_given_nota": 0.5750326228795128
+  },
+  "Affirmative action": {
+   "fit_tvd": 0.12895352696439577,
+   "p_b_given_a": 0.9193149381541389,
+   "p_notb_given_nota": 0.6607669616519174
+  },
+  "BK Mr F paper": {
+   "fit_tvd": 0.08226550229256693,
+   "p_b_given_a": 0.8484852079897813,
+   "p_notb_given_nota": 0.6307691072188627
+  },
+  "BK Bill paper": {
+   "fit_tvd": 0.24484491646118767,
+   "p_b_given_a": 0.180327107229202,
+   "p_notb_given_nota": 0.6770829785156471
+  },
+  "BK Mr F computer": {
+   "fit_tvd": 0.08990574542241442,
+   "p_b_given_a": 0.5384638313600648,
+   "p_notb_given_nota": 0.8604651442221042
+  },
+  "BK Bill computer": {
+   "fit_tvd": 0.004164866599476295,
+   "p_b_given_a": 0.7083330781245215,
+   "p_notb_given_nota": 0.7235767596670392
+  },
+  "BK Linda computer paid": {
+   "fit_tvd": 0.35431126730465234,
+   "p_b_given_a": 0.09782614012290225,
+   "p_notb_given_nota": 0.8448277199761035
+  },
+  "BK Linda not paid A": {
+   "fit_tvd": 0.0045790064731358136,
+   "p_b_given_a": 0.5,
+   "p_notb_given_nota": 0.320261331966362
+  },
+  "BK Linda not paid B": {
+   "fit_tvd": 0.013912214541231784,
+   "p_b_given_a": 0.5384615384615385,
+   "p_notb_given_nota": 0.44155869505810297
+  }
+ },
+ "summary": {
+  "eta": -0.7853897988344999,
+  "test1": {
+   "rows": 7,
+   "mean_error_quantum": 0.17615426370654505,
+   "mean_error_classical_average": 0.1714285714285714,
+   "mean_error_classical_best": 0.07857142857142856,
+   "quantum_beats_average": 5,
+   "quantum_beats_best": 2
+  },
+  "test2": {
+   "rows": 13,
+   "mean_tvd_classical": 0.12499007692307694,
+   "mean_tvd_quantum": 0.42393966290626506,
+   "mean_tvd_quantum_better_sign": 0.29952835374847503,
+   "quantum_beats_classical": 0,
+   "better_sign_beats_classical": 0
+  },
+  "test3": {
+   "rows": 13,
+   "qq_survives": 9,
+   "no_order_effect_survives": 6
+  }
+ },
+ "not_scored": [
+  {
+   "study": "Tversky & Shafir 1992",
+   "scored": false,
+   "observed": 0.36,
+   "quantum": 0.36,
+   "classical_average": 0.6399999999999999,
+   "classical_best": 0.59,
+   "error_quantum": 0.0,
+   "error_average": 0.2799999999999999,
+   "error_best": 0.22999999999999998
+  },
+  {
+   "study": "Tversky & Shafir 1992 between",
+   "scored": false,
+   "observed": 0.38,
+   "quantum": 0.34325204404581633,
+   "classical_average": 0.6299999999999999,
+   "classical_best": 0.57,
+   "error_quantum": 0.036747955954183675,
+   "error_average": 0.2499999999999999,
+   "error_best": 0.18999999999999995
+  }
+ ]
+}

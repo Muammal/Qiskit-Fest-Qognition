@@ -3,6 +3,7 @@
 People affect each other only through their bodies: someone who sees a neighbour leaving knows to go, and an able-bodied neighbour
 helps an injured person keep up. Nothing about anyone else ever reaches a mind, because the frozen contract has no place for it.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -10,8 +11,8 @@ import numpy as np
 from stranded_physics.core.api import ScenarioPack
 from stranded_physics.runtime.simulation import PackSimulation, Shared
 
-NOTICE_M = 500.  # assumption: close enough to see that a neighbour has been warned and is acting on it.
-HELP_M = 200.  # assumption: close enough to help someone walk.
+NOTICE_M = 500.0  # assumption: close enough to see that a neighbour has been warned and is acting on it.
+HELP_M = 200.0  # assumption: close enough to help someone walk.
 
 
 def notice_each_other(people: list[PackSimulation]) -> None:

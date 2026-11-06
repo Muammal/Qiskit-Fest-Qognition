@@ -2,6 +2,7 @@
 and compare against the exact closed-form values. Offline only - this
 never runs during gameplay (D7); see 06-circuits-and-hardware.md.
 """
+
 import json
 from datetime import datetime, timezone
 from pathlib import Path

@@ -11,6 +11,7 @@ Includes:
 - `build_coherence_probe_circuit` and `build_delay_circuit`: T2 Ramsey and
   delay-decoherence circuits.
 """
+
 import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import UnitaryGate
@@ -40,10 +41,7 @@ def build_decision_circuit(safety, events, q_S, q_D, eta, allow_collapse=False):
             continue
         if event in COLLAPSE_EVENTS:
             if not allow_collapse:
-                raise ValueError(
-                    f"{event!r} is a collapse event; it has no gate representation "
-                    "(see 06-circuits-and-hardware.md)"
-                )
+                raise ValueError(f"{event!r} is a collapse event; it has no gate representation (see 06-circuits-and-hardware.md)")
             qc.reset(0)
             qc.x(0)
             continue

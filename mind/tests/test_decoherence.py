@@ -4,12 +4,13 @@ gamma = 1 - (1-lam)**2 is the trap: Aer's phase_damping_error(gamma) scales
 coherence by sqrt(1-gamma), not (1-gamma). With this gamma, sqrt(1-gamma)
 = 1-lam exactly, so lam is a per-slot linear coherence-decay rate.
 """
+
 import numpy as np
 import pytest
 from qiskit.quantum_info import DensityMatrix, Kraus
 from qiskit_aer.noise import phase_damping_error
 
-from mind.belief import apply_event, prepare_belief, run_events
+from mind.belief import prepare_belief, run_events
 from mind.decoherence import apply_phase_damping, decoherence_strength
 from mind.model import bloch_vector
 

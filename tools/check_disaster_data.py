@@ -1,4 +1,5 @@
 """Locked checker for the data task. Run from the folder under test. Re-downloads sources to compare."""
+
 import csv
 import hashlib
 import html
@@ -17,18 +18,59 @@ from pathlib import Path
 ROOT = Path("disaster_data")
 RESULTS = {}
 RNG = random.Random(secrets.randbits(64))
-ISLANDS = {"st_vincent": (13.33, -61.18), "montserrat": (16.72, -62.18), "miyakejima": (34.094, 139.526),
-           "stromboli": (38.789, 15.213), "la_palma": (28.57, -17.83)}
-SOURCE_IDS = ["gvp_volcanoes", "gvp_eruptions", "noaa_volcano_events", "noaa_tsunamis", "noaa_earthquakes",
-              "natural_earth_land", "natural_earth_minor_islands", "ibtracs", "upper_wind_st_vincent",
-              *[f"weather_{i}" for i in ISLANDS]]
-REQUIRED_RAW = {"gvp_volcanoes.json", "gvp_eruptions.json", "noaa_volcano_events.json", "noaa_tsunamis.json", "noaa_earthquakes.json",
-                "ne_10m_land.zip", "ne_10m_minor_islands.zip", "ibtracs_since1980.csv", "upper_wind_st_vincent.json",
-                *[f"weather_{i}.json" for i in ISLANDS]}
-CATALOGS = ["volcanoes", "eruptions", "noaa_volcano_events", "volcanic_tsunamis", "earthquakes_near_study_islands",
-            "cyclones_near_study_islands", "precursor_lead_times"]
-KEYS = {"first_unrest", "evacuation_order", "evacuation_complete", "eruption_onset", "first_pdc", "lahar", "ashfall",
-        "tsunami", "deaths", "evacuees", "precursor"}
+ISLANDS = {
+    "st_vincent": (13.33, -61.18),
+    "montserrat": (16.72, -62.18),
+    "miyakejima": (34.094, 139.526),
+    "stromboli": (38.789, 15.213),
+    "la_palma": (28.57, -17.83),
+}
+SOURCE_IDS = [
+    "gvp_volcanoes",
+    "gvp_eruptions",
+    "noaa_volcano_events",
+    "noaa_tsunamis",
+    "noaa_earthquakes",
+    "natural_earth_land",
+    "natural_earth_minor_islands",
+    "ibtracs",
+    "upper_wind_st_vincent",
+    *[f"weather_{i}" for i in ISLANDS],
+]
+REQUIRED_RAW = {
+    "gvp_volcanoes.json",
+    "gvp_eruptions.json",
+    "noaa_volcano_events.json",
+    "noaa_tsunamis.json",
+    "noaa_earthquakes.json",
+    "ne_10m_land.zip",
+    "ne_10m_minor_islands.zip",
+    "ibtracs_since1980.csv",
+    "upper_wind_st_vincent.json",
+    *[f"weather_{i}.json" for i in ISLANDS],
+}
+CATALOGS = [
+    "volcanoes",
+    "eruptions",
+    "noaa_volcano_events",
+    "volcanic_tsunamis",
+    "earthquakes_near_study_islands",
+    "cyclones_near_study_islands",
+    "precursor_lead_times",
+]
+KEYS = {
+    "first_unrest",
+    "evacuation_order",
+    "evacuation_complete",
+    "eruption_onset",
+    "first_pdc",
+    "lahar",
+    "ashfall",
+    "tsunami",
+    "deaths",
+    "evacuees",
+    "precursor",
+}
 EVENTS = {"tremor", "gas_plume", "eruption", "ash_fall"}
 
 
@@ -74,8 +116,11 @@ def check_layout():
     missing = [s for s in SOURCE_IDS if s not in sources]
     check("manifest_has_sources", not missing, missing)
     fields = ("url", "retrieved_at", "sha256", "file", "licence", "citation")
-    check("manifest_fields", all(all(s.get(k) for k in fields) for s in sources.values()),
-          [i for i, s in sources.items() if not all(s.get(k) for k in fields)][:5])
+    check(
+        "manifest_fields",
+        all(all(s.get(k) for k in fields) for s in sources.values()),
+        [i for i, s in sources.items() if not all(s.get(k) for k in fields)][:5],
+    )
     raw = {p.name for p in (ROOT / "raw").iterdir()} if (ROOT / "raw").exists() else set()
     check("raw_files_present", REQUIRED_RAW <= raw, sorted(REQUIRED_RAW - raw))
     bad = []
@@ -136,8 +181,21 @@ def check_catalogs_against_live():
 def check_island_classes():
     rows = table("volcanoes")
     named = {r["name"]: r for r in rows}
-    expected = {"small_island": ["Soufriere St. Vincent", "Soufriere Hills", "Miyakejima", "Izu-Oshima", "Stromboli", "Vestmannaeyjar", "La Palma", "Pelee", "Krakatau"],
-                "large_island": ["Merapi", "Hekla"], "continental": ["St. Helens", "Rainier", "Popocatepetl", "Vesuvius"]}
+    expected = {
+        "small_island": [
+            "Soufriere St. Vincent",
+            "Soufriere Hills",
+            "Miyakejima",
+            "Izu-Oshima",
+            "Stromboli",
+            "Vestmannaeyjar",
+            "La Palma",
+            "Pelee",
+            "Krakatau",
+        ],
+        "large_island": ["Merapi", "Hekla"],
+        "continental": ["St. Helens", "Rainier", "Popocatepetl", "Vesuvius"],
+    }
     wrong = [(n, named.get(n, {}).get("island_class"), want) for want, names in expected.items() for n in names if named.get(n, {}).get("island_class") != want]
     check("island_classes_known_answers", not wrong, wrong)
     counts = Counter(r["island_class"] for r in rows)
@@ -191,13 +249,19 @@ def check_cases():
     required = {"360150": ("eruption_onset", "2021-04-09"), "372010": ("eruption_onset", "1973-01-23"), "360120": ("first_pdc", "1902-05-08")}
     wrong = []
     for number, (key, date) in required.items():
-        case = next((c for c in cases if str(c.get("volcano_number")) == number and any(str(f.get("iso_date", "")).startswith(date[:4]) for f in c["facts"])), None)
+        case = next(
+            (c for c in cases if str(c.get("volcano_number")) == number and any(str(f.get("iso_date", "")).startswith(date[:4]) for f in c["facts"])), None
+        )
         if not case or not any(f["key"] == key and str(f.get("iso_date", "")).startswith(date) for f in case["facts"]):
             wrong.append((number, key, date))
     check("known_dates", not wrong, wrong)
     rows = table("precursor_lead_times")
     hours = [float(r["lead_hours"]) for r in rows if r["lead_hours"]]
-    check("iceland_lead_times", len(rows) >= 15 and 0.2 <= min(hours) <= 0.3 and 300 <= max(hours) <= 325, (len(rows), min(hours, default=None), max(hours, default=None)))
+    check(
+        "iceland_lead_times",
+        len(rows) >= 15 and 0.2 <= min(hours) <= 0.3 and 300 <= max(hours) <= 325,
+        (len(rows), min(hours, default=None), max(hours, default=None)),
+    )
     return data
 
 
@@ -209,22 +273,38 @@ def _classify(precip, wind):
 
 def _markov(hourly):
     start = next(i for i, t in enumerate(hourly["time"]) if int(t[11:13]) % 2 == 0)
-    states = [_classify(hourly["precipitation"][i:i + 2], hourly["wind_speed_10m"][i:i + 2])
-              for i in range(start, len(hourly["time"]) - 1, 2)
-              if None not in hourly["precipitation"][i:i + 2] and None not in hourly["wind_speed_10m"][i:i + 2]]
+    states = [
+        _classify(hourly["precipitation"][i : i + 2], hourly["wind_speed_10m"][i : i + 2])
+        for i in range(start, len(hourly["time"]) - 1, 2)
+        if None not in hourly["precipitation"][i : i + 2] and None not in hourly["wind_speed_10m"][i : i + 2]
+    ]
     pairs = Counter(zip(states, states[1:]))
-    return {a: {b: pairs[(a, b)] / max(sum(pairs[(a, c)] for c in ("calm", "rain", "storm")), 1) for b in ("calm", "rain", "storm")} for a in ("calm", "rain", "storm")}
+    return {
+        a: {b: pairs[(a, b)] / max(sum(pairs[(a, c)] for c in ("calm", "rain", "storm")), 1) for b in ("calm", "rain", "storm")}
+        for a in ("calm", "rain", "storm")
+    }
 
 
 def check_calibration():
     cal = json.loads((ROOT / "calibration.json").read_text(encoding="utf-8"))
-    required = ["vei_distribution_small_island", "hazard_agents_small_island", "lead_time_hours_iceland", "upper_wind_st_vincent",
-                "case_lead_times", "volcanic_tsunami_count", "small_island_eruption_count"]
+    required = [
+        "vei_distribution_small_island",
+        "hazard_agents_small_island",
+        "lead_time_hours_iceland",
+        "upper_wind_st_vincent",
+        "case_lead_times",
+        "volcanic_tsunami_count",
+        "small_island_eruption_count",
+    ]
     for island in ISLANDS:
         required += [f"weather_markov_{island}", f"temperature_{island}", f"cyclone_rate_per_year_{island}"]
     missing = [k for k in required if k not in cal]
     check("calibration_entries", not missing, missing)
-    thin = [k for k, v in cal.items() if not all(f in v for f in ("value", "n", "method", "source_ids", "region", "caveat")) or not v["caveat"] or not v["source_ids"]]
+    thin = [
+        k
+        for k, v in cal.items()
+        if not all(f in v for f in ("value", "n", "method", "source_ids", "region", "caveat")) or not v["caveat"] or not v["source_ids"]
+    ]
     check("calibration_provenance", not thin, thin[:5])
     volcanoes = {r["volcano_number"]: r for r in table("volcanoes")}
     counts = Counter()
@@ -246,7 +326,11 @@ def check_calibration():
                     bad.append((island, a, b, ours[a][b], round(theirs[a][b], 3)))
     check("markov_recomputed", not bad, bad[:5])
     temps = cal["temperature_st_vincent"]["value"]
-    check("temperature_plausible", 15 <= min(v for v in temps.values() if isinstance(v, (int, float))) and max(v for v in temps.values() if isinstance(v, (int, float))) <= 40, temps)
+    check(
+        "temperature_plausible",
+        15 <= min(v for v in temps.values() if isinstance(v, (int, float))) and max(v for v in temps.values() if isinstance(v, (int, float))) <= 40,
+        temps,
+    )
     rate = cal["cyclone_rate_per_year_st_vincent"]["value"]
     check("cyclone_rate_plausible", isinstance(rate, (int, float)) and 0.1 <= rate <= 3, rate)
     check("lead_times_labelled_iceland", "iceland" in str(cal["lead_time_hours_iceland"]["region"]).lower())
@@ -266,11 +350,19 @@ def _circular_mean(values):
 def check_live_weather():
     island = RNG.choice(list(ISLANDS))
     hourly = json.loads((ROOT / "raw" / f"weather_{island}.json").read_text(encoding="utf-8"))["hourly"]
-    check("weather_covers_ten_years", len(hourly["time"]) >= 87000 and hourly["time"][0].startswith("2015-01-01") and hourly["time"][-1].startswith("2024-12-31"), len(hourly["time"]))
+    check(
+        "weather_covers_ten_years",
+        len(hourly["time"]) >= 87000 and hourly["time"][0].startswith("2015-01-01") and hourly["time"][-1].startswith("2024-12-31"),
+        len(hourly["time"]),
+    )
     year, month, day = RNG.randint(2015, 2024), RNG.randint(1, 12), RNG.randint(1, 28)
     date = f"{year}-{month:02d}-{day:02d}"
     lat, lon = ISLANDS[island]
-    live = json.loads(fetch(f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}&start_date={date}&end_date={date}&timezone=UTC&hourly=temperature_2m,precipitation"))["hourly"]
+    live = json.loads(
+        fetch(
+            f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}&start_date={date}&end_date={date}&timezone=UTC&hourly=temperature_2m,precipitation"
+        )
+    )["hourly"]
     index = {t: i for i, t in enumerate(hourly["time"])}
     bad = [t for k, t in enumerate(live["time"]) if abs((hourly["temperature_2m"][index[t]] or 0) - (live["temperature_2m"][k] or 0)) > 1.5]
     check("weather_matches_live", len(bad) <= 2, (island, date, bad[:4]))
@@ -285,7 +377,11 @@ def check_scenarios():
     check("st_vincent_start", scenario["start_utc"].startswith("2021-04-08T00:00"), scenario["start_utc"])
     check("st_vincent_onset_step", scenario["onset_step"] == onset, (scenario["onset_step"], onset))
     check("st_vincent_upper_wind", scenario["wind_source"] == "500hPa")
-    live = json.loads(fetch("https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=13.33&longitude=-61.18&start_date=2021-04-08&end_date=2021-04-10&timezone=UTC&hourly=wind_direction_500hPa,wind_direction_10m"))["hourly"]
+    live = json.loads(
+        fetch(
+            "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=13.33&longitude=-61.18&start_date=2021-04-08&end_date=2021-04-10&timezone=UTC&hourly=wind_direction_500hPa,wind_direction_10m"
+        )
+    )["hourly"]
     mismatch = sum(abs(((scenario["wind_deg"][k] - (live["wind_direction_500hPa"][2 * k] + 180)) + 180) % 360 - 180) > 15 for k in range(36))
     check("st_vincent_wind_matches_live", mismatch <= 3, mismatch)
     after = list(range(int(onset), min(int(onset) + 12, 36)))
@@ -321,7 +417,11 @@ def check_report():
     check("report_sections", not missing, missing)
     banned = [s for s in ("proves the model", "validates the model", "forecasts", "guarantee") if s in lowered]
     check("report_no_overclaim", not banned, banned)
-    check("report_compares_engine", all(s in text for s in ("2/3", "PDC_DELAYS")) and "cold" in lowered, "needs eruption probability, PDC_DELAYS and cold mechanics")
+    check(
+        "report_compares_engine",
+        all(s in text for s in ("2/3", "PDC_DELAYS")) and "cold" in lowered,
+        "needs eruption probability, PDC_DELAYS and cold mechanics",
+    )
 
 
 def main():

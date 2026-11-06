@@ -25,8 +25,10 @@ KG_TO_UG = 1e9
 
 def briggs_sigmas_m(downwind_m):
     x = _nonnegative(downwind_m, "downwind distance")
-    return (SETTINGS["sigma_y_coefficient"] * x / np.sqrt(1 + SETTINGS["sigma_y_decay"] * x),
-            SETTINGS["sigma_z_coefficient"] * x / np.sqrt(1 + SETTINGS["sigma_z_decay"] * x))
+    return (
+        SETTINGS["sigma_y_coefficient"] * x / np.sqrt(1 + SETTINGS["sigma_y_decay"] * x),
+        SETTINGS["sigma_z_coefficient"] * x / np.sqrt(1 + SETTINGS["sigma_z_decay"] * x),
+    )
 
 
 def ground_concentration_ug_m3(rate_kg_s, downwind_m, crosswind_m, release_m, wind_m_s):
@@ -38,8 +40,7 @@ def ground_concentration_ug_m3(rate_kg_s, downwind_m, crosswind_m, release_m, wi
     result = np.zeros(x.shape)
     active = x > 0
     sy, sz = briggs_sigmas_m(x[active])
-    result[active] = (q[active] * KG_TO_UG / (np.pi * u[active] * sy * sz)
-                      * np.exp(-.5 * (y[active] / sy)**2 - .5 * (h[active] / sz)**2))
+    result[active] = q[active] * KG_TO_UG / (np.pi * u[active] * sy * sz) * np.exp(-0.5 * (y[active] / sy) ** 2 - 0.5 * (h[active] / sz) ** 2)
     return result.item() if result.ndim == 0 else result
 
 
@@ -47,7 +48,7 @@ def so2_rate_kg_s(phase, mass_rate_kg_s):
     phase, mass = np.broadcast_arrays(_nonnegative(phase, "phase"), _nonnegative(mass_rate_kg_s, "mass rate"))
     if (phase > 3).any():
         raise InterfaceError("phase outside [0, 3]")
-    return np.where(phase >= 1, SETTINGS["peak_so2_flux"] + SETTINGS["so2_mass_fraction"] * mass, 0.)
+    return np.where(phase >= 1, SETTINGS["peak_so2_flux"] + SETTINGS["so2_mass_fraction"] * mass, 0.0)
 
 
 class Gas:
@@ -75,11 +76,16 @@ class Gas:
         if not np.isfinite(bearing).all() or np.any((bearing < 0) | (bearing > 360)):
             raise InterfaceError("bearing outside [0, 360]")
         angle = np.deg2rad(bearing)
-        x = self.grid.x0_m + (np.arange(self.grid.nx) + .5) * self.grid.dx_m - self.vent[0]
-        y = self.grid.y0_m - (np.arange(self.grid.ny) + .5) * self.grid.dx_m - self.vent[1]
+        x = self.grid.x0_m + (np.arange(self.grid.nx) + 0.5) * self.grid.dx_m - self.vent[0]
+        y = self.grid.y0_m - (np.arange(self.grid.ny) + 0.5) * self.grid.dx_m - self.vent[1]
         east, north = np.meshgrid(x, y)
-        return ground_concentration_ug_m3(so2_rate_kg_s(phase, mass), east*np.sin(angle)+north*np.cos(angle),
-            east*np.cos(angle)-north*np.sin(angle), SETTINGS["release_height"], np.maximum(wind, SETTINGS["min_wind"]))
+        return ground_concentration_ug_m3(
+            so2_rate_kg_s(phase, mass),
+            east * np.sin(angle) + north * np.cos(angle),
+            east * np.cos(angle) - north * np.sin(angle),
+            SETTINGS["release_height"],
+            np.maximum(wind, SETTINGS["min_wind"]),
+        )
 
     def run(self, fields, rng):
         frames = np.array([self._frame(fields, k) for k in range(self.time.n)])

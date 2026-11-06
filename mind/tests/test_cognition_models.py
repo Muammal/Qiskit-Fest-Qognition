@@ -1,4 +1,5 @@
 """Tests for the 6 research-paper-backed quantum cognition models in `mind/cognition_models.py`."""
+
 import math
 import numpy as np
 import pytest

@@ -6,6 +6,7 @@ so that p_protect_closed_form(0.5, x=1, ...) reproduces the observed
 exact solve; TECH_A_BUILD_PLAN.md Appendix A rounds it for display to
 -0.7854. See docs/tech-a/DECISIONS.md D6.
 """
+
 import numpy as np
 import pytest
 from qiskit import QuantumCircuit
@@ -53,7 +54,7 @@ def test_U_validity_random_sweep():
         assert np.max(np.abs(U.T @ U - np.eye(4))) < 1e-10
         assert np.linalg.det(U) == pytest.approx(1.0, abs=1e-9)
 
-        probs = U ** 2
+        probs = U**2
         assert np.all(probs >= -1e-12)
         assert np.all(probs <= 1 + 1e-12)
         # each column of a real orthogonal matrix is a valid probability

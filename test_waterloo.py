@@ -1,7 +1,7 @@
 """Tests for the Waterloo chlorine leak scenario."""
+
 import json
 
-import numpy as np
 import pytest
 
 import contracts
@@ -40,16 +40,20 @@ def test_map_keeps_the_island_world_interface(world):
 
 
 def test_building_and_pool_areas_match_their_outlines(world):
-    tile = SITE_M_PER_TILE ** 2
+    tile = SITE_M_PER_TILE**2
     drawn = {(x, y) for y in range(40) for x in range(40) if (x, y) in world.areas["indoors"]} | set(DOORS.values())
     drawn |= {p for p in world.wall_tiles if p not in world.areas["pool_deck"]} - _fence(world)
-    assert abs(len(drawn) * tile / polygon_area(BUILDING) - 1) < .05
-    assert abs(len(world.pool_tiles) * tile / polygon_area(POOL) - 1) < .05
+    assert abs(len(drawn) * tile / polygon_area(BUILDING) - 1) < 0.05
+    assert abs(len(world.pool_tiles) * tile / polygon_area(POOL) - 1) < 0.05
 
 
 def _fence(world):
-    return {p for p in world.wall_tiles if any(q in world.areas["pool"] | world.areas["pool_deck"] for q in world.neighbors(p)) and
-            not any(q in world.areas["indoors"] for q in world.neighbors(p))}
+    return {
+        p
+        for p in world.wall_tiles
+        if any(q in world.areas["pool"] | world.areas["pool_deck"] for q in world.neighbors(p))
+        and not any(q in world.areas["indoors"] for q in world.neighbors(p))
+    }
 
 
 def test_every_walkable_tile_can_reach_every_exit(world):
@@ -111,6 +115,7 @@ def test_every_provenance_entry_has_a_status_and_sourced_ones_have_a_link():
 
 # --- Chlorine model ---
 
+
 @pytest.fixture(scope="module")
 def leak(world):
     return ChlorineModel(1, world)
@@ -125,7 +130,7 @@ def test_nothing_before_the_leak_and_a_two_hour_run(leak):
 
 def test_source_holds_its_level_only_while_leaking_then_fades(leak):
     x, y = leak.source
-    assert leak.ppm[leak.leak_end_step - 1, y, x] == pytest.approx(SOURCE_PPM, rel=.15)
+    assert leak.ppm[leak.leak_end_step - 1, y, x] == pytest.approx(SOURCE_PPM, rel=0.15)
     assert leak.ppm[-1].max() < leak.ppm[leak.leak_end_step - 1].max() / 2
 
 
@@ -145,7 +150,7 @@ def test_gas_only_gets_outside_through_doors(world):
     during = range(LEAK_START_STEP, model.leak_end_step)
     assert all(model.ppm[t, y - 1, x] < model.ppm[t, y, x] for t in during)
     # With no door nearby, the far side of the solid east wall stays almost clear.
-    assert model.ppm[:, 12, 24].max() < .1 * model.ppm[:, 12, 22].max()
+    assert model.ppm[:, 12, 24].max() < 0.1 * model.ppm[:, 12, 22].max()
 
 
 def test_outdoor_gas_drifts_downwind(world):
@@ -157,8 +162,8 @@ def test_outdoor_gas_drifts_downwind(world):
 
 
 def test_level_scales_with_the_source(world):
-    low, high = ChlorineModel(1, world), ChlorineModel(1, world, source_ppm=110.)
-    assert high.ppm.max() == pytest.approx(low.ppm.max() * 5, rel=.05)
+    low, high = ChlorineModel(1, world), ChlorineModel(1, world, source_ppm=110.0)
+    assert high.ppm.max() == pytest.approx(low.ppm.max() * 5, rel=0.05)
 
 
 def test_all_leak_sites_are_settings_on_open_tiles(world):
@@ -169,16 +174,16 @@ def test_all_leak_sites_are_settings_on_open_tiles(world):
 
 def test_exposure_levels_follow_the_epa_table():
     steps = lambda minutes: minutes * 6
-    assert exposure_level([0.] * steps(60)) == 0
-    assert exposure_level([.6] * steps(10)) == 1
-    assert exposure_level([3.] * steps(10)) == 2
+    assert exposure_level([0.0] * steps(60)) == 0
+    assert exposure_level([0.6] * steps(10)) == 1
+    assert exposure_level([3.0] * steps(10)) == 2
     assert exposure_level([2.1] * steps(60)) == 2
-    assert exposure_level([60.] * steps(10)) == 3
-    assert exposure_level([21.] * steps(60)) == 3
+    assert exposure_level([60.0] * steps(10)) == 3
+    assert exposure_level([21.0] * steps(60)) == 3
 
 
 def test_brief_exposure_is_averaged_over_the_full_window():
-    assert exposure_level([3.] * 6) == 0  # one minute at 3 ppm averages 0.3 ppm over ten minutes
+    assert exposure_level([3.0] * 6) == 0  # one minute at 3 ppm averages 0.3 ppm over ten minutes
 
 
 def test_wind_table_uses_the_day_s_values():
@@ -186,6 +191,7 @@ def test_wind_table_uses_the_day_s_values():
 
 
 # --- People and simulation ---
+
 
 @pytest.fixture(scope="module")
 def run():
@@ -233,9 +239,9 @@ def test_nobody_knows_before_the_leak():
 
 
 def test_smelling_depends_only_on_level():
-    assert smell_chance(ODOUR_PPM * .9) == 0
-    assert smell_chance(ODOUR_PPM) == pytest.approx(.2)
-    assert smell_chance(100.) == 1
+    assert smell_chance(ODOUR_PPM * 0.9) == 0
+    assert smell_chance(ODOUR_PPM) == pytest.approx(0.2)
+    assert smell_chance(100.0) == 1
 
 
 def test_people_decide_once_per_interval():
@@ -289,12 +295,15 @@ def test_population_setting_changes_the_count():
 
 # --- Window ---
 
+
 @pytest.fixture(scope="module")
 def app():
     import os
+
     os.environ["SDL_VIDEODRIVER"] = "dummy"
     os.environ["SDL_AUDIODRIVER"] = "dummy"
     from engine.gui import IslandVisualizerApp
+
     return IslandVisualizerApp(seed=105, start_screen="event_choice", scenario="volcano")
 
 
@@ -342,6 +351,7 @@ def test_pompeii_settings_are_not_touched_by_waterloo_buttons(app):
 
 # --- Cutscenes ---
 
+
 def _all_scenes(sim):
     scenes = []
     while sim.step() is not None:
@@ -360,7 +370,7 @@ def test_every_scene_kind_can_play_and_draws(world):
     for scene in scenes:
         player = WaterlooCutscenes(font, font)
         player.enqueue([scene])
-        player.elapsed = 1.
+        player.elapsed = 1.0
         player.draw(canvas)
 
 
@@ -396,10 +406,11 @@ def test_alarm_pool_scene_plays_when_the_alarm_starts():
 
 # --- Walking speed ---
 
+
 def _walk_metres(role, start, steps, world):
     patron = Patron(0, role, list(start), 0)
     field = world.next_step_field(world.exits.values())
-    moved, position = 0., tuple(start)
+    moved, position = 0.0, tuple(start)
     for _ in range(steps):
         patron.walk(world, field)
         while position != tuple(patron.pos):
@@ -417,7 +428,8 @@ def test_average_walking_speed_matches_the_sourced_values(world):
 
 def test_slow_water_still_lets_people_move(world, monkeypatch):
     import engine.site as site_module
-    monkeypatch.setattr(site_module, "WADE_M_PER_S", .25)
+
+    monkeypatch.setattr(site_module, "WADE_M_PER_S", 0.25)
     start = max(world.pool_tiles, key=lambda p: p[0] + p[1])
     field = world.next_step_field(world.exits.values())
     patron = Patron(0, "adult", list(start), 0)

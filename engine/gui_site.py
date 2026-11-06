@@ -4,6 +4,7 @@ One 40x40 site map with a chlorine overlay. The written thoughts are templates b
 model computed: what a person noticed, their danger belief, their action and the gas where they stand.
 They are labelled as illustration on screen and invent no feelings or motives.
 """
+
 import random
 
 import pygame
@@ -16,7 +17,7 @@ GRASS, ROAD, PARKING, WALL = (176, 202, 146), (150, 148, 142), (172, 172, 188), 
 FLOOR, POOL, DECK, CREEK = (232, 222, 200), (92, 182, 232), (224, 214, 188), (42, 92, 170)
 AREA_COLORS = dict(ice_pad=(206, 234, 248), lobby=(244, 206, 152), community_room=(234, 182, 190), change_rooms=(202, 192, 238))
 GAS = (168, 214, 40)
-GAS_FULL_PPM = 10.  # display only: the overlay is fully opaque from here up, at NIOSH's IDLH
+GAS_FULL_PPM = 10.0  # display only: the overlay is fully opaque from here up, at NIOSH's IDLH
 
 
 def clock_text(t):
@@ -29,7 +30,9 @@ def thought_text(person, record, ppm):
     if person.status == "out":
         return "Has left the site."
     if record is None:
-        return "Not yet recorded."
+        cues = [e.replace("_", " ") for e in person.recent_events if e != "none"]
+        heard = f"Has noticed: {', '.join(cues)}." if cues else "Has noticed nothing yet."
+        return f"{heard} No decision yet. Gas here: {ppm:.2f} ppm."
     quantum = record.get("quantum") or {}
     story = record.get("story")
     parts = [f"{story}." if story and story != "Nothing new" else "Has noticed nothing new."]
@@ -76,10 +79,10 @@ class SitePanels(SplitPanels):
         if height > 110 and record:
             bar_w = width - 32
             for action, value in sorted(record["probs"].items(), key=lambda item: -item[1])[:2]:
-                pygame.draw.rect(surface, (234, 216, 178), (x + 16, row, bar_w, 14), border_radius=3)
-                pygame.draw.rect(surface, (146, 58, 196), (x + 16, row, int(bar_w * min(1., value)), 14), border_radius=3)
-                surface.blit(small.render(f"{action} {value:.0%}", True, INK), (x + 22, row))
-                row += 18
+                pygame.draw.rect(surface, (234, 216, 178), (x + 16, row, bar_w, 17), border_radius=3)
+                pygame.draw.rect(surface, (182, 128, 214), (x + 16, row, int(bar_w * min(1.0, value)), 17), border_radius=3)
+                surface.blit(small.render(f"{person.action_label(action)} {value:.0%}", True, INK), (x + 22, row))
+                row += 20
         row += 4
         t = max(0, self.sim.t - 1)
         for line in wrap(thought_text(person, record, self.sim.chlorine.ppm_at(t, tuple(person.pos))), body, width - 32)[:3]:
@@ -126,10 +129,10 @@ class SiteView:
         pass
 
     def person_xy(self, person):
-        jx = ((person.id * 7919) % 15 - 7) * 1.
-        jy = ((person.id * 104729) % 15 - 7) * 1.
+        jx = ((person.id * 7919) % 15 - 7) * 1.0
+        jy = ((person.id * 104729) % 15 - 7) * 1.0
         x, y = person.pos
-        return (x + .5) * TILE + jx, (y + .5) * TILE + jy
+        return (x + 0.5) * TILE + jx, (y + 0.5) * TILE + jy
 
     def focus_xy(self, engine):
         return self.person_xy(engine.agent)
@@ -154,8 +157,8 @@ class SiteView:
         for y in range(GRID_DIM):
             for x in range(GRID_DIM):
                 ppm = float(grid[y, x])
-                if ppm >= .05:  # display only: below this the overlay would be invisible
-                    alpha = int(50 + 180 * min(1., ppm / GAS_FULL_PPM))
+                if ppm >= 0.05:  # display only: below this the overlay would be invisible
+                    alpha = int(50 + 180 * min(1.0, ppm / GAS_FULL_PPM))
                     pygame.draw.rect(layer, (*GAS, alpha), (round(x * TILE), round(y * TILE), TILE + 1, TILE + 1))
         canvas.blit(layer, (0, 0))
 
@@ -176,9 +179,11 @@ class SiteView:
         band = pygame.Surface((MAP_SIZE, 48), pygame.SRCALPHA)
         band.fill((20, 14, 12, 190))
         canvas.blit(band, (0, 52))
-        text = (f"{clock_text(t)}  {engine.chlorine.phases[t].upper()}   On site {counts['on_site']}   Off site {counts['off_site']}   "
-                f"Know {counts['knows']}   Alarm {'on' if engine.alarm_step is not None and t >= engine.alarm_step else 'off'}   "
-                f"Highest gas {engine.chlorine.hazard_by_step[t]['peak_ppm']:.1f} ppm")
+        text = (
+            f"{clock_text(t)}  {engine.chlorine.phases[t].upper()}   On site {counts['on_site']}   Off site {counts['off_site']}   "
+            f"Know {counts['knows']}   Alarm {'on' if engine.alarm_step is not None and t >= engine.alarm_step else 'off'}   "
+            f"Highest gas {engine.chlorine.hazard_by_step[t]['peak_ppm']:.1f} ppm"
+        )
         canvas.blit(self.font_sub.render(text, True, (246, 240, 226)), (14, 56))
         line = (f"Following {engine.agent.label}.  Click a person to follow them.  P panels.  Summary film at the end.  "
                 f"Mapping {engine.event_mapping}.  Green is chlorine, black box is the assumed leak.")
@@ -197,11 +202,11 @@ class SiteView:
             x += label.get_width() + 22
 
     def pick_person(self, engine, pos):
-        best, best_distance = None, 14.
+        best, best_distance = None, 14.0
         for person in engine.people:
             if person.status == "site":
                 x, y = self.person_xy(person)
-                distance = ((x - pos[0]) ** 2 + (y - pos[1]) ** 2) ** .5
+                distance = ((x - pos[0]) ** 2 + (y - pos[1]) ** 2) ** 0.5
                 if distance < best_distance:
                     best, best_distance = person, distance
         return best

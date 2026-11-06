@@ -4,6 +4,7 @@ Launch times are Wormstedt's revised table (https://wormstedt.com/Titanic/revise
 which calls them approximate. Boats leave at those times whoever has boarded, so
 the number aboard is an outcome of the simulation, never an input.
 """
+
 from engine.flood import BRIDGE_UNDER_STEP, LOAD_STEP, clock_step
 
 STANDARD_SEATS = 65  # Museums Worcestershire, Launching the Lifeboats
@@ -24,15 +25,24 @@ def _row(boat, side, kind, x, hour, minute):
 
 # Odd numbers starboard, even port. Station x is an assumption: forward group near the bridge, aft group aft.
 BOAT_TABLE = [
-    _row(7, "starboard", "standard", 26, 0, 40), _row(5, "starboard", "standard", 27, 0, 45),
-    _row(3, "starboard", "standard", 28, 0, 55), _row(8, "port", "standard", 26, 1, 0),
-    _row(1, "starboard", "cutter", 29, 1, 5), _row(6, "port", "standard", 27, 1, 10),
-    _row(16, "port", "standard", 11, 1, 20), _row(14, "port", "standard", 12, 1, 25),
-    _row(12, "port", "standard", 13, 1, 30), _row(9, "starboard", "standard", 14, 1, 30),
-    _row(11, "starboard", "standard", 13, 1, 35), _row(13, "starboard", "standard", 12, 1, 40),
-    _row(15, "starboard", "standard", 11, 1, 40), _row(2, "port", "cutter", 29, 1, 45),
-    _row(10, "port", "standard", 14, 1, 50), _row(4, "port", "standard", 28, 1, 50),
-    _row("C", "starboard", "collapsible", 30, 2, 0), _row("D", "port", "collapsible", 30, 2, 5),
+    _row(7, "starboard", "standard", 26, 0, 40),
+    _row(5, "starboard", "standard", 27, 0, 45),
+    _row(3, "starboard", "standard", 28, 0, 55),
+    _row(8, "port", "standard", 26, 1, 0),
+    _row(1, "starboard", "cutter", 29, 1, 5),
+    _row(6, "port", "standard", 27, 1, 10),
+    _row(16, "port", "standard", 11, 1, 20),
+    _row(14, "port", "standard", 12, 1, 25),
+    _row(12, "port", "standard", 13, 1, 30),
+    _row(9, "starboard", "standard", 14, 1, 30),
+    _row(11, "starboard", "standard", 13, 1, 35),
+    _row(13, "starboard", "standard", 12, 1, 40),
+    _row(15, "starboard", "standard", 11, 1, 40),
+    _row(2, "port", "cutter", 29, 1, 45),
+    _row(10, "port", "standard", 14, 1, 50),
+    _row(4, "port", "standard", 28, 1, 50),
+    _row("C", "starboard", "collapsible", 30, 2, 0),
+    _row("D", "port", "collapsible", 30, 2, 5),
 ]
 FLOAT_OFF = [  # Wormstedt: A floated off upright and B upside down as the bridge went under.
     dict(id="A", side="starboard", kind="collapsible", seats=COLLAPSIBLE_SEATS, x=31, launch_step=BRIDGE_UNDER_STEP),
@@ -62,16 +72,11 @@ class Lifeboat:
         return self.side == MEN_ALLOWED_SIDE
 
     def export_dict(self):
-        return dict(id=self.id, side=self.side, kind=self.kind, seats=self.seats,
-                    launch_step=self.launch_step, aboard=len(self.aboard), state=self.state)
+        return dict(id=self.id, side=self.side, kind=self.kind, seats=self.seats, launch_step=self.launch_step, aboard=len(self.aboard), state=self.state)
 
 
 class LifeboatSchedule:
-<<<<<<< Updated upstream
     def __init__(self, world, crew_seats=CREW_SEATS, allow_all_sides=False, boarding_rule=True):
-=======
-    def __init__(self, world, boarding_rule=True):
->>>>>>> Stashed changes
         self.boarding_rule = boarding_rule
         deck_row = world.assembly_points[0][1]
         self.crew_seats = crew_seats
@@ -100,20 +105,20 @@ class LifeboatSchedule:
             organisers = [a for a in waiting if a.role in ("officer", "evac_worker")]
             passengers = [a for a in waiting if a.role not in ("officer", "evac_worker", "captain")]
             limit = min(MAX_LOAD_PER_STEP, BASE_LOAD_PER_STEP + LOAD_PER_ORGANISER * len(organisers))
-<<<<<<< Updated upstream
-            order = sorted((a for a in passengers if boat.eligible(a)),
-                           key=lambda a: (a.group == "man", a.id))
-            if not self.boarding_rule:  # assumption: fixed scrambled order, because id order would favour first class
-=======
             if self.boarding_rule:
-                order = sorted((a for a in passengers if boat.eligible(a)), key=lambda a: (a.group == "man", a.id))
+                order = sorted((a for a in passengers if boat.eligible(a)),
+                               key=lambda a: (a.group == "man", a.id))
             else:  # assumption: fixed scrambled order, because id order would favour first class
->>>>>>> Stashed changes
+                order = sorted((a for a in passengers if boat.eligible(a)),
+                               key=lambda a: (a.id * 2654435761 % 4294967296))
                 order = sorted(passengers, key=lambda a: a.id * 2654435761 % 4294967296)
+=======
+            order = sorted((a for a in passengers if boat.eligible(a)), key=lambda a: (a.group == "man", a.id))
+>>>>>>> a8750dbb13c6822b142844cb867d976177092ef4
             # Rowers board only as the boat is about to leave, so organisers keep working.
             if t >= boat.launch_step - 1:
                 seats_left = self.crew_seats - boat.crew_aboard
-                order = sorted(organisers, key=lambda a: a.id)[:max(0, seats_left)] + order
+                order = sorted(organisers, key=lambda a: a.id)[: max(0, seats_left)] + order
             for agent in order:
                 if limit <= 0 or boat.free_seats <= 0:
                     break

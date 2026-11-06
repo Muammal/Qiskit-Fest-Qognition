@@ -5,6 +5,7 @@ Operates on the belief qubit alone, as a 2x2 density matrix: |0> = safe,
 (Stage 4 consolidation); re-exported here since mind/tests/test_belief.py
 imports them from this module.
 """
+
 import numpy as np
 
 from mind.config import COLLAPSE_EVENTS, EVENT_GATES

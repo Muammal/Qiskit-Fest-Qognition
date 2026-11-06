@@ -1,0 +1,10 @@
+* text=auto
+
+# Sim files and the gallery list must read the same on every computer.
+*.qsim text eol=lf
+community/index.json text eol=lf
+community/README.md text eol=lf
+
+*.png binary
+*.qpy binary
+*.npz binary

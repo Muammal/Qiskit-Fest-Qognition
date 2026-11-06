@@ -1,0 +1,54 @@
+# A starting point in the scenario builder. Needs no downloaded data.
+id = "my_volcano_island"
+title = "Eruption on a made-up island"
+place = "generated"
+start_utc = "2023-06-01T00:00:00+00:00"
+hours = 96
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "dials"
+summit_m = 900.0
+area_km2 = 200.0
+
+[[entity]]
+kind = "weather"
+source = "dials"
+rain_mm_h = 1.0
+wind_m_s = 6.0
+wind_bearing_deg = 270.0
+temperature_c = 27.0
+upper_wind_m_s = 20.0
+upper_bearing_deg = 90.0
+
+[[entity]]
+kind = "eruption"
+source = "catalogue"
+vent_lon = -61.1814
+vent_lat = 13.2997
+
+[[entity]]
+kind = "ash"
+source = "replay"
+
+[[entity]]
+kind = "flow"
+source = "replay"
+delay_hours = 6.0
+
+[[entity]]
+kind = "person"
+source = "dials"
+name = "A villager"
+mind = "quantum"
+start_lon = -61.2276
+start_lat = 13.3
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "The far coast"
+lon = -61.237
+lat = 13.2676

@@ -1,4 +1,5 @@
 """The agent's body, and the adapter to the frozen contract. Water, food and fatigue come from domains/agent/physiology.py."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -18,13 +19,13 @@ class AgentBody:
     hour: int
     day: int = 1
     minute: int = 0  # Within the hour. The frozen contract shows minds whole hours only.
-    hunger: float = .85
-    thirst: float = .80
-    warmth: float = .90
-    energy: float = .90
-    safety: float = .85
-    morale: float = .80
-    stress: float = .15
+    hunger: float = 0.85
+    thirst: float = 0.80
+    warmth: float = 0.90
+    energy: float = 0.90
+    safety: float = 0.85
+    morale: float = 0.80
+    stress: float = 0.15
     injured: bool = False
     alive: bool = True
     cause: str | None = None
@@ -55,8 +56,12 @@ class AgentBody:
 def to_state(body: AgentBody, recent_events: list[str]) -> dict:
     """Exactly the frozen contract keys. Nothing else may reach a mind."""
     return {
-        "day": body.day, "hour": body.hour, "pos": list(body.tile),
+        "day": body.day,
+        "hour": body.hour,
+        "pos": list(body.tile),
         "needs": {key: round(getattr(body, key), 3) for key in sorted(NEED_KEYS)},
-        "stress": round(body.stress, 3), "injured": body.injured,
-        "inventory": dict(body.inventory), "recent_events": list(recent_events),
+        "stress": round(body.stress, 3),
+        "injured": body.injured,
+        "inventory": dict(body.inventory),
+        "recent_events": list(recent_events),
     }

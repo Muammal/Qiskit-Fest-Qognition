@@ -1,7 +1,8 @@
 """Restores terrain raw files from their records, and refuses anything that fails its size or hash check.
 
-    python -m stranded_physics.domains.terrain.fetch
+python -m stranded_physics.domains.terrain.fetch
 """
+
 from __future__ import annotations
 
 import hashlib

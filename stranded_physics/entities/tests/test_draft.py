@@ -1,4 +1,5 @@
 """The builder's rules, tested without a window: bad values are refused, and a save reloads as the identical file."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -8,7 +9,19 @@ import pytest
 from stranded_physics.core.api import InterfaceError
 from stranded_physics.entities.api import dump_scenario, load_scenario
 from stranded_physics.entities.draft import (
-    add_entity, choices, from_file, new_draft, place, problem, remove_entity, save_draft, set_choice, set_dial, set_header, set_name, to_scenario,
+    add_entity,
+    choices,
+    from_file,
+    new_draft,
+    place,
+    problem,
+    remove_entity,
+    save_draft,
+    set_choice,
+    set_dial,
+    set_header,
+    set_name,
+    to_scenario,
 )
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -69,12 +82,13 @@ def test_a_part_of_a_person_is_refused():
 def test_a_file_asking_for_part_of_a_person_is_refused_too():
     from stranded_physics.entities.api import EntitySpec
     from stranded_physics.entities.kinds import check_entity
+
     with pytest.raises(InterfaceError, match="whole"):
-        check_entity(EntitySpec("group", "dials", settings={"start_lon": RICHMOND[0], "start_lat": RICHMOND[1], "count": 4.5, "radius_km": 1.}))
+        check_entity(EntitySpec("group", "dials", settings={"start_lon": RICHMOND[0], "start_lat": RICHMOND[1], "count": 4.5, "radius_km": 1.0}))
 
 
 def test_a_person_placed_off_the_map_is_named_as_the_problem():
-    draft = place(add_entity(new_draft(), "person"), 2, (-60., 13.3))
+    draft = place(add_entity(new_draft(), "person"), 2, (-60.0, 13.3))
     draft = place(add_entity(draft, "shelter"), 3, BARROUALLIE)
     assert "outside the map" in problem(draft)
 
@@ -89,10 +103,23 @@ def test_only_the_runtimes_two_hour_step_is_accepted():
         set_header(with_person_and_shelter(), "step_hours", "1")
 
 
-@pytest.mark.parametrize("key, text", [
-    ("id", "../../evil"), ("id", "Has Spaces"), ("id", ""), ("title", ""), ("title", "two\nlines"), ("place", "mars"),
-    ("hours", "7"), ("hours", "-2"), ("hours", "lots"), ("start_utc", "2021-04-08T00:00:00"), ("start_utc", "soon"), ("local_utc_offset", "99"),
-])
+@pytest.mark.parametrize(
+    "key, text",
+    [
+        ("id", "../../evil"),
+        ("id", "Has Spaces"),
+        ("id", ""),
+        ("title", ""),
+        ("title", "two\nlines"),
+        ("place", "mars"),
+        ("hours", "7"),
+        ("hours", "-2"),
+        ("hours", "lots"),
+        ("start_utc", "2021-04-08T00:00:00"),
+        ("start_utc", "soon"),
+        ("local_utc_offset", "99"),
+    ],
+)
 def test_a_bad_scenario_setting_is_refused(key, text):
     with pytest.raises(InterfaceError):
         set_header(new_draft(), key, text)
@@ -145,6 +172,7 @@ def test_a_saved_scenario_cannot_take_a_shipped_scenarios_name(tmp_path):
 
 def test_a_changed_copy_of_a_shipped_scenario_is_told_apart_from_the_original():
     from stranded_physics.entities.draft import borrows_evidence
+
     original = from_file(CARDS / "st_vincent_2021.toml")
     assert not borrows_evidence(original)
     changed = set_dial(original, 6, "start_lat", "13.32")
@@ -161,6 +189,7 @@ def test_a_device_name_is_refused_as_an_id(name):
 
 def test_a_save_that_fails_its_check_keeps_the_previous_file(tmp_path, monkeypatch):
     from stranded_physics.entities import draft as module
+
     draft = with_person_and_shelter()
     path = save_draft(draft, tmp_path)
     first = path.read_bytes()

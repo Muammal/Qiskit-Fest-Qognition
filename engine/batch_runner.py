@@ -6,7 +6,7 @@ Owned by Tech C (Integration, Engine, Batch Analysis).
 import json
 import os
 import sys
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict
 import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # assumption: local import root
@@ -32,8 +32,10 @@ def run_batch_comparison(num_seeds: int = 20, max_steps: int = DEFAULT_STEPS) ->
     mixture_divergence_steps = 0
     mixture_total_steps = 0
 
-    print(f"[BatchRunner] Synthetic heuristic-stub comparison: {num_seeds} paired seeds "
-          "(quantum-labelled vs classical-labelled stubs; no quantum or hardware results).")
+    print(
+        f"[BatchRunner] Synthetic heuristic-stub comparison: {num_seeds} paired seeds "
+        "(quantum-labelled vs classical-labelled stubs; no quantum or hardware results)."
+    )
 
     for seed in range(100, 100 + num_seeds):
         # 1. Run Quantum Mind
@@ -67,7 +69,7 @@ def run_batch_comparison(num_seeds: int = 20, max_steps: int = DEFAULT_STEPS) ->
             "c_cause": res_c["cause"],
             "c_steps": steps_c,
             "divergences": seed_divergences,
-            "divergence_pct": round(seed_divergences / max(1, min_steps) * 100.0, 1)
+            "divergence_pct": round(seed_divergences / max(1, min_steps) * 100.0, 1),
         }
 
         # 3. Run the classical-mixture control (same model, lam forced to 1)
@@ -83,13 +85,15 @@ def run_batch_comparison(num_seeds: int = 20, max_steps: int = DEFAULT_STEPS) ->
                     mixture_divergence_steps += 1
                     seed_mixture_divergences += 1
                 mixture_total_steps += 1
-            record.update({
-                "m_outcome": res_m["outcome"],
-                "m_cause": res_m["cause"],
-                "m_steps": steps_m,
-                "mixture_divergences": seed_mixture_divergences,
-                "mixture_divergence_pct": round(seed_mixture_divergences / max(1, min_steps_qm) * 100.0, 1),
-            })
+            record.update(
+                {
+                    "m_outcome": res_m["outcome"],
+                    "m_cause": res_m["cause"],
+                    "m_steps": steps_m,
+                    "mixture_divergences": seed_mixture_divergences,
+                    "mixture_divergence_pct": round(seed_mixture_divergences / max(1, min_steps_qm) * 100.0, 1),
+                }
+            )
 
         records.append(record)
 
@@ -112,7 +116,7 @@ def run_batch_comparison(num_seeds: int = 20, max_steps: int = DEFAULT_STEPS) ->
         "divergence_rate_pct": divergence_rate,
         "quantum_survival_rate_pct": q_survival_rate,
         "classical_survival_rate_pct": c_survival_rate,
-        "records": records
+        "records": records,
     }
 
     if classical_mixture_decide is not None and "m_outcome" in df:
@@ -144,20 +148,20 @@ def curate_demo_pack(output_dir="demo-pack"):
             found.setdefault("run_02_dramatic_death", q)
         if "run_03_order_effect_quantum" not in found:
             c = SimulationEngine(seed=seed, mind_type="classical").run()
-            if any(a["action"] != b["action"] for a,b in zip(q["steps"],c["steps"])) and any("Order effect" in r["reason"] for r in q["steps"]):
+            if any(a["action"] != b["action"] for a, b in zip(q["steps"], c["steps"])) and any("Order effect" in r["reason"] for r in q["steps"]):
                 found["run_03_order_effect_quantum"] = q
                 found["run_04_order_effect_classical"] = c
         used = {timeline["world"]["seed"] for timeline in found.values()}
-        if seed not in used and any(r["state"]["stress"] > .4 and "Decoherence" in r["reason"] for r in q["steps"]):
+        if seed not in used and any(r["state"]["stress"] > 0.4 and "Decoherence" in r["reason"] for r in q["steps"]):
             found.setdefault("run_05_stress_decoherence", q)
         if len(found) == 5:
             break
     if len(found) != 5:
         raise RuntimeError(f"Seed search incomplete: {sorted(found)}")
     for name, timeline in found.items():
-        with open(os.path.join(output_dir, name+".json"), "w", encoding="utf-8") as f:
-            json.dump(timeline, f, separators=(',', ':'))
-    print("[DemoPack] Five searched stub runs exported:", {k:v["world"]["seed"] for k,v in found.items()})
+        with open(os.path.join(output_dir, name + ".json"), "w", encoding="utf-8") as f:
+            json.dump(timeline, f, separators=(",", ":"))
+    print("[DemoPack] Five searched stub runs exported:", {k: v["world"]["seed"] for k, v in found.items()})
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # Engine status
 
-**Updated November 6, 2026.** The engine is built end to end: every kind in [ENTITIES.md](ENTITIES.md) has its sources, and scenarios run on real or generated land. With the import and extraction of all 19 raw physics datasets from GitHub Release [`data-v1`](https://github.com/Muammal/Qiskit-Fest-Qognition/releases/tag/data-v1), **all 22 required physical verification gates pass (`22 / 22 PASS`)**, and the complete test suite passes at **816 passed, 3 skipped**. On St Vincent 2021 it agrees with one of three blind real-world checks. Rerun the full table with:
+**Updated November 5, 2026.** The engine is built end to end: every kind in [ENTITIES.md](ENTITIES.md) has its sources, and scenarios run on real or generated land. **Being built isn't the same as being right.** On St Vincent 2021 it agrees with one of three blind real-world checks. Rerun the full table with:
 
 ```bash
 python -m stranded_physics.check stranded_physics/scenario_cards/st_vincent_2021.toml
@@ -63,6 +63,8 @@ The solver's scheme for moving flow over small bed steps was derived here, not t
 `eruption-lead-time-sampling` could not be passed by any correct sampler, so it now compares whole distributions. See [changes/003-lead-time-gate.md](changes/003-lead-time-gate.md). It's a check of the sampling, not of reality, and it should be reviewed by someone else.
 
 ## The Titanic
+
+> **Two different Titanics.** The results on this page come from the physics-engine scenario, `scenario_cards/titanic_1912.toml` run through `PackSimulation`, where about 3.4% are saved and every people gate fails. **The paper does not use this one.** The paper's Titanic is the separate crowd simulation `engine/titanic.py` (2,208 people, five-minute steps, perception by deck and position), which saves far more; see [SCENARIO_NUMBERS.md](../docs/results/SCENARIO_NUMBERS.md). They differ because they are different programs: different step size, different boarding rules, and different ways of telling people to go. Neither result should be quoted as the other's. Agreement between `engine/titanic.py` and the record is not validation either: that model has its own assumptions, listed in [TITANIC_MODEL.md](../docs/TITANIC_MODEL.md).
 
 The scenario is `scenario_cards/titanic_1912.toml`: 2,201 people, with the ship, damage, boats and who was aboard from the 1912 British inquiry. Targets were committed before any ship model existed, but everyone working on this knows how it ended, so they are blind to the result and not to the target. Boat times come from Wormstedt, Fitch and Behe's revised table, with the 1912 table held for comparison.
 

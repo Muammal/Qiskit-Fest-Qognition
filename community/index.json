@@ -1,0 +1,33 @@
+{
+ "format": "qognition-gallery",
+ "version": 1,
+ "sims": [
+  {
+   "file": "made_up_island_eruption.qsim",
+   "title": "Eruption on a made-up island",
+   "author": "Qognition team",
+   "description": "One person, a sampled eruption, and a far coast to reach.",
+   "needs_data_pack": false,
+   "seed": 1,
+   "sha256": "6686aee416780316c19993162a46d9b7f62ed04b1e3a46600be3d72ea1f92c17"
+  },
+  {
+   "file": "made_up_island_storm.qsim",
+   "title": "Storm on a made-up island",
+   "author": "Qognition team",
+   "description": "One person and a cyclone passing close.",
+   "needs_data_pack": false,
+   "seed": 2,
+   "sha256": "8f6eff8863fbcfdfd396e25e857c569e5681dce481f4d8f28da05e6bba2a243e"
+  },
+  {
+   "file": "quantum_against_control.qsim",
+   "title": "Quantum against control",
+   "author": "Qognition team",
+   "description": "Two groups with different minds face the same eruption.",
+   "needs_data_pack": false,
+   "seed": 3,
+   "sha256": "3d73e1c2a1e59524ed56717f7974e58e7b58c8a3639920a2f4d2ab0ba1a59f75"
+  }
+ ]
+}

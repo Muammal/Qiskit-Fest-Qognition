@@ -12,25 +12,37 @@ from stranded_physics.domains.eruption.model import Eruption, mastin_mass_rate_k
 
 
 def generate(seed=42, **dials):
-    return gen.generate(np.random.default_rng(seed), 60 * 86400., **dials)
+    return gen.generate(np.random.default_rng(seed), 60 * 86400.0, **dials)
 
 
 def test_seed_and_all_dial_overrides():
     assert generate() == generate()
-    dials = dict(size=4, lead_s=300., onset_s=1200., column_m=8000.)
+    dials = dict(size=4, lead_s=300.0, onset_s=1200.0, column_m=8000.0)
     event = generate(**dials)
-    assert (event.size, event.lead_s, event.onset_s) == (4, 300., 1200.)
-    assert all(e.height_m == 8000. for e in event.events)
+    assert (event.size, event.lead_s, event.onset_s) == (4, 300.0, 1200.0)
+    assert all(e.height_m == 8000.0 for e in event.events)
     for seed in range(20):
         event = generate(seed)
-        assert .25 * 60 * 86400 <= event.onset_s <= .75 * 60 * 86400
+        assert 0.25 * 60 * 86400 <= event.onset_s <= 0.75 * 60 * 86400
         assert event.onset_s >= event.lead_s
 
 
-@pytest.mark.parametrize("dials", [dict(size=-1), dict(size=8), dict(size=2.5),
-    dict(lead_s=-1), dict(lead_s=np.inf), dict(onset_s=-1), dict(onset_s=60 * 86400 + 1),
-    dict(column_m=0), dict(column_m=60001), dict(column_m=np.nan),
-    dict(onset_s=0, lead_s=1)])
+@pytest.mark.parametrize(
+    "dials",
+    [
+        dict(size=-1),
+        dict(size=8),
+        dict(size=2.5),
+        dict(lead_s=-1),
+        dict(lead_s=np.inf),
+        dict(onset_s=-1),
+        dict(onset_s=60 * 86400 + 1),
+        dict(column_m=0),
+        dict(column_m=60001),
+        dict(column_m=np.nan),
+        dict(onset_s=0, lead_s=1),
+    ],
+)
 def test_invalid_dials_are_refused(dials):
     with pytest.raises(InterfaceError):
         generate(**dials)
@@ -44,13 +56,13 @@ def test_invalid_axis_is_refused(axis):
 
 def test_warning_is_never_resampled_to_fit():
     with pytest.raises(InterfaceError):
-        gen.generate(np.random.default_rng(1), 100., lead_s=90.)
-    result = gen.generate(np.random.default_rng(1), [0., 50., 100.], lead_s=90., onset_s=95.)
-    assert result.onset_s == 95.
+        gen.generate(np.random.default_rng(1), 100.0, lead_s=90.0)
+    result = gen.generate(np.random.default_rng(1), [0.0, 50.0, 100.0], lead_s=90.0, onset_s=95.0)
+    assert result.onset_s == 95.0
 
 
 @pytest.mark.parametrize("size", range(8))
-@pytest.mark.parametrize("column", [None, 1., 60000.])
+@pytest.mark.parametrize("column", [None, 1.0, 60000.0])
 def test_mass_and_order_for_every_size_and_extreme_columns(size, column):
     event = generate(size=size, column_m=column)
     actual = fsum(mastin_mass_rate_kg_s(e.height_m) * e.duration_s for e in event.events)
@@ -63,9 +75,9 @@ def test_mass_and_order_for_every_size_and_extreme_columns(size, column):
     gen.validate_generated(event)
 
 
-@pytest.mark.parametrize("step", [37., 300., 7200.])
+@pytest.mark.parametrize("step", [37.0, 300.0, 7200.0])
 def test_domain_conserves_frame_overlap_and_obeys_time_rule(step):
-    event = generate(size=2, lead_s=100., onset_s=200., column_m=5000.)
+    event = generate(size=2, lead_s=100.0, onset_s=200.0, column_m=5000.0)
     start = datetime(2032, 1, 1, tzinfo=timezone.utc)
     end = event.events[-1].start_s + event.events[-1].duration_s
     axis = TimeAxis(start, step, int(np.ceil(end / step)) + 1)
@@ -74,14 +86,15 @@ def test_domain_conserves_frame_overlap_and_obeys_time_rule(step):
     assert model.check_validity(fields) == []
     model.run(fields, np.random.default_rng(9))
     moments = np.arange(axis.n) * step
-    expected_phase = np.where(moments >= 200., 2., np.where(moments >= 100., 1., 0.))
+    expected_phase = np.where(moments >= 200.0, 2.0, np.where(moments >= 100.0, 1.0, 0.0))
     np.testing.assert_array_equal(store.get("eruption.phase", "dimensionless"), expected_phase)
     mass = store.get("eruption.mass_rate", "kg/s")
     assert mass[0] == 0
     assert mass.sum() * step == pytest.approx(event.total_mass_kg, rel=1e-12)
     for k in range(1, axis.n):
-        expected = fsum(mastin_mass_rate_kg_s(e.height_m) * max(0., min(moments[k], e.start_s + e.duration_s)
-                       - max(moments[k-1], e.start_s)) for e in event.events)
+        expected = fsum(
+            mastin_mass_rate_kg_s(e.height_m) * max(0.0, min(moments[k], e.start_s + e.duration_s) - max(moments[k - 1], e.start_s)) for e in event.events
+        )
         assert mass[k] * step == pytest.approx(expected, rel=1e-12)
     short = Eruption(TimeAxis(start, step, 3), generated=event)
     prefix = FieldStore()
@@ -92,9 +105,10 @@ def test_domain_conserves_frame_overlap_and_obeys_time_rule(step):
 
 def test_generated_path_does_not_read_replay_facts(monkeypatch):
     import stranded_physics.domains.eruption.model as model
+
     monkeypatch.setattr(model, "read_events", lambda: pytest.fail("generated path read facts.csv"))
-    axis = TimeAxis(datetime(2040, 1, 1, tzinfo=timezone.utc), 60., 10)
-    event = generate(size=1, lead_s=0., onset_s=0.)
+    axis = TimeAxis(datetime(2040, 1, 1, tzinfo=timezone.utc), 60.0, 10)
+    event = generate(size=1, lead_s=0.0, onset_s=0.0)
     domain, store = Eruption(axis, generated=event), FieldStore()
     domain.run(ScopedFields(store, domain.id, domain.inputs, domain.outputs), np.random.default_rng(2))
     bad = replace(event, total_mass_kg=event.total_mass_kg * 2)
@@ -103,15 +117,15 @@ def test_generated_path_does_not_read_replay_facts(monkeypatch):
 
 
 def test_exact_onset_has_an_explosion_but_no_preceding_interval_mass():
-    event = generate(size=2, lead_s=3600., onset_s=7200., column_m=8000.)
-    axis = TimeAxis(datetime(2032, 1, 1, tzinfo=timezone.utc), 7200., 3)
+    event = generate(size=2, lead_s=3600.0, onset_s=7200.0, column_m=8000.0)
+    axis = TimeAxis(datetime(2032, 1, 1, tzinfo=timezone.utc), 7200.0, 3)
     domain, store = Eruption(axis, generated=event), FieldStore()
     domain.run(ScopedFields(store, domain.id, domain.inputs, domain.outputs), np.random.default_rng(1))
     rate = store.get("eruption.mass_rate", "kg/s")
     explosion = store.get("eruption.explosion", "dimensionless")
-    assert rate[0] == rate[1] == 0.
-    assert explosion[1] == 1.
-    assert rate[2] > 0.
+    assert rate[0] == rate[1] == 0.0
+    assert explosion[1] == 1.0
+    assert rate[2] > 0.0
 
 
 def test_training_split_is_checked_before_reading_size(tmp_path, monkeypatch):
@@ -132,15 +146,13 @@ def test_samples_are_empirical_catalogue_values():
     assert {gen.sample_lead_s(rng) for _ in range(100)} <= set(gen.lead_catalog())
 
 
-@pytest.mark.parametrize("samples, ratio", [([3600.] * 4, .5),
-    ([3600., 3600., 10800., 10800.], 1.), ([10800.] * 4, 1.5)])
+@pytest.mark.parametrize("samples, ratio", [([3600.0] * 4, 0.5), ([3600.0, 3600.0, 10800.0, 10800.0], 1.0), ([10800.0] * 4, 1.5)])
 def test_lead_measure_reports_sample_median_without_adjusting_it(monkeypatch, samples, ratio):
     from stranded_physics.domains.eruption import measure
 
     draws = iter(samples)
     monkeypatch.setitem(measure.SETTINGS, "lead_sample_count", len(samples))
     monkeypatch.setattr(gen, "sample_lead_s", lambda rng: next(draws))
-    monkeypatch.setattr(gen, "lead_catalog", lambda: (3600., 10800.))
+    monkeypatch.setattr(gen, "lead_catalog", lambda: (3600.0, 10800.0))
     result = measure.generator_measure("lead_time_ratio")
-    assert result == {"value": ratio, "sample_median_s": ratio * 7200.,
-                      "catalogue_median_s": 7200., "sample_count": 4, "catalogue_count": 2}
+    assert result == {"value": ratio, "sample_median_s": ratio * 7200.0, "catalogue_median_s": 7200.0, "sample_count": 4, "catalogue_count": 2}

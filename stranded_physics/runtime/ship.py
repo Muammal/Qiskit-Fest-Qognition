@@ -2,6 +2,7 @@
 
 Boarding belongs to the crew, not to minds: nothing about seats, boats or the flooding reaches a mind, because the frozen contract has no place for it.
 """
+
 from __future__ import annotations
 
 import math
@@ -46,14 +47,14 @@ def passengers_of(scenario: ScenarioFile, grid, length_m: float, beam_m: float) 
         crewing = int(round(settings["boat_crew"] * len(groups)))
         for number, group in enumerate(groups):
             share = float(rng.uniform(settings["deck_from"], settings["deck_to"]))
-            where = _deck_position(grid, length_m, beam_m, share, float(rng.uniform(-1., 1.)))
+            where = _deck_position(grid, length_m, beam_m, share, float(rng.uniform(-1.0, 1.0)))
             people.append(Passenger(entity.name or f"group {index}", group, entity.mind, settings["reach_minutes"], number < crewing, where))
     return people
 
 
 def ship_sites(scenario: ScenarioFile, world) -> dict[str, list[XY]]:
     people = passengers_of(scenario, world.grid, world.ship.length_m, world.ship.beam_m)
-    middle = _deck_position(world.grid, world.ship.length_m, world.ship.beam_m, .5, 0.)
+    middle = _deck_position(world.grid, world.ship.length_m, world.ship.beam_m, 0.5, 0.0)
     stations = list(dict.fromkeys(station for station, _, _ in world.boats))
     return {"spawn": [person.start for person in people] or [middle], "assembly": stations, "water": [middle], "vent": []}
 
@@ -77,7 +78,7 @@ class ShipSimulation(PackSimulation):
         self.fate = float(self.luck.random())
         self.temperature_c = float(pack.series("sea.temperature")[0])
         alarm = np.flatnonzero(pack.series("ship.alarm") > 0)
-        self.free_to_go_s = (float(alarm[0]) * pack.time.dt_s if alarm.size else math.inf) + passenger.reach_minutes * 60.
+        self.free_to_go_s = (float(alarm[0]) * pack.time.dt_s if alarm.size else math.inf) + passenger.reach_minutes * 60.0
 
     def _clock(self) -> float:
         return len(self.steps) * self.pack.time.dt_s
@@ -98,11 +99,16 @@ class ShipSimulation(PackSimulation):
             return
         if self.in_water_since is None and self.pack.sample("ship.submerged", self.agent.xy_m, min(clock_s, self.pack.time.dt_s * (self.pack.time.n - 1))) > 0:
             self.in_water_since = clock_s
-        if self.in_water_since is not None and immersion_death_probability((clock_s - self.in_water_since) / 60., self.temperature_c, lifebelt=self.lifebelt) > self.fate:
+        if (
+            self.in_water_since is not None
+            and immersion_death_probability((clock_s - self.in_water_since) / 60.0, self.temperature_c, lifebelt=self.lifebelt) > self.fate
+        ):
             self.agent.alive, self.agent.cause = False, "immersion"
 
 
-def _board(people: list[ShipSimulation], stations: list[BoatStation], clock_s: float, women_first: bool, port_women_only: bool, reach_m: float, port_y: float) -> None:
+def _board(
+    people: list[ShipSimulation], stations: list[BoatStation], clock_s: float, women_first: bool, port_women_only: bool, reach_m: float, port_y: float
+) -> None:
     """The crew fill each boat from whoever has reached it: seamen first, then women and children if that's the order, then men."""
     waiting = [person for person in people if person.agent.alive and person.boat is None and person.in_water_since is None and person.heading_for_boat]
     for station in stations:
@@ -130,11 +136,25 @@ def play_ship(pack: ScenarioPack, scenario: ScenarioFile) -> list[ShipSimulation
     grid = pack.grid
     ship = next(entity for entity in scenario.entities if entity.kind == "ship")
     from stranded_physics.domains.ship.model import make_ship, titanic_ship
-    spec = titanic_ship() if ship.source == "replay" else make_ship(ship.settings["length_m"], ship.settings["beam_m"], ship.settings["draught_m"], ship.settings["displacement_t"],
-                                                                    int(ship.settings["compartments"]), ship.settings["bulkhead_top_m"], ship.settings["boat_deck_m"])
+
+    spec = (
+        titanic_ship()
+        if ship.source == "replay"
+        else make_ship(
+            ship.settings["length_m"],
+            ship.settings["beam_m"],
+            ship.settings["draught_m"],
+            ship.settings["displacement_t"],
+            int(ship.settings["compartments"]),
+            ship.settings["bulkhead_top_m"],
+            ship.settings["boat_deck_m"],
+        )
+    )
     shared = Shared(pack)
     stations = [BoatStation(xy, int(pack.sample("boats.capacity", xy)), pack.sample("boats.launch", xy)) for xy in pack.sites["assembly"]]
-    people = [ShipSimulation(pack, passenger, index, shared, stations) for index, passenger in enumerate(passengers_of(scenario, grid, spec.length_m, spec.beam_m))]
+    people = [
+        ShipSimulation(pack, passenger, index, shared, stations) for index, passenger in enumerate(passengers_of(scenario, grid, spec.length_m, spec.beam_m))
+    ]
     boats = next(entity for entity in scenario.entities if entity.kind == "lifeboats")
     women_first, port_only = bool(boats.settings.get("women_first", 1)), bool(boats.settings.get("port_women_only", 0))
     port_y = grid.y0_m - grid.ny * grid.dx_m / 2
@@ -150,9 +170,11 @@ def play_ship(pack: ScenarioPack, scenario: ScenarioFile) -> list[ShipSimulation
 
 def summary(people: list[ShipSimulation]) -> dict[str, float]:
     """Shares saved, in the groupings the 1912 report used, with whatever else the file calls its cohorts."""
+
     def share(chosen):
         chosen = list(chosen)
         return sum(person.agent.alive for person in chosen) / len(chosen) if chosen else float("nan")
+
     result = {"all": share(people)}
     for group in (ADULT_MALE, ADULT_FEMALE, CHILD):
         result[group] = share(person for person in people if person.passenger.group == group)

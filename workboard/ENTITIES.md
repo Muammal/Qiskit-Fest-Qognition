@@ -35,6 +35,8 @@ python -m stranded_physics.check <file>                      # What can it hones
 
 ## The in-game builder
 
+The builder now opens on ready-made starting points that need no downloaded data, with **Advanced** for everything below. Sharing is in [SIM_FILES.md](../docs/SIM_FILES.md).
+
 From the game's first screen, choose **Build your own scenario** or press `3`. Add entities from the left, click the map to place what's selected, change its settings on the right, then **Save** or **Play this scenario**. In play, `P` follows the next person, and `Q` changes the mind on the same world.
 
 The screen draws from `KINDS` and every rule lives in `entities/draft.py`, so the screen and a hand-written file can't disagree. Saves go to `scenario_cards/saved/` and never overwrite a shipped scenario. Results belong to a scenario's id, so a changed copy of a shipped scenario shows none of the original's results, and it can't be saved until it has a new id. A generated island can't be saved with its place set to real.

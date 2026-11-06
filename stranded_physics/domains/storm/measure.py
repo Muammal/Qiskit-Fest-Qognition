@@ -1,4 +1,5 @@
 """Standalone storm diagnostics, without imports from other categories."""
+
 from __future__ import annotations
 
 import csv
@@ -17,13 +18,15 @@ from .model import HERE, METRES_PER_KM, SECONDS_PER_HOUR, SETTINGS, Storm
 
 def wind_holdout():
     from .generator import CATALOG, KNOTS_TO_MS, sample_max_wind_m_s
+
     rng = np.random.default_rng(int(SETTINGS["generator_measure_seed"]))
-    samples = [sample_max_wind_m_s(rng, before_season=2005)
-               for _ in range(int(SETTINGS["wind_sample_count"]))]
+    samples = [sample_max_wind_m_s(rng, before_season=2005) for _ in range(int(SETTINGS["wind_sample_count"]))]
     with CATALOG.open(encoding="utf-8-sig", newline="") as stream:
-        held = [float(row["max_wind_kt"]) * KNOTS_TO_MS for row in csv.DictReader(stream)
-                if row["season"].strip() and float(row["season"]) >= SETTINGS["wind_before_season"]
-                and row["max_wind_kt"].strip()]
+        held = [
+            float(row["max_wind_kt"]) * KNOTS_TO_MS
+            for row in csv.DictReader(stream)
+            if row["season"].strip() and float(row["season"]) >= SETTINGS["wind_before_season"] and row["max_wind_kt"].strip()
+        ]
     if not held:
         raise InterfaceError("no holdout storm winds")
     return {"value": float(ks_2samp(samples, held).statistic)}
@@ -42,25 +45,23 @@ def cyclone_rate(path=None):
             if row["island"] != "st_vincent":
                 continue
             name = row["name"].strip().upper()
-            if (first <= int(row["season"]) <= last and float(row["closest_km"]) <= radius
-                    and name not in ("", "UNNAMED", "NOT_NAMED", "NONAME")):
+            if first <= int(row["season"]) <= last and float(row["closest_km"]) <= radius and name not in ("", "UNNAMED", "NOT_NAMED", "NONAME"):
                 storms.add(row["sid"])
-    return {"storms_per_year": len(storms) / (last - first + 1), "first_year": first,
-            "last_year": last, "radius_km": radius, "named_storms": len(storms)}
+    return {"storms_per_year": len(storms) / (last - first + 1), "first_year": first, "last_year": last, "radius_km": radius, "named_storms": len(storms)}
 
 
 def beryl_peak():
-    axis = TimeAxis(datetime.fromtimestamp(SETTINGS["peak_axis_epoch"], timezone.utc),
-                    SECONDS_PER_HOUR, int(SETTINGS["peak_axis_frames"]))
+    axis = TimeAxis(datetime.fromtimestamp(SETTINGS["peak_axis_epoch"], timezone.utc), SECONDS_PER_HOUR, int(SETTINGS["peak_axis_frames"]))
     model = Storm(axis, (SETTINGS["kingstown_lon"], SETTINGS["kingstown_lat"]))
     store = FieldStore()
-    model.run(ScopedFields(store, model.id, model.inputs, model.outputs),
-              np.random.default_rng(int(SETTINGS["validation_seed"])))
+    model.run(ScopedFields(store, model.id, model.inputs, model.outputs), np.random.default_rng(int(SETTINGS["validation_seed"])))
     winds = store.get("storm.max_wind", "m/s")
     k = int(np.argmax(winds))
-    return {"peak_m_s": float(winds[k]),
-            "time_utc": (axis.t0_utc + timedelta(seconds=k * axis.dt_s)).isoformat().replace("+00:00", "Z"),
-            "closest_km": float(model.distance_m.min() / METRES_PER_KM)}
+    return {
+        "peak_m_s": float(winds[k]),
+        "time_utc": (axis.t0_utc + timedelta(seconds=k * axis.dt_s)).isoformat().replace("+00:00", "Z"),
+        "closest_km": float(model.distance_m.min() / METRES_PER_KM),
+    }
 
 
 def main(argv):

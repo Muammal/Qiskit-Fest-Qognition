@@ -1,0 +1,204 @@
+"""Writes the scenario results table the README links to, from real runs.
+
+    python tools/make_readme_numbers.py              # run everything, then write
+    python tools/make_readme_numbers.py --from-json  # rewrite the table only
+
+Output: docs/results/scenario_numbers.json and docs/results/SCENARIO_NUMBERS.md.
+Nothing in the table is hand-typed. These are single-seed model runs, not
+forecasts, and the spread across cue translations is itself a finding: the
+translation is an assumption.
+"""
+
+import argparse
+import json
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+import contracts  # noqa: E402,F401  (must load before mind; see conftest.py)
+
+RESULTS = ROOT / "docs" / "results"
+JSON_PATH = RESULTS / "scenario_numbers.json"
+TABLE_PATH = RESULTS / "SCENARIO_NUMBERS.md"
+MINDS = ("quantum", "classical_mixture", "classical")
+MIND_LABEL = {"quantum": "Quantum", "classical_mixture": "Mixture control", "classical": "Classical argmax"}
+SEED = 42
+AEGL2_OR_WORSE = ("above AEGL-2, serious or lasting effects", "above AEGL-3, risk to life")
+
+
+def order_effect():
+    """The tremor/gas_plume gap from the default start, at default stress and at both lambda limits."""
+    from engine.agent import SurvivalAgent
+    from mind.quantum_mind import _decide
+
+    state = SurvivalAgent().get_state()
+    out = {}
+    for name, lam in (("default_stress", None), ("lambda_0", 0.0), ("lambda_1", 1.0)):
+        a = _decide(dict(state, recent_events=["tremor", "gas_plume"]), force_lam=lam)["quantum"]["p_protect"]
+        b = _decide(dict(state, recent_events=["gas_plume", "tremor"]), force_lam=lam)["quantum"]["p_protect"]
+        out[name] = a - b
+    return out
+
+
+def run_volcano(seeds=range(200)):
+    from mind.experiments.validate import paired_evac_delay_stats, run_batch, survival_rate
+
+    records = run_batch(seeds)
+    stats = paired_evac_delay_stats(records)
+    return dict(
+        seeds=len(list(seeds)),
+        survival={m: survival_rate(records, m) for m in MINDS},
+        paired_delay_steps=dict(mean=stats["mean"], se=stats["se"], later=stats["pos"], earlier=stats["neg"], same=stats["zero"], n=stats["n"]),
+    )
+
+
+def run_titanic():
+    from engine.titanic import EVENT_MAPPINGS, TitanicSimulation
+
+    rows = []
+    for mapping in EVENT_MAPPINGS:
+        for mind in MINDS:
+            sim = TitanicSimulation(seed=SEED, mind_type=mind, event_mapping=mapping)
+            sim.run()
+            counts = sim.counts()
+            rows.append(dict(mapping=mapping, mind=mind, total=len(sim.people), saved=counts["boats"], dead=counts["dead"]))
+    return rows
+
+
+def run_pompeii():
+    from engine.pompeii import EVENT_MAPPINGS, PompeiiSimulation
+
+    rows = []
+    for mapping in EVENT_MAPPINGS:
+        for mind in MINDS:
+            sim = PompeiiSimulation(seed=SEED, mind_type=mind, event_mapping=mapping)
+            sim.run()
+            rows.append(dict(mapping=mapping, mind=mind, total=len(sim.people), dead=sim.counts()["dead"]))
+    return rows
+
+
+def run_waterloo():
+    from engine.waterloo import EVENT_MAPPINGS, WaterlooSimulation
+
+    rows = []
+    for mapping in EVENT_MAPPINGS:
+        for alarm in (True, False):
+            for mind in MINDS:
+                sim = WaterlooSimulation(seed=SEED, mind_type=mind, event_mapping=mapping, alarm=alarm)
+                timeline = sim.run()
+                rows.append(
+                    dict(
+                        mapping=mapping,
+                        alarm=alarm,
+                        mind=mind,
+                        total=len(sim.people),
+                        off_site=sim.counts()["off_site"],
+                        exposure=timeline["crowd"]["exposure"],
+                    )
+                )
+    return rows
+
+
+def collect():
+    started = time.time()
+    commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    data = dict(
+        generated_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        commit=commit,
+        seed=SEED,
+        order_effect=order_effect(),
+        volcano=run_volcano(),
+        titanic=run_titanic(),
+        pompeii=run_pompeii(),
+        waterloo=run_waterloo(),
+    )
+    data["seconds"] = round(time.time() - started, 1)
+    return data
+
+
+def _table(rows, value, heading):
+    keys = list(dict.fromkeys(r["mapping"] for r in rows))
+    out = [f"| {heading} | " + " | ".join(MIND_LABEL[m] for m in MINDS) + " |", "| --- |" + " --- |" * len(MINDS)]
+    for key in keys:
+        by_mind = {r["mind"]: r for r in rows if r["mapping"] == key}
+        out.append(f"| {key} | " + " | ".join(value(by_mind[m]) for m in MINDS) + " |")
+    return out
+
+
+def _aegl2_or_worse(row):
+    exposure = row["exposure"]
+    return str(sum(count for name, count in exposure.items() if name in AEGL2_OR_WORSE))
+
+
+def render(data):
+    gap = data["order_effect"]
+    volcano = data["volcano"]
+    delay = volcano["paired_delay_steps"]
+    lines = [
+        "# Scenario numbers",
+        "",
+        f"_Generated by `tools/make_readme_numbers.py` at commit `{data['commit']}`, {data['generated_utc']}. Do not edit by hand._",
+        "",
+        f"These are model runs, not forecasts. Titanic, Pompeii and Waterloo use one seed ({data['seed']}). "
+        "A cue translation says which model event a real-world cue maps to. It is an assumption, "
+        "and results move with it, so every translation is listed.",
+        "",
+        "## Order effect",
+        "",
+        "P(protect) for (tremor, gas_plume) minus (gas_plume, tremor), from the default start.",
+        "",
+        "| Dephasing | Gap |",
+        "| --- | --- |",
+        f"| Default stress | {gap['default_stress']:+.3f} |",
+        f"| λ=0 | {gap['lambda_0']:+.3f} |",
+        f"| λ=1 (mixture control) | {gap['lambda_1']:+.3f} |",
+        "",
+        f"## Volcano, seeds 0-{volcano['seeds'] - 1}",
+        "",
+        "| Mind | Survival |",
+        "| --- | --- |",
+    ]
+    lines += [f"| {MIND_LABEL[m]} | {volcano['survival'][m] * 100:.1f}% |" for m in MINDS]
+    lines += [
+        "",
+        f"Paired evacuation delay, quantum minus mixture: {delay['mean']:+.2f} steps (SE {delay['se']:.3f}), "
+        f"n={delay['n']}: {delay['later']} later, {delay['earlier']} earlier, {delay['same']} same.",
+        "",
+    ]
+
+    titanic = data["titanic"]
+    lines += [f"## Titanic ({titanic[0]['total']:,} aboard), saved in boats", ""]
+    lines += _table(titanic, lambda r: f"{r['saved']:,} ({r['saved'] / r['total'] * 100:.1f}%)", "Cue translation")
+    pompeii = data["pompeii"]
+    lines += ["", f"## Pompeii ({pompeii[0]['total']:,} people), deaths", ""]
+    lines += _table(pompeii, lambda r: f"{r['dead']:,}", "Cue translation")
+    waterloo = data["waterloo"]
+    lines += ["", f"## Waterloo ({waterloo[0]['total']} people), reached AEGL-2 or worse", ""]
+    for alarm in (True, False):
+        lines += [f"**{'With' if alarm else 'Without'} the staff alarm**", ""]
+        lines += _table([r for r in waterloo if r["alarm"] is alarm], _aegl2_or_worse, "Cue translation")
+        lines += [""]
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--from-json", action="store_true", help="rewrite the table from the saved JSON without rerunning")
+    args = parser.parse_args()
+    RESULTS.mkdir(parents=True, exist_ok=True)
+    if args.from_json:
+        data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    else:
+        data = collect()
+        JSON_PATH.write_text(json.dumps(data, indent=1), encoding="utf-8")
+    TABLE_PATH.write_text(render(data), encoding="utf-8")
+    print(f"Wrote {TABLE_PATH.relative_to(ROOT).as_posix()}")
+
+
+if __name__ == "__main__":
+    main()

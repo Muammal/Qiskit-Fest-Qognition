@@ -1,0 +1,13 @@
+{
+ "format": "qognition-sim",
+ "version": 1,
+ "title": "Storm on a made-up island",
+ "author": "Qognition team",
+ "description": "One person and a cyclone passing close.",
+ "created_utc": "2026-11-06T13:22:29+00:00",
+ "seed": 2,
+ "needs_data_pack": false,
+ "scenario": "id = \"made_up_island_storm\"\ntitle = \"Storm on a made-up island\"\nplace = \"generated\"\nstart_utc = \"2023-06-01T00:00:00+00:00\"\nhours = 96\nstep_hours = 2\nlocal_utc_offset = -4\n\n[[entity]]\nkind = \"terrain\"\nsource = \"dials\"\nsummit_m = 900.0\narea_km2 = 200.0\n\n[[entity]]\nkind = \"weather\"\nsource = \"dials\"\nrain_mm_h = 1.0\nwind_m_s = 6.0\nwind_bearing_deg = 270.0\ntemperature_c = 27.0\nupper_wind_m_s = 20.0\nupper_bearing_deg = 90.0\n\n[[entity]]\nkind = \"storm\"\nsource = \"dials\"\nmax_wind_m_s = 50.0\nclosest_km = 50.0\nbearing_deg = 300.0\nspeed_m_s = 6.0\nrmax_km = 30.0\nclosest_hours = 48.0\nsite_lon = -61.2276\nsite_lat = 13.3\n\n[[entity]]\nkind = \"person\"\nsource = \"dials\"\nname = \"A villager\"\nmind = \"quantum\"\nstart_lon = -61.2276\nstart_lat = 13.3\n\n[[entity]]\nkind = \"shelter\"\nsource = \"dials\"\nname = \"The far coast\"\nlon = -61.237\nlat = 13.2676\n",
+ "sha256": "8f6eff8863fbcfdfd396e25e857c569e5681dce481f4d8f28da05e6bba2a243e",
+ "licence": "CC-BY-4.0"
+}

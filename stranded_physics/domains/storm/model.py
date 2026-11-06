@@ -1,4 +1,5 @@
 """Best-track interpolation and symmetric Holland cyclostrophic winds."""
+
 from __future__ import annotations
 
 import csv
@@ -16,10 +17,10 @@ HERE = Path(__file__).resolve().parent
 RAW = HERE.parents[2] / "artifacts/physics/raw/storm"
 PARAMETERS = load_parameters(HERE / "params.toml")
 SETTINGS = {p.id.split(".", 1)[1]: float(p.value.magnitude) for p in PARAMETERS}
-KNOTS_TO_MS = .514444
-NAUTICAL_MILES_TO_M = 1852.
-METRES_PER_KM = 1000.
-SECONDS_PER_HOUR = 3600.
+KNOTS_TO_MS = 0.514444
+NAUTICAL_MILES_TO_M = 1852.0
+METRES_PER_KM = 1000.0
+SECONDS_PER_HOUR = 3600.0
 
 
 def default_files():
@@ -30,8 +31,7 @@ def default_files():
 def holland_wind_m_s(r_m, vmax, rmax, b):
     """Holland (1980) cyclostrophic profile; citation from memory in params."""
     r = np.asarray(r_m, dtype=float)
-    if (not np.isfinite(r).all() or (r < 0).any()
-            or not np.isfinite([vmax, rmax, b]).all() or vmax < 0 or rmax <= 0 or b <= 0):
+    if not np.isfinite(r).all() or (r < 0).any() or not np.isfinite([vmax, rmax, b]).all() or vmax < 0 or rmax <= 0 or b <= 0:
         raise InterfaceError("Holland winds need nonnegative radius/wind and positive rmax/b")
     result = np.zeros_like(r)
     positive = r > 0
@@ -40,7 +40,7 @@ def holland_wind_m_s(r_m, vmax, rmax, b):
     supported = log_q < np.log(np.finfo(float).max)
     speed = np.zeros_like(log_q)
     q = np.exp(log_q[supported])
-    speed[supported] = vmax * np.exp(.5 * (log_q[supported] + 1 - q))
+    speed[supported] = vmax * np.exp(0.5 * (log_q[supported] + 1 - q))
     result[positive] = speed
     return float(result) if result.ndim == 0 else result
 
@@ -49,7 +49,7 @@ def great_circle_m(site_lonlat, lon, lat):
     site_lon, site_lat = np.deg2rad(site_lonlat)
     lon, lat = np.deg2rad(lon), np.deg2rad(lat)
     haversine = np.sin((lat - site_lat) / 2) ** 2 + np.cos(site_lat) * np.cos(lat) * np.sin((lon - site_lon) / 2) ** 2
-    return 2 * SETTINGS["earth_radius"] * np.arcsin(np.sqrt(np.clip(haversine, 0., 1.)))
+    return 2 * SETTINGS["earth_radius"] * np.arcsin(np.sqrt(np.clip(haversine, 0.0, 1.0)))
 
 
 def read_track(path):
@@ -65,13 +65,19 @@ def read_track(path):
             instant = datetime.fromisoformat(row["ISO_TIME"].strip().replace("Z", "+00:00"))
             if instant.utcoffset() is None:
                 instant = instant.replace(tzinfo=timezone.utc)
-            fixes.append((instant.timestamp(), float(row["LAT"]), float(row["LON"]),
-                          float(row["USA_WIND"]) * KNOTS_TO_MS, float(row["USA_RMW"]) * NAUTICAL_MILES_TO_M))
+            fixes.append(
+                (instant.timestamp(), float(row["LAT"]), float(row["LON"]), float(row["USA_WIND"]) * KNOTS_TO_MS, float(row["USA_RMW"]) * NAUTICAL_MILES_TO_M)
+            )
     data = np.asarray(fixes, dtype=float)
     if data.ndim != 2 or len(data) < 2 or not np.isfinite(data).all():
         raise InterfaceError("track needs at least two finite complete fixes")
-    if ((np.diff(data[:, 0]) <= 0).any() or (np.abs(data[:, 1]) > 90).any()
-            or (np.abs(data[:, 2]) > 180).any() or (data[:, 3] < 0).any() or (data[:, 4] <= 0).any()):
+    if (
+        (np.diff(data[:, 0]) <= 0).any()
+        or (np.abs(data[:, 1]) > 90).any()
+        or (np.abs(data[:, 2]) > 180).any()
+        or (data[:, 3] < 0).any()
+        or (data[:, 4] <= 0).any()
+    ):
         raise InterfaceError("track fixes must be chronological with valid coordinates, wind and radius")
     return data
 
@@ -89,15 +95,14 @@ class Storm:
         self.files = default_files() if files is None and generated is None else files
 
     def check_validity(self, fields):
-        if (self.time.n < 1 or not np.isfinite(self.time.dt_s) or self.time.dt_s <= 0
-                or self.time.t0_utc.utcoffset() is None):
+        if self.time.n < 1 or not np.isfinite(self.time.dt_s) or self.time.dt_s <= 0 or self.time.t0_utc.utcoffset() is None:
             return ["storm needs a positive timezone-aware time axis"]
-        if (len(self.site_lonlat) != 2 or not np.isfinite(self.site_lonlat).all()
-                or abs(self.site_lonlat[0]) > 180 or abs(self.site_lonlat[1]) > 90):
+        if len(self.site_lonlat) != 2 or not np.isfinite(self.site_lonlat).all() or abs(self.site_lonlat[0]) > 180 or abs(self.site_lonlat[1]) > 90:
             return ["storm site needs finite longitude/latitude in degrees"]
         if self.generated is not None:
             try:
                 from .generator import validate_generated
+
                 validate_generated(self.generated)
             except (ValueError, TypeError, AttributeError) as error:
                 return [str(error)]
@@ -126,6 +131,7 @@ class Storm:
             lat, lon, vmax, rmax = [np.interp(moments, track[:, 0], track[:, col]) for col in range(1, 5)]
         else:
             from .generator import interpolate_track
+
             track = self.generated.track
             moments = np.arange(self.time.n) * self.time.dt_s
             lat, lon, vmax, rmax = interpolate_track(track, moments)

@@ -1,4 +1,5 @@
 """Plays a precomputed pack for any mind. Mirrors engine.simulation.SimulationEngine for GUI and JSON."""
+
 from __future__ import annotations
 
 import math
@@ -15,10 +16,10 @@ from stranded_physics.runtime.body import AgentBody, to_state
 from stranded_physics.runtime.perception import perceive
 
 SUBSTEP_MINUTES = 5  # Hazard contact is checked at this resolution along a walk.
-DRINK_REACH_M = 400.  # assumption: close enough to a stream to drink from it.
-FOOD_REACH_M = 400.  # assumption: close enough to gather food.
-SHELTER_REACH_M = 400.  # assumption: close enough to count as sheltered.
-WOOD_REACH_M = 400.  # assumption: close enough to gather wood.
+DRINK_REACH_M = 400.0  # assumption: close enough to a stream to drink from it.
+FOOD_REACH_M = 400.0  # assumption: close enough to gather food.
+SHELTER_REACH_M = 400.0  # assumption: close enough to count as sheltered.
+WOOD_REACH_M = 400.0  # assumption: close enough to gather wood.
 WOOD_PER_SHELTER = 2  # assumption: carried over from the fictional island.
 MOST_WOOD_CARRIED = 4  # assumption: carried over from the fictional island's food limit.
 INJURY_STEPS = 12  # assumption: in two-hour steps, a day before an injured person walks normally again. Resting heals twice as fast.
@@ -26,7 +27,7 @@ TWO_HOURS_MINUTES = 120
 LUCK_STREAM = 603  # Keeps who survives apart from every other random stream, so a choice of mind changes nothing else.
 GALE_M_S = 17.2  # Beaufort force 8, from memory: strong enough for a person to notice and act on.
 HURRICANE_M_S = 32.7  # Beaufort force 12, from memory. assumption: an unsheltered person is injured at this wind.
-STORM_RAIN_MM_H = 5.  # assumption: T0 threshold; a `convention` value in the frozen event mapping.
+STORM_RAIN_MM_H = 5.0  # assumption: T0 threshold; a `convention` value in the frozen event mapping.
 PHASE_NAMES = {0: "unrest", 1: "escalating", 2: "erupting", 3: "fading"}
 TILE_CODES = {"water": 0, "plains": 1, "forest": 2, "mountain": 3, "shelter": 4}
 
@@ -35,6 +36,7 @@ def _mind(mind_type: str):
     """The team's minds. The control lives with the quantum mind, and is imported only when asked for."""
     if mind_type == "classical_mixture":
         from mind.quantum_mind import classical_mixture_decide
+
         return classical_mixture_decide
     return contracts.quantum_decide if mind_type == "quantum" else contracts.classical_decide
 
@@ -59,7 +61,7 @@ class PackWorld:
         self.scale_m_per_tile = grid.dx_m
         self.shelter_tiles: list[tuple[int, int]] = []
         self.lava, self.pdc, self.lahar = set(), set(), set()
-        self.ash = 0.
+        self.ash = 0.0
 
     def _tile(self, row: int, col: int) -> int:
         xy = self.pack.contract_grid.centre(row, col)
@@ -89,11 +91,21 @@ class PackWorld:
     def export_dict(self) -> dict:
         grid = self.pack.contract_grid
         route = [list(self.spawn_pos), list(self.assembly_points[0])]
-        return {"width": self.width, "height": self.height, "tiles": self.tiles, "map_seed": self.pack.scenario,
-                "scale_m_per_tile": grid.dx_m, "elevation": [[round(v) for v in row] for row in self.elevation],
-                "evacuation_map": {"zones": self.zones, "assembly_points": [list(p) for p in self.assembly_points],
-                                   "routes_from_spawn": [route], "route_from_spawn": route,
-                                   "clean_springs": [list(p) for p in self.clean_springs]}}
+        return {
+            "width": self.width,
+            "height": self.height,
+            "tiles": self.tiles,
+            "map_seed": self.pack.scenario,
+            "scale_m_per_tile": grid.dx_m,
+            "elevation": [[round(v) for v in row] for row in self.elevation],
+            "evacuation_map": {
+                "zones": self.zones,
+                "assembly_points": [list(p) for p in self.assembly_points],
+                "routes_from_spawn": [route],
+                "route_from_spawn": route,
+                "clean_springs": [list(p) for p in self.clean_springs],
+            },
+        }
 
 
 class Shared:
@@ -108,7 +120,16 @@ class Shared:
 class PackSimulation:
     """Same surface as SimulationEngine: step(), run(), timeline(), world, agent, steps."""
 
-    def __init__(self, pack: ScenarioPack, mind_type: str = "quantum", noise_source: str = "stub", decide_fn=None, allow_out_of_domain: bool = False, person: int = 0, shared: "Shared | None" = None) -> None:
+    def __init__(
+        self,
+        pack: ScenarioPack,
+        mind_type: str = "quantum",
+        noise_source: str = "stub",
+        decide_fn=None,
+        allow_out_of_domain: bool = False,
+        person: int = 0,
+        shared: "Shared | None" = None,
+    ) -> None:
         breaches = [k for k, v in pack.verdicts.items() if v == "OUT_OF_DOMAIN"]
         if breaches and not allow_out_of_domain:
             raise InterfaceError(f"pack is outside its models' valid range: {breaches}")
@@ -120,22 +141,22 @@ class PackSimulation:
         self.agent = AgentBody(tuple(pack.sites["spawn"][person]), self.world.to_tile(pack.sites["spawn"][person]), pack.t0_local_hour)
         self.recent_events = ["none", "none"]
         self._fields = self.shared.fields
-        self._walked = (0., 0., 0.)  # Seconds, metres and metres climbed in the current step.
+        self._walked = (0.0, 0.0, 0.0)  # Seconds, metres and metres climbed in the current step.
         self.steps: list[dict] = []
         self.warned = False
         self.built: list[XY] = []  # Shelters this person has built. Only they use them.
         self.injury_steps_left = 0
-        self.step_minutes = round(pack.time.dt_s / 60.)
+        self.step_minutes = round(pack.time.dt_s / 60.0)
         self.luck = np.random.default_rng([pack.seed, person, LUCK_STREAM])
         self.flow_met_on_step: int | None = None  # A flow is one event in a step, however many substeps it covers.
-        self.roof_failed_share = 0.  # The roof failure share at this person's shelter when last checked.
+        self.roof_failed_share = 0.0  # The roof failure share at this person's shelter when last checked.
         self.roof_lost = False
         self.helped = False  # Someone able-bodied is close enough to help. Set by runtime/group.py. It changes the walking only, and never reaches the mind.
 
     def _event(self, t_s: float) -> str:
         """One event per step, by the frozen priority, from what the agent can notice."""
         now = perceive(self.pack, self.agent.xy_m, t_s)
-        previous = perceive(self.pack, self.agent.xy_m, max(0., t_s - self.pack.time.dt_s))
+        previous = perceive(self.pack, self.agent.xy_m, max(0.0, t_s - self.pack.time.dt_s))
         if now.explosion_heard or now.flow_visible:
             return "eruption"
         if now.wind_m_s >= GALE_M_S:
@@ -178,19 +199,19 @@ class PackSimulation:
         """Walk through the step in substeps, checking hazards at each. No solver runs here."""
         goal = self._walk_goal(action)
         grid = self.pack.grid
-        spare_s = 0.
-        seconds, metres, climbed = 0., 0., 0.
+        spare_s = 0.0
+        seconds, metres, climbed = 0.0, 0.0, 0.0
         for minute in range(0, self.step_minutes, SUBSTEP_MINUTES):
-            clock = t_s + minute * 60.
+            clock = t_s + minute * 60.0
             cell = grid.locate(self.agent.xy_m)
             if goal is not None and cell is not None:
                 # An injured person covers half the ground. This factor is an assumption, carried over from T0.
-                budget = spare_s + SUBSTEP_MINUTES * 60. * (.5 if self.agent.injured and not self.helped else 1.)
+                budget = spare_s + SUBSTEP_MINUTES * 60.0 * (0.5 if self.agent.injured and not self.helped else 1.0)
                 reached, spare_s = walk(self._field(goal), cell, budget, (grid.ny, grid.nx))
                 if reached != cell:
                     start, end = self.agent.xy_m, grid.centre(*reached)
                     rise = self.pack.sample("terrain.elevation", end) - self.pack.sample("terrain.elevation", start)
-                    seconds, metres, climbed = seconds + SUBSTEP_MINUTES * 60., metres + math.dist(start, end), climbed + max(0., rise)
+                    seconds, metres, climbed = seconds + SUBSTEP_MINUTES * 60.0, metres + math.dist(start, end), climbed + max(0.0, rise)
                     self.agent.xy_m = end
             if self._killed_by_flow(clock):
                 break
@@ -207,12 +228,18 @@ class PackSimulation:
         """Water, food and fatigue from the balance model. Safety and stress are still labelled assumptions."""
         body = self.agent
         seconds, metres, climbed = self._walked
-        speed = metres / seconds if seconds else 0.
-        grade = 100. * climbed / metres if metres else 0.
+        speed = metres / seconds if seconds else 0.0
+        grade = 100.0 * climbed / metres if metres else 0.0
         water = self._walk_goal("drink")
-        body.balance = advance(body.balance, self.step_minutes / 60., seconds / 3600., pandolf_watts(speed, grade) if seconds else 0.,
-                               drank=bool(action == "drink" and water and math.dist(water, body.xy_m) < DRINK_REACH_M), rested=action == "rest",
-                               ate_kcal=setting("meal_energy", "kcal") if self._within("food", FOOD_REACH_M) and action == "forage" else 0.)
+        body.balance = advance(
+            body.balance,
+            self.step_minutes / 60.0,
+            seconds / 3600.0,
+            pandolf_watts(speed, grade) if seconds else 0.0,
+            drank=bool(action == "drink" and water and math.dist(water, body.xy_m) < DRINK_REACH_M),
+            rested=action == "rest",
+            ate_kcal=setting("meal_energy", "kcal") if self._within("food", FOOD_REACH_M) and action == "forage" else 0.0,
+        )
         self._use_materials(action)
         self._heal(action)
         self._expose_to_ash()
@@ -222,8 +249,8 @@ class PackSimulation:
         body.thirst, body.hunger, body.energy = current["thirst"], current["hunger"], current["energy"]
         if event in ("tremor", "gas_plume", "eruption", "ash_fall"):
             self.warned = True
-            body.safety = max(0., body.safety - .1)
-            body.stress = min(1., body.stress + .08)
+            body.safety = max(0.0, body.safety - 0.1)
+            body.stress = min(1.0, body.stress + 0.08)
         body.minute += self.step_minutes
         body.hour += body.minute // 60
         body.minute %= 60
@@ -254,12 +281,12 @@ class PackSimulation:
             return
         t_s = len(self.steps) * self.pack.time.dt_s
         body, load = self.agent, self.pack.sample("tephra.deposit_load", self.agent.xy_m, t_s)
-        tiredness = ash_energy_cost_per_hour(load, self._sheltered()) * self.step_minutes / 60. * setting("fatigue_span", "kcal")
+        tiredness = ash_energy_cost_per_hour(load, self._sheltered()) * self.step_minutes / 60.0 * setting("fatigue_span", "kcal")
         body.balance = replace(body.balance, fatigue_kcal=body.balance.fatigue_kcal + float(tiredness))
         if self.pack.has("exposure.roof_failure") and self._sheltered():
             share = self.pack.sample("exposure.roof_failure", self.agent.xy_m, t_s)
             if share > self.roof_failed_share:
-                chance = (share - self.roof_failed_share) / (1. - self.roof_failed_share)
+                chance = (share - self.roof_failed_share) / (1.0 - self.roof_failed_share)
                 self.roof_failed_share = share
                 if self.luck.random() < chance:
                     self.roof_lost = True
@@ -286,7 +313,9 @@ class PackSimulation:
             self.agent.injured = self.injury_steps_left > 0
 
     def _sheltered(self) -> bool:
-        return not self.roof_lost and (self._within("assembly", SHELTER_REACH_M) or any(math.dist(point, self.agent.xy_m) < SHELTER_REACH_M for point in self.built))
+        return not self.roof_lost and (
+            self._within("assembly", SHELTER_REACH_M) or any(math.dist(point, self.agent.xy_m) < SHELTER_REACH_M for point in self.built)
+        )
 
     def step(self) -> dict | None:
         t = len(self.steps)
@@ -303,9 +332,17 @@ class PackSimulation:
         contracts.validate_decision(decision)
         self._advance(decision["action"], t_s)
         self._needs(decision["action"], event)
-        record = {"t": t, "state": state, "event": event, "action": decision["action"], "probs": decision["probs"],
-                  "reason": decision["reason"], "pos_after": list(self.agent.tile),
-                  "phase": PHASE_NAMES[int(self.pack.series("eruption.phase")[t])] if self.pack.has("eruption.phase") else "none"}
+        record = {
+            "t": t,
+            "state": state,
+            "event": event,
+            "action": decision["action"],
+            "probs": decision["probs"],
+            "reason": decision["reason"],
+            "quantum": decision.get("quantum"),
+            "pos_after": list(self.agent.tile),
+            "phase": PHASE_NAMES[int(self.pack.series("eruption.phase")[t])] if self.pack.has("eruption.phase") else "none",
+        }
         self.steps.append(record)
         return record
 
@@ -320,18 +357,28 @@ class PackSimulation:
 
     def _volcano_export(self) -> dict:
         if not self.pack.has("eruption.phase"):
-            return {"vent": None, "erupts": False, "onset_step": None, "first_pdc_step": None, "phases": ["none"] * self.pack.time.n,
-                    "world_events": [r["event"] for r in self.steps], "hazard_by_step": []}
+            return {
+                "vent": None,
+                "erupts": False,
+                "onset_step": None,
+                "first_pdc_step": None,
+                "phases": ["none"] * self.pack.time.n,
+                "world_events": [r["event"] for r in self.steps],
+                "hazard_by_step": [],
+            }
         phase = self.pack.series("eruption.phase")
         erupting = np.flatnonzero(phase == 2)
         arrival = self.pack.frame("pdc.arrival") if self.pack.has("pdc.arrival") else np.array([])
         finite = arrival[np.isfinite(arrival)]
-        return {"vent": list(self.world.vent), "erupts": bool(erupting.size),
-                "onset_step": int(erupting[0]) if erupting.size else None,
-                "first_pdc_step": int(finite.min() // self.pack.time.dt_s) if finite.size else None,
-                "phases": [PHASE_NAMES[int(p)] for p in phase],
-                "world_events": [r["event"] for r in self.steps],
-                "hazard_by_step": self._hazards()}
+        return {
+            "vent": list(self.world.vent),
+            "erupts": bool(erupting.size),
+            "onset_step": int(erupting[0]) if erupting.size else None,
+            "first_pdc_step": int(finite.min() // self.pack.time.dt_s) if finite.size else None,
+            "phases": [PHASE_NAMES[int(p)] for p in phase],
+            "world_events": [r["event"] for r in self.steps],
+            "hazard_by_step": self._hazards(),
+        }
 
     def _hazards(self) -> list[dict]:
         if self.shared.hazards is None:
@@ -341,12 +388,23 @@ class PackSimulation:
     def _hazard_at(self, step: int) -> dict:
         t_s = step * self.pack.time.dt_s
         grid = self.pack.contract_grid
-        flows = [[col, row] for row in range(grid.ny) for col in range(grid.nx)
-                 if self.pack.sample("pdc.active", grid.centre(row, col), t_s) > 0] if self.pack.has("pdc.active") else []
-        ash = round(float(self.pack.frame("tephra.deposit_load", t_s).max()), 3) if self.pack.has("tephra.deposit_load") else 0.
-        return {"new_lava": [], "new_pdc": flows, "active_pdc": flows, "surge": [],
-                "new_lahar": [], "active_lahar": [], "ash": ash,
-                "ash_grid": ["0" * grid.nx for _ in range(grid.ny)], "wind_deg": 0.0}
+        flows = (
+            [[col, row] for row in range(grid.ny) for col in range(grid.nx) if self.pack.sample("pdc.active", grid.centre(row, col), t_s) > 0]
+            if self.pack.has("pdc.active")
+            else []
+        )
+        ash = round(float(self.pack.frame("tephra.deposit_load", t_s).max()), 3) if self.pack.has("tephra.deposit_load") else 0.0
+        return {
+            "new_lava": [],
+            "new_pdc": flows,
+            "active_pdc": flows,
+            "surge": [],
+            "new_lahar": [],
+            "active_lahar": [],
+            "ash": ash,
+            "ash_grid": ["0" * grid.nx for _ in range(grid.ny)],
+            "wind_deg": 0.0,
+        }
 
     def _weather_labels(self) -> list[str]:
         return ["storm" if r >= STORM_RAIN_MM_H else "rain" if r > 0 else "calm" for r in self.pack.series("atmos.rain_rate")]
@@ -354,12 +412,29 @@ class PackSimulation:
     def timeline(self) -> dict:
         volcano = self._volcano_export()
         world = self.world.export_dict()
-        world.update(seed=self.seed, mind=self.mind_type, noise_source=self.noise_source, initial_tiles=self.world.tiles,
-                     volcano=volcano, pack_hash=self.pack.content_hash, pack_verdicts=dict(self.pack.verdicts),
-                     weather=self._weather_labels())
+        world.update(
+            seed=self.seed,
+            mind=self.mind_type,
+            noise_source=self.noise_source,
+            scenario=self.pack.scenario,
+            initial_tiles=self.world.tiles,
+            volcano=volcano,
+            pack_hash=self.pack.content_hash,
+            pack_verdicts=dict(self.pack.verdicts),
+            weather=self._weather_labels(),
+        )
         left = next((r["t"] for r in self.steps if self.world.zones[r["pos_after"][1]][r["pos_after"][0]] != 2), None)
         safe = next((r["t"] for r in self.steps if self.world.zones[r["pos_after"][1]][r["pos_after"][0]] == 0), None)
         pdc = volcano["first_pdc_step"]
-        return {"world": world, "steps": self.steps, "outcome": "survived" if self.agent.alive else "died", "cause": self.agent.cause,
-                "evacuation": {"left_danger_step": left, "reached_safe_step": safe, "first_pdc_step": pdc,
-                               "margin_hours": None if safe is None or pdc is None else 2 * (pdc - safe)}}
+        return {
+            "world": world,
+            "steps": self.steps,
+            "outcome": "survived" if self.agent.alive else "died",
+            "cause": self.agent.cause,
+            "evacuation": {
+                "left_danger_step": left,
+                "reached_safe_step": safe,
+                "first_pdc_step": pdc,
+                "margin_hours": None if safe is None or pdc is None else 2 * (pdc - safe),
+            },
+        }

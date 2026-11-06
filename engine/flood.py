@@ -4,6 +4,7 @@ Timing anchors come from sources cited below. The waterline shape between them
 is an assumption chosen to meet those anchors on the schematic cutaway; it is
 not a naval-architecture calculation.
 """
+
 import copy
 import random
 from collections import OrderedDict
@@ -31,15 +32,23 @@ SINK_STEP = clock_step(2, 20)  # Wikipedia: gone from view at 02:20 ship's time
 
 # (minutes after 23:30, water row at the bow, water row at the stern). Smaller row = higher water.
 WATERLINE_KEYS = (
-    (0, 21.5, 21.5), (10, 21.5, 21.5), (30, 19.5, 22.), (60, 18., 22.2), (90, 16.5, 22.5),
-    (120, 14.5, 22.5), (150, 11., 22.), (155, 7.2, 21.), (165, -3., 17.), (170, -30., -8.),
+    (0, 21.5, 21.5),
+    (10, 21.5, 21.5),
+    (30, 19.5, 22.0),
+    (60, 18.0, 22.2),
+    (90, 16.5, 22.5),
+    (120, 14.5, 22.5),
+    (150, 11.0, 22.0),
+    (155, 7.2, 21.0),
+    (165, -3.0, 17.0),
+    (170, -30.0, -8.0),
 )  # assumption: shaped to reach boat deck at the bridge by 02:05, bridge under 02:15, all gone 02:20
 # (minutes after 23:30, degrees down by the head). Wikipedia summary: ~2 early, ~4.5 first hour,
 # ~5 second hour, witnesses 30-45 near the end. Used for perception and cutscenes only.
-TRIM_KEYS = ((0, 0.), (10, 0.), (20, 2.), (70, 4.5), (130, 5.), (150, 10.), (165, 35.), (170, 45.))
-WATERLINE_JITTER = .2  # assumption: seeded row offset so seeds differ slightly; anchors hold within one step
+TRIM_KEYS = ((0, 0.0), (10, 0.0), (20, 2.0), (70, 4.5), (130, 5.0), (150, 10.0), (165, 35.0), (170, 45.0))
+WATERLINE_JITTER = 0.2  # assumption: seeded row offset so seeds differ slightly; anchors hold within one step
 KEEL_ROW = 27  # assumption: water enters a compartment at the bottom and climbs
-FILL_ROWS_PER_STEP = .3  # assumption: rows climbed per step in the aftmost flooding compartment
+FILL_ROWS_PER_STEP = 0.3  # assumption: rows climbed per step in the aftmost flooding compartment
 FILL_BOW_FACTOR = 2.5  # assumption: the bow compartments, with the longest gash per volume, fill this much faster
 
 _FORECAST_CACHE = OrderedDict()  # assumption: retain at most 16 immutable forecasts
@@ -101,18 +110,24 @@ class FloodModel:
             if t == SINK_STEP:  # whatever has not flooded yet goes down with the ship
                 new_flood.update(p for p in walkable if p not in flooded)
             flooded |= new_flood
-            rising = {q for p in flooded for q in world.neighbors(p)
-                      if world.get_tile(*q) and q not in flooded}
+            rising = {q for p in flooded for q in world.neighbors(p) if world.get_tile(*q) and q not in flooded}
             self.phases.append(self._phase(t))
             self.world_events.append(self._event(t))
-            self.hazard_by_step.append(dict(
-                new_flood=sorted(new_flood), rising=sorted(rising), waterline=[round(bow, 2), round(stern, 2)],
-                top_row=round(top_row, 2), trim_deg=round(trim, 2), ash=0., wind_deg=0.,
-            ))
+            self.hazard_by_step.append(
+                dict(
+                    new_flood=sorted(new_flood),
+                    rising=sorted(rising),
+                    waterline=[round(bow, 2), round(stern, 2)],
+                    top_row=round(top_row, 2),
+                    trim_deg=round(trim, 2),
+                    ash=0.0,
+                    wind_deg=0.0,
+                )
+            )
 
     @staticmethod
     def _fill_row(x, t, since):
-        forwardness = max(0., (x - BREACHED_FROM_X) / (world_bow_x() - BREACHED_FROM_X))
+        forwardness = max(0.0, (x - BREACHED_FROM_X) / (world_bow_x() - BREACHED_FROM_X))
         rate = FILL_ROWS_PER_STEP * (1 + (FILL_BOW_FACTOR - 1) * forwardness)
         return KEEL_ROW - rate * (t - since)
 
@@ -137,7 +152,10 @@ class FloodModel:
         return "eruption" if t in (BOAT_DECK_AWASH_STEP, BRIDGE_UNDER_STEP, SINK_STEP) else "none"
 
     def export_dict(self):
-        return dict(onset_step=self.onset_step, sink_step=self.sink_step, phases=self.phases,
-                    world_events=self.world_events,
-                    hazard_by_step=[{**h, **{key: [list(p) for p in h[key]] for key in ("new_flood", "rising")}}
-                                    for h in self.hazard_by_step])
+        return dict(
+            onset_step=self.onset_step,
+            sink_step=self.sink_step,
+            phases=self.phases,
+            world_events=self.world_events,
+            hazard_by_step=[{**h, **{key: [list(p) for p in h[key]] for key in ("new_flood", "rising")}} for h in self.hazard_by_step],
+        )

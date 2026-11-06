@@ -5,6 +5,7 @@ become hypothermic in less than 30 minutes", and gives 10–40 minutes for swim
 failure. No published 0 C distribution is in hand. All curve choices are
 labelled assumptions in params.toml, not fits to Titanic deaths.
 """
+
 from math import erf, exp, isfinite, log, sqrt
 from pathlib import Path
 
@@ -32,8 +33,7 @@ def _value(value, name):
 
 def incapacitation_median_minutes(temperature_c) -> float:
     temperature = _value(temperature_c, "temperature")
-    return SETTINGS["incapacitation_median_at_freezing"] * exp(
-        SETTINGS["incapacitation_warming_rate"] * (temperature - SETTINGS["freezing_point"]))
+    return SETTINGS["incapacitation_median_at_freezing"] * exp(SETTINGS["incapacitation_warming_rate"] * (temperature - SETTINGS["freezing_point"]))
 
 
 def immersion_death_probability(minutes, temperature_c, lifebelt=True) -> float:
@@ -42,11 +42,11 @@ def immersion_death_probability(minutes, temperature_c, lifebelt=True) -> float:
     if not isinstance(lifebelt, (bool, np.bool_)):
         raise InterfaceError("lifebelt must be boolean")
     if minutes == 0:
-        return 0.
+        return 0.0
     if lifebelt:
         median *= SETTINGS["lifebelt_factor"]
     z = (log(minutes) - log(median)) / SETTINGS["incapacitation_spread"]
-    return .5 * (1. + erf(z / sqrt(2.)))
+    return 0.5 * (1.0 + erf(z / sqrt(2.0)))
 
 
 def titanic_sea_temperature_c() -> float:
@@ -62,8 +62,7 @@ class Sea:
     parameters = PARAMETERS
 
     def __init__(self, time, temperature_c):
-        if (not isinstance(time.n, int) or time.n < 1
-                or not isfinite(time.dt_s) or time.dt_s <= 0):
+        if not isinstance(time.n, int) or time.n < 1 or not isfinite(time.dt_s) or time.dt_s <= 0:
             raise InterfaceError("positive finite time axis required")
         self.time = time
         self.temperature_c = _value(temperature_c, "temperature")
@@ -72,6 +71,5 @@ class Sea:
         return []
 
     def run(self, fields, rng):
-        fields.put("sea.temperature", np.full(self.time.n, self.temperature_c),
-                   "degC", time=self.time)
+        fields.put("sea.temperature", np.full(self.time.n, self.temperature_c), "degC", time=self.time)
         return {}

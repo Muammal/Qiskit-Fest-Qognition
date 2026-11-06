@@ -1,4 +1,5 @@
 """Side-cutaway map view of the ship and everyone aboard, for the Titanic scenario."""
+
 import math
 import time
 
@@ -15,7 +16,7 @@ SEA_TOP, SEA_LOW = (24, 62, 104), (6, 20, 44)
 HULL, HULL_RED = (20, 22, 28), (120, 38, 30)
 CABIN = {1: (178, 142, 92), 3: (92, 84, 78), 4: (226, 214, 186)}
 STEEL = (64, 70, 80)
-SURFACE_AFTER_SINKING = 13.  # assumption: row of the calm sea drawn once the ship has gone
+SURFACE_AFTER_SINKING = 13.0  # assumption: row of the calm sea drawn once the ship has gone
 BOAT_ROW_OUT_STEPS = 12  # display only: an hour for a boat to reach its spot on the map
 
 
@@ -28,21 +29,25 @@ def build_ship_surface(world, size=MAP_SIZE):
     surface = pygame.Surface((size, size), pygame.SRCALPHA)
     tile = size / GRID_DIM
 
-    def rect(x, y, w=1., h=1.):
+    def rect(x, y, w=1.0, h=1.0):
         return pygame.Rect(round(x * tile), round(y * tile), math.ceil(w * tile), math.ceil(h * tile))
 
     # Funnels and masts rise behind the superstructure.
     for x in (12.5, 17, 21.5, 26):
-        pygame.draw.polygon(surface, (196, 124, 46), [(x * tile, 9.4 * tile), ((x + 1.6) * tile, 9.4 * tile),
-                                                      ((x + 1.2) * tile, 4.2 * tile), ((x - .4) * tile, 4.2 * tile)])
-        pygame.draw.polygon(surface, (18, 18, 22), [((x + 1.27) * tile, 5.4 * tile), ((x - .27) * tile, 5.4 * tile),
-                                                    ((x - .4) * tile, 4.2 * tile), ((x + 1.2) * tile, 4.2 * tile)])
+        pygame.draw.polygon(
+            surface, (196, 124, 46), [(x * tile, 9.4 * tile), ((x + 1.6) * tile, 9.4 * tile), ((x + 1.2) * tile, 4.2 * tile), ((x - 0.4) * tile, 4.2 * tile)]
+        )
+        pygame.draw.polygon(
+            surface,
+            (18, 18, 22),
+            [((x + 1.27) * tile, 5.4 * tile), ((x - 0.27) * tile, 5.4 * tile), ((x - 0.4) * tile, 4.2 * tile), ((x + 1.2) * tile, 4.2 * tile)],
+        )
     for x, height in ((5, 3.5), (34, 3)):
         pygame.draw.line(surface, (120, 104, 84), (x * tile, height * tile), (x * tile, 15.6 * tile), max(1, int(tile / 8)))
 
     hull = [(0.8, 15.6), (39.2, 15.6), (38.8, 21.5), (37.6, 25), (35.5, 27.8), (5, 27.8), (2.2, 25), (1, 21)]
     pygame.draw.polygon(surface, HULL, [(x * tile, y * tile) for x, y in hull])
-    red = [(p[0], max(p[1], WATERLINE_ROW + .3)) for p in hull]
+    red = [(p[0], max(p[1], WATERLINE_ROW + 0.3)) for p in hull]
     pygame.draw.polygon(surface, HULL_RED, [(x * tile, y * tile) for x, y in red])
     upper = [(6, 13.6), (34, 13.6), (34, 15.7), (6, 15.7)]
     pygame.draw.polygon(surface, (232, 228, 214), [(x * tile, y * tile) for x, y in upper])
@@ -88,13 +93,13 @@ class ShipView:
 
     def person_xy(self, person, engine, t):
         """Screen position, jittered by id so a crowd on one tile spreads out."""
-        jx = ((person.id * 7919) % 19 - 9) * .9
-        jy = ((person.id * 104729) % 11 - 5) * .9
+        jx = ((person.id * 7919) % 19 - 9) * 0.9
+        jy = ((person.id * 104729) % 11 - 5) * 0.9
         x, y = person.pos
         if person.status == "aboard":
-            return (x + .5) * TILE + jx, (y + .5) * TILE + jy
+            return (x + 0.5) * TILE + jx, (y + 0.5) * TILE + jy
         if person.status == "water":
-            return (x + .5) * TILE + jx * 2, (self.surface_row(x, engine, t) + .3) * TILE + abs(jy) * 2
+            return (x + 0.5) * TILE + jx * 2, (self.surface_row(x, engine, t) + 0.3) * TILE + abs(jy) * 2
         boat = self._boat_by_id(engine, person.boat_id)
         bx, by = self.boat_xy(boat, engine, t)
         return bx + jx, by - 4
@@ -105,15 +110,15 @@ class ShipView:
 
     def boat_xy(self, boat, engine, t):
         if boat.state in ("stowed", "loading"):
-            return (boat.station[0] + .5) * TILE, (BOAT - .35) * TILE
+            return (boat.station[0] + 0.5) * TILE, (BOAT - 0.35) * TILE
         # Each boat rows from its station toward its own spot, so they spread across the sea.
         fleet = engine.boats.boats + engine.boats.floating
         index = fleet.index(boat)
         spot = 1.5 + index * 36 / (len(fleet) - 1)
-        progress = min(1., max(0, t - boat.launch_step) / BOAT_ROW_OUT_STEPS)
+        progress = min(1.0, max(0, t - boat.launch_step) / BOAT_ROW_OUT_STEPS)
         x = boat.station[0] + (spot - boat.station[0]) * progress
         row = self.surface_row(x, engine, t)
-        return (x + .5) * TILE, (row + .1) * TILE + (index % 3) * 22 * progress
+        return (x + 0.5) * TILE, (row + 0.1) * TILE + (index % 3) * 22 * progress
 
     def focus_xy(self, engine):
         return self.person_xy(engine.agent, engine, max(0, engine.t - 1))
@@ -124,8 +129,7 @@ class ShipView:
         self.flood_count = len(world.flooded)
         self.flood_layer.fill((0, 0, 0, 0))
         for x, y in world.flooded:
-            pygame.draw.rect(self.flood_layer, (34, 110, 190, 215),
-                             (round(x * TILE), round(y * TILE), math.ceil(TILE), math.ceil(TILE)))
+            pygame.draw.rect(self.flood_layer, (34, 110, 190, 215), (round(x * TILE), round(y * TILE), math.ceil(TILE), math.ceil(TILE)))
 
     def draw(self, app):
         canvas, engine = app.canvas, app.engine
@@ -148,7 +152,7 @@ class ShipView:
         phase = time.time() * 2
         points = []
         for px in range(0, MAP_SIZE + 30, 30):
-            wave = math.sin(px * .03 + phase) * 2
+            wave = math.sin(px * 0.03 + phase) * 2
             points.append((px, self.surface_row(px / TILE, engine, t) * TILE + wave))
         layer = pygame.Surface((MAP_SIZE, MAP_SIZE), pygame.SRCALPHA)
         pygame.draw.polygon(layer, (*SEA_TOP, 150), points + [(MAP_SIZE, MAP_SIZE), (0, MAP_SIZE)])
@@ -187,8 +191,7 @@ class ShipView:
         minutes = 23 * 60 + 30 + t * 5
         clock = f"{minutes // 60 % 24:02d}:{minutes % 60:02d}"
         phase = engine.flood.phases[t].upper()
-        text = (f"{clock}  {phase}   Aboard {counts['aboard']}   In boats {counts['boats']}   "
-                f"In water {counts['water']}   Dead {counts['dead']}")
+        text = f"{clock}  {phase}   Aboard {counts['aboard']}   In boats {counts['boats']}   In water {counts['water']}   Dead {counts['dead']}"
         band = pygame.Surface((MAP_SIZE, 48), pygame.SRCALPHA)
         band.fill((6, 12, 30, 190))
         canvas.blit(band, (0, 52))
@@ -212,7 +215,7 @@ class ShipView:
 
     def pick_person(self, engine, pos, t):
         """Nearest living person to a map click, or None if nobody is close."""
-        best, best_distance = None, 14.
+        best, best_distance = None, 14.0
         for person in engine.people:
             if not person.is_alive:
                 continue

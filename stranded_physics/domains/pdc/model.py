@@ -3,6 +3,7 @@
 An energy cone, after Malin and Sheridan 1982, but measured along connected paths, so high ground blocks a flow.
 It has no flow physics beyond that: no mass, no entrainment and no dilute surge. T2 is the depth-averaged solver.
 """
+
 from __future__ import annotations
 
 import heapq
@@ -21,7 +22,9 @@ GRAVITY_M_S2 = 9.80665
 NEIGHBOURS = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
 
 
-def energy_reach(elevation: np.ndarray, passable: np.ndarray, start: tuple[int, int], start_energy_m: float, ratio: float, dx_m: float, min_speed: float) -> np.ndarray:
+def energy_reach(
+    elevation: np.ndarray, passable: np.ndarray, start: tuple[int, int], start_energy_m: float, ratio: float, dx_m: float, min_speed: float
+) -> np.ndarray:
     """Seconds for a flow to reach each cell from `start`, infinity where it never does.
 
     The energy height falls by `ratio` per metre travelled, along the shortest connected path. A cell is reached only
@@ -29,8 +32,8 @@ def energy_reach(elevation: np.ndarray, passable: np.ndarray, start: tuple[int, 
     """
     arrival = np.full(elevation.shape, np.inf)
     length = np.full(elevation.shape, np.inf)
-    length[start], arrival[start] = 0., 0.
-    heap = [(0., start)]
+    length[start], arrival[start] = 0.0, 0.0
+    heap = [(0.0, start)]
     while heap:
         travelled, (row, col) = heapq.heappop(heap)
         if travelled > length[row, col]:
@@ -39,7 +42,7 @@ def energy_reach(elevation: np.ndarray, passable: np.ndarray, start: tuple[int, 
             r, c = row + d_row, col + d_col
             if not (0 <= r < elevation.shape[0] and 0 <= c < elevation.shape[1]) or not passable[r, c]:
                 continue
-            step = dx_m * (math.sqrt(2.) if d_row and d_col else 1.)
+            step = dx_m * (math.sqrt(2.0) if d_row and d_col else 1.0)
             total = travelled + step
             height_above = start_energy_m - ratio * total - elevation[r, c]
             if height_above <= 0 or total >= length[r, c]:
@@ -51,8 +54,8 @@ def energy_reach(elevation: np.ndarray, passable: np.ndarray, start: tuple[int, 
 
 
 def distance_from(grid: GridSpec, point: XY) -> np.ndarray:
-    xs = grid.x0_m + (np.arange(grid.nx) + .5) * grid.dx_m - point[0]
-    ys = grid.y0_m - (np.arange(grid.ny) + .5) * grid.dx_m - point[1]
+    xs = grid.x0_m + (np.arange(grid.nx) + 0.5) * grid.dx_m - point[0]
+    ys = grid.y0_m - (np.arange(grid.ny) + 0.5) * grid.dx_m - point[1]
     return np.hypot(*np.meshgrid(xs, ys))
 
 
@@ -66,7 +69,9 @@ def flow_footprint(elevation: np.ndarray, land: np.ndarray, height_above_channel
     start = grid.locate(vent)
     passable = land & ((height_above_channel <= SETTINGS["valley_confinement"]) | (distance_from(grid, vent) <= SETTINGS["proximal_radius"]))
     passable[start] = True
-    return energy_reach(elevation, passable, start, float(elevation[start]) + SETTINGS["collapse_height"], SETTINGS["height_over_length"], grid.dx_m, SETTINGS["min_speed"])
+    return energy_reach(
+        elevation, passable, start, float(elevation[start]) + SETTINGS["collapse_height"], SETTINGS["height_over_length"], grid.dx_m, SETTINGS["min_speed"]
+    )
 
 
 class Pdc:
@@ -88,8 +93,13 @@ class Pdc:
         return [] if self.grid.locate(self.vent) is not None else ["the vent is outside the flow grid"]
 
     def run(self, fields, rng: np.random.Generator) -> dict[str, float]:
-        travel = flow_footprint(fields.get("terrain.elevation", "m", self.grid), fields.get("terrain.land_mask", "dimensionless", self.grid) > 0,
-                                fields.get("terrain.height_above_drainage", "m", self.grid), self.grid, self.vent)
+        travel = flow_footprint(
+            fields.get("terrain.elevation", "m", self.grid),
+            fields.get("terrain.land_mask", "dimensionless", self.grid) > 0,
+            fields.get("terrain.height_above_drainage", "m", self.grid),
+            self.grid,
+            self.vent,
+        )
         if self.reach_limit_m is not None:
             travel = np.where(distance_from(self.grid, self.vent) <= self.reach_limit_m, travel, np.inf)
         reached = np.isfinite(travel)

@@ -1,0 +1,51 @@
+# A starting point in the scenario builder. Needs no downloaded data.
+id = "my_storm_island"
+title = "Storm on a made-up island"
+place = "generated"
+start_utc = "2023-06-01T00:00:00+00:00"
+hours = 96
+step_hours = 2
+local_utc_offset = -4
+
+[[entity]]
+kind = "terrain"
+source = "dials"
+summit_m = 900.0
+area_km2 = 200.0
+
+[[entity]]
+kind = "weather"
+source = "dials"
+rain_mm_h = 1.0
+wind_m_s = 6.0
+wind_bearing_deg = 270.0
+temperature_c = 27.0
+upper_wind_m_s = 20.0
+upper_bearing_deg = 90.0
+
+[[entity]]
+kind = "storm"
+source = "dials"
+max_wind_m_s = 50.0
+closest_km = 50.0
+bearing_deg = 300.0
+speed_m_s = 6.0
+rmax_km = 30.0
+closest_hours = 48.0
+site_lon = -61.2276
+site_lat = 13.3
+
+[[entity]]
+kind = "person"
+source = "dials"
+name = "A villager"
+mind = "quantum"
+start_lon = -61.2276
+start_lat = 13.3
+
+[[entity]]
+kind = "shelter"
+source = "dials"
+name = "The far coast"
+lon = -61.237
+lat = 13.2676
