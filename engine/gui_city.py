@@ -48,7 +48,9 @@ def thought_text(person, record):
     if person.status == "escaped":
         return "Reached a road out of the region."
     if record is None:
-        return "Not yet recorded."
+        cues = [e.replace("_", " ") for e in person.recent_events if e != "none"]
+        heard = f"Has noticed: {', '.join(cues)}." if cues else "Has noticed nothing yet."
+        return f"{heard} No decision yet. {'In shelter.' if person.status == 'city' else 'In the open.'}"
     quantum = record.get("quantum") or {}
     parts = []
     if record.get("story") and record["story"] != "Nothing new":
@@ -130,14 +132,18 @@ class SplitPanels:
         if height > 110 and record:
             bar_w = width - 32
             for action, value in sorted(record["probs"].items(), key=lambda item: -item[1])[:2]:
-                pygame.draw.rect(surface, (234, 216, 178), (x + 16, row, bar_w, 14), border_radius=3)
-                pygame.draw.rect(surface, (146, 58, 196), (x + 16, row, int(bar_w * min(1., value)), 14), border_radius=3)
-                surface.blit(small.render(f"{action} {value:.0%}", True, INK), (x + 22, row))
-                row += 18
+                pygame.draw.rect(surface, (234, 216, 178), (x + 16, row, bar_w, 17), border_radius=3)
+                pygame.draw.rect(surface, (182, 128, 214), (x + 16, row, int(bar_w * min(1., value)), 17), border_radius=3)
+                surface.blit(small.render(f"{person.action_label(action)} {value:.0%}", True, INK), (x + 22, row))
+                row += 20
         row += 4
         for line in wrap(thought_text(person, record), body, width - 32)[:3]:
             surface.blit(body.render(line, True, INK), (x + 16, row))
             row += 19
+        decision = record["action_label"] if record else "None yet"
+        pumice = self.sim.eruption.hazard_by_step[max(0, self.sim.t - 1)]["pumice_m"]
+        exposure = "out of reach" if person.status == "escaped" else f"{pumice:.1f} m of pumice in town"
+        surface.blit(small.render(f"Last decision: {decision}.  Exposure: {exposure}.", True, INK), (x + 16, y + height - 40))
         surface.blit(small.render("Illustration, written from model values", True, MUTED), (x + 16, y + height - 20))
 
 
@@ -257,7 +263,7 @@ class CityView:
         canvas.blit(self.font_sub.render(text, True, (246, 240, 226)), (14, 56))
         mapping = engine.event_mapping
         line = (f"Following {engine.agent.label}.  Click a person to follow them.  M region map, P panels, "
-                f"C cutscenes.  Event mapping {mapping}.")
+                f"Event mapping {mapping}.")
         canvas.blit(self.font.render(line, True, (214, 204, 186)), (14, 78))
 
     def _draw_legend(self, canvas, engine):

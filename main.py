@@ -85,7 +85,7 @@ def run_live_demo(
 ):
     """Executes a live visual interactive survival run step-by-step in the terminal."""
     print(f"\n{BOLD}{CYAN}========================================================================{RESET}")
-    print(f"{BOLD}{CYAN}   QUANTUM COGNITION SIMULATION (TERMINAL LIVE RUN)                     {RESET}")
+    print(f"{BOLD}{CYAN}   QOGNITION (TERMINAL LIVE RUN)                                        {RESET}")
     print(f"{BOLD}{CYAN}========================================================================{RESET}")
     print(f"  Configuration: Engine={engine_mode.upper()} | Scenario={scenario.upper()} | Seed={seed} | Mind={mind.upper()} | Noise={noise}")
     print(f"  Legend: {BLUE}~{RESET} Water  {YELLOW}.{RESET} Plains  {GREEN}^{RESET} Forest  M Mountain  {MAGENTA}S{RESET} Shelter  {BOLD}{RED}@{RESET} Agent\n")
@@ -163,7 +163,7 @@ def open_builder(app):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Quantum Cognition Simulation")
+    parser = argparse.ArgumentParser(description="Qognition")
     parser.add_argument("--gui", action="store_true", help="Launch interactive 2D Pygame simulation (default)")
     parser.add_argument("--demo", action="store_true", help="Run interactive terminal ASCII survival run")
     parser.add_argument("--terminal", action="store_true", help="Run interactive terminal ASCII survival run")

@@ -222,7 +222,7 @@ One assumption changed at a time. Ten seeds, pool-side leak. Each cell is the me
 
 ## On screen
 
-`python gui_island.py --scenario waterloo`, or key 5 on the first screen. Green shows chlorine, with colour exaggerated and a minimum opacity from 0.05 ppm. Six short skippable cutscenes play: the assumed leak, a building cutaway, across the pool, the water's edge, from above, and a close-up. They are illustrations; tests confirm they never change a result. Written thoughts are templates built from model values.
+`python gui_island.py --scenario waterloo`, or key 5 on the first screen. Green shows chlorine, with colour exaggerated and a minimum opacity from 0.05 ppm. The engine still requests six illustrative scenes, and tests confirm they never change a result, but the 2D GUI no longer plays them mid-run: there is one debrief at the end. Written thoughts are templates built from model values.
 
 ## What can and cannot be claimed
 

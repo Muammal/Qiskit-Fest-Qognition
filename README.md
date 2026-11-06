@@ -1,6 +1,6 @@
-# Quantum Cognition Simulation: Decision-Making & Multi-Scenario Evacuation Survival
+# Qognition: Decision-Making & Multi-Scenario Evacuation Survival
 
-[![Integration Tests](https://img.shields.io/badge/tests-712%20passed-brightgreen.svg)](#daily-integration--verification-testing)
+[![Integration Tests](https://img.shields.io/badge/tests-413%20passed-brightgreen.svg)](#daily-integration--verification-testing)
 [![Qiskit](https://img.shields.io/badge/Qiskit-2.x-6929C4.svg)](https://qiskit.org/)
 [![Status](https://img.shields.io/badge/Tech%20A%20%2B%20B%20%2B%20C%20%2B%20D-Unified-success.svg)](#unified-track-documentation-tech-a--tech-b--tech-c--product-d)
 [![Resolution](https://img.shields.io/badge/Resolution-1600%C3%97900%20(Fullscreen%20Scaled)-blueviolet.svg)](#fullscreen--interactive-controls)
@@ -9,7 +9,7 @@
 
 > **Start here:** the project notebook, [`notebooks/stranded_quantum_cognition.ipynb`](notebooks/stranded_quantum_cognition.ipynb), states what is real, what is a model, and where this falls short. Engine results are in [`workboard/ENGINE_STATUS.md`](workboard/ENGINE_STATUS.md).
 
-**Quantum Cognition Simulation** is an interactive multi-scenario cognitive modeling, crowd evacuation, and physical hazard platform. The system simulates human decision-making under existential pressure across **five evacuation and survival scenarios** (**Island Wilderness**, **Volcano Eruption**, **RMS Titanic 1912**, **Pompeii AD 79**, and **Waterloo Pool Chlorine Leak**) plus an **Interactive Scenario Builder**. It contrasts a **2-qubit quantum cognition architecture**—alongside **6 quantum cognition models adapted from published papers and open-source code** (exhibiting non-commuting order effects, Tversky–Shafir disjunction interference, Belief Entropy QLBN, Busemeyer dynamic Hamiltonians, and Lindblad open-system decoherence)—against a **zero-coherence classical mixture control ($\lambda=1$)** and a **classical rational baseline**.
+**Qognition** is an interactive multi-scenario cognitive modeling, crowd evacuation, and physical hazard platform. The system simulates human decision-making under existential pressure across **five evacuation and survival scenarios** (**Island Wilderness**, **Volcano Eruption**, **RMS Titanic 1912**, **Pompeii AD 79**, and **Waterloo Pool Chlorine Leak**) plus an **Interactive Scenario Builder**. It contrasts a **2-qubit quantum cognition architecture**—alongside **6 quantum cognition models adapted from published papers and open-source code** (exhibiting non-commuting order effects, Tversky–Shafir disjunction interference, Belief Entropy QLBN, Busemeyer dynamic Hamiltonians, and Lindblad open-system decoherence)—against a **zero-coherence classical mixture control ($\lambda=1$)** and a **classical rational baseline**.
 
 ---
 
@@ -25,6 +25,13 @@ Results are in the generated table [`docs/results/SCENARIO_NUMBERS.md`](docs/res
 | **4** | **Pompeii AD 79 (`pompeii`)** | **11,500 citizens** across households, 128 steps (15 min/step) | Plinian column, pumice accumulation, roof collapses & pyroclastic surges (`engine/eruption.py`) | Deaths depend strongly on the cue translation, so all four are reported |
 | **5** | **Waterloo Pool Chlorine Leak (`waterloo`)** | **100 swimmers & staff**, 721 steps (10 sec/step) | 2D chlorine gas advection-diffusion plume (`engine/chlorine.py`) & EPA AEGL-1/2/3 thresholds | Compares exposure with and without a staff alarm, under each cue translation |
 | **6** | **Scenario Builder (`engine/builder.py`)** | Custom multi-person packs | Interactive terrain, hazard, and multi-agent placement editor | Build, save, and replay custom evacuation packs directly in the GUI (`[B]`) |
+
+---
+
+## Results and changes
+
+- **[What changed and what came out (`docs/CHANGES_AND_RESULTS.md`)](docs/CHANGES_AND_RESULTS.md)**, including results that go against the paper, and suggested paper edits.
+- [Human data, every row](docs/HUMAN_DATA_RESULTS.md), [lead-time sweep](docs/results/LEAD_TIME.md), [sensitivity](docs/results/SENSITIVITY.md), [pre-registered protocols](docs/protocols/README.md).
 
 ---
 
@@ -44,7 +51,7 @@ Detailed technical documentation explaining how **Tech A**, **Tech B**, **Tech C
 
 ## Visual Interface & Simulation Showcase
 
-The application features an engineered 1600×900 research & tactical visualizer with dynamic relief shading, atmospheric particle systems, aspect-scaled fullscreen rendering, and real-time cognitive telemetry.
+The application lays out in 1600×900 logical units and renders text at the window's real resolution (`engine/hidpi.py`), so it stays sharp on a projector. A run ends in one debrief, with no mid-run cutscenes. All results shown are model output, not predictions.
 
 ### 1. Scenario Selection Hub (`Screen 0`)
 The initial screen presented on launch allows users to choose their survival environment: **Island Wilderness** or **Volcano Evacuation**. Features interactive hover states, metadata pill badges, and direct keyboard navigation (`[1]` / `[2]`).
@@ -180,7 +187,9 @@ start site/index.html
 | **Simulation View** | `RIGHT ARROW` or `N` | **Step Forward** single turn |
 | **Simulation View** | `Q` or `[Mind Toggle]` Button | **Cycle Mind Live** (`Quantum` $\to$ `Classical Mixture` $\to$ `Classical Rational`) |
 | **Simulation View** | `F` | **Follow Next Person / Role** (in crowd scenarios & custom builder packs) |
-| **Simulation View** | `P` / `M` / `X` | **Toggle Split Panels** (`P`), **Region Map** (`M` in Pompeii), or **Skip Cutscene** (`X`) |
+| **Simulation View** | `P` / `M` | **Toggle Split Panels** (`P`) or **Region Map** (`M` in Pompeii) |
+| **Quantum panel** | `[Swap cues]` | **Order swap**: swaps the last two cues and shows the change in P(protect) |
+| **Configuration Hub** | `A` / `B` / `C` / `D` buttons | **Cue translation** for Titanic, Pompeii and Waterloo. Each one is an assumption, and results move with it |
 | **Simulation View** | `[Speed]` Button | **Cycle Speed** (0.5×, 1×, 2×, 4×) |
 | **Simulation View** | `E` | **Toggle Evacuation Map Overlay** (zones, assembly points, Dijkstra paths) |
 | **Simulation View** | `TAB` or `[Action Log]` Button | **Toggle Chronological Action History Overlay** (mouse wheel scrolls) |
@@ -191,7 +200,7 @@ start site/index.html
 
 ## Daily Integration & Verification Testing
 
-Run the unified 712-test suite (`712 passed`) across **Tech A**, **Tech B**, **Tech C**, **Titanic**, **Pompeii**, and **Waterloo**:
+Run the unified suite across **Tech A**, **Tech B**, **Tech C**, **Titanic**, **Pompeii**, and **Waterloo** (413 passed, 3 skipped on 6 November 2026; `test_ui_layout.py`, `test_gui3d.py` and `mind/human_tests` add 75):
 
 ```powershell
 $env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py test_titanic.py test_pompeii.py test_waterloo.py mind/tests stranded_physics/core -q

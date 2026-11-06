@@ -35,7 +35,7 @@ def card(app, rect):
 def dashboard(app):
     s=app.canvas
     pygame.draw.rect(s,PAPER,(760,0,520,760))
-    app.text('STRANDED',784,18,font=app.font_hero)
+    app.text('QOGNITION',784,18,font=app.font_hero)
     app.text(f'{app.mind_type.capitalize()}-labelled stub  /  Seed {app.seed}',784,56,color=MUTED)
     a=app.agent
     app.text(f'Day {a.day}  {a.hour:02d}:00    Step {app.step_idx} / {app.max_steps}',784,84,font=app.font_sub)
@@ -95,7 +95,7 @@ def dashboard(app):
 
 def home(app):
     app.canvas.fill(PAPER)
-    app.text('STRANDED',72,46,font=app.font_hero)
+    app.text('QOGNITION',72,46,font=app.font_hero)
     app.text('An island. A warning. A decision to leave.',72,95,font=app.font_title)
     app.text('VOLCANO EVACUATION SCENARIO',72,166,font=app.font_small,color=MUTED)
     for i,line in enumerate(('Follow an autonomous survivor through changing weather,',

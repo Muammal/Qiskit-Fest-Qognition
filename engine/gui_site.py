@@ -29,7 +29,9 @@ def thought_text(person, record, ppm):
     if person.status == "out":
         return "Has left the site."
     if record is None:
-        return "Not yet recorded."
+        cues = [e.replace("_", " ") for e in person.recent_events if e != "none"]
+        heard = f"Has noticed: {', '.join(cues)}." if cues else "Has noticed nothing yet."
+        return f"{heard} No decision yet. Gas here: {ppm:.2f} ppm."
     quantum = record.get("quantum") or {}
     story = record.get("story")
     parts = [f"{story}." if story and story != "Nothing new" else "Has noticed nothing new."]
@@ -76,10 +78,10 @@ class SitePanels(SplitPanels):
         if height > 110 and record:
             bar_w = width - 32
             for action, value in sorted(record["probs"].items(), key=lambda item: -item[1])[:2]:
-                pygame.draw.rect(surface, (234, 216, 178), (x + 16, row, bar_w, 14), border_radius=3)
-                pygame.draw.rect(surface, (146, 58, 196), (x + 16, row, int(bar_w * min(1., value)), 14), border_radius=3)
-                surface.blit(small.render(f"{action} {value:.0%}", True, INK), (x + 22, row))
-                row += 18
+                pygame.draw.rect(surface, (234, 216, 178), (x + 16, row, bar_w, 17), border_radius=3)
+                pygame.draw.rect(surface, (182, 128, 214), (x + 16, row, int(bar_w * min(1., value)), 17), border_radius=3)
+                surface.blit(small.render(f"{person.action_label(action)} {value:.0%}", True, INK), (x + 22, row))
+                row += 20
         row += 4
         t = max(0, self.sim.t - 1)
         for line in wrap(thought_text(person, record, self.sim.chlorine.ppm_at(t, tuple(person.pos))), body, width - 32)[:3]:
@@ -180,7 +182,7 @@ class SiteView:
                 f"Know {counts['knows']}   Alarm {'on' if engine.alarm_step is not None and t >= engine.alarm_step else 'off'}   "
                 f"Highest gas {engine.chlorine.hazard_by_step[t]['peak_ppm']:.1f} ppm")
         canvas.blit(self.font_sub.render(text, True, (246, 240, 226)), (14, 56))
-        line = (f"Following {engine.agent.label}.  Click a person to follow them.  P panels, C cutscenes.  "
+        line = (f"Following {engine.agent.label}.  Click a person to follow them.  P panels.  "
                 f"Mapping {engine.event_mapping}.  Green is chlorine, black box is the assumed leak.")
         canvas.blit(self.font.render(line, True, (214, 204, 186)), (14, 78))
 
