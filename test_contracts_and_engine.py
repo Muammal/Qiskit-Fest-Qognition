@@ -1067,6 +1067,23 @@ def test_quantum_mind_alternative_cognition_models():
         assert "order_gap" in d["quantum"]
 
 
+def test_recording_without_a_video_backend_explains_itself(monkeypatch, tmp_path):
+    import shutil
+    import sys
+
+    from engine.exporter import LiveVideoRecorder, VideoBackendMissing
+    from engine.gui import IslandVisualizerApp
+
+    monkeypatch.setattr(shutil, "which", lambda name: None)
+    monkeypatch.setitem(sys.modules, "cv2", None)
+    with pytest.raises(VideoBackendMissing, match="ffmpeg"):
+        LiveVideoRecorder(str(tmp_path / "x.mp4")).start()
+
+    app = IslandVisualizerApp(seed=101, start_screen="sim", scenario="volcano")
+    app._toggle_video_recording()
+    assert app.video_recorder is None and "ffmpeg" in app.bubble_text
+
+
 def test_slow_mo_fast_forward_and_exports(tmp_path):
     from engine.gui import IslandVisualizerApp
     from engine.exporter import export_simulation_video

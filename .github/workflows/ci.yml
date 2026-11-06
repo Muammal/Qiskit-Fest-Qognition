@@ -12,8 +12,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - run: python -m pip install -r requirements-dev.txt
@@ -28,11 +28,13 @@ jobs:
       SDL_AUDIODRIVER: dummy
       OPENBLAS_NUM_THREADS: "1"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
           cache: pip
       - run: python -m pip install -r requirements.txt -r requirements-physics.txt -r requirements-dev.txt
       - run: python tools/publish_sim.py check
-      - run: python -m pytest -q -m "not slow"
+      - run: python -m pytest -q -m "not slow" --junitxml=results.xml
+      - if: failure()
+        run: python tools/ci_failures.py results.xml

@@ -1327,7 +1327,7 @@ class IslandVisualizerApp:
 
     def _toggle_video_recording(self):
         """Starts or stops live MP4 video recording of the simulation canvas."""
-        from engine.exporter import LiveVideoRecorder
+        from engine.exporter import LiveVideoRecorder, VideoBackendMissing
 
         if self.video_recorder is not None and self.video_recorder.active:
             saved = self.video_recorder.stop()
@@ -1337,7 +1337,13 @@ class IslandVisualizerApp:
         else:
             out_file = os.path.join("exports", "videos", f"{self.scenario}_seed{self.seed}_{self.mind_type}_{int(time.time())}.mp4")
             self.video_recorder = LiveVideoRecorder(out_file, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, fps=FPS)
-            self.video_recorder.start()
+            try:
+                self.video_recorder.start()
+            except VideoBackendMissing as error:
+                self.video_recorder = None
+                self.bubble_text = str(error)
+                self.bubble_timer = 4.0
+                return
             self.bubble_text = f"Recording MP4: {os.path.basename(out_file)}"
             self.bubble_timer = 2.5
 

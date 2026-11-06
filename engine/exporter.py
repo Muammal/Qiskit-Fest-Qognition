@@ -28,6 +28,13 @@ from engine.pompeii import PompeiiSimulation
 from engine.waterloo import WaterlooSimulation
 
 
+VIDEO_HELP = "Recording video needs ffmpeg, or opencv-python-headless. Install either one and try again."
+
+
+class VideoBackendMissing(RuntimeError):
+    """Neither ffmpeg nor OpenCV is available."""
+
+
 class LiveVideoRecorder:
     """Streams 1600x900 Pygame canvas frames to an H.264 MP4 file via ffmpeg or OpenCV."""
 
@@ -75,7 +82,10 @@ class LiveVideoRecorder:
             self.active = True
             return self.output_path
 
-        import cv2
+        try:
+            import cv2
+        except ImportError:
+            raise VideoBackendMissing(VIDEO_HELP) from None
 
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         self._cv_writer = cv2.VideoWriter(self.output_path, fourcc, float(self.fps), (self.width, self.height))
