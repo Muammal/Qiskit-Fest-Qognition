@@ -40,10 +40,7 @@ def test_gui_order_line_uses_computed_numbers():
 
 
 def test_faq_has_no_unfilled_placeholders_or_hardware_claims():
-    faq = ROOT / "RISKS_AND_FAQ.md"
-    if not faq.exists():  # .gitignore keeps this file out of a fresh checkout
-        pytest.skip("RISKS_AND_FAQ.md is not tracked")
-    text = faq.read_text(encoding="utf-8")
+    text = (ROOT / "RISKS_AND_FAQ.md").read_text(encoding="utf-8")
     assert not re.search(r"\[N\]|\[X\]|\[Backend name\]|\[date\]|\[library\]", text)
     assert "and we did" not in text
     assert "No IBM hardware job was submitted" in text

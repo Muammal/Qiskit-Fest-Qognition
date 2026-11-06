@@ -45,7 +45,7 @@ One test was already failing before this work: `stranded_physics/core/tests/test
 **Different from the prompt:**
 
 - **Item 4:** the old text, ".33, against .04", was hard-coded but not wrong. From the default start the computed gaps are 0.328 and 0.043. It is computed now anyway.
-- **Item 5:** `RISKS_AND_FAQ.md`, `PLAN.md` and `TECH_STACK.md` are git-ignored (`*RISKS*.md` and similar in `.gitignore`), so those edits exist on this machine only and are not in any commit. They were not force-added, since ignoring them looks deliberate. Decide whether to track them.
+- **Item 5:** `RISKS_AND_FAQ.md`, `PLAN.md` and `TECH_STACK.md` were git-ignored, so these edits first existed only locally. They are now tracked, with exceptions in `.gitignore`.
 
 ## Phase 2: scientific work
 
