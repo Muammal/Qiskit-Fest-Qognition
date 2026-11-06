@@ -2,6 +2,12 @@
 
 [![CI](https://github.com/Muammal/Qiskit-Fest-Qognition/actions/workflows/ci.yml/badge.svg)](https://github.com/Muammal/Qiskit-Fest-Qognition/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+[![Quantum Computing](https://img.shields.io/badge/Quantum-Computing-6929C4.svg)](docs/TECH_A_QUANTUM_MIND.md)
+[![Simulation](https://img.shields.io/badge/Simulation-2D-2E8B57.svg)](#five-evacuation--survival-scenarios--custom-scenario-builder)
+[![Risk Management](https://img.shields.io/badge/Risk-Management-D9534F.svg)](docs/FAQ.md)
+[![Website](https://img.shields.io/badge/Website-Live-000000.svg)](https://stranded-qognition-268.vercel.app/)
+
+**Website:** <https://stranded-qognition-268.vercel.app/>
 
 > **"Can quantum probability explain why humans make counterintuitive evacuation and survival decisions under extreme environmental stress — and how can we use it to improve real-life evacuation survival rates?"**
 

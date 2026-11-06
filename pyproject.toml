@@ -7,6 +7,10 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 
+[project.urls]
+Homepage = "https://stranded-qognition-268.vercel.app/"
+Repository = "https://github.com/Muammal/Qiskit-Fest-Qognition"
+
 [tool.ruff]
 line-length = 160
 target-version = "py311"
