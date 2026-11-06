@@ -68,8 +68,8 @@ class BoatStation:
 class ShipSimulation(PackSimulation):
     """One person aboard. Walking and the body are as on land. Only where they can go, and what the water does, differ."""
 
-    def __init__(self, pack: ScenarioPack, passenger: Passenger, index: int, shared: Shared, stations: list[BoatStation], lifebelt: bool = True) -> None:
-        super().__init__(pack, mind_type=passenger.mind, person=index, shared=shared)
+    def __init__(self, pack: ScenarioPack, passenger: Passenger, index: int, shared: Shared, stations: list[BoatStation], lifebelt: bool = True, decide_fn=None) -> None:
+        super().__init__(pack, mind_type=passenger.mind, person=index, shared=shared, decide_fn=decide_fn)
         self.passenger, self.stations, self.lifebelt = passenger, stations, lifebelt
         self.boat: BoatStation | None = None
         self.heading_for_boat = False  # True once this person has chosen to go and reached the boat deck. A start position stands in for a cabin decks below.
@@ -125,7 +125,7 @@ def _board(people: list[ShipSimulation], stations: list[BoatStation], clock_s: f
             station.seats -= 1
 
 
-def play_ship(pack: ScenarioPack, scenario: ScenarioFile) -> list[ShipSimulation]:
+def play_ship(pack: ScenarioPack, scenario: ScenarioFile, decide_fn=None) -> list[ShipSimulation]:
     """Everyone, step by step together, because boat seats are shared. Returns each person's finished simulation."""
     grid = pack.grid
     ship = next(entity for entity in scenario.entities if entity.kind == "ship")
@@ -134,7 +134,7 @@ def play_ship(pack: ScenarioPack, scenario: ScenarioFile) -> list[ShipSimulation
                                                                     int(ship.settings["compartments"]), ship.settings["bulkhead_top_m"], ship.settings["boat_deck_m"])
     shared = Shared(pack)
     stations = [BoatStation(xy, int(pack.sample("boats.capacity", xy)), pack.sample("boats.launch", xy)) for xy in pack.sites["assembly"]]
-    people = [ShipSimulation(pack, passenger, index, shared, stations) for index, passenger in enumerate(passengers_of(scenario, grid, spec.length_m, spec.beam_m))]
+    people = [ShipSimulation(pack, passenger, index, shared, stations, decide_fn=decide_fn) for index, passenger in enumerate(passengers_of(scenario, grid, spec.length_m, spec.beam_m))]
     boats = next(entity for entity in scenario.entities if entity.kind == "lifeboats")
     women_first, port_only = bool(boats.settings.get("women_first", 1)), bool(boats.settings.get("port_women_only", 0))
     port_y = grid.y0_m - grid.ny * grid.dx_m / 2

@@ -1,0 +1,107 @@
+# Sources for aboard counts: Wikipedia, Sinking of the RMS Empress of Ireland. No survival data used.
+# Sinking duration: 14 minutes; assumption, commonly reported.
+# Breach area matches this recorded physical input, not survival; all geometry is assumed.
+id = "empress_of_ireland_1914" # assumption: event identifier
+title = "empress_of_ireland_1914" # assumption: event identifier
+place = "real"
+start_utc = "1914-05-29T05:59:00+00:00" # assumption: clock alignment
+hours = 5 # assumption: Titanic observation duration
+step_minutes = 1 # assumption: resolves at least ten steps before sinking
+local_utc_offset = -3 # assumption: Titanic choice
+
+[[entity]]
+kind = "ship"
+source = "dials"
+length_m = 259.842  # assumption: Titanic choices where available
+beam_m = 28.194  # assumption: Titanic choices where available
+draught_m = 10.541  # assumption: Titanic choices where available
+displacement_t = 53149.5755  # assumption: Titanic choices where available
+compartments = 16  # assumption: Titanic choices where available
+bulkhead_top_m = 3.3528  # assumption: Titanic choices where available
+boat_deck_m = 17.6784  # assumption: Titanic choices where available
+
+[[entity]]
+kind = "breach"
+source = "dials"
+first_compartment = 0  # assumption: Titanic choices where available
+holed = 5  # assumption: Titanic choices where available
+area_m2 = 28.147163  # assumption: physics-only solve for 14 minutes after impact, not survival
+impact_minutes = 1.0  # assumption: one minute after start
+alarm_minutes = 1.0  # assumption: immediate warning
+
+[[entity]]
+kind = "lifeboats"
+source = "dials"
+boats = 20  # assumption: Titanic choices where available
+seats = 65  # assumption: Titanic choices where available
+first_launch_minutes = 5.0  # assumption: early launch in the shorter sinking interval
+last_launch_minutes = 13.0  # assumption: final launch before the assumed sinking
+women_first = 1  # assumption: Titanic choices where available
+port_women_only = 1  # assumption: Titanic choices where available
+
+[[entity]]
+kind = "sea"
+source = "dials"
+temperature_c = -2.0  # assumption: Titanic choices where available
+
+[[entity]]
+kind = "weather"
+source = "dials"
+rain_mm_h = 0.0  # assumption: Titanic choices where available
+wind_m_s = 0.0  # assumption: Titanic choices where available
+wind_bearing_deg = 0.0  # assumption: Titanic choices where available
+temperature_c = 0.0  # assumption: Titanic choices where available
+upper_wind_m_s = 0.0  # assumption: Titanic choices where available
+upper_bearing_deg = 0.0  # assumption: Titanic choices where available
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "first_class"
+mind = "quantum"
+men = 40  # assumption: sex split; cohort total 87 from Wikipedia, Sinking of the RMS Empress of Ireland
+women = 41  # assumption: remainder after assumed sex and child split
+children = 6  # assumption: Titanic choice; child count unknown
+deck_from = 0.35  # assumption: Titanic choices where available
+deck_to = 0.65  # assumption: Titanic choices where available
+reach_minutes = 5.0  # assumption: Titanic choices where available
+boat_crew = 0.0  # assumption: Titanic choices where available
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "second_class"
+mind = "quantum"
+men = 114  # assumption: sex split; cohort total 253 from Wikipedia, Sinking of the RMS Empress of Ireland
+women = 115  # assumption: remainder after assumed sex and child split
+children = 24  # assumption: Titanic choice; child count unknown
+deck_from = 0.65  # assumption: Titanic choices where available
+deck_to = 0.85  # assumption: Titanic choices where available
+reach_minutes = 10.0  # assumption: Titanic choices where available
+boat_crew = 0.0  # assumption: Titanic choices where available
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "third_class"
+mind = "quantum"
+men = 319  # assumption: sex split; cohort total 717 from Wikipedia, Sinking of the RMS Empress of Ireland
+women = 319  # assumption: remainder after assumed sex and child split
+children = 79  # assumption: Titanic choice; child count unknown
+deck_from = 0.05  # assumption: Titanic choices where available
+deck_to = 0.95  # assumption: Titanic choices where available
+reach_minutes = 25.0  # assumption: Titanic choices where available
+boat_crew = 0.0  # assumption: Titanic choices where available
+
+[[entity]]
+kind = "passengers"
+source = "dials"
+name = "crew"
+mind = "quantum"
+men = 420  # Wikipedia, Sinking of the RMS Empress of Ireland: cohort total 420; assumption: all adult men
+women = 0  # assumption: Titanic choices where available
+children = 0  # assumption: Titanic choices where available
+deck_from = 0.2  # assumption: Titanic choices where available
+deck_to = 0.8  # assumption: Titanic choices where available
+reach_minutes = 15.0  # assumption: Titanic choices where available
+boat_crew = 0.0  # assumption: Titanic choices where available
