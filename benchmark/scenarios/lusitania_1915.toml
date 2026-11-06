@@ -4,10 +4,10 @@
 id = "lusitania_1915" # assumption: event identifier
 title = "lusitania_1915" # assumption: event identifier
 place = "real"
-start_utc = "1915-05-07T14:09:00+00:00" # assumption: clock alignment
+start_utc = "1915-05-07T14:09:00+00:00" # Wikipedia, Sinking of RMS Lusitania: torpedo at 14:10; the ship kept GMT, so local time is the clock
 hours = 5 # assumption: Titanic observation duration
 step_minutes = 1 # assumption: resolves at least ten steps before sinking
-local_utc_offset = -3 # assumption: Titanic choice
+local_utc_offset = 0 # Wikipedia: the ship's clocks were set to GMT
 
 [[entity]]
 kind = "ship"
@@ -42,7 +42,7 @@ port_women_only = 1  # assumption: Titanic choices where available
 [[entity]]
 kind = "sea"
 source = "dials"
-temperature_c = -2.0  # assumption: Titanic choices where available
+temperature_c = 11 # Wikipedia, Sinking of RMS Lusitania: "Many in the 52 °F (11 °C) water had succumbed to the cold" (read via summary, check)
 
 [[entity]]
 kind = "weather"
@@ -50,7 +50,7 @@ source = "dials"
 rain_mm_h = 0.0  # assumption: Titanic choices where available
 wind_m_s = 0.0  # assumption: Titanic choices where available
 wind_bearing_deg = 0.0  # assumption: Titanic choices where available
-temperature_c = 0.0  # assumption: Titanic choices where available
+temperature_c = 13.0 # assumption, typical air temperature: off southern Ireland, May afternoon
 upper_wind_m_s = 0.0  # assumption: Titanic choices where available
 upper_bearing_deg = 0.0  # assumption: Titanic choices where available
 

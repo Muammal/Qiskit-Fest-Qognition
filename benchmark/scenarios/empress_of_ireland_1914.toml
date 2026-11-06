@@ -4,10 +4,10 @@
 id = "empress_of_ireland_1914" # assumption: event identifier
 title = "empress_of_ireland_1914" # assumption: event identifier
 place = "real"
-start_utc = "1914-05-29T05:59:00+00:00" # assumption: clock alignment
+start_utc = "1914-05-29T01:55:00+00:00" # Wikipedia, RMS Empress of Ireland: collision at 01:56 local time; the clock is local time
 hours = 5 # assumption: Titanic observation duration
 step_minutes = 1 # assumption: resolves at least ten steps before sinking
-local_utc_offset = -3 # assumption: Titanic choice
+local_utc_offset = 0 # assumption: the clock is the ship's local time
 
 [[entity]]
 kind = "ship"
@@ -42,7 +42,7 @@ port_women_only = 1  # assumption: Titanic choices where available
 [[entity]]
 kind = "sea"
 source = "dials"
-temperature_c = -2.0  # assumption: Titanic choices where available
+temperature_c = 2 # assumption: Wikipedia, RMS Empress of Ireland, says "near-freezing water" (read via summary, check)
 
 [[entity]]
 kind = "weather"
@@ -50,7 +50,7 @@ source = "dials"
 rain_mm_h = 0.0  # assumption: Titanic choices where available
 wind_m_s = 0.0  # assumption: Titanic choices where available
 wind_bearing_deg = 0.0  # assumption: Titanic choices where available
-temperature_c = 0.0  # assumption: Titanic choices where available
+temperature_c = 5.0 # assumption, typical air temperature: lower St Lawrence, May night
 upper_wind_m_s = 0.0  # assumption: Titanic choices where available
 upper_bearing_deg = 0.0  # assumption: Titanic choices where available
 

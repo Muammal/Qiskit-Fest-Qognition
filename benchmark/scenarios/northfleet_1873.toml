@@ -59,7 +59,7 @@ source = "dials"
 rain_mm_h = 0.0 # assumption: Titanic-based approximation as described above
 wind_m_s = 0.0 # assumption: Titanic-based approximation as described above
 wind_bearing_deg = 0.0 # assumption: Titanic-based approximation as described above
-temperature_c = 0.0 # assumption: Titanic-based approximation as described above
+temperature_c = 4.0 # assumption, typical air temperature: off Dungeness, January night
 upper_wind_m_s = 0.0 # assumption: Titanic-based approximation as described above
 upper_bearing_deg = 0.0 # assumption: Titanic-based approximation as described above
 

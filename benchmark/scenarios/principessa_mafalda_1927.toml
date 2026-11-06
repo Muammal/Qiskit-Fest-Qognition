@@ -58,7 +58,7 @@ source = "dials"
 rain_mm_h = 0.0 # assumption: Titanic calm weather default
 wind_m_s = 0.0 # assumption: Titanic calm weather default
 wind_bearing_deg = 0.0 # assumption: Titanic calm weather default
-temperature_c = 0.0 # assumption: Titanic calm weather default
+temperature_c = 25.0 # assumption, typical air temperature: off Bahia, October evening
 upper_wind_m_s = 0.0 # assumption: Titanic calm weather default
 upper_bearing_deg = 0.0 # assumption: Titanic calm weather default
 
