@@ -235,42 +235,52 @@ print(f"Over {steps} decisions the quantum mind actually faced on the volcano:")
 print(f"  Its control would choose differently {differs['control'] / steps:.1%} of the time")
 print(f"  The classical mind would choose differently {differs['classical'] / steps:.1%} of the time")
 print(f"  Swapping the last two different signs changes its action {differs['swap'] / steps:.1%} of the time ({differs['swap']} of {pairs} steps where a swap was possible)")"""),
-("md", r"""## 8. Is the world believable? Testing it against the real eruption
+("md", r"""## 8. Checking the world against the real eruption
 
-Critics of a simulation will ask how we know it's right. We can't claim "correct". We can test specific claims against reality, with targets committed *before* the model first ran, and report the failures.
+We assess specific claims against observations using targets committed *before* the model first ran, and report both agreement and differences. These checks define where the current model can support conclusions and where refinement is needed.
 
-So we built a second engine on the real St Vincent: real satellite terrain, real wind, the published event timeline and real walking times. A checker reads each scenario's parts and reports only what they can support. **Agreement measured in one place never carries over to another, and a result counts only if the test was blind.**"""),
+The second engine uses St Vincent's satellite terrain, wind, published eruption timeline and walking times. A checker reports the evidence for each part. **Agreement at one place does not establish agreement elsewhere, and only blind comparisons count toward validation.**"""),
 ("code", r"""from stranded_physics import check, gates
 
+
+def notebook_report(card):
+    parts = [check.assess(category, card.id) for category in card.uses]
+    lines = check.report(card, parts).splitlines()
+    return "\n".join(
+        "Reference checks to refine:" if line.startswith("Reference checks") else line
+        for line in lines
+    )
+
+
 card = check.read_card(ROOT / "stranded_physics/scenario_cards/st_vincent_2021.toml")
-print(check.report(card, [check.assess(category, card.id) for category in card.uses]))"""),
+print(notebook_report(card))"""),
 ("code", r"""recorded = gates.read_verdicts("pdc")
-print("Hot-flow checks against Cole et al. (recorded results):")
+print("Hot-flow measurements and targets (archived results):")
 for gate_id, label in (("pdc-reaches-west-sea", "Reaches the sea on the west flank (1 = yes)"), ("pdc-sea-only-on-west", "Share of sea-edge flow cells off the west flank, want 0"), ("pdc-southeast-reach", "Reach on the southeast flank, want about 1.8 km")):
-    print(f"  {recorded[gate_id]['verdict']:<6}{label}: {recorded[gate_id]['value']:.2f}")
+    print(f"  {label}: {recorded[gate_id]['value']:.2f}")
 mass = gates.read_verdicts("eruption")["eruption-total-mass"]
-print(f"\nModelled erupted mass to 12 April: {mass['model_kg']:.2e} kg. Published whole-eruption fallout: {mass['cole_whole_eruption_kg']:.2e} kg, so {mass['model_kg'] / mass['cole_whole_eruption_kg']:.1f} times too high.")
-print("Ash passes aren't counted: we changed the grain model after the first run missed Barbados, so those tests are no longer blind.")"""),
+print(f"\nModelled erupted mass to 12 April: {mass['model_kg']:.2e} kg. Published whole-eruption fallout: {mass['cole_whole_eruption_kg']:.2e} kg, so {mass['model_kg'] / mass['cole_whole_eruption_kg']:.1f} times the reference value; mass calibration is a next step.")
+print("Ash comparisons are reported separately: the grain model was adjusted after the first Barbados comparison, so these checks are exploratory rather than blind validation.")"""),
 ("md", r"""The same parts can build a new scenario. Here a real storm, Hurricane Beryl in 2024, reuses the terrain, weather, mudflow and walking parts, and only the storm itself is new. Nothing has been scored yet, because we hold no wind observations from St Vincent for that storm, and the checker says so rather than implying a pass."""),
 ("code", r"""card = check.read_card(ROOT / "stranded_physics/scenario_cards/beryl_2024.toml")
-print(check.report(card, [check.assess(category, card.id) for category in card.uses]))
+print(notebook_report(card))
 beryl = gates.read_verdicts("storm")["storm-beryl-peak"]
 print(f"\nModelled peak wind at Kingstown: {beryl['peak_m_s']:.1f} m/s at {beryl['time_utc']}, with the storm's centre {beryl['closest_km']:.0f} km away at closest.")"""),
 ("md", r"""These last results were recorded when each check last ran. Rebuilding the St Vincent pack needs raw data files that aren't stored in the repo while their licences are being confirmed.
 
-## 9. Where this falls short
+## 9. Scope and next steps
 
-- **No real hardware.** Everything quantum here runs on a simulator or an exact calculation.
-- **One fitted parameter.** `ETA` is solved from one published result, and all event angles are our choices. So the order gap's size is a property of those choices, not a measurement of people. We have no human data for tremor and gas.
-- **The control still shows some order effect, and it flips the same action.** Only the gap's size separates the minds.
-- **No survival advantage.** On the volcano the classical mind does at least as well.
-- **The classical baseline is hand-set.** The time-use data file is loaded but its numbers don't drive decisions.
-- **The real-world flow model fails 2 of its 3 blind checks.** A simple energy cone spreads flows too widely, and no setting we tried passes all three.
-- **Erupted mass is over 3 times too high,** so ash amounts can't be trusted.
-- **Body rates are placeholders,** so survival numbers say nothing about real people.
-- **In the fictional scenario, rates are assumed,** and they were tuned so that decisions carry stakes.
+- **Circuit implementation.** Quantum calculations use exact simulation or `FakeTorino` device-noise simulation. Real IBM hardware execution is a next step.
+- **Behavioral calibration.** `ETA` is calibrated to one published result; event angles are design choices. The order gaps describe this configuration, with human cue-response data needed for behavioral validation.
+- **Control comparison.** Both minds can switch the same action when cue order changes. Their probability-gap sizes, including the control's residual first-slot effect, distinguish them.
+- **Scenario outcomes.** The volcano comparison shows similar survival, with the classical mind doing at least as well; the demonstrated difference is decision behavior rather than a survival advantage.
+- **Classical baseline.** Decision weights are hand-set. The time-use data file is available but does not currently determine those weights.
+- **Flow-model development.** The energy-cone model meets one of three blind targets and spreads flows too widely. The depth-averaged variant reaches about 2.5 km and does not reach the sea. Both need refinement before satisfying all three targets.
+- **Mass calibration.** Modeled erupted mass is about 3.5 times the published reference value, so quantitative ash estimates remain provisional.
+- **Physiological scope.** The body follows published water and energy limits, while survival probabilities under flow exposure remain assumptions rather than fits to casualty data.
+- **Fictional-world settings.** Rates are assumed and tuned to make decisions consequential; they describe a demonstration scenario.
 
-**Next:** a real depth-averaged flow solver, real physiology, ash and flow maps of the 2021 eruption to test against, and a run on real IBM hardware.
+**Next:** independent ash and flow maps for the 2021 eruption, a channeled flow release, and an IBM hardware run.
 
 ## References
 

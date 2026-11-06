@@ -5,7 +5,7 @@
 
 > **"Can quantum probability explain why humans make counterintuitive evacuation and survival decisions under extreme environmental stress — and how can we use it to improve real-life evacuation survival rates?"**
 
-> **Start here:** the project notebook, [`notebooks/stranded_quantum_cognition.ipynb`](notebooks/stranded_quantum_cognition.ipynb), states what is real, what is a model, and where this falls short. Engine results are in [`workboard/ENGINE_STATUS.md`](workboard/ENGINE_STATUS.md).
+> **Start here:** the project notebook, [`notebooks/stranded_quantum_cognition.ipynb`](notebooks/stranded_quantum_cognition.ipynb), explains the model, its evidence, and next steps. Engine results are in [`workboard/ENGINE_STATUS.md`](workboard/ENGINE_STATUS.md).
 
 **Qognition** is an interactive multi-scenario cognitive modeling, crowd evacuation, and physical hazard platform. The system simulates human decision-making under existential pressure across **five evacuation and survival scenarios** (**Island Wilderness**, **Volcano Eruption**, **RMS Titanic 1912**, **Pompeii AD 79**, and **Waterloo Pool Chlorine Leak**) plus an **Interactive Scenario Builder**. It contrasts a **2-qubit quantum cognition architecture**—alongside **6 quantum cognition models adapted from published papers and open-source code** (exhibiting non-commuting order effects, Tversky–Shafir disjunction interference, Belief Entropy QLBN, Busemeyer dynamic Hamiltonians, and Lindblad open-system decoherence)—against a **zero-coherence classical mixture control ($\lambda=1$)** and a **classical rational baseline**.
 
