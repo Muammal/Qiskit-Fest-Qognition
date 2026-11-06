@@ -1,0 +1,62 @@
+{
+ "seeds": [
+  0,
+  199
+ ],
+ "arms": {
+  "quantum": {
+   "survival": 0.995,
+   "paired_n": 140,
+   "delay_vs_mixture": 0.55,
+   "se": 0.09085920802787815,
+   "later": 45,
+   "earlier": 5,
+   "same": 90
+  },
+  "classical_no_interference": {
+   "survival": 0.99,
+   "paired_n": 135,
+   "delay_vs_mixture": -0.15555555555555556,
+   "se": 0.0620870362773546,
+   "later": 6,
+   "earlier": 24,
+   "same": 105
+  },
+  "markov_hesitation": {
+   "survival": 0.985,
+   "paired_n": 141,
+   "delay_vs_mixture": 1.5673758865248226,
+   "se": 0.1262445498894867,
+   "later": 95,
+   "earlier": 0,
+   "same": 46
+  },
+  "markov_hesitation_ts": {
+   "survival": 0.985,
+   "paired_n": 141,
+   "delay_vs_mixture": 1.9645390070921986,
+   "se": 0.13139858213776373,
+   "later": 111,
+   "earlier": 0,
+   "same": 30
+  },
+  "classical_mixture": {
+   "survival": 0.995,
+   "paired_n": 141,
+   "delay_vs_mixture": 0.0,
+   "se": 0.0,
+   "later": 0,
+   "earlier": 0,
+   "same": 141
+  },
+  "classical": {
+   "survival": 1.0,
+   "paired_n": 135,
+   "delay_vs_mixture": -0.9185185185185185,
+   "se": 0.11520733915523618,
+   "later": 0,
+   "earlier": 57,
+   "same": 78
+  }
+ }
+}

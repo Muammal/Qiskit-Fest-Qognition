@@ -56,6 +56,10 @@ $$|\psi_0\rangle = R_y(\theta_0)|0\rangle, \qquad \theta_0 = 2\arcsin\left(\sqrt
 
 yielding initial danger probability $p_0 = \langle 1|\rho_0|1\rangle = 1 - s$ and initial coherence $\text{Re}(\rho_{0,01}) = \sqrt{s(1-s)}$.
 
+### 3.2a Dephasing per slot or per unit of time
+
+The default, `dephasing_mode="per_slot"`, applies the same $\lambda(\sigma)$ at every decision, whatever the step length. With `dephasing_mode="per_time"` and the optional state key `dt_seconds`, $\lambda_	ext{slot} = 1 - e^{-dt/	au(\sigma)}$, with $	au(\sigma)$ chosen so that $dt = 2$ h reproduces $\lambda(\sigma)$. Engines pass their decision cadence: volcano and island 2 h, Waterloo `decision_seconds` (60 s by default). Titanic (5 min) and Pompeii (15 min) decide at every step, so their step length is their cadence. The numbers are in `mind/results/time_aware.json`.
+
 ### 3.3 Sequential Event Operators & Non-Commutativity (`apply_event`)
 Each event $e \in \text{recent\_events}$ (excluding `"none"`) transforms the $2 \times 2$ belief density matrix $\rho$ via one of two physical mechanisms:
 

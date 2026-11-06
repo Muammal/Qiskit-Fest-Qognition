@@ -1,0 +1,44 @@
+{
+ "volcano": {
+  "seeds": 200,
+  "identical_actions": true,
+  "survival": {
+   "per_slot": 0.995,
+   "per_time": 0.995
+  }
+ },
+ "scenarios": {
+  "titanic": {
+   "per_slot": {
+    "saved": 578,
+    "total": 2208
+   },
+   "per_time": {
+    "saved": 705,
+    "total": 2208
+   }
+  },
+  "pompeii": {
+   "per_slot": {
+    "dead": 0,
+    "total": 11500
+   },
+   "per_time": {
+    "dead": 0,
+    "total": 11500
+   }
+  },
+  "waterloo": {
+   "per_slot": {
+    "aegl2_or_worse": 1,
+    "off_site": 100,
+    "total": 100
+   },
+   "per_time": {
+    "aegl2_or_worse": 2,
+    "off_site": 100,
+    "total": 100
+   }
+  }
+ }
+}

@@ -1,0 +1,62 @@
+{
+ "seeds": [
+  0,
+  59
+ ],
+ "replicates": 30,
+ "arms": [
+  "quantum",
+  "classical_mixture",
+  "classical_no_interference",
+  "markov_hesitation",
+  "markov_hesitation_ts"
+ ],
+ "leads_hours": [
+  0,
+  2,
+  4,
+  6,
+  8,
+  12,
+  24,
+  30
+ ],
+ "distances_tiles": [
+  4.2,
+  6.4,
+  8.9,
+  10.8
+ ],
+ "start_tiles": {
+  "4.2": [
+   23,
+   23
+  ],
+  "6.4": [
+   24,
+   25
+  ],
+  "8.9": [
+   24,
+   28
+  ],
+  "10.8": [
+   26,
+   29
+  ]
+ },
+ "stress_offset_sd": 0.1,
+ "eta_sd": 0.15,
+ "eta_mean": -0.7853897988344999,
+ "markov_hesitation": 0.2396072020948411,
+ "ts_hesitation": 0.4375,
+ "catalog": {
+  "n": 22,
+  "q25": 1.1291499999999999,
+  "median": 1.875,
+  "q75": 5.75,
+  "q90": 27.900000000000045
+ },
+ "runs": 288000,
+ "seconds": 1043.5
+}

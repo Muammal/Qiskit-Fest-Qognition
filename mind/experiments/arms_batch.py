@@ -14,15 +14,22 @@ import contracts  # noqa: F401  (must load before mind; see conftest.py)
 from engine.events import VOLCANIC
 from engine.simulation import SimulationEngine
 from mind.experiments.validate import evacuation_delay
+from mind.quantum_mind import markov_hesitation_decide
 
-ARMS = ("quantum", "classical_no_interference", "markov_hesitation", "classical_mixture", "classical")
+ARMS = ("quantum", "classical_no_interference", "markov_hesitation", "markov_hesitation_ts", "classical_mixture", "classical")
+TS_HESITATION = 1 - 0.36 / 0.64  # hits Tversky & Shafir's 0.36, the row ETA was solved from
 OUT = Path(__file__).resolve().parents[1] / "results" / "arms_batch.json"
+
+
+def _markov_ts(state):
+    return markov_hesitation_decide(state, hesitation=TS_HESITATION)
 
 
 def run_seed(seed):
     out = {}
     for arm in ARMS:
-        timeline = SimulationEngine(seed=seed, mind_type=arm).run()
+        options = dict(decide_fn=_markov_ts) if arm == "markov_hesitation_ts" else {}
+        timeline = SimulationEngine(seed=seed, mind_type=arm, **options).run()
         out[arm] = dict(survived=timeline["outcome"] == "survived", delay=evacuation_delay(timeline["steps"], VOLCANIC))
     return out
 
