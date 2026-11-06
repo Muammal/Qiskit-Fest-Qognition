@@ -698,6 +698,20 @@ class IslandVisualizerApp:
             on_back=self._config_on_back
         )
 
+        self.card1_rect = self.hub_screen.card_island_rect
+        self.card2_rect = self.hub_screen.card_volcano_rect
+        self.card3_rect = self.hub_screen.btn_titanic.rect
+        self.card4_rect = self.hub_screen.btn_pompeii.rect
+        self.card5_rect = self.hub_screen.btn_waterloo.rect
+        self.card_build_rect = self.hub_screen.btn_builder.rect
+
+        self.btn_choice_island.rect = self.hub_screen.btn_play_island.rect
+        self.btn_choice_volcano.rect = self.hub_screen.btn_play_volcano.rect
+        self.btn_choice_titanic.rect = self.hub_screen.btn_titanic.rect
+        self.btn_choice_pompeii.rect = self.hub_screen.btn_pompeii.rect
+        self.btn_choice_waterloo.rect = self.hub_screen.btn_waterloo.rect
+        self.btn_choice_build.rect = self.hub_screen.btn_builder.rect
+
         # Initialize Simulation Engine (sets initial character position accurately per scenario)
         self._init_simulation()
 
@@ -741,6 +755,7 @@ class IslandVisualizerApp:
         self.mind_type = self.config_screen.mind_type
         self.max_steps = self.config_screen.max_steps
         self._init_simulation()
+        self._show_mind_on_button()
         self.app_state = "sim"
 
     def _config_on_back(self):
@@ -1056,6 +1071,8 @@ class IslandVisualizerApp:
         self.char_target_y = self.char_screen_y
         if hasattr(self, "weather"):
             self.weather.particles.clear()
+        if hasattr(self, "btn_nav_mind"):
+            self._show_mind_on_button()
 
     def step_forward(self):
         """Advances the simulation by one 2-hour step."""
@@ -1065,11 +1082,14 @@ class IslandVisualizerApp:
             return self._pompeii_start_step()
         if not self.agent.is_alive or self.step_idx >= self.max_steps:
             self.show_debrief_modal = True
+            self._ensure_ending_screen()
+            self._ensure_ending_screen()
             return
 
         record = self.engine.step()
         if record is None:
             self.show_debrief_modal = True
+            self._ensure_ending_screen()
             return
 
         self.step_idx += 1
@@ -1102,6 +1122,7 @@ class IslandVisualizerApp:
 
         if not self.agent.is_alive or self.step_idx >= self.max_steps:
             self.show_debrief_modal = True
+            self._ensure_ending_screen()
 
     def _titanic_step_forward(self):
         """One five-minute step for everyone aboard; the panels follow the focused person."""
@@ -1211,8 +1232,9 @@ class IslandVisualizerApp:
             self.cutscene.skip()
             return True
 
-        if self.show_debrief_modal and self.ending_screen is not None and self.scenario in ("island", "volcano"):
-            if self.ending_screen.handle_event(event, v_mouse):
+        if self.show_debrief_modal and self.scenario in ("island", "volcano"):
+            self._ensure_ending_screen()
+            if self.ending_screen is not None and self.ending_screen.handle_event(event, v_mouse):
                 return True
 
         elif event.type == pygame.VIDEORESIZE:
@@ -1460,8 +1482,15 @@ class IslandVisualizerApp:
 
         elif self.app_state == "sim":
             if self.show_debrief_modal:
+                if self.ending_screen is not None and self.scenario in ("island", "volcano"):
+                    for b in (self.ending_screen.btn_replay, self.ending_screen.btn_new_seed,
+                              self.ending_screen.btn_switch_mind, self.ending_screen.btn_menu):
+                        if b.check_hover(pos):
+                            return True
                 return ((self._scenes_available() and self.btn_modal_scenes.check_hover(pos)) or
                         self.btn_modal_replay.check_hover(pos) or self.btn_modal_switch.check_hover(pos) or
+                        self.btn_modal_scenario.check_hover(pos) or self.btn_modal_home.check_hover(pos) or
+                        self.btn_modal_close.check_hover(pos))
                         self.btn_modal_scenario.check_hover(pos) or self.btn_modal_home.check_hover(pos) or
                         self.btn_modal_close.check_hover(pos))
             if self.show_history_overlay:
@@ -2714,18 +2743,23 @@ class IslandVisualizerApp:
         self.show_debrief_modal = False
         self.ending_screen = None
 
+    def _ensure_ending_screen(self):
+        if self.ending_screen is None and self.scenario in ("island", "volcano"):
+            tl = self.engine.timeline() if hasattr(self.engine, "timeline") else {}
+            tl["max_steps"] = self.max_steps
+            self.ending_screen = EndingCutsceneScreen(
+                timeline_data=tl,
+                on_replay=self._ending_replay,
+                on_new_seed=self._ending_new_seed,
+                on_switch_mind=self._ending_switch_mind,
+                on_main_menu=self._ending_main_menu,
+            )
+
     def draw_debrief_modal(self, mouse_pos: Tuple[int, int]):
         if self.scenario in ("island", "volcano"):
-            if self.ending_screen is None:
-                tl = self.engine.timeline() if hasattr(self.engine, "timeline") else {}
-                self.ending_screen = EndingCutsceneScreen(
-                    timeline_data=tl,
-                    on_replay=self._ending_replay,
-                    on_new_seed=self._ending_new_seed,
-                    on_switch_mind=self._ending_switch_mind,
-                    on_main_menu=self._ending_main_menu,
-                )
-            self.ending_screen.draw(self.canvas)
+            self._ensure_ending_screen()
+            if self.ending_screen is not None:
+                self.ending_screen.draw(self.canvas, mouse_pos)
             return
 
         dim_surf = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)

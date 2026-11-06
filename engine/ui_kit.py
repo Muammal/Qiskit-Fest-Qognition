@@ -238,7 +238,8 @@ class WoodButton:
     def handle_mouse_up(self, mouse_pos: Tuple[int, int]) -> bool:
         was_pressed = self.is_pressed
         self.is_pressed = False
-        if was_pressed and self.check_hover(mouse_pos):
+        hit = self.orig_rect.inflate(Display.S(8), Display.S(8)).collidepoint(mouse_pos)
+        if was_pressed and hit:
             if self.callback:
                 self.callback()
             return True
@@ -334,17 +335,36 @@ class Stepper:
     """Numeric parameter stepper (+/-1, +/-10, randomize)."""
 
     def __init__(self, rect: pygame.Rect, value: int = 101, min_val: int = 1, max_val: int = 99999):
-        self.rect = rect
+        self._rect = rect
         self.value = value
         self.min_val = min_val
         self.max_val = max_val
 
-        btn_w = Display.S(36)
+        btn_w = Display.S(38)
         btn_h = rect.height
         self.btn_minus_10 = WoodButton(pygame.Rect(rect.x, rect.y, btn_w, btn_h), "-10", 14, bg_color=COLOR_WOOD, callback=lambda: self.adjust(-10))
         self.btn_minus_1 = WoodButton(pygame.Rect(rect.x + btn_w + Display.S(4), rect.y, btn_w, btn_h), "-1", 14, bg_color=COLOR_WOOD, callback=lambda: self.adjust(-1))
         self.btn_plus_1 = WoodButton(pygame.Rect(rect.right - btn_w * 2 - Display.S(4), rect.y, btn_w, btn_h), "+1", 14, bg_color=COLOR_WOOD, callback=lambda: self.adjust(1))
         self.btn_plus_10 = WoodButton(pygame.Rect(rect.right - btn_w, rect.y, btn_w, btn_h), "+10", 14, bg_color=COLOR_WOOD, callback=lambda: self.adjust(10))
+        self._realign_buttons()
+
+    @property
+    def rect(self) -> pygame.Rect:
+        return self._rect
+
+    @rect.setter
+    def rect(self, new_rect: pygame.Rect):
+        self._rect = new_rect
+        self._realign_buttons()
+
+    def _realign_buttons(self):
+        btn_w = Display.S(38)
+        btn_h = self._rect.height
+        gap = Display.S(4)
+        self.btn_minus_10.orig_rect = pygame.Rect(self._rect.x, self._rect.y, btn_w, btn_h)
+        self.btn_minus_1.orig_rect = pygame.Rect(self._rect.x + btn_w + gap, self._rect.y, btn_w, btn_h)
+        self.btn_plus_1.orig_rect = pygame.Rect(self._rect.right - btn_w * 2 - gap, self._rect.y, btn_w, btn_h)
+        self.btn_plus_10.orig_rect = pygame.Rect(self._rect.right - btn_w, self._rect.y, btn_w, btn_h)
 
     def adjust(self, delta: int):
         self.value = max(self.min_val, min(self.max_val, self.value + delta))

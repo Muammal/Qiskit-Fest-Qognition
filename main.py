@@ -165,6 +165,7 @@ def open_builder(app):
 def main():
     parser = argparse.ArgumentParser(description="Quantum Cognition Simulation")
     parser.add_argument("--gui", action="store_true", help="Launch interactive 2D Pygame simulation (default)")
+    parser.add_argument("--3d", dest="use_3d", action="store_true", help="Launch interactive 3D simulation front-end (Ursina / Panda3D)")
     parser.add_argument("--demo", action="store_true", help="Run interactive terminal ASCII survival run")
     parser.add_argument("--terminal", action="store_true", help="Run interactive terminal ASCII survival run")
     parser.add_argument("--batch", action="store_true", help="Compare Quantum vs Classical Mixture vs Classical Rational")
@@ -188,7 +189,7 @@ def main():
     if args.test:
         import pytest
         print("[Tech C] Running integration test suite...")
-        sys.exit(pytest.main(["-v", "test_contracts_and_engine.py", "test_gui_hayday.py"]))
+        sys.exit(pytest.main(["-v", "test_contracts_and_engine.py", "test_gui_hayday.py", "test_gui3d.py"]))
     elif args.export_data:
         from engine.exporter import export_evacuation_datasets
         out_dir = args.output or "exports"
@@ -224,6 +225,10 @@ def main():
         scen = args.scenario or "volcano"
         run_live_demo(seed=args.seed, mind=args.mind, noise=args.noise,
                       scenario=scen, speed=args.speed, engine_mode=args.engine)
+    elif args.use_3d:
+        from gui3d.app import GameApp
+        app = GameApp(seed=args.seed, mind=args.mind, scenario=args.scenario or "volcano")
+        app.run()
     else:
         from engine.gui import launch_gui
         start_screen = "home" if args.scenario else "event_choice"

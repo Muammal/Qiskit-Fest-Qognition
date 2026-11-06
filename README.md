@@ -152,25 +152,10 @@ Procedural 40×40 topographic island wilderness and volcanic evacuation environm
 
 ---
 
-### 8. Single Cinematic Ending Cut Scene
-Replaces intrusive mid-run modals with **one** uninterrupted, cinematic game-ending sequence triggered only upon run completion (survived to horizon or fatal conclusion):
-- **Atmospheric Transition**: Ambient vignette and sky-mood shift (warm sunrise for survival, dusk/ash for disaster).
-- **Outlined Ribbon Title Card**: Scenario-tailored banners (*"Rescued at Dawn"*, *"Against All Odds"*, *"The Island Claimed Them"*, *"Lost to the Eruption"*).
-- **Staggered Results Reveal & Animated Count-Ups**:
-  - **Grade & Stars**: Tiered letter grades (**S / A / B / C / D**) paired with 1–3 animated gold stars calculated from survival longevity and physiological vitals.
-  - **Survival Rate**: Count-up percentage of the horizon endured, along with background-computed counterfactual comparisons (**Quantum vs Classical** on the identical seed).
-  - **Comprehensive Telemetry**: Lowest vital timestamp, resources gathered/consumed, distance covered, shelter construction count, and hazard zones crossed.
-  - **Quantum Cognition Highlights**: Decision divergences against classical baselines, cue order-effect interference count, and stress-induced decoherence episodes.
-  - **Decision Timeline Strip**: Chronological action strip with color-coded badges and hazard markers.
-  - **Closing Epilogue & Freeze Frame**: Expressive character freeze frame (happy, exhausted, or fallen) and epilogue narrative quote.
-  - **Tactile Navigation**: WoodButtons and hotkeys for Replay (`[R]`), New Seed (`[N]`), Switch Mind (`[Q]`), and Main Menu (`[ESC]`/`[H]`), with `[SPACE]`/`[ENTER]` animation skipping.
+### 8. Mission Debrief & Comparative Telemetry Modal
+End-of-simulation telemetry modal displaying survivor status, cause of death, physiological logs, and instant single-click buttons for replay or mind-to-mind comparison on the exact same seed.
 
----
-
-### 9. Resolution-Adaptive Rendering & Design System
-- **Crisp Vector & Procedural Graphics**: Tactile *Hay Day*-inspired palette (#7CC24A grass, #B9783F carved timber, #F8EBC8 warm parchment, #3B2312 espresso borders) powered by `tools/make_assets.py` procedural generator and bundled with `Lilita One` Google font.
-- **Resolution-Adaptive Scale Manager (`engine/display.py`)**: Seamless rendering from 1024×576 up to 4K Ultrawide (21:9) using quantized design scaling (`Display.S()`), DPI awareness, and ~150ms debounced window resize caching.
-- **Zero Mid-Run Interruptions**: Runs in Island Wilderness and Volcano Evacuation proceed completely uninterrupted—no modal popups, forced freezes, or dialogue modals pause the simulation during gameplay.
+![Mission Debrief Modal](docs/images/05_mission_debrief.png)
 
 ---
 
@@ -180,15 +165,34 @@ Replaces intrusive mid-run modals with **one** uninterrupted, cinematic game-end
 QWC/
 ├── contracts.py                  # Frozen interfaces, Grover DTQW explore_step & classical baseline
 ├── data/priors.json              # BLS ATUS baseline time-use priors
-├── main.py                       # Unified executable entrypoint (GUI, CLI, demo, batch, exports)
+├── main.py                       # Unified executable entrypoint (GUI, CLI, demo, batch, exports, --3d)
+├── play3d.py                     # Standalone 3D front-end entrypoint (Ursina / Panda3D)
+├── requirements.txt              # Core dependencies for simulation and 2D visualizer
+├── requirements-3d.txt           # Additional dependencies for stylized 3D front-end
 ├── test_contracts_and_engine.py  # Contract and engine integration test suite (68 tests)
-├── test_gui_hayday.py            # Hay Day GUI, resolution scaling & uninterrupted sim suite (4 tests)
+├── test_gui_hayday.py            # Hay Day 2D GUI and resolution scaling test suite (5 tests)
+├── test_gui3d.py                 # Stylized 3D Ursina front-end verification suite (5 tests)
 ├── test_titanic.py               # RMS Titanic scenario verification suite
 ├── test_pompeii.py               # Pompeii AD 79 scenario verification suite
 ├── test_waterloo.py              # Waterloo chlorine leak scenario verification suite
 ├── tools/
-│   └── make_assets.py            # Procedural Pillow asset generator (sprites, tiles, icons)
+│   └── make_assets.py            # Procedural Pillow asset generator for 2D sprites, tiles & icons
 ├── assets/                       # UI assets, fonts (Lilita One), tiles, icons, and theme.json
+├── gui3d/                        # Stylized 3D Front-end (Ursina / Panda3D)
+│   ├── app.py                    # Main Ursina GameApp lifecycle and scene director
+│   ├── world.py                  # Batched merged terrain mesh, scenery instancing & celestial day/night
+│   ├── models.py                 # Procedural low-poly models (Agent3D, trees, rocks, volcano, huts)
+│   ├── agent3d.py                # Animated Agent3D character with bob/walk cycles & expressive poses
+│   ├── ui.py                     # 2D HUD (vital progress bars, speech bubbles, quantum panel, wood buttons)
+│   ├── cinematics.py             # Single cinematic ending cut scene (crane orbit, count-ups, star ratings)
+│   ├── cameras.py                # Tilted 3/4 perspective, camera orbit/pan/zoom, trauma screen shake
+│   ├── shaders.py                # Stepped cel-shading & animated shoreline foam water shaders
+│   ├── particles.py              # Zero-allocation pooled particle systems (ash, rain, embers, confetti)
+│   ├── playback.py               # Pure-Python frame-by-frame simulation playback state machine
+│   ├── ending_stats.py           # Pure function evaluating grades, stars, telemetry & counterfactuals
+│   ├── data_source.py            # Multi-threaded simulation worker & replay timeline adapter
+│   ├── layout.py                 # Resolution-adaptive 1600x900 coordinate mapper & letterboxing
+│   └── palette.py                # Warm saturated Hay Day color palette (#7CC24A, #B9783F, #F8EBC8)
 ├── mind/                         # Tech A: 2-Qubit Quantum Cognitive Architecture
 │   ├── model.py                  # Deliberation unitary U(q_S, q_D) & Tversky-Shafir calibration
 │   ├── cognition_models.py       # 6 published quantum cognition models (Busemeyer, QLBN, Lindblad, etc.)
@@ -206,14 +210,11 @@ QWC/
 │   ├── catalog.py                # Automated dataset & parameter catalog builder
 │   └── gates.py                  # Physical verification gate runner (22/22 PASS)
 ├── engine/                       # Tech C: Multi-Scenario Evacuation Engine & Visualizer
-│   ├── display.py                # Resolution-adaptive display manager & debounced resize
-│   ├── ui_kit.py                 # Hay Day UI components (NineSlicePanel, WoodButton, OutlinedText)
+│   ├── display.py                # Resolution-adaptive 2D display manager & debounced resize
+│   ├── ui_kit.py                 # 2D Hay Day UI components (NineSlicePanel, WoodButton, OutlinedText)
 │   ├── assets.py                 # Scale-keyed cached sprite & asset loader
 │   ├── fx.py                     # Optional ModernGL post-processing (vignette, warm grade)
-│   ├── screens/                  # Modular screen controllers
-│   │   ├── hub.py                # Event Choice Hub with hanging wooden signboards
-│   │   ├── config.py             # Scenario configuration parchment modal
-│   │   └── ending.py             # Single cinematic ending cut scene & stats evaluator
+│   ├── screens/                  # Modular 2D screen controllers (hub, config, ending)
 │   ├── world.py                  # Dual-scenario DEM, priority-flood drainage & Tobler pathfinder
 │   ├── volcano.py                # Ash grid, active PDC/lahar, surge & lava models
 │   ├── titanic.py                # RMS Titanic 2,208-agent simulation loop
@@ -225,7 +226,7 @@ QWC/
 │   ├── chlorine.py               # 2D advection-diffusion gas dispersion model
 │   ├── builder.py                # In-engine custom scenario creator
 │   ├── exporter.py               # Full MP4 video renderer & evacuation data exporter
-│   └── gui.py                    # Resolution-adaptive Pygame Visualizer & Dashboard
+│   └── gui.py                    # Resolution-adaptive 2D Pygame Visualizer & Dashboard
 ├── artifacts/physics/raw/        # Tech B: 19 Verified Raw Data Assets (Copernicus DEM, FABDEM, etc.)
 ├── exports/                      # Exported survival rates, policy CSVs, and full simulation videos
 └── site/                         # Product D: Client-Side Web Replay & Quantum Inspector (index.html)
@@ -283,24 +284,81 @@ python main.py --export-video --scenario titanic --seed 42 --mind quantum
 
 ---
 
+### 5. Stylized 3D Front-end (Ursina / Panda3D)
+
+A stylized, resolution-adaptive 3D front-end with an original *Hay Day*-inspired aesthetic, procedural low-poly art, uninterrupted simulation playback, and cinematic ending cut scenes.
+
+#### Installation
+```bash
+pip install -r requirements-3d.txt
+```
+*(Compatible with Python 3.10 through 3.13; tested on Python 3.13.14)*
+
+#### Running the 3D Simulation
+```bash
+# Launch interactive 3D simulation
+python play3d.py
+
+# Launch directly via main.py flag
+python main.py --3d
+
+# Set seed, mind, scenario, and quality
+python play3d.py --seed 101 --mind quantum --scenario volcano --quality high
+python play3d.py --scenario island --quality medium
+
+# Replay any recorded timeline run in 3D
+python play3d.py --replay demo-pack/run_01_heroic_survival.json
+
+# Run headless offscreen smoke test (used by tests)
+python play3d.py --smoke
+```
+
+#### 3D Controls
+- `F11`: Toggle native fullscreen / windowed
+- `SPACE`: Pause / Resume simulation (or skip ending animations)
+- `N` / `RIGHT`: Step forward one turn
+- `Q`: Switch cognitive mind (Quantum $\leftrightarrow$ Classical) and replay on same seed
+- `1` / `2` / `3`: Playback speed (1.6s, 0.8s, 0.35s per step)
+- `E`: Toggle evacuation route and hazard zone overlay
+- `TAB`: Toggle chronological action log panel
+- `R`: Restart run on current seed
+- `ESC` / `H`: Return to Event Choice Hub / Main Menu
+- `Right Mouse Button`: Orbit camera pitch and yaw
+- `Middle Mouse Button` or `WASD`: Pan camera focus target
+- `Scroll Wheel`: Distance zoom
+- `C`: Cycle camera tracking mode (`Follow` $\to$ `Overview` $\to$ `Cinematic`)
+- `V`: Toggle top-down orthographic perspective
+
+> **Screenshots**: *Screenshots of the 3D front-end will be placed in `docs/images/` upon graphical capture.*
+
+---
+
 ## Daily Integration & Verification Testing
 
 The entire repository is verified using automated test suites, physical gate runners, and Qiskit validation scripts:
 
 ```powershell
-# 1. Full unified pytest suite (Tech A + Tech B + Tech C + Titanic + Pompeii + Waterloo)
+# 1. Tech C Core Integration & GUI test suites (68 contracts/engine + 5 Hay Day 2D + 5 Stylized 3D)
+python main.py --test
+# -> 78 passed in 12s
+
+# 2. Dedicated 3D headless smoke test
+python play3d.py --smoke
+# -> Exits 0 cleanly
+
+# 3. Full unified pytest suite (Tech A + Tech B + Tech C + Titanic + Pompeii + Waterloo)
 $env:SDL_VIDEODRIVER="dummy"; $env:SDL_AUDIODRIVER="dummy"; python -m pytest -q
 # -> 816 passed, 3 skipped in 13m 19s
 
-# 2. Tech B 14-Domain Physical Verification Gates
+# 4. Tech B 14-Domain Physical Verification Gates
 python -m stranded_physics.gates required
 # -> 22/22 PASS across all domains
 
-# 3. Automated Physical Parameter & Dataset Catalog Builder
+# 5. Automated Physical Parameter & Dataset Catalog Builder
 python -m stranded_physics.catalog
 # -> Generated workboard/CATALOG.md (49 datasets, 20 Pint parameters)
 
-# 4. Tech A Quantum Cognition Validation Suite
+# 6. Tech A Quantum Cognition Validation Suite
 python -m mind.experiments.validate
 # -> Generated docs/tech-a/07-validation-report.md (any_failed=False)
 ```
