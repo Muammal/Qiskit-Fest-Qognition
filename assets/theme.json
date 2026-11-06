@@ -1,0 +1,52 @@
+{
+  "#main_container": {
+    "colours": {
+      "dark_bg": "#3B2312"
+    }
+  },
+  "panel": {
+    "colours": {
+      "dark_bg": "#F8EBC8",
+      "normal_border": "#3B2312"
+    },
+    "misc": {
+      "border_width": "3",
+      "shadow_width": "4",
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "12"
+    }
+  },
+  "button": {
+    "colours": {
+      "normal_bg": "#3E8E3A",
+      "hovered_bg": "#7CC24A",
+      "active_bg": "#2F6E2C",
+      "normal_text": "#FFFDF5",
+      "hovered_text": "#FFFFFF",
+      "normal_border": "#3B2312",
+      "hovered_border": "#3B2312"
+    },
+    "font": {
+      "name": "Lilita One",
+      "size": "20",
+      "regular_path": "assets/fonts/LilitaOne-Regular.ttf"
+    },
+    "misc": {
+      "border_width": "3",
+      "shadow_width": "3",
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "10"
+    }
+  },
+  "label": {
+    "colours": {
+      "normal_text": "#3B2312"
+    },
+    "font": {
+      "name": "Lilita One",
+      "size": "18",
+      "regular_path": "assets/fonts/LilitaOne-Regular.ttf"
+    }
+  }
+}
+
