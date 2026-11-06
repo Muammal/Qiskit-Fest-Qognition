@@ -159,7 +159,7 @@ def run_live_demo(
 def open_builder(app):
     """The scenario builder, imported only when asked for, so the original scenarios run without the physics packages."""
     from stranded_physics.builder_screen import BuilderScreen
-    return BuilderScreen(app)
+    return BuilderScreen(app, start_open=True)
 
 
 def main():
@@ -171,6 +171,7 @@ def main():
     parser.add_argument("--curate", action="store_true", help="Curate signature runs into demo-pack/")
     parser.add_argument("--export-data", action="store_true", help="Export evacuation survival rates, critical seeds & policy interventions to exports/")
     parser.add_argument("--export-video", action="store_true", help="Export full simulation run MP4 video to exports/videos/")
+    parser.add_argument("--open", dest="open_sim", type=str, default=None, help="Open a .qsim file or https link in the scenario builder. With --report, run it and write the report")
     parser.add_argument("--report", action="store_true", help="Run one event, then write its end-of-event report as Excel and CSV")
     parser.add_argument("--test", action="store_true", help="Execute integration test suite")
     parser.add_argument("--seed", type=int, default=101, help="Event hazard or terrain seed")
@@ -210,6 +211,11 @@ def main():
         print(f"\n{BOLD}{GREEN}=== Exported Full Simulation Video ==={RESET}")
         for k, v in info.items():
             print(f"  {k}: {CYAN}{v}{RESET}")
+    elif args.report and args.open_sim:
+        from engine.report import DEFAULT_DIR
+        from stranded_physics.runtime.report import report_sim
+        workbook, folder = report_sim(args.open_sim, mind=args.mind, out_dir=args.output or DEFAULT_DIR)
+        print(f"Report saved: {workbook}\nCSV tables: {folder}")
     elif args.report:
         from engine.report import DEFAULT_DIR, run_and_report
         scen = args.scenario or "volcano"
@@ -235,7 +241,7 @@ def main():
         start_screen = "home" if args.scenario else "event_choice"
         print(f"Launching Quantum Cognition Simulation (Seed={args.seed}, Mind={args.mind})...")
         launch_gui(seed=args.seed, mind=args.mind, noise=args.noise, start_screen=start_screen,
-                   scenario=args.scenario or "volcano", builder_factory=open_builder)
+                   scenario=args.scenario or "volcano", builder_factory=open_builder, open_sim=args.open_sim)
 
 
 if __name__ == "__main__":

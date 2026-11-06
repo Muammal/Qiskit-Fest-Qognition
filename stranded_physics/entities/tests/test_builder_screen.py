@@ -28,6 +28,8 @@ def app(tmp_path):
     window = IslandVisualizerApp(seed=101, start_screen="event_choice", builder_factory=open_builder)
     window._open_builder()
     window.builder.save_folder = tmp_path
+    window.builder.sim_folder = tmp_path
+    window.builder.guided, window.builder.start_open = False, False
     window.draw((0, 0))
     yield window
     pygame.quit()

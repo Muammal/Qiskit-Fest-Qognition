@@ -21,6 +21,13 @@ ID_PATTERN = re.compile(r"[a-z0-9][a-z0-9_-]{0,39}")
 STEP_HOURS = 2  # PackSimulation moves people in 2-hour steps, the frozen contract's step.
 MAX_UTC_OFFSET = 14
 WINDOWS_DEVICE_NAMES = {"con", "prn", "aux", "nul", *(f"com{n}" for n in range(1, 10)), *(f"lpt{n}" for n in range(1, 10))}  # Can never be file names there.
+PORTABLE_SOURCE = dict(terrain="dials", weather="dials", eruption="catalogue", storm="dials")
+# (template, name, what it is, needs the data pack)
+TEMPLATES = (("volcano_island", "Eruption on a made-up island", "One person, a sampled eruption, and a coast to reach", False),
+             ("storm_island", "Storm on a made-up island", "One person and a cyclone passing close", False),
+             ("mind_contest", "Quantum against control", "Two groups with different minds face the same eruption", False),
+             ("blank_island", "Empty island", "Land and weather only. Add everything else yourself", False),
+             ("st_vincent", "St Vincent, April 2021", "The real recorded eruption. Needs the 230 MB data pack", True))
 HEADER_KEYS = ("id", "title", "place", "start_utc", "hours", "step_hours", "local_utc_offset")
 
 
@@ -30,7 +37,7 @@ class Draft:
     entries: tuple[Mapping[str, object], ...]
 
 
-def _usable_id(text: object) -> bool:
+def usable_id(text: object) -> bool:
     return bool(ID_PATTERN.fullmatch(str(text))) and str(text) not in WINDOWS_DEVICE_NAMES
 
 
@@ -45,7 +52,51 @@ def from_file(path: Path) -> Draft:
         table = _table(path)
     except (tomllib.TOMLDecodeError, UnicodeDecodeError, ValueError, KeyError, TypeError) as error:
         raise InterfaceError(f"Can't read {Path(path).name}: {error}") from error
+    return draft_from_table(table)
+
+
+def draft_from_table(table: Mapping[str, object]) -> Draft:
     return Draft({key: table[key] for key in (*HEADER_KEYS, "step_minutes") if key in table}, tuple(table["entity"]))
+
+
+def template_draft(name: str) -> Draft:
+    """A starting point that plays straight away. See TEMPLATES."""
+    if name == "st_vincent":
+        draft = from_file(CARDS / "st_vincent_2021.toml")
+        return Draft({**draft.header, "id": "my_st_vincent", "title": "St Vincent, April 2021"}, draft.entries)
+    return from_file(CARDS / "templates" / f"{name}.toml")
+
+
+def id_from_title(title: str) -> str:
+    """A usable id for a title, so people who never think about ids never have to."""
+    text = re.sub(r"[^a-z0-9]+", "_", title.lower()).strip("_")[:37].strip("_")
+    text = text if text.startswith("my_") else f"my_{text}" if text else "my_scenario"
+    text = text[:40].strip("_-")
+    return text if usable_id(text) and text not in shipped_ids() else "my_scenario"
+
+
+def set_title(draft: Draft, text: str) -> Draft:
+    """Changes the title, and the id with it unless someone chose the id by hand."""
+    changed = set_header(draft, "title", text)
+    if draft.header["id"] in (id_from_title(str(draft.header["title"])), "new_scenario") or str(draft.header["id"]).startswith("my_"):
+        return replace(changed, header={**changed.header, "id": id_from_title(text)})
+    return changed
+
+
+def add_portable(draft: Draft, kind: str) -> Draft:
+    """A new entity whose numbers don't need the data pack, where the kind offers that."""
+    added = add_entity(draft, kind)
+    if kind in PORTABLE_SOURCE:
+        return set_choice(added, len(added.entries) - 1, "source", PORTABLE_SOURCE[kind])
+    return added
+
+
+def next_steps(draft: Draft) -> tuple[tuple[str, bool, tuple[str, ...]], ...]:
+    """What a playable scenario still needs: (label, done, kinds to add)."""
+    kinds = {entry["kind"] for entry in draft.entries}
+    return (("Land", "terrain" in kinds, ("terrain",)), ("Weather", "weather" in kinds, ("weather",)),
+            ("Danger", bool(kinds & {"eruption", "storm", "ship"}), ("eruption", "ash", "flow")),
+            ("People", bool(kinds & {"person", "group", "passengers"}), ("person",)), ("Safe place", "shelter" in kinds or "ship" in kinds, ("shelter",)))
 
 
 def new_draft() -> Draft:
@@ -188,7 +239,7 @@ def _whole(key: str, text: str) -> int:
 def set_header(draft: Draft, key: str, text: str) -> Draft:
     """Changes one scenario-wide setting, refusing anything the engine wouldn't accept."""
     value: object = text
-    if key == "id" and not _usable_id(text):
+    if key == "id" and not usable_id(text):
         raise InterfaceError("An id is 1 to 40 lowercase letters, digits, _ or -, starting with a letter or digit, and can't be a device name such as nul")
     if key == "title" and not (text.strip() and text.isprintable()):
         raise InterfaceError("A title has to be one line, and can't be empty")
@@ -212,14 +263,14 @@ def set_header(draft: Draft, key: str, text: str) -> Draft:
     return replace(draft, header={**draft.header, key: value})
 
 
-def _shipped_ids() -> set[str]:
+def shipped_ids() -> set[str]:
     return {path.stem for path in CARDS.glob("*.toml")}
 
 
 def borrows_evidence(draft: Draft) -> bool:
     """True when this uses a shipped scenario's id but isn't that scenario. Results are tied to the id, so they wouldn't belong to this."""
     shipped = CARDS / f"{draft.header['id']}.toml"
-    return str(draft.header["id"]) in _shipped_ids() and to_scenario(draft) != load_scenario(shipped)
+    return str(draft.header["id"]) in shipped_ids() and to_scenario(draft) != load_scenario(shipped)
 
 
 def save_draft(draft: Draft, folder: Path = SAVED) -> Path:
@@ -228,9 +279,9 @@ def save_draft(draft: Draft, folder: Path = SAVED) -> Path:
     if found:
         raise InterfaceError(found)
     scenario = to_scenario(draft)
-    if not _usable_id(scenario.id):
+    if not usable_id(scenario.id):
         raise InterfaceError(f"{scenario.id!r} can't be used as an id")
-    if scenario.id in _shipped_ids():
+    if scenario.id in shipped_ids():
         raise InterfaceError(f"{scenario.id!r} is a shipped scenario, and results are tied to its id. Give this copy a new id before saving")
     text = dump_scenario(scenario)
     folder = Path(folder)

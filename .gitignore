@@ -107,6 +107,7 @@ RISKS_AND_FAQ.md
 
 # --- Generated end-of-event reports ---
 exports/reports/
+exports/sims/
 
 # --- Operating System & Editor Metadata ---
 .DS_Store

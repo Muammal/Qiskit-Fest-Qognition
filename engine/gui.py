@@ -1201,6 +1201,9 @@ class IslandVisualizerApp:
             v_mouse = self.get_virtual_mouse_pos()
         if event.type == pygame.QUIT:
             return False
+        if event.type == pygame.DROPFILE:
+            self.open_sim(event.file)
+            return True
 
         if self.cutscene.active and (event.type == pygame.KEYDOWN or
                                      (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
@@ -1477,6 +1480,12 @@ class IslandVisualizerApp:
             self.custom_game, self.max_steps = None, DEFAULT_STEPS
             self.seed, self.mind_type = self.before_custom_game
             self._show_mind_on_button()
+
+    def open_sim(self, source):
+        """A sim file or link, from dropping a file on the window or from --open."""
+        self._open_builder()
+        if self.app_state == "builder":
+            self.builder.open_source(source)
 
     def _open_builder(self):
         if self.builder_factory is None:
@@ -3074,8 +3083,10 @@ class IslandVisualizerApp:
 
 
 def launch_gui(seed: int = 101, mind: str = "quantum", noise: str = "stub", start_screen: str = "event_choice",
-               scenario: str = "volcano", builder_factory=None):
+               scenario: str = "volcano", builder_factory=None, open_sim=None):
     """Launches the complete Pygame Quantum Cognition Simulation starting at the Event Choice Screen."""
     app = IslandVisualizerApp(seed=seed, mind_type=mind, noise_source=noise, start_screen=start_screen,
                               scenario=scenario, builder_factory=builder_factory)
+    if open_sim:
+        app.open_sim(open_sim)
     app.run()

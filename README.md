@@ -24,7 +24,7 @@ Results are in the generated table [`docs/results/SCENARIO_NUMBERS.md`](docs/res
 | **3** | **RMS Titanic 1912 (`titanic`)** | **2,208 agents** across 10 decks, 44 steps (5 min/step) | Progressive compartment flooding (`engine/flood.py`) & 20 lifeboats (`1,178` seats, Wormstedt schedule) | Models below-deck normalcy bias, and how the result moves with the cue translation |
 | **4** | **Pompeii AD 79 (`pompeii`)** | **11,500 citizens** across households, 128 steps (15 min/step) | Plinian column, pumice accumulation, roof collapses & pyroclastic surges (`engine/eruption.py`) | Deaths depend strongly on the cue translation, so all four are reported |
 | **5** | **Waterloo Pool Chlorine Leak (`waterloo`)** | **100 swimmers & staff**, 721 steps (10 sec/step) | 2D chlorine gas advection-diffusion plume (`engine/chlorine.py`) & EPA AEGL-1/2/3 thresholds | Compares exposure with and without a staff alarm, under each cue translation |
-| **6** | **Scenario Builder (`engine/builder.py`)** | Custom multi-person packs | Interactive terrain, hazard, and multi-agent placement editor | Build, save, and replay custom evacuation packs directly in the GUI (`[B]`) |
+| **6** | **Scenario Builder (`stranded_physics/builder_screen.py`)** | Custom multi-person packs | Interactive terrain, hazard, and multi-agent placement editor | Build, save, and replay custom evacuation packs directly in the GUI (`[B]`) |
 
 ---
 
@@ -173,6 +173,16 @@ start site/index.html
 
 ---
 
+## Make, Share and Open Sims
+
+Build a scenario from a ready-made starting point, then save it as a `.qsim` file that runs on any copy of the app. Open one by dropping it on the window, pasting a link, or browsing **Community**. Publish yours to the [community gallery](community/README.md) from the builder. Details, safety rules and limits are in [`docs/SIM_FILES.md`](docs/SIM_FILES.md).
+
+```bash
+python main.py --open community/sims/made_up_island_eruption.qsim
+```
+
+---
+
 ## End-of-Event Report
 
 Every run ends in one debrief with the crucial details: survivors against deaths, key events, the paired run on the same seed, and the assumptions used. **Export Report** (or `K` in the debrief) writes an Excel workbook and a folder of CSVs to `exports/reports/`, with these tables:
@@ -204,7 +214,7 @@ Reports are model output, not predictions.
 |---|---|---|
 | **Any Screen** | `F11` or `[Fullscreen]` Button | **Toggle Fullscreen / Windowed Mode** (with automatic aspect-ratio letterboxing) |
 | **Event Choice Hub** | `[1]` / `[2]` / `[3]` / `[4]` / `[5]` | **Select Island** (`1`), **Volcano** (`2`), **Titanic** (`3`), **Pompeii** (`4`), or **Waterloo** (`5`) |
-| **Event Choice Hub** | `B` or `[Build Scenario]` | **Open Interactive Scenario Builder** (`engine/builder.py`) |
+| **Event Choice Hub** | `B` or `[Build Scenario]` | **Open Interactive Scenario Builder** (`stranded_physics/builder_screen.py`) |
 | **Event Choice Hub** | Click on Card or Button | **Open Scenario Configuration** |
 | **Configuration Hub** | `ENTER` or `SPACE` | **Launch Simulation** |
 | **Configuration Hub** | `ESC` or `< Change Scenario` | **Return to Event Choice Hub** |
@@ -214,6 +224,8 @@ Reports are model output, not predictions.
 | **Simulation View** | `F` | **Follow Next Person / Role** (in crowd scenarios & custom builder packs) |
 | **Simulation View** | `P` / `M` | **Toggle Split Panels** (`P`) or **Region Map** (`M` in Pompeii) |
 | **Quantum panel** | `[Swap cues]` | **Order swap**: swaps the last two cues and shows the change in P(protect) |
+| **Any Screen** | Drop a `.qsim` file on the window | **Open a sim** in the builder |
+| **Scenario Builder** | `[Share]`, `[Undo]` or `Ctrl+Z` | **Export or publish a sim**, or step back |
 | **Debrief** | `[Export Report]` or `K` | **Write the report** as Excel and CSV to `exports/reports/` |
 | **Configuration Hub** | `A` / `B` / `C` / `D` buttons | **Cue translation** for Titanic, Pompeii and Waterloo. Each one is an assumption, and results move with it |
 | **Simulation View** | `[Speed]` Button | **Cycle Speed** (0.5×, 1×, 2×, 4×) |
@@ -226,7 +238,7 @@ Reports are model output, not predictions.
 
 ## Daily Integration & Verification Testing
 
-Run the unified suite across **Tech A**, **Tech B**, **Tech C**, **Titanic**, **Pompeii**, and **Waterloo** (413 passed, 3 skipped on 6 November 2026; `test_ui_layout.py`, `test_report.py` and `mind/human_tests` add 89):
+Run the unified suite across **Tech A**, **Tech B**, **Tech C**, **Titanic**, **Pompeii**, and **Waterloo** (413 passed, 3 skipped on 6 November 2026; `test_ui_layout.py`, `test_report.py`, `test_simfile.py` and `mind/human_tests` add more):
 
 ```powershell
 $env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py test_titanic.py test_pompeii.py test_waterloo.py mind/tests stranded_physics/core -q

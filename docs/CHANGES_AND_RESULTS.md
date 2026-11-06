@@ -146,6 +146,10 @@ A bug in the script's first draft was caught by a unit test before the run. It i
 
 `engine/report.py` builds the report from a finished run, and the debrief shows its key events. **Export Report** (or `K` in the debrief) writes an Excel workbook and a folder of CSVs to `exports/reports/`, and `python main.py --report` does the same without the GUI. The tables are Summary, Key events, Timeline, Crowd over time, Groups, Decisions, Paired run and Assumptions.
 
+## Sim files and the easier builder
+
+The builder opens on starting points, with a checklist, undo, plain messages and an Advanced switch. `.qsim` files carry a scenario and seed to any copy of the app, and the community gallery publishes them through GitHub. See [SIM_FILES.md](SIM_FILES.md).
+
 ## Tests
 
 The standard command gives 413 passed, 3 skipped (the 3 need `qiskit_ibm_runtime`, which is not installed here). `test_ui_layout.py`, `test_report.py` and `mind/human_tests` add 89 passed. The README had claimed 712, which matched nothing. New files: `mind/tests/test_paper_baseline.py`, `test_cross_check_verdicts.py`, `test_phase1_honesty.py`, `test_readme_numbers.py`, `test_extended_models.py`, `test_synthetic_recovery.py`, `test_time_aware.py`, `test_lead_sweep.py`, and `test_ui_layout.py`.
