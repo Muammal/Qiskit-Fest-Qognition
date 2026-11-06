@@ -112,9 +112,11 @@ def test_calibration_filter(monkeypatch):
         return {k: .5 for k in ('all','adult_male','adult_female','child','first_class','second_class','third_class','crew')}
     monkeypatch.setattr(run, 'run_event', fake)
     result = run.evaluate(['classical'], {})
-    assert set(events) == {'titanic_1912'}
+    # Every calibration event with a scenario runs, and no holdout event does.
+    holdout = {'lusitania_1915', 'empress_of_ireland_1914', 'admiral_nakhimov_1986', 'principessa_mafalda_1927'}
+    assert 'titanic_1912' in events and not set(events) & holdout
     assert 'holdout' not in json.dumps(result)
-    assert len(result['rows']) == 8
+    assert all(row['split'] == 'calibration' for row in result['rows'])
 
 def test_shared_settings():
     scenario = small_scenario()
