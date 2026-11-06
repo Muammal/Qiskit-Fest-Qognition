@@ -66,7 +66,11 @@ class ShipAgent(SurvivalAgent):
         self.inventory["lifebelt"] = 0
         self.status = "aboard"  # aboard, boat, water
         self.boat_id = None
+<<<<<<< Updated upstream
         self.neutral_inputs = False  # True removes the nudges below; see TitanicSimulation's inputs setting
+=======
+        self.neutral_inputs = True  # False reproduces the first version's nudges; see TitanicSimulation
+>>>>>>> Stashed changes
         self.knows_danger = False
         self.story_event = "none"
         self.last_action = "rest"
@@ -136,6 +140,7 @@ class ShipAgent(SurvivalAgent):
             self.injury_cooldown = max(0, self.injury_cooldown - 1)
             self.injured = self.injury_cooldown > 0
         indoors = world.get_tile(*self.pos) == 4
+<<<<<<< Updated upstream
         if action == "hide" and self.neutral_inputs:
             if self.knows_danger:  # same rule as agent.py: with no warning, nobody knows to run
                 self.walk_to_boat(world, fields, crowding)
@@ -146,6 +151,16 @@ class ShipAgent(SurvivalAgent):
                 self.stress = max(0, self.stress - .02)
             else:
                 self.needs["energy"] = min(1, self.needs["energy"] + .02)
+=======
+        if action == "hide":
+            if self.neutral_inputs:
+                if self.knows_danger:  # same rule as agent.py: with no warning, nobody knows to run
+                    self.walk_to_boat(world, fields, crowding)
+            else:
+                self.walk_to_boat(world, fields, crowding)
+                self.needs["safety"] = min(1, self.needs["safety"] + .05)
+                self.stress = max(0, self.stress - .02)
+>>>>>>> Stashed changes
         elif action == "forage":
             if not self.inventory["lifebelt"]:
                 if indoors:

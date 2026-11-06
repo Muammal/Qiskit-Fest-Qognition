@@ -30,6 +30,7 @@ EVENT_NAMES = {
     "steward_warning": "gas_plume", "crowd_moving": "gas_plume", "orders_to_crew": "gas_plume",
     "distress_rocket": "ash_fall", "officers_told_ship_will_sink": "eruption", "water_at_feet": "eruption",
 }
+<<<<<<< Updated upstream
 EVENT_MAPPINGS = {
     "default": {},  # Rockets trigger projective collapse (ash_fall), steward warning is ambiguous (gas_plume)
     "ambiguous_rockets": {"distress_rocket": "gas_plume"},  # Rockets treated as ambiguous rotation (tests quantum coherence)
@@ -37,6 +38,15 @@ EVENT_MAPPINGS = {
 }
 EVENT_MAPPINGS["only_water_certain"] = {"distress_rocket": "gas_plume", "officers_told_ship_will_sink": "gas_plume"}
 DEFAULT_MAPPING = "default"
+=======
+# The first version's translation is A. B and C read more events as uncertain. Nothing in the mind changes.
+EVENT_MAPPINGS = {
+    "A": EVENT_NAMES,
+    "B": {**EVENT_NAMES, "distress_rocket": "gas_plume"},  # rockets as a warning, not certainty
+    "C": {**EVENT_NAMES, "distress_rocket": "gas_plume", "officers_told_ship_will_sink": "gas_plume"},  # only water is certain
+}
+DEFAULT_MAPPING = "A"  # provisional; the user chooses after the side-by-side test
+>>>>>>> Stashed changes
 STORY_TEXT = {
     "none": "Nothing new", "collision": "A shudder runs through the ship",
     "ship_tilting": "The deck is visibly tilting", "steward_warning": "A steward says to put on lifebelts",
@@ -60,6 +70,7 @@ HISTORICAL = dict(aboard=2208, saved=712, source="Wikipedia casualty table citin
 
 class TitanicSimulation:
     def __init__(self, seed=42, mind_type='quantum', noise_source='stub', decide_fn=None,
+<<<<<<< Updated upstream
                  scenario='titanic', scripted_events=None, event_mapping=DEFAULT_MAPPING,
                  warned_only_hide=False, crew_seats=3, allow_all_sides=False,
                  inputs='original', crew_told=True, boarding_rule=True):
@@ -74,6 +85,17 @@ class TitanicSimulation:
         # 'neutral' removes the safety cap by deck and the nudge after hide, and hide then needs a warning.
         self.inputs, self.crew_told = inputs, crew_told
         self.neutral_inputs = inputs == 'neutral'
+=======
+                 scenario='titanic', scripted_events=None, inputs='neutral', event_mapping=DEFAULT_MAPPING,
+                 crew_told=True, boarding_rule=True):
+        self.seed, self.mind_type = seed, mind_type.lower()
+        self.noise_source, self.scenario = noise_source, scenario
+        self.scripted_events = dict(scripted_events) if scripted_events else {}
+        # 'original' reproduces the first version: safety capped by deck, a nudge after hide, and hide without a warning.
+        self.neutral_inputs = inputs == 'neutral'
+        self.inputs, self.event_mapping, self.crew_told = inputs, event_mapping, crew_told
+        self.event_names = EVENT_MAPPINGS[event_mapping]
+>>>>>>> Stashed changes
         self.horizon = HORIZON
         self.world = ShipWorld(seed=seed)
         self.initial_world = copy.deepcopy(self.world.export_dict())
@@ -82,8 +104,12 @@ class TitanicSimulation:
         self.event_gen = EventGenerator(seed, horizon=HORIZON)
         self.event_gen.weather = ['calm'] * HORIZON  # Wikipedia: clear, flat calm night
         self.event_gen.world_events = list(self.flood.world_events)
+<<<<<<< Updated upstream
         self.boats = LifeboatSchedule(self.world, crew_seats=crew_seats, allow_all_sides=allow_all_sides,
                                       boarding_rule=boarding_rule)
+=======
+        self.boats = LifeboatSchedule(self.world, boarding_rule=boarding_rule)
+>>>>>>> Stashed changes
         self.people = build_crowd(self.world, seed)
         for person in self.people:
             person.neutral_inputs = self.neutral_inputs

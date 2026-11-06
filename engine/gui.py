@@ -1002,7 +1002,7 @@ class IslandVisualizerApp:
         self.btn_modal_replay = UIButton((mx - 340, my + 175, 150, 46), "Replay Run", self.font_sub, bg_color=(36, 138, 198), active_color=COLOR_CYAN, icon="replay")
         self.btn_modal_switch = UIButton((mx - 175, my + 175, 175, 46), "Compare Mind", self.font_sub, bg_color=(138, 56, 186), active_color=COLOR_PURPLE, icon="compare")
         self.btn_modal_scenario = UIButton((mx + 15, my + 175, 175, 46), "Change Scenario", self.font_sub, bg_color=(214, 96, 28), active_color=COLOR_ORANGE, icon="menu")
-        self.btn_modal_scenes = UIButton((mx - 140, my + 118, 280, 46), "Replay Scenes", self.font_sub, bg_color=(36, 120, 96))
+        self.btn_modal_scenes = UIButton((mx - 140, my + 118, 280, 46), "Watch the Run Summary", self.font_sub, bg_color=(36, 120, 96))
         self.btn_modal_home = UIButton((mx + 205, my + 175, 135, 46), "Settings", self.font_sub, bg_color=(112, 74, 38), active_color=COLOR_CARD_HOVER, icon="home")
         self.btn_modal_close = UIButton((mx + 390, my - 225, 34, 34), "X", self.font_title, bg_color=COLOR_PANEL_BG)
 
@@ -1011,6 +1011,7 @@ class IslandVisualizerApp:
 
     def _init_simulation(self):
         self._finish_worker()
+        self._summary_for = None
         if self.scenario in ("titanic", "pompeii", "waterloo"):
             self.max_steps = self._horizon_for(self.scenario)  # each always runs its whole timeline
             if self.app_state == "home" and getattr(self, "_home_built_for", None) != self.scenario:
@@ -1141,7 +1142,7 @@ class IslandVisualizerApp:
         self.weather.add_action_particles(self.char_screen_x, self.char_screen_y, record["action"])
         self.bubble_text = record["action_label"]
         self.bubble_timer = 2.8
-        self.cutscene.record(self.engine.scenes)
+        self.cutscene.record(self.engine.scenes, self.engine)
         if self.step_idx >= self.max_steps:
             self.show_debrief_modal = True
 
@@ -1178,7 +1179,7 @@ class IslandVisualizerApp:
         self._sync_titanic_focus()
         self.bubble_text = record["action_label"]
         self.bubble_timer = 2.8
-        self.cutscene.record(engine.scenes)
+        self.cutscene.record(engine.scenes, engine)
         if self.step_idx >= self.max_steps:
             self.show_debrief_modal = True
 
@@ -1222,7 +1223,7 @@ class IslandVisualizerApp:
                 elif event.key == pygame.K_LEFT:
                     self.cutscene.replay_previous()
                 elif event.key == pygame.K_SPACE:
-                    self.cutscene.replay_paused = not self.cutscene.replay_paused
+                    self.cutscene.toggle_replay_pause()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.cutscene.replay_next()
             return True
@@ -1281,7 +1282,7 @@ class IslandVisualizerApp:
                 self._follow({"pompeii": next_role_citizen, "waterloo": next_role_patron}.get(self.scenario, next_role_person)(self.engine))
             elif event.key == pygame.K_c and self.app_state == "sim" and self.scenario in ("titanic", "pompeii", "waterloo"):
                 if self.show_debrief_modal:
-                    self.cutscene.start_replay()
+                    self.cutscene.start_replay(self.engine, self.mind_type)
             elif event.key == pygame.K_m and self.app_state == "sim" and self.scenario == "pompeii":
                 self.city_view.toggle()
             elif event.key == pygame.K_p and self.app_state == "sim" and self.scenario in CROWD_SCENARIOS:
@@ -1380,6 +1381,7 @@ class IslandVisualizerApp:
             sim_dt = dt * self.speed_multiplier
 
             # Auto-stepping during unpaused simulation (scaled by Slow-Mo / Fast-Forward multiplier)
+            self._autoplay_summary()
             self.cutscene.update(dt if self.cutscene.replaying else sim_dt)
             if self.scenario in CROWD_SCENARIOS:
                 self._pompeii_poll_step()
@@ -1489,8 +1491,6 @@ class IslandVisualizerApp:
                             return True
                 return ((self._scenes_available() and self.btn_modal_scenes.check_hover(pos)) or
                         self.btn_modal_replay.check_hover(pos) or self.btn_modal_switch.check_hover(pos) or
-                        self.btn_modal_scenario.check_hover(pos) or self.btn_modal_home.check_hover(pos) or
-                        self.btn_modal_close.check_hover(pos))
                         self.btn_modal_scenario.check_hover(pos) or self.btn_modal_home.check_hover(pos) or
                         self.btn_modal_close.check_hover(pos))
             if self.show_history_overlay:
@@ -1685,20 +1685,26 @@ class IslandVisualizerApp:
             self._init_simulation()
             self.app_state = "sim"
 
+    def _autoplay_summary(self):
+        """The summary film starts by itself once, when a run reaches its results."""
+        if self.app_state == "sim" and self.show_debrief_modal and self._summary_for is not self.engine and self._scenes_available():
+            self._summary_for = self.engine
+            self.cutscene.start_replay(self.engine, self.mind_type)
+
     def _scenes_available(self):
         return self.scenario in ("titanic", "pompeii", "waterloo") and bool(self.cutscene.library)
 
     def _draw_scenes_button(self, mouse_pos):
         """The end screen's way back into the run's scenes."""
         if self._scenes_available():
-            self.btn_modal_scenes.text = f"Replay Scenes ({len(self.cutscene.library)})  [C]"
+            self.btn_modal_scenes.text = "Watch the Run Summary  [C]"
             self.btn_modal_scenes.check_hover(mouse_pos)
             self.btn_modal_scenes.draw(self.canvas)
 
     def _handle_sim_click(self, pos: Tuple[int, int]):
         if self.show_debrief_modal:
             if self._scenes_available() and self.btn_modal_scenes.check_hover(pos):
-                self.cutscene.start_replay()
+                self.cutscene.start_replay(self.engine, self.mind_type)
             elif self.btn_modal_replay.check_hover(pos):
                 self._init_simulation()
                 self.show_debrief_modal = False

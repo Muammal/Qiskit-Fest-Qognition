@@ -257,7 +257,7 @@ class CityView:
         canvas.blit(self.font_sub.render(text, True, (246, 240, 226)), (14, 56))
         mapping = engine.event_mapping
         line = (f"Following {engine.agent.label}.  Click a person to follow them.  M region map, P panels, "
-                f"Scenes replay at the end.  Event mapping {mapping}.")
+                f"Summary film at the end.  Event mapping {mapping}.")
         canvas.blit(self.font.render(line, True, (214, 204, 186)), (14, 78))
 
     def _draw_legend(self, canvas, engine):

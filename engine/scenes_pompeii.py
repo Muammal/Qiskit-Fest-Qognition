@@ -217,7 +217,7 @@ def scene_person_closeup(surface, f, scene):
     for i, side in enumerate((-1, 1)):
         pygame.draw.rect(surface, PLASTER if i else STONE, (800 + side * 760 * zoom - 200, 120, 400, 700))
     color = ROLE_COLORS.get(scene.get("role"), ROLE_COLORS["resident"])
-    center_x, center_y = 620, 470
+    center_x, center_y = 790 if scene.get("reel") else 620, 470
     head = int(92 * zoom)
     shoulders = int(220 * zoom)
     pygame.draw.ellipse(surface, color, (center_x - shoulders, center_y + head // 2, shoulders * 2, 700))
@@ -228,11 +228,11 @@ def scene_person_closeup(surface, f, scene):
     pygame.draw.circle(surface, DARK, (center_x + eye, center_y - head // 2), max(3, int(8 * zoom)))
     # A level mouth: the model has no emotions, so the face shows none.
     pygame.draw.line(surface, DARK, (center_x - eye // 2, center_y - head // 12), (center_x + eye // 2, center_y - head // 12), 3)
-    box = pygame.Surface((560, 280), pygame.SRCALPHA)
-    box.fill((14, 12, 12, 200))
-    surface.blit(box, (960, 250))
-    font = scene.get("font")
+    font = None if scene.get("reel") else scene.get("font")  # the summary film sets this text itself
     if font:
+        box = pygame.Surface((560, 280), pygame.SRCALPHA)
+        box.fill((14, 12, 12, 200))
+        surface.blit(box, (960, 250))
         for i, line in enumerate(_wrap(scene.get("thought", ""), font, 520)):
             surface.blit(font.render(line, True, (246, 238, 220)), (980, 270 + i * 34))
         tag = font.render("Illustration, written from model values", True, (190, 180, 160))
@@ -284,7 +284,81 @@ SCENES = {
 class PompeiiCutscenes(CutscenePlayer):
     """The shared player, with Pompeii's scenes and clock."""
 
+    def render_scene(self, surface, scene, f):
+        scene.setdefault("font", self.font_title)
+        SCENES[scene["kind"]](surface, f, scene)
+
+    @staticmethod
+    def reel_key(scene):
+        return "bay_flow" if scene["kind"] == "bay_wide" and scene.get("flow") else scene["kind"]
+
+    @staticmethod
+    def reel_clock(t):
+        minutes = START_HOUR * 60 + t * STEP_MINUTES
+        return f"DAY {1 + minutes // 1440} {minutes // 60 % 24:02d}:{minutes % 60:02d}"
+
+    @staticmethod
+    def reel_active(person):
+        return person.is_alive and person.status in ("city", "road")
+
+    @staticmethod
+    def reel_rows(engine):
+        counts = engine.counts()
+        return [("In town", counts["in_town"]), ("On the roads", counts["on_roads"]), ("Got away", counts["escaped"]), ("Dead", counts["dead"])]
+
+    @staticmethod
+    def reel_title(engine, mind):
+        return dict(place="Pompeii / AD 79", heading="THE LAST DAY.", ribbon=f"POMPEII  •  {len(engine.people):,} PEOPLE  •  ONE MIND",
+                    sub=f"A whole town on one {mind} mind, under cue translation {engine.event_mapping}. A demonstration of how far deaths move with what you assume, not a reconstruction.")
+
+    @staticmethod
+    def reel_chapter(engine, key, scene):
+        causes = engine.death_breakdown()["causes"]
+        numbers = "docs/results/SCENARIO_NUMBERS.md, seed 42"
+        unsure = ("Why an unsure person waits.", "At maximum uncertainty P(protect) dips to 0.36, below 0.69 if safe and 0.59 if in danger, and below the 0.64 average.", "Blog: Why an unsure evacuee waits")
+        return {
+            "column_street": ("The column", "THE MOUNTAIN OPENS.", f"{scene['caption']}.",
+                              ("One translation decides the toll.", "Deaths with the quantum mind: 0 under A, B and D, and 1,095 under C, where the mixture control loses 1.", numbers)),
+            "bay_wide": ("From the bay", "IT FILLS THE SKY.", f"{scene['caption']}.", unsure),
+            "bay_flow": ("From the bay", "IT COMES DOWN.", f"{scene['caption']}.",
+                         ("Order matters to this mind.", "Hearing two warnings in the opposite order changes P(protect) by 0.328. Without coherence it changes by 0.043.", numbers)),
+            "crowd_aerial": ("The crowds", "THE TOWN STARTS TO RUN.", f"{scene['caption']}.",
+                             ("Does hesitation cost survival? No.", "The pre-registered test failed: +2.3 points at no warning, not significant at other warning times.", "Blog: Does hesitation cost lives when warning is short?")),
+            "roof_cutaway": ("The roofs", "THE ROOFS GIVE WAY.", f"Under the weight of pumice. {causes.get('roof_collapse', 0):,} deaths by the end of this run.",
+                             ("The model misses how people died.", "38% of known victims died in the pumice phase. The model loses far fewer there. About 1,150 bodies were found, which is not a death toll.", "Luongo et al. 2003, in docs/POMPEII_SOURCES.md")),
+            "flow_arrival": ("The flows", "THE BURNING CLOUD ARRIVES.", f"{causes.get('pyroclastic_flow', 0):,} deaths from flows by the end of this run.",
+                             ("One translation decides the toll.", "Under C, quantum loses 1,095 and the mixture control 1. The other translations lose none.", numbers)),
+            "person_first": ("One person", "ONE PERSON LEARNS.", f"{scene['caption']}. {scene.get('thought', '')}", unsure),
+            "person_last": ("One person", "ONE ENDING.", f"{scene['caption']}. {scene.get('thought', '')}",
+                            ("Does quantum predict human data better? No.", "Error 0.176, against 0.171 for the classical average and 0.071 for Markov held out.", "Blog: Does the quantum model predict human data?")),
+        }.get(key, ("The eruption", scene["caption"].upper(), "", None))
+
+    @staticmethod
+    def reel_stats(engine):
+        counts, causes = engine.counts(), engine.death_breakdown()["causes"]
+        return [dict(label="Got away", value=counts["escaped"], detail=f"of {len(engine.people):,}, by the end of this run."),
+                dict(label="Dead", value=counts["dead"], danger=True, detail="About 1,150 bodies were found on site, which is not a death toll."),
+                dict(label="Under roofs", value=causes.get("roof_collapse", 0), danger=True, detail="38% of known victims died in the pumice phase."),
+                dict(label="In flows", value=causes.get("pyroclastic_flow", 0), danger=True, detail="Deaths from pyroclastic flows in this run.")]
+
+    @staticmethod
+    def reel_table(engine):
+        return dict(title="Pompeii, deaths, of 11,500", columns=("Cue translation", "Quantum", "Mixture", "Classical"),
+                    rows=(("A", 0, 0, 0), ("B", 0, 0, 0), ("C", "1,095", 1, 0), ("D", 0, 0, 0)),
+                    findings=(("The gap appears under one translation only.", "That shows how much the assumption matters. It isn't evidence for quantum cognition."),
+                              ("Does quantum predict human data better? No.", "Error 0.176, against 0.171 for the classical average and 0.071 for Markov held out.")),
+                    source="docs/results/SCENARIO_NUMBERS.md, one seed (42). Blog: Does the quantum model predict human data?")
+
+    @staticmethod
+    def reel_closing(engine):
+        headline = ("The default settings overstate escape. That is a limit of the model." if engine.event_mapping == "B"
+                    else "A different translation of events gives a very different toll.")
+        return dict(headline=headline, limits="Results swing widely with how events are translated and how fast people walk on pumice. Not a finding about AD 79, and not a prediction.")
+
     def draw(self, canvas):
+        if self.replaying:
+            self.reel.draw(canvas)
+            return
         if self.current is None:
             return
         scene = self.current
@@ -300,6 +374,6 @@ class PompeiiCutscenes(CutscenePlayer):
         canvas.blit(clock, (28, 30))
         title = self.font_title.render(scene["caption"], True, (250, 240, 216))
         canvas.blit(title, ((WIDTH - title.get_width()) // 2, HEIGHT - BAR + 16))
-        hint = self.font_small.render(self.hint_text(), True, (150, 142, 130))
+        hint = self.font_small.render("Click or press any key to skip", True, (150, 142, 130))
         canvas.blit(hint, ((WIDTH - hint.get_width()) // 2, HEIGHT - BAR + 46))
         pygame.draw.rect(canvas, (226, 170, 90), (0, HEIGHT - 4, int(WIDTH * min(1., self.elapsed / DURATION)), 4))

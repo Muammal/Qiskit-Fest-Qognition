@@ -196,7 +196,7 @@ class ShipView:
         state = {"boat": "in a lifeboat", "water": "in the water"}.get(focus.status, "aboard")
         if not focus.is_alive:
             state = f"dead ({focus.cause_of_death})"
-        line = f"Following {focus.label}: {state}.  Click a person to follow them, F for the next role.  Scenes replay at the end."
+        line = f"Following {focus.label}: {state}.  Click a person to follow them, F for the next role.  Summary film at the end."
         canvas.blit(self.font.render(line, True, (196, 208, 232)), (14, 78))
 
     def _draw_legend(self, canvas, engine):

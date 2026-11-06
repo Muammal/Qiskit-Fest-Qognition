@@ -35,6 +35,9 @@ def _gas(surface, x, y, spread, alpha, seed=3):
 
 
 def _tag(surface, scene, text, x=28, y=BAR + 14):
+    if scene.get("reel"):  # the summary film sets this line itself
+        scene["note"] = text
+        return
     font = scene.get("small")
     if font:
         label = font.render(text, True, (250, 244, 224))
@@ -185,10 +188,10 @@ def scene_person_closeup(surface, f, scene):
     """Zooms in on one person with what the model says they noticed."""
     _gradient(surface, SKY_TOP, SKY_LOW, 0, 620)
     pygame.draw.rect(surface, CONCRETE, (0, 620, WIDTH, HEIGHT - 620))
-    pygame.draw.rect(surface, BRICK, (0, 300, 700, 320))
+    pygame.draw.rect(surface, BRICK, (0, 300, WIDTH if scene.get("reel") else 700, 320))
     zoom = .7 + .55 * min(1., f * 2)
     color = ROLE_COLORS.get(scene.get("role"), ROLE_COLORS["adult"])
-    center_x, center_y = 560, 470
+    center_x, center_y = 790 if scene.get("reel") else 560, 470
     head, shoulders = int(92 * zoom), int(220 * zoom)
     pygame.draw.ellipse(surface, color, (center_x - shoulders, center_y + head // 2, shoulders * 2, 700))
     pygame.draw.circle(surface, SKIN, (center_x, center_y - head // 3), head)
@@ -198,11 +201,11 @@ def scene_person_closeup(surface, f, scene):
     pygame.draw.circle(surface, DARK, (center_x + eye, center_y - head // 2), max(3, int(8 * zoom)))
     # A level mouth: the model has no emotions, so the face shows none.
     pygame.draw.line(surface, DARK, (center_x - eye // 2, center_y - head // 12), (center_x + eye // 2, center_y - head // 12), 3)
-    box = pygame.Surface((600, 300), pygame.SRCALPHA)
-    box.fill((14, 12, 12, 205))
-    surface.blit(box, (920, 240))
-    font = scene.get("font")
+    font = None if scene.get("reel") else scene.get("font")  # the summary film sets this text itself
     if font:
+        box = pygame.Surface((600, 300), pygame.SRCALPHA)
+        box.fill((14, 12, 12, 205))
+        surface.blit(box, (920, 240))
         for i, line in enumerate(_wrap(scene.get("thought", ""), font, 560)):
             surface.blit(font.render(line, True, (246, 238, 220)), (940, 260 + i * 34))
         surface.blit(font.render("Illustration, written from model values", True, (190, 180, 160)), (940, 496))
@@ -217,7 +220,81 @@ SCENES = {
 class WaterlooCutscenes(CutscenePlayer):
     """The shared player, with Waterloo's scenes and clock."""
 
+    def render_scene(self, surface, scene, f):
+        scene.setdefault("font", self.font_title)
+        scene.setdefault("small", self.font_small)
+        SCENES[scene["kind"]](surface, f, scene)
+
+    @staticmethod
+    def reel_clock(t):
+        seconds = START_HOUR * 3600 + t * STEP_SECONDS
+        return f"{seconds // 3600:02d}:{seconds // 60 % 60:02d}:{seconds % 60:02d}"
+
+    @staticmethod
+    def reel_active(person):
+        return person.status == "site"
+
+    @staticmethod
+    def reel_rows(engine):
+        from engine.chlorine import exposure_level
+        counts = engine.counts()
+        above = sum(exposure_level(p.exposure) >= 1 for p in engine.people)
+        return [("On site", counts["on_site"]), ("Know", counts["knows"]), ("Off site", counts["off_site"]), ("Above AEGL-1", above)]
+
+    @staticmethod
+    def reel_title(engine, mind):
+        return dict(place="Waterloo, Ontario / hypothetical", heading="A CHLORINE LEAK.", ribbon=f"WATERLOO  •  {len(engine.people)} PEOPLE  •  ONE MIND",
+                    sub=f"{len(engine.people)} people on one {mind} mind at Moses Springer Community Centre. A hypothetical at a real site: almost nothing about the real leak of 30 July 2012 is known.")
+
+    @staticmethod
+    def reel_chapter(engine, key, scene):
+        timing, counts = engine.timing(), engine.counts()
+        half = timing["half_off_site"]
+        total = len(engine.people)
+        numbers = "docs/results/SCENARIO_NUMBERS.md, seed 42"
+        unsure = ("Why an unsure person waits.", "At maximum uncertainty P(protect) dips to 0.36, below 0.69 if safe and 0.59 if in danger, and below the 0.64 average.", "Blog: Why an unsure evacuee waits")
+        everyone = counts["off_site"] == total
+        return {
+            "leak_start": ("The leak", "IT STARTS QUIETLY.", f"{scene['caption']}. Below 0.31 ppm nobody can smell it.", unsure),
+            "alarm_cutaway": ("The warning", "SOMEONE NOTICES.", f"{scene['caption']}.",
+                              ("Order matters to this mind.", "Hearing two warnings in the opposite order changes P(protect) by 0.328. Without coherence it changes by 0.043.", numbers)),
+            "alarm_pool": ("The alarm", "THE ALARM SOUNDS.", f"{scene['caption']}. Whether the real centre had one in 2012 is unknown.",
+                           ("With the staff alarm, one person reached AEGL-2.", "Quantum mind under translation A, against none for the controls. Very small numbers, on one seed.", numbers)),
+            "pool_exit": ("Out of the pool", "THEY LEAVE THE WATER.", f"{scene['caption']}.",
+                          ("Is the delay from interference? Yes, on this batch.", "On the volcano batch, forcing interference to zero moves the delay from +0.55 steps to -0.16.", "Blog: What changed, and what came out")),
+            "site_aerial": ("From above", "EVERYONE HEADS OUT." if everyone else "NOT EVERYONE LEAVES.",
+                            f"{counts['off_site']} of {total} left the site in this run" + (f", half within {half} seconds of the leak." if half is not None else "."),
+                            ("Does hesitation cost survival? No.", "The pre-registered test failed: +2.3 points at no warning, not significant at other warning times.", "Blog: Does hesitation cost lives when warning is short?")),
+            "person_first": ("One person", "ONE PERSON LEARNS.", f"{scene['caption']}. {scene.get('thought', '')}", unsure),
+            "person_last": ("One person", "ONE PERSON GETS OUT.", f"{scene['caption']}. {scene.get('thought', '')}",
+                            ("Does quantum predict human data better? No.", "Error 0.176, against 0.171 for the classical average and 0.071 for Markov held out.", "Blog: Does the quantum model predict human data?")),
+        }.get(key, ("The leak", scene["caption"].upper(), "", None))
+
+    @staticmethod
+    def reel_stats(engine):
+        counts, timing, levels = engine.counts(), engine.timing(), list(engine.exposure_summary().values())
+        return [dict(label="Off the site", value=counts["off_site"], detail=f"of {len(engine.people)} in this run."),
+                dict(label="Half out by", value=timing["half_off_site"], suffix=" s", detail="Seconds after the leak started."),
+                dict(label="Above AEGL-1", value=sum(levels[1:]), detail="EPA planning level for discomfort."),
+                dict(label="Above AEGL-2", value=sum(levels[2:]), danger=True, detail="Serious effects level. Not a prediction of injury. No deaths are modelled.")]
+
+    @staticmethod
+    def reel_table(engine):
+        return dict(title="Reached AEGL-2 or worse, of 100", columns=("Cue translation", "Quantum", "Mixture", "Classical"),
+                    rows=(("A, with alarm", 1, 0, 0), ("B, with alarm", 0, 0, 0), ("C, with alarm", 0, 0, 0), ("Any, no alarm", 0, 0, 0)),
+                    findings=(("Too small to read much into.", "One person, on one seed, is not a measured effect."),
+                              ("Does quantum predict human data better? No.", "Error 0.176, against 0.171 for the classical average and 0.071 for Markov held out.")),
+                    source="docs/results/SCENARIO_NUMBERS.md, one seed (42). Blog: Does the quantum model predict human data?")
+
+    @staticmethod
+    def reel_closing(engine):
+        return dict(headline="The real head-count, leak and injuries are unknown.",
+                    limits="These numbers come from stated assumptions. Exposure levels are planning limits, and nobody is scripted to be hurt. Nothing here describes what happened that day.")
+
     def draw(self, canvas):
+        if self.replaying:
+            self.reel.draw(canvas)
+            return
         if self.current is None:
             return
         scene = self.current
@@ -234,6 +311,6 @@ class WaterlooCutscenes(CutscenePlayer):
         canvas.blit(clock, (28, HEIGHT - BAR + 30))
         title = self.font_title.render(scene["caption"], True, (250, 240, 216))
         canvas.blit(title, ((WIDTH - title.get_width()) // 2, HEIGHT - BAR + 16))
-        hint = self.font_small.render(self.hint_text(), True, (150, 142, 130))
+        hint = self.font_small.render("Click or press any key to skip", True, (150, 142, 130))
         canvas.blit(hint, ((WIDTH - hint.get_width()) // 2, HEIGHT - BAR + 46))
         pygame.draw.rect(canvas, (226, 170, 90), (0, HEIGHT - 4, int(WIDTH * min(1., self.elapsed / DURATION)), 4))

@@ -482,32 +482,64 @@ def test_scenes_are_only_recorded_during_a_run(scenario, steps):
     assert app.cutscene.library and not app.cutscene.queue
 
 
-def test_replay_tool_runs_every_scene_in_order_and_closes():
+def test_summary_film_is_title_one_shot_per_moment_then_outcome():
     pygame = pytest.importorskip("pygame")
     app = _finished_app()
-    _advance(app, 60)
-    app.show_debrief_modal = True
+    while not app.show_debrief_modal:
+        _advance(app, 1)
     app.draw((5, 5))
-    library = app.cutscene.library
-    assert app._scenes_available()
     app._handle_sim_click(app.btn_modal_scenes.rect.center)
-    assert app.cutscene.replaying and app.cutscene.current is library[0]
+    player = app.cutscene
+    assert player.replaying
+    kinds = [shot["kind"] for shot in player.reel.shots]
+    assert kinds[0] == "title" and kinds[-1] == "end" and kinds.count("title") == kinds.count("end") == 1
+    scenes = [shot["scene"] for shot in player.reel.shots if shot["kind"] == "scene"]
+    assert [s["t"] for s in scenes] == sorted(s["t"] for s in scenes)
+    assert len({player.reel_key(s) for s in scenes if s["kind"] != "person_closeup"}) == sum(s["kind"] != "person_closeup" for s in scenes)
+    assert player.reel.total < 65
     app.draw((5, 5))
     _press(app, pygame.K_RIGHT)
-    assert app.cutscene.current is library[1]
+    assert player.reel.index == 1
+    app.draw((5, 5))
     _press(app, pygame.K_LEFT)
-    assert app.cutscene.current is library[0]
+    assert player.reel.index == 0
     _press(app, pygame.K_SPACE)
-    app.cutscene.update(DURATION * 2)
-    assert app.cutscene.current is library[0]
+    before = player.reel.time
+    player.update(5.)
+    assert player.reel.time == before
     _press(app, pygame.K_SPACE)
-    for _ in library:
-        app.cutscene.update(DURATION)
-    assert not app.cutscene.replaying and not app.cutscene.active and app.show_debrief_modal
+    for _ in player.reel.shots:
+        player.update(10.)
+    assert not player.replaying and not player.active and app.show_debrief_modal
     _press(app, pygame.K_c)
-    assert app.cutscene.replaying
+    assert player.replaying
     _press(app, pygame.K_ESCAPE)
-    assert not app.cutscene.replaying
+    assert not player.replaying
+
+
+@pytest.mark.parametrize("scenario,steps", [("titanic", 48), ("pompeii", 60)])
+def test_every_shot_of_the_film_draws_in_other_scenarios(scenario, steps):
+    app = _finished_app(scenario)
+    if scenario == "pompeii":
+        app.pompeii_settings["population"] = 1_500
+        app._init_simulation()
+    _advance(app, steps)
+    app.show_debrief_modal = True
+    app.cutscene.start_replay(app.engine, app.mind_type)
+    reel = app.cutscene.reel
+    for index in range(len(reel.shots)):
+        reel.go(index)
+        reel.time = reel.shots[index]["seconds"] * .5
+        app.draw((5, 5))
+
+
+def test_film_numbers_come_from_the_finished_run():
+    app = _finished_app()
+    while not app.show_debrief_modal:
+        _advance(app, 1)
+    stats = app.cutscene.reel_stats(app.engine)
+    assert stats[0]["value"] == app.engine.counts()["off_site"]
+    assert stats[1]["value"] == app.engine.timing()["half_off_site"]
 
 
 def test_a_new_run_starts_with_an_empty_library():
@@ -516,3 +548,44 @@ def test_a_new_run_starts_with_an_empty_library():
     assert app.cutscene.library
     app._init_simulation()
     assert not app.cutscene.library and not app._scenes_available()
+
+
+def test_summary_film_plays_by_itself_once_when_a_run_ends():
+    app = _finished_app()
+    while not app.show_debrief_modal:
+        _advance(app, 1)
+    assert not app.cutscene.replaying
+    app._autoplay_summary()
+    assert app.cutscene.replaying
+    app.cutscene.stop_replay()
+    app._autoplay_summary()
+    assert not app.cutscene.replaying and app.show_debrief_modal  # closing it returns to the results for good
+
+
+def test_summary_film_does_not_play_during_a_run():
+    app = _finished_app()
+    _advance(app, 20)
+    app._autoplay_summary()
+    assert not app.cutscene.replaying
+
+
+def test_every_shot_has_this_moment_s_numbers_and_a_named_source():
+    app = _finished_app()
+    while not app.show_debrief_modal:
+        _advance(app, 1)
+    app.cutscene.start_replay(app.engine, app.mind_type)
+    for shot in app.cutscene.reel.shots:
+        if shot["kind"] == "scene":
+            snapshot = shot["scene"]["snapshot"]
+            assert snapshot["rows"] and snapshot["actions"]
+            assert abs(sum(share for _, share in snapshot["actions"]) - 1) < 1e-6
+            assert shot["research"] and shot["research"][2]
+
+
+def test_a_snapshot_records_that_moment_not_the_end_of_the_run():
+    app = _finished_app()
+    while not app.show_debrief_modal:
+        _advance(app, 1)
+    first = app.cutscene.library[0]["snapshot"]
+    assert dict(first["rows"])["Off site"] == 0
+    assert app.engine.counts()["off_site"] == len(app.engine.people)

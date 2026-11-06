@@ -11,7 +11,11 @@ from collections import Counter
 from multiprocessing import Pool
 from statistics import mean
 
+<<<<<<< Updated upstream
 from engine.titanic import TitanicSimulation
+=======
+from engine.titanic import EVENT_MAPPINGS, TitanicSimulation
+>>>>>>> Stashed changes
 
 MINDS = ("quantum", "classical_mixture", "classical")
 GROUPS = ("first", "second", "third", "crew")
@@ -30,14 +34,22 @@ def one(job):
 
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     # early_pa_alarm is left out: it is a teammate's policy intervention, not a reading of the night's events.
     readings = ("default", "ambiguous_rockets", "only_water_certain")
     combos = [("original", "default", mi) for mi in MINDS] + [("neutral", m, mi) for m in readings for mi in MINDS]
+=======
+    combos = [("original", "A", mi) for mi in MINDS] + [("neutral", m, mi) for m in EVENT_MAPPINGS for mi in MINDS]
+>>>>>>> Stashed changes
     jobs = [(i, m, mi, seed) for i, m, mi in combos for seed in range(1, 11)]
     with Pool(6) as pool:
         rows = pool.map(one, jobs)
     json.dump(rows, open(sys.argv[1], "w"))
     for i, m, mi in combos:
         R = [r for r in rows if (r["inputs"], r["mapping"], r["mind"]) == (i, m, mi)]
+<<<<<<< Updated upstream
         print(f"{i:9s}{m:19s} {mi:18s} saved {round(mean(r['saved'] for r in R)):4d} ({min(r['saved'] for r in R)}-{max(r['saved'] for r in R)}) "
+=======
+        print(f"{i:9s}{m} {mi:18s} saved {round(mean(r['saved'] for r in R)):4d} ({min(r['saved'] for r in R)}-{max(r['saved'] for r in R)}) "
+>>>>>>> Stashed changes
               + " ".join(f"{g} {round(mean(r['by_class'].get(g, 0) for r in R)):3d}" for g in GROUPS))

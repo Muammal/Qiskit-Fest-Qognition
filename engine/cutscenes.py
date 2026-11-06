@@ -5,6 +5,7 @@ display only and never change a result. They are recorded silently during a run 
 watched afterward from the end screen, so nothing interrupts the simulation.
 """
 import math
+from collections import Counter
 
 import pygame
 
@@ -316,51 +317,139 @@ class CutscenePlayer:
     def __init__(self, font_title, font_small):
         self.font_title, self.font_small = font_title, font_small
         self.queue, self.current, self.elapsed = [], None, 0.
-        self.library, self.replaying, self.replay_paused, self.replay_index = [], False, False, 0
+        self.library, self.replaying, self.reel, self.run_actions = [], False, None, Counter()
         self.enabled = True
         self.last_crowd_scene = {}
         self._backdrop = None
 
     @property
     def active(self):
-        return self.current is not None
+        return self.current is not None or self.replaying
 
     def reset(self):
         self.queue, self.current, self.elapsed = [], None, 0.
-        self.library, self.replaying, self.replay_paused, self.replay_index = [], False, False, 0
+        self.library, self.replaying, self.reel, self.run_actions = [], False, None, Counter()
         self.last_crowd_scene = {}
 
-    def record(self, scenes):
-        """Keep this step's scenes for the replay at the end, with nothing shown now."""
-        self.library.extend(self._filtered(scenes))
+    def record(self, scenes, engine=None):
+        """Keep this step's scenes for the summary film, with what was true at that moment. Nothing is shown now."""
+        kept = self._filtered(scenes)
+        if engine is None:
+            self.library.extend(kept)
+            return
+        actions = Counter(p.last_action for p in engine.people if self.reel_active(p))
+        self.run_actions.update(actions)
+        if kept:
+            from engine.reel import action_shares
+            snapshot = dict(rows=self.reel_rows(engine), actions=action_shares(actions), belief=self._belief(engine))
+            for scene in kept:
+                scene["snapshot"] = snapshot
+        self.library.extend(kept)
 
-    def start_replay(self, index=0):
-        if self.library:
-            self.replaying, self.replay_paused = True, False
-            self._show(index)
+    @staticmethod
+    def _belief(engine):
+        log = engine.logs.get(engine.agent.id) if hasattr(engine, "logs") else engine.agent.log
+        quantum = (log[-1].get("quantum") or {}) if log else {}
+        if not quantum:
+            return None
+        return f"{engine.agent.label}: danger belief {quantum.get('p_danger', 0):.2f}, P(protect) {quantum.get('p_protect', 0):.2f}"
+
+    def start_replay(self, engine, mind):
+        """Build the one summary film from everything this run recorded."""
+        if not self.library:
+            return
+        from engine.reel import Reel, action_shares, choose_chapters
+        chapters = []
+        for key, scene in choose_chapters(self.library, self.reel_key):
+            scene = dict(scene, reel=True)
+            label, headline, sub, research = self.reel_chapter(engine, key, scene)
+            chapters.append(dict(scene=scene, label=label, headline=headline, sub=sub, research=research))
+        self.reel = Reel(self.render_scene, self.reel_title(engine, mind), chapters, self.reel_stats(engine), self.reel_closing(engine),
+                         self.reel_clock, table=self.reel_table(engine), shares=action_shares(self.run_actions))
+        self.replaying = True
 
     def stop_replay(self):
-        self.replaying, self.replay_paused, self.current = False, False, None
-
-    def _show(self, index):
-        self.replay_index = max(0, index)
-        if self.replay_index >= len(self.library):
-            self.stop_replay()
-        else:
-            self.current, self.elapsed = self.library[self.replay_index], 0.
+        self.replaying, self.reel = False, None
 
     def replay_next(self):
-        self._show(self.replay_index + 1)
+        self.reel.go(self.reel.index + 1)
+        if self.reel.finished:
+            self.stop_replay()
 
     def replay_previous(self):
-        self._show(self.replay_index - 1)
+        self.reel.go(self.reel.index - 1)
 
-    def hint_text(self):
-        if self.replaying:
-            state = "Paused   " if self.replay_paused else ""
-            return (f"{state}Scene {self.replay_index + 1} of {len(self.library)}     "
-                    "Left / Right change scene     Space pause     Esc close")
-        return "Click or press any key to skip"
+    def toggle_replay_pause(self):
+        self.reel.paused = not self.reel.paused
+
+    @staticmethod
+    def reel_key(scene):
+        return scene["kind"]
+
+    def render_scene(self, surface, scene, f):
+        if self._backdrop is None:
+            self._backdrop = _backdrop()
+        surface.blit(self._backdrop, (0, 0))
+        SCENES[scene["kind"]](surface, f, scene, self._backdrop)
+
+    @staticmethod
+    def reel_clock(t):
+        minutes = 23 * 60 + 30 + t * 5
+        return f"{minutes // 60 % 24:02d}:{minutes % 60:02d} SHIP'S TIME"
+
+    @staticmethod
+    def reel_active(person):
+        return person.is_alive and person.status == "aboard"
+
+    @staticmethod
+    def reel_rows(engine):
+        counts = engine.counts()
+        return [("Still aboard", counts["aboard"]), ("In boats", counts["boats"]), ("In the water", counts["water"]), ("Dead", counts["dead"])]
+
+    @staticmethod
+    def reel_title(engine, mind):
+        return dict(place="RMS Titanic / 14-15 April 1912", heading="THE LAST NIGHT.", ribbon=f"TITANIC  •  {len(engine.people):,} PEOPLE  •  ONE MIND",
+                    sub=f"Everyone aboard runs the same {mind} mind. Deck position sets who hears what, and when. A compressed model, not a reconstruction.")
+
+    @staticmethod
+    def reel_chapter(engine, key, scene):
+        counts = engine.counts()
+        in_water = sum(p.status == "water" for p in engine.people)
+        source = "docs/results/SCENARIO_NUMBERS.md, seed 42"
+        return {
+            "boat_lowered": ("The first boat", "THE FIRST BOAT LEAVES.", f"{scene['caption']}.",
+                             ("The reading of a warning moves the toll.", "Saved with the quantum mind: 578 by default, 297 if rockets read as ambiguous, 824 with an early alarm.", source)),
+            "jump_boat": ("The boats", "A SCRAMBLE FOR SEATS.", f"By the end of this run, {counts['boats']:,} people reached a lifeboat.",
+                          ("Quantum 578, mixture 536, classical 839.", "Saved in boats by each mind, default translation. The quantum mind did not beat the classical one.", source)),
+            "jump_sea": ("The water", "ONLY THE WATER LEFT.", f"In this run, {in_water:,} people entered -2 C water and never reached a boat.",
+                         ("Why an unsure person waits.", "At maximum uncertainty P(protect) dips to 0.36, below 0.69 if safe and 0.59 if in danger, and below the 0.64 average.", "Blog: Why an unsure evacuee waits")),
+            "float_off": ("Collapsibles", "THE LAST BOATS FLOAT OFF.", f"{scene['caption']}.",
+                          ("Does hesitation cost survival? No.", "The pre-registered test failed: +2.3 points at no warning, not significant at other warning times. Results are model output.", "Blog: Does hesitation cost lives when warning is short?")),
+        }.get(key, ("The night", scene["caption"].upper(), "", None))
+
+    @staticmethod
+    def reel_stats(engine):
+        counts = engine.counts()
+        from engine.lifeboats import TOTAL_SEATS
+        in_water = sum(p.status == "water" for p in engine.people)
+        return [dict(label="Saved", value=counts["boats"], detail=f"of {len(engine.people):,} aboard. History records about 712."),
+                dict(label="Dead", value=counts["dead"], danger=True, detail="Drowned, trapped below decks or lost to the cold."),
+                dict(label="Seats filled", value=100 * counts["boats"] / TOTAL_SEATS, suffix="%", detail=f"Of {TOTAL_SEATS:,} lifeboat seats."),
+                dict(label="In the water", value=in_water, detail="Entered -2 C water and never reached a boat.")]
+
+    @staticmethod
+    def reel_table(engine):
+        return dict(title="Titanic, saved in boats, of 2,208", columns=("Cue translation", "Quantum", "Mixture", "Classical"),
+                    rows=(("Default", 578, 536, 839), ("Ambiguous rockets", 297, 278, 839), ("Early PA alarm", 824, 796, 839)),
+                    findings=(("Quantum never beat classical here.", "Classical saves the same 839 under all three translations."),
+                              ("Does quantum predict human data better? No.", "Error 0.176, against 0.171 for the classical average and 0.071 for Markov held out."),
+                              ("No hardware job was run.", "Every backend result is FakeTorino simulation.")),
+                    source="docs/results/SCENARIO_NUMBERS.md, one seed (42). Blog: What changed, and what came out.")
+
+    @staticmethod
+    def reel_closing(engine):
+        return dict(headline="Everyone ran on the same mind. Role and class never reached it.",
+                    limits="A model output under stated assumptions, not fitted to history, and not a prediction. It says nothing about how any real person acted that night.")
 
     def enqueue(self, scenes):
         if not self.enabled:
@@ -390,16 +479,21 @@ class CutscenePlayer:
         self._next_if_idle()
 
     def update(self, dt):
-        if self.current is None or (self.replaying and self.replay_paused):
+        if self.replaying:
+            self.reel.update(dt)
+            if self.reel.finished:
+                self.stop_replay()
+            return
+        if self.current is None:
             return
         self.elapsed += dt
         if self.elapsed >= DURATION:
-            if self.replaying:
-                self.replay_next()
-            else:
-                self.skip()
+            self.skip()
 
     def draw(self, canvas):
+        if self.replaying:
+            self.reel.draw(canvas)
+            return
         if self.current is None:
             return
         if self._backdrop is None:
@@ -418,7 +512,7 @@ class CutscenePlayer:
         canvas.blit(clock, (28, 30))
         title = self.font_title.render(scene["caption"], True, (250, 244, 224))
         canvas.blit(title, ((WIDTH - title.get_width()) // 2, HEIGHT - bar + 16))
-        hint = self.font_small.render(self.hint_text(), True, (150, 158, 176))
+        hint = self.font_small.render("Click or press any key to skip", True, (150, 158, 176))
         canvas.blit(hint, ((WIDTH - hint.get_width()) // 2, HEIGHT - bar + 46))
         progress = min(1., self.elapsed / DURATION)
         pygame.draw.rect(canvas, (250, 214, 120), (0, HEIGHT - 4, int(WIDTH * progress), 4))

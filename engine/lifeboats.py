@@ -67,7 +67,11 @@ class Lifeboat:
 
 
 class LifeboatSchedule:
+<<<<<<< Updated upstream
     def __init__(self, world, crew_seats=CREW_SEATS, allow_all_sides=False, boarding_rule=True):
+=======
+    def __init__(self, world, boarding_rule=True):
+>>>>>>> Stashed changes
         self.boarding_rule = boarding_rule
         deck_row = world.assembly_points[0][1]
         self.crew_seats = crew_seats
@@ -96,9 +100,15 @@ class LifeboatSchedule:
             organisers = [a for a in waiting if a.role in ("officer", "evac_worker")]
             passengers = [a for a in waiting if a.role not in ("officer", "evac_worker", "captain")]
             limit = min(MAX_LOAD_PER_STEP, BASE_LOAD_PER_STEP + LOAD_PER_ORGANISER * len(organisers))
+<<<<<<< Updated upstream
             order = sorted((a for a in passengers if boat.eligible(a)),
                            key=lambda a: (a.group == "man", a.id))
             if not self.boarding_rule:  # assumption: fixed scrambled order, because id order would favour first class
+=======
+            if self.boarding_rule:
+                order = sorted((a for a in passengers if boat.eligible(a)), key=lambda a: (a.group == "man", a.id))
+            else:  # assumption: fixed scrambled order, because id order would favour first class
+>>>>>>> Stashed changes
                 order = sorted(passengers, key=lambda a: a.id * 2654435761 % 4294967296)
             # Rowers board only as the boat is about to leave, so organisers keep working.
             if t >= boat.launch_step - 1:
