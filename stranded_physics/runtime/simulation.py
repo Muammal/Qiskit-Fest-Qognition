@@ -304,7 +304,7 @@ class PackSimulation:
         self._advance(decision["action"], t_s)
         self._needs(decision["action"], event)
         record = {"t": t, "state": state, "event": event, "action": decision["action"], "probs": decision["probs"],
-                  "reason": decision["reason"], "pos_after": list(self.agent.tile),
+                  "reason": decision["reason"], "quantum": decision.get("quantum"), "pos_after": list(self.agent.tile),
                   "phase": PHASE_NAMES[int(self.pack.series("eruption.phase")[t])] if self.pack.has("eruption.phase") else "none"}
         self.steps.append(record)
         return record
@@ -354,7 +354,7 @@ class PackSimulation:
     def timeline(self) -> dict:
         volcano = self._volcano_export()
         world = self.world.export_dict()
-        world.update(seed=self.seed, mind=self.mind_type, noise_source=self.noise_source, initial_tiles=self.world.tiles,
+        world.update(seed=self.seed, mind=self.mind_type, noise_source=self.noise_source, scenario=self.pack.scenario, initial_tiles=self.world.tiles,
                      volcano=volcano, pack_hash=self.pack.content_hash, pack_verdicts=dict(self.pack.verdicts),
                      weather=self._weather_labels())
         left = next((r["t"] for r in self.steps if self.world.zones[r["pos_after"][1]][r["pos_after"][0]] != 2), None)
