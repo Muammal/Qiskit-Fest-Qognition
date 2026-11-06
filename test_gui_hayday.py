@@ -59,6 +59,18 @@ def test_ui_kit_components():
     assert counter.is_complete is True
     assert counter.get_text() == "100"
 
+    # Stepper
+    from engine.ui_kit import Stepper
+    stepper = Stepper(pygame.Rect(50, 50, 260, 38), value=100)
+    assert stepper.value == 100
+    p10_pos = stepper.btn_plus_10.orig_rect.center
+    stepper.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=p10_pos), p10_pos)
+    stepper.handle_event(pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=p10_pos), p10_pos)
+    assert stepper.value == 110
+    # Move stepper to new rect and verify child buttons realigned
+    stepper.rect = pygame.Rect(200, 200, 300, 40)
+    assert stepper.btn_plus_10.orig_rect.right == 500
+
 
 def test_resolution_adaptive_scaling():
     """Verify display scaling and integer tile sizes across standard aspect ratios."""
@@ -141,4 +153,53 @@ def test_build_ending_stats_demo_pack():
         assert stats02["steps_survived"] == len(data02["steps"])
         assert stats02["cause"] == data02["cause"]
         assert len(stats02["decisive_moment"]) > 0
+
+
+def test_config_and_ending_screens():
+    """Verify ConfigScreen and EndingCutsceneScreen interactions, layout, and rendering."""
+    import time
+    from engine.screens.config import ConfigScreen
+    from engine.screens.hub import EventChoiceHubScreen
+
+    # 1. ConfigScreen
+    started = []
+    cfg = ConfigScreen(scenario="volcano", seed=101, mind_type="quantum", on_start=lambda: started.append(True))
+    assert cfg.seed == 101
+    cfg._cycle_mind()
+    assert cfg.mind_type == "classical_mixture"
+    cfg._set_horizon(24)
+    assert cfg.max_steps == 24
+    cfg._randomize_seed()
+    assert cfg.seed != 101
+
+    surf = pygame.Surface((1600, 900))
+    cfg.draw(surf, (0, 0))
+    # Trigger start via button
+    p_start = cfg.btn_start.orig_rect.center
+    cfg.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=p_start), p_start)
+    cfg.handle_event(pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=p_start), p_start)
+    assert len(started) == 1
+
+    # 2. HubScreen single callback check
+    island_chosen = []
+    hub = EventChoiceHubScreen(on_choose_island=lambda: island_chosen.append(True), on_choose_volcano=lambda: None)
+    hub.draw(surf, (0, 0))
+    btn_pos = hub.btn_play_island.orig_rect.center
+    hub.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=btn_pos), btn_pos)
+    hub.handle_event(pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=btn_pos), btn_pos)
+    assert len(island_chosen) == 1, "Button click must invoke callback exactly once!"
+
+    # 3. EndingCutsceneScreen background comparison
+    run01_path = os.path.join("demo-pack", "run_01_heroic_survival.json")
+    if os.path.exists(run01_path):
+        with open(run01_path, "r", encoding="utf-8") as f:
+            d = json.load(f)
+        ending = EndingCutsceneScreen(d)
+        ending.draw(surf, (0, 0))
+        # Wait up to 1 second for background comparison thread to finish
+        t0 = time.time()
+        while not ending.comparison_ready and time.time() - t0 < 1.0:
+            time.sleep(0.05)
+        ending.draw(surf, (0, 0))
+
 

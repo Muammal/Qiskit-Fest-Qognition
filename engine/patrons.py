@@ -70,6 +70,7 @@ class Patron(SurvivalAgent):
         self.last_action = "rest"
         self.exposure = []
         self.left_step = None
+        self.walk_credit = 0.
 
     @property
     def label(self):
@@ -82,21 +83,24 @@ class Patron(SurvivalAgent):
         """Walk along a least-time field until this step's seconds run out."""
         if field is None:
             return
-        budget = STEP_SECONDS / 60 * ROLE_SPEED_M_S[self.role] / WALK_M_PER_S
+        self.walk_credit += STEP_SECONDS / 60 * ROLE_SPEED_M_S[self.role] / WALK_M_PER_S
         p = tuple(self.pos)
-        while budget > 0:
+        while True:
             q = field.get(p)
             if q is None:
+                self.walk_credit = 0.
                 break
             cost = world.travel_minutes(p, q)
-            if cost > budget:
+            if cost > self.walk_credit:  # unspent time carries over, so average speed matches the sourced value
                 break
-            budget -= cost
+            self.walk_credit -= cost
             p = q
         self.pos = list(p)
 
     def execute_action(self, action, world, fields, rng):
         """What each of the seven contract actions means on this site, for one 10-second step."""
+        if action not in ("hide", "build_shelter"):
+            self.walk_credit = 0.
         if action == "hide":
             if self.knows_danger:  # same rule as agent.py: with no warning, nobody knows to run
                 self.walk(world, fields["leave"])

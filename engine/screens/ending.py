@@ -283,6 +283,20 @@ class EndingCutsceneScreen:
         self.btn_switch_mind = WoodButton(pygame.Rect(0, 0, 180, 48), "Switch Mind [Q]", 18, bg_color=(120, 60, 160), callback=self.on_switch_mind)
         self.btn_menu = WoodButton(pygame.Rect(0, 0, 150, 48), "Menu [ESC]", 18, bg_color=COLOR_DARK_WOOD, callback=self.on_main_menu)
 
+        self.modal_rect = pygame.Rect(0, 0, 0, 0)
+        self._layout(1600, 900)
+
+    def _layout(self, w: int, h: int):
+        modal_w = min(Display.S(1200), int(w * 0.90))
+        modal_h = min(Display.S(740), int(h * 0.90))
+        self.modal_rect = pygame.Rect((w - modal_w) // 2, (h - modal_h) // 2, modal_w, modal_h)
+
+        btn_y = self.modal_rect.bottom - Display.S(58)
+        self.btn_replay.orig_rect = pygame.Rect(w // 2 - Display.S(360), btn_y, Display.S(160), Display.S(44))
+        self.btn_new_seed.orig_rect = pygame.Rect(w // 2 - Display.S(185), btn_y, Display.S(160), Display.S(44))
+        self.btn_switch_mind.orig_rect = pygame.Rect(w // 2 + Display.S(5), btn_y, Display.S(180), Display.S(44))
+        self.btn_menu.orig_rect = pygame.Rect(w // 2 + Display.S(205), btn_y, Display.S(150), Display.S(44))
+
     def _start_background_comparison(self, timeline_data: Dict[str, Any]):
         """Runs opposite mind model on identical seed in background thread."""
         def run_comp():
@@ -358,6 +372,7 @@ class EndingCutsceneScreen:
     def draw(self, surface: pygame.Surface, mouse_pos: Tuple[int, int] = (0, 0)):
         w = surface.get_width()
         h = surface.get_height()
+        self._layout(w, h)
 
         # 1. Background Mood Tint
         is_survived = self.data["outcome"] == "survived"
@@ -365,16 +380,13 @@ class EndingCutsceneScreen:
         surface.fill(bg_tint)
 
         # 2. Main Parchment Report Slab
-        modal_w = min(Display.S(1200), int(w * 0.90))
-        modal_h = min(Display.S(740), int(h * 0.90))
-        modal_rect = pygame.Rect((w - modal_w) // 2, (h - modal_h) // 2, modal_w, modal_h)
-
+        modal_rect = self.modal_rect
         NineSlicePanel.draw_wood_frame(surface, modal_rect, corner_radius=18)
         inner_rect = modal_rect.inflate(-Display.S(24), -Display.S(24))
         NineSlicePanel.draw_parchment_card(surface, inner_rect, corner_radius=14)
 
         # 3. Header Ribbon Title Card
-        ribbon_w = min(Display.S(640), int(modal_w * 0.70))
+        ribbon_w = min(Display.S(640), int(modal_rect.width * 0.70))
         ribbon_h = Display.S(54)
         ribbon_rect = pygame.Rect((w - ribbon_w) // 2, modal_rect.top - Display.S(14), ribbon_w, ribbon_h)
         ribbon_color = COLOR_GOLD if is_survived else (190, 45, 35)
@@ -403,17 +415,31 @@ class EndingCutsceneScreen:
         surface.blit(steps_lbl, (left_x, surv_y + Display.S(30)))
 
         # Survivors vs Deaths Row
-        icon_y = surv_y + Display.S(65)
+        icon_y = surv_y + Display.S(62)
         surv_status_str = "Status: SURVIVED & EVACUATED" if is_survived else f"Cause of Death: {str(self.data['cause']).upper()}"
         status_color = COLOR_DEEP_GREEN if is_survived else COLOR_RED
         stat_surf = OutlinedText.render(surv_status_str, 16, color=status_color)
         surface.blit(stat_surf, (left_x, icon_y))
 
         # Final Vitals Mini Cards
-        v_y = icon_y + Display.S(35)
+        v_y = icon_y + Display.S(30)
         vitals_txt = "Final Vitals: " + " | ".join([f"{k[:4].capitalize()}: {int(v * 100)}%" for k, v in self.data['final_vitals'].items() if k in ('hunger', 'thirst', 'warmth', 'safety')])
         v_surf = OutlinedText.render(vitals_txt, 14, color=COLOR_DARK_WOOD, outline_color=COLOR_PARCHMENT, outline_thickness=1)
         surface.blit(v_surf, (left_x, v_y))
+
+        # Counterfactual Comparison with Opposite Mind (Background Thread)
+        comp_y = v_y + Display.S(26)
+        opp_name = "Classical Rational" if self.data["mind_type"] == "quantum" else "Quantum Mind"
+        if self.comparison_ready and self.comparison_pct is not None:
+            comp_txt = f"Counterfactual ({opp_name}): {self.comparison_pct}% Survived"
+            comp_col = COLOR_DEEP_GREEN if self.comparison_pct >= 70.0 else (COLOR_GOLD if self.comparison_pct >= 40.0 else COLOR_RED)
+        else:
+            spin_chars = ["◓", "◑", "◒", "◐"]
+            spin = spin_chars[int(self.anim_time * 6.0) % 4]
+            comp_txt = f"Counterfactual ({opp_name}): Evaluating {spin}"
+            comp_col = (110, 80, 50)
+        comp_surf = OutlinedText.render(comp_txt, 14, color=comp_col, outline_color=COLOR_PARCHMENT, outline_thickness=1)
+        surface.blit(comp_surf, (left_x, comp_y))
 
         # Right Column: Quantum Highlights & Decisive Moment
         right_x = left_x + col_w + Display.S(18)
@@ -430,11 +456,24 @@ class EndingCutsceneScreen:
         surface.blit(q3, (right_x, q_y + Display.S(48)))
 
         # Decisive Moment Box
-        dec_y = q_y + Display.S(85)
+        dec_y = q_y + Display.S(80)
         dec_hdr = OutlinedText.render("The Decisive Moment:", 16, color=COLOR_DARK_WOOD)
         surface.blit(dec_hdr, (right_x, dec_y))
-        dec_msg = OutlinedText.render(self.data["decisive_moment"][:60], 14, color=COLOR_OUTLINE_BROWN, outline_thickness=1)
+        dec_msg = OutlinedText.render(self.data["decisive_moment"][:55], 14, color=COLOR_OUTLINE_BROWN, outline_thickness=1)
         surface.blit(dec_msg, (right_x, dec_y + Display.S(24)))
+
+        # Agent Freeze Frame Character Sprite
+        freeze_state = "happy" if is_survived else "fallen"
+        agent_sprite = AssetManager.get_agent_frame(freeze_state, base_size=Display.S(48))
+        if agent_sprite:
+            shadow_img = AssetManager.get_image("sprites/shadow_blob.png")
+            sh_w, sh_h = Display.S(44), Display.S(16)
+            fx = right_x + col_w - Display.S(60)
+            fy = dec_y + Display.S(30)
+            if shadow_img:
+                s_scaled = pygame.transform.smoothscale(shadow_img, (sh_w, sh_h))
+                surface.blit(s_scaled, (fx - sh_w // 2, fy + Display.S(16)))
+            surface.blit(agent_sprite, (fx - agent_sprite.get_width() // 2, fy - agent_sprite.get_height() // 2))
 
         # 5. Decision Timeline Strip (Bottom Section)
         strip_y = inner_rect.bottom - Display.S(135)
@@ -461,11 +500,5 @@ class EndingCutsceneScreen:
         surface.blit(ep_surf, ep_surf.get_rect(center=(w // 2, strip_y + Display.S(42))))
 
         # 6. Action Buttons Bar
-        btn_y = modal_rect.bottom - Display.S(58)
-        self.btn_replay.orig_rect = pygame.Rect(w // 2 - Display.S(360), btn_y, Display.S(160), Display.S(44))
-        self.btn_new_seed.orig_rect = pygame.Rect(w // 2 - Display.S(185), btn_y, Display.S(160), Display.S(44))
-        self.btn_switch_mind.orig_rect = pygame.Rect(w // 2 + Display.S(5), btn_y, Display.S(180), Display.S(44))
-        self.btn_menu.orig_rect = pygame.Rect(w // 2 + Display.S(205), btn_y, Display.S(150), Display.S(44))
-
         for b in (self.btn_replay, self.btn_new_seed, self.btn_switch_mind, self.btn_menu):
             b.draw(surface)
