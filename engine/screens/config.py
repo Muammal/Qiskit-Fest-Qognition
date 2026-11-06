@@ -157,7 +157,7 @@ class ConfigScreen:
         self._preview_surface = surf
         return surf
 
-    def draw(self, surface: pygame.Surface):
+    def draw(self, surface: pygame.Surface, mouse_pos: Tuple[int, int] = (0, 0)):
         w = surface.get_width()
         h = surface.get_height()
 
