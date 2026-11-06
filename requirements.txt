@@ -13,10 +13,6 @@ numpy>=1.24.0
 # Visualization & Demo Plots
 matplotlib>=3.7.0
 pygame-ce>=2.5.0
-pygame_gui>=0.6.14
-pytweening>=1.2.0
-Pillow>=10.0.0
-moderngl>=5.8.0
 
 # Testing & Verification
 pytest>=7.0.0
