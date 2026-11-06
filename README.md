@@ -256,6 +256,55 @@ python main.py --export-video --scenario titanic --seed 42 --mind quantum
 
 ---
 
+### 5. Stylized 3D Front-end (Ursina / Panda3D)
+
+A stylized, resolution-adaptive 3D front-end with an original *Hay Day*-inspired aesthetic, procedural low-poly art, uninterrupted simulation playback, and cinematic ending cut scenes.
+
+#### Installation
+```bash
+pip install -r requirements-3d.txt
+```
+*(Compatible with Python 3.10 through 3.13; tested on Python 3.13.14)*
+
+#### Running the 3D Simulation
+```bash
+# Launch interactive 3D simulation
+python play3d.py
+
+# Launch directly via main.py flag
+python main.py --3d
+
+# Set seed, mind, scenario, and quality
+python play3d.py --seed 101 --mind quantum --scenario volcano --quality high
+python play3d.py --scenario island --quality medium
+
+# Replay any recorded timeline run in 3D
+python play3d.py --replay demo-pack/run_01_heroic_survival.json
+
+# Run headless offscreen smoke test (used by tests)
+python play3d.py --smoke
+```
+
+#### 3D Controls
+- `F11`: Toggle native fullscreen / windowed
+- `SPACE`: Pause / Resume simulation (or skip ending animations)
+- `N` / `RIGHT`: Step forward one turn
+- `Q`: Switch cognitive mind (Quantum $\leftrightarrow$ Classical) and replay on same seed
+- `1` / `2` / `3`: Playback speed (1.6s, 0.8s, 0.35s per step)
+- `E`: Toggle evacuation route and hazard zone overlay
+- `TAB`: Toggle chronological action log panel
+- `R`: Restart run on current seed
+- `ESC` / `H`: Return to Event Choice Hub / Main Menu
+- `Right Mouse Button`: Orbit camera pitch and yaw
+- `Middle Mouse Button` or `WASD`: Pan camera focus target
+- `Scroll Wheel`: Distance zoom
+- `C`: Cycle camera tracking mode (`Follow` $\to$ `Overview` $\to$ `Cinematic`)
+- `V`: Toggle top-down orthographic perspective
+
+> **Screenshots**: *Screenshots of the 3D front-end will be placed in `docs/images/` upon graphical capture.*
+
+---
+
 ## Daily Integration & Verification Testing
 
 The entire repository is verified using automated test suites, physical gate runners, and Qiskit validation scripts:
