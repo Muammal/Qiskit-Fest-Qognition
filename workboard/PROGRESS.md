@@ -1,20 +1,19 @@
 # Progress
 
-**Last updated: November 6, 2026.** Task-level status lives in [tasks.csv](tasks.csv).
+**Last updated: November 5, 2026.** Task-level status lives in [tasks.csv](tasks.csv).
 
 ## Where we are
 
 | Track | Status | Details |
 |---|---|---|
 | **Tech A (`mind/`)** | **Built and tested** | 2-qubit deliberation unitary + **6 quantum cognition models adapted from published papers** (`mind/cognition_models.py`), Qiskit 2.x circuits, 48 passing tests |
-| **Tech B (`stranded_physics/`, `disaster_data/`, `contracts.py`)** | **Verified with Data-v1 (`22 / 22 PASS`)** | 49 datasets registered in 14 category `datasets.toml` files, 20 Pint parameters in `params.toml`, 19 raw physics assets extracted from release `data-v1`, 9 stand-in solvers + physical domain solvers, Tobler locomotion, BLS ATUS `data/priors.json`, 4-direction Grover DTQW |
-| **Tech C (`engine/`, `main.py`)** | **Built, verified & exported across 5 scenarios** | 5 Scenarios (`island`, `volcano`, `titanic`, `pompeii`, `waterloo`), counterfactual `scripted_events`, 3-mind selector, **1600×900 Clash / Hay Day Tactical UI**, Slow-Mo/Fast-Forward controls, and MP4 video / data exporters |
-| **In-game scenario builder (`engine/builder.py`, `stranded_physics/builder_screen.py`)** | **Built** | See [ENTITIES.md](ENTITIES.md). In-GUI interactive level editor, custom hazard placement, and multi-agent pack simulation |
-| **Real St Vincent engine (`stranded_physics/domains/`)** | **Built end to end with Data-v1 assets** | See [ENGINE_STATUS.md](ENGINE_STATUS.md). All 22 required physical gates PASS |
-| **Product D (`site/index.html`)** | **Built with multi-scenario presets** | Client-side HTML5 40×40 replay canvas, Bloch circle & 6-model live Quantum Cognition Inspector |
+| **Tech B (`stranded_physics/`, `disaster_data/`, `contracts.py`)** | **Records done; physics not done** (14/14 record checks pass (settings and data files load; the physics is not tested against reality)) | 49 datasets registered in 14 category `datasets.toml` files, 20 Pint parameters in `params.toml`, 9 simplified stand-in solvers in `stranded_physics/scenarios.py`, not real St Vincent physics, Tobler locomotion, BLS ATUS `data/priors.json`, 4-direction Grover DTQW |
+| **Tech C (`engine/`, `main.py`)** | **Built; nobody has played a full run by hand yet** | Dual-scenario simulator (`volcano` & `island`), counterfactual `scripted_events`, 3-mind selector, and **1600×900 Clash of Clans / Hay Day Village UI** |
+| **In-game scenario builder (`stranded_physics/builder_screen.py`)** | **Built** | See [ENTITIES.md](ENTITIES.md). Every source of every kind can be chosen. Plays one person at a time |
+| **Real St Vincent engine (`stranded_physics/domains/`)** | **Built end to end; agrees with 1 of 3 blind checks** | See [ENGINE_STATUS.md](ENGINE_STATUS.md). Being built doesn't mean being right |
+| **Product D (`site/index.html`)** | **Built; not yet hosted, and no curated runs bundled** | Client-side HTML5 40×40 replay canvas, Bloch circle & 6-model live Quantum Cognition Inspector |
 
 ## Verification Summary
-- **Unified Pytest Suite**: `816 passed, 3 skipped` across the entire codebase (100% pass rate in 13 min 19 sec)
-- **Physics Category Gates (`python -m stranded_physics.gates required`)**: `22 / 22 PASS` (recorded in [CLAIMS.md](CLAIMS.md))
+- **Unified Pytest Suite**: `158 passed` (`test_contracts_and_engine.py`, `mind/tests`, `stranded_physics/core`)
+- **Physics Category Gates (`python -m stranded_physics.gates required`)**: `14 / 14` record checks pass (files load; physics not tested) (recorded in [CLAIMS.md](CLAIMS.md))
 - **Category Data & Parameter Catalog (`python -m stranded_physics.catalog`)**: 49 datasets and 20 Pint-checked parameters across 14 categories in [CATALOG.md](CATALOG.md)
-- **Tech A Validation Suite (`python -m mind.experiments.validate`)**: `PASS` (`any_failed=False`)

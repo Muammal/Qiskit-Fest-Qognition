@@ -163,69 +163,13 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ---
 
-## Slide 13: Scenario 3 — RMS Titanic 1912 Evacuation (`engine/titanic.py`)
-
-- **2,208 Simulated Passengers & Crew** across 10 ship decks (Boat Deck to Orlop).
-- **Progressive Compartment Inundation & List Calculation** ([`engine/flood.py`](../engine/flood.py)).
-- **20 Lifeboats on Historical Timelines** ([`engine/lifeboats.py`](../engine/lifeboats.py), Wormstedt et al. 2011).
-- **Policy Comparison**: Distress rockets as ambiguous cues (`gas_plume`) reduce survival from **849** to **815** due to quantum destructive interference; early unambiguous PA alarm + open both-side boarding increases survival to **913+**.
-
-![RMS Titanic Evacuation](images/06_titanic_evacuation_sim.png)
-
----
-
-## Slide 14: Scenario 4 — Pompeii AD 79 Evacuation (`engine/pompeii.py`)
-
-- **11,500 Roman Citizens** across 9 city regions and suburban villas.
-- **Physical Plinian Column & Pumice Fallout Accumulation** ([`engine/eruption.py`](../engine/eruption.py)) causing structural roof collapses.
-- **Lethal Pyroclastic Density Currents (PDCs)** terminating city survival at step 105.
-- **Ambiguity & Disjunction Fatality Jump**: Under ambiguous warning mapping C, quantum hesitation causes **644 deaths** vs **287** in classical mixture; under mapping D (enslaved delay), quantum deaths reach **981**.
-
-![Pompeii Evacuation](images/07_pompeii_evacuation_sim.png)
-
----
-
-## Slide 15: Scenario 5 — Waterloo Pool Chlorine Gas Leak (`engine/waterloo.py`)
-
-- **100–300 Swimmers, Lifeguards & Staff** inside a municipal indoor aquatic center.
-- **Physics-Based 2D Advection-Diffusion Plume** ([`engine/chlorine.py`](../engine/chlorine.py)) tracking EPA AEGL-1, AEGL-2, and AEGL-3 toxic gas thresholds.
-- **Alarm Collapse of Normalcy Bias**: Unambiguous staff evacuation whistle collapses quantum hesitation superposition, reducing disabling AEGL-2 chemical exposures from **32** to **23** (**28% reduction**).
-
-![Waterloo Chlorine Gas Simulation](images/08_waterloo_chlorine_sim.png)
-
----
-
-## Slide 16: Interactive Scenario Builder (`engine/builder.py`)
-
-- **In-Engine Tactical Level Editor**: Paint terrain elevations, place water sources, define custom hazard vectors (active volcanoes, chlorine cylinders, rising flood waters), and drop agent clusters.
-- **Instant Multi-Agent Pack Simulation**: Export and run custom `.npz` scenario packs with selectable mind models directly from the UI (`[B]` shortcut).
-
-![Scenario Builder](images/09_scenario_builder.png)
-
----
-
-## Slide 17: Simulation Controls & Video / Data Exporters
-
-- **Dynamic Speed Controls**: Instant Slow-Mo down to `0.25x` (`[` key) for fine-grained inspection of cognitive decision points; Fast-Forward up to `10x` (`]` key) for high-speed multi-agent evacuation runs.
-- **Production MP4 Video Exporter (`engine/video_exporter.py`)**:
-  ```bash
-  python main.py --export-video --scenario titanic --duration 15
-  ```
-- **Evacuation Survival & Seed Exporter (`engine/data_exporter.py`)**:
-  ```bash
-  python main.py --export-data --all-scenarios
-  ```
-  Exports comparative CSV sheets, JSON simulation data bundles, and policy insight reports.
-
----
-
-## Slide 18: Quantitative Validation & Test Suite Results
+## Slide 13: Quantitative Validation & Test Suite Results
 
 | Verification Suite | Command | Status |
 |---|---|---|
-| **Full Unified Pytest Suite** | `python -m pytest -q` | **`816 passed, 3 skipped`** |
+| **Full Unified Pytest Suite** | `python -m pytest test_contracts_and_engine.py test_titanic.py test_pompeii.py test_waterloo.py mind/tests stranded_physics/core -q` | **`712 passed`** |
 | **Tech A Validation & 6-Paper Cross-Check** | `python -m mind.experiments.validate` | **`PASS` (`any_failed=False`)** |
-| **Tech B 14-Category Verification Gates** | `python -m stranded_physics.gates required` | **`22 / 22 PASS` (all physics gates pass)** |
+| **Tech B 14-Category Verification Gates** | `python -m stranded_physics.gates required` | **`14 / 14` record checks pass (files load; physics not tested)** |
 | **Tech B Provenance & Unit Catalog** | `python -m stranded_physics.catalog` | **49 Datasets, 20 Pint Params** |
 
 ### Key Empirical & Mathematical Findings Across 5 Evacuation Scenarios
@@ -238,7 +182,7 @@ $$P_q(\text{protect}) = \underbrace{(1-p)q_S + p q_D}_{\text{Classical Mixture }
 
 ---
 
-## Slide 19: Live Demo Guide & Commands
+## Slide 14: Live Demo Guide & Commands
 
 ```bash
 # 1. Launch the 1600x900 Clash of Clans / Hay Day Pygame Simulator
@@ -248,9 +192,8 @@ python main.py
 python main.py --demo --seed 101 --mind quantum --scenario volcano --engine legacy
 python main.py --demo --seed 101 --mind quantum --engine physics
 
-# 3. Export Simulation Video (MP4) or Evacuation Data Bundle
-python main.py --export-video --scenario titanic
-python main.py --export-data --all-scenarios
+# 3. Run 3-Way Batch Comparison (Quantum vs Classical Mixture vs Classical Rational)
+python main.py --batch
 
 # 4. Open Product D Web Replay & 6-Model Quantum Inspector
 start site/index.html

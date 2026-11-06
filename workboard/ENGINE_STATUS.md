@@ -1,6 +1,6 @@
 # Engine status
 
-**Updated November 6, 2026.** The engine is built end to end: every kind in [ENTITIES.md](ENTITIES.md) has its sources, and scenarios run on real or generated land. With the import and extraction of all 19 raw physics datasets from GitHub Release [`data-v1`](https://github.com/Muammal/Qiskit-Fest-Qognition/releases/tag/data-v1), **all 22 required physical verification gates pass (`22 / 22 PASS`)**, and the complete test suite passes at **816 passed, 3 skipped**. On St Vincent 2021 it agrees with one of three blind real-world checks. Rerun the full table with:
+**Updated November 5, 2026.** The engine is built end to end: every kind in [ENTITIES.md](ENTITIES.md) has its sources, and scenarios run on real or generated land. **Being built isn't the same as being right.** On St Vincent 2021 it agrees with one of three blind real-world checks. Rerun the full table with:
 
 ```bash
 python -m stranded_physics.check stranded_physics/scenario_cards/st_vincent_2021.toml

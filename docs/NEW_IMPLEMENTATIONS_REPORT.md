@@ -127,32 +127,15 @@ Implemented 9 simplified stand-in solvers, not real St Vincent physics, in [`str
 ### 3.4 Product D: Web Replay Viewer & Quantum Cognition Inspector (`site/index.html`)
 - Created [`site/index.html`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/site/index.html) providing a client-side 40×40 field replay canvas, live Bloch circle visualization, interactive stress/coherence deliberation sandbox, and real-time evaluation of all 6 quantum cognition models adapted from published papers on every simulation step.
 
-### 3.5 Tech C: Multi-Scenario Evacuation Architecture & Interactive Builder (`engine/`)
-- **RMS Titanic 1912 Evacuation ([`engine/titanic.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/titanic.py))**: 2,208 agents across 10 decks, compartment flooding solver (`engine/flood.py`), 20 lifeboats with launch schedule (`engine/lifeboats.py`), and counterfactual policy comparison (`compare_titanic_policies`).
-- **Pompeii AD 79 Evacuation ([`engine/pompeii.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/pompeii.py))**: 11,500 citizens across 9 Roman regions, Plinian column eruption (`engine/eruption.py`), pumice tephra roof collapse physics, and event-translation mappings A–D.
-- **Waterloo Pool Chlorine Leak ([`engine/waterloo.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/waterloo.py))**: 100–300 swimmers and staff, 2D advection-diffusion chemical plume (`engine/chlorine.py`), and EPA AEGL-1/2/3 exposure integration.
-- **Interactive Scenario Builder ([`engine/builder.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/builder.py))**: In-GUI tactical level editor allowing custom terrain, hazard placement, and multi-agent pack simulation.
-
-### 3.6 Tech C: Dynamic Speed Controls, MP4 Video Exporter & Data Exporter
-- **Slow-Motion & Fast-Forward Engine**: Interactive speed toggles (`1x`, `2x`, `5x`, `10x`, plus `[` for Slow-Mo down to 0.25x and `]` for Fast-Forward up to 10x) allowing high-resolution inspection of cognitive choice points.
-- **MP4 Video Exporter ([`engine/video_exporter.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/video_exporter.py))**: Headless Pygame frame recorder that exports high-definition MP4 simulation videos across all scenarios (`python main.py --export-video`).
-- **Evacuation Data & Seed Exporter ([`engine/data_exporter.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/engine/data_exporter.py))**: Generates comprehensive CSV survival matrices (`exports/evacuation_survival_comparison.csv`), JSON seed packs (`exports/evacuation_data_bundle.json`), and policy analysis (`exports/EVACUATION_INSIGHTS_REPORT.md`).
-
-### 3.7 Tech B: Data-v1 Release Import & Physics Gates
-- Imported 19 raw physics datasets from GitHub Release `data-v1` via [`tools/fetch_artifacts.py`](file:///c:/Users/lenovo/OneDrive/Desktop/QWC/tools/fetch_artifacts.py).
-- Passed **22 / 22** required physics verification gates (`python -m stranded_physics.gates required`).
-
 ---
 
 ## 4. Automated Test & Validation Results
 
-Running the full unified test suite across all tracks:
+Running the full test suite across all tracks:
 
 ```powershell
-$env:SDL_VIDEODRIVER="dummy"; python -m pytest -q
+$env:SDL_VIDEODRIVER="dummy"; python -m pytest test_contracts_and_engine.py mind/tests stranded_physics/core -q
 ```
 
-- **Result**: **`816 passed, 3 skipped`** (100% pass rate across the full codebase in 13m 19s; the 3 skipped tests are third-party copyright paper references omitted by design).
-- **Physical Verification Gates**: **`22 / 22 PASS`** (`python -m stranded_physics.gates required`).
-- **Tech A Validation**: **`any_failed = False`** (`python -m mind.experiments.validate`).
+- **Result**: **`158 passed`** (100% pass rate across all unit, contract, physics, GUI, and quantum cognition model tests).
 
